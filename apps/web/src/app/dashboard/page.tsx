@@ -1,7 +1,8 @@
-import { authClient } from "@/lib/auth-client";
-import { redirect } from "next/navigation";
-import Dashboard from "./dashboard";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { Chat } from "@/components/chat/chat";
+import { KanbanBoard } from "@/components/kanban-board";
+import { authClient } from "@/lib/auth-client";
 
 export default async function DashboardPage() {
 	const session = await authClient.getSession({
@@ -21,10 +22,9 @@ export default async function DashboardPage() {
 	});
 
 	return (
-		<div>
-			<h1>Dashboard</h1>
-			<p>Welcome {session.data.user.name}</p>
-			<Dashboard session={session.data} customerState={customerState} />
+		<div className="mx-6 mt-6">
+			<KanbanBoard />
+			<Chat />
 		</div>
 	);
 }
