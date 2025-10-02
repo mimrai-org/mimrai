@@ -1,15 +1,20 @@
 import { and, eq, type SQL } from "drizzle-orm";
-import type {
-	CreateColumnInput,
-	DeleteColumnInput,
-	GetColumnsInput,
-	UpdateColumnInput,
-} from "@/schemas/columns";
+import type { DeleteColumnInput, UpdateColumnInput } from "@/schemas/columns";
 import { db } from "..";
 import { columns } from "../schema/schemas";
 
-export const getColumns = async ({ pageSize, cursor }: GetColumnsInput) => {
+export const getColumns = async ({
+	pageSize,
+	cursor,
+	teamId,
+}: {
+	pageSize: number;
+	cursor?: string;
+	teamId?: string;
+}) => {
 	const whereConditions: SQL[] = [];
+
+	if (teamId) whereConditions.push(eq(columns.teamId, teamId));
 
 	const query = db
 		.select({
@@ -44,7 +49,12 @@ export const getColumns = async ({ pageSize, cursor }: GetColumnsInput) => {
 	};
 };
 
-export const createColumn = async (input: CreateColumnInput) => {
+export const createColumn = async (input: {
+	name: string;
+	description?: string;
+	order?: number;
+	teamId: string;
+}) => {
 	const [column] = await db
 		.insert(columns)
 		.values({
@@ -59,10 +69,10 @@ export const createColumn = async (input: CreateColumnInput) => {
 	return column;
 };
 
-export const deleteColumn = async (input: DeleteColumnInput) => {
+export const deleteColumn = async (input: { id: string; teamId: string }) => {
 	const [column] = await db
 		.delete(columns)
-		.where(eq(columns.id, input.id))
+		.where(and(eq(columns.id, input.id), eq(columns.teamId, input.teamId)))
 		.returning();
 
 	if (!column) {
@@ -72,13 +82,19 @@ export const deleteColumn = async (input: DeleteColumnInput) => {
 	return column;
 };
 
-export const updateColumn = async (input: UpdateColumnInput) => {
+export const updateColumn = async (input: {
+	id: string;
+	name?: string;
+	description?: string;
+	order?: number;
+	teamId: string;
+}) => {
 	const [column] = await db
 		.update(columns)
 		.set({
 			...input,
 		})
-		.where(eq(columns.id, input.id))
+		.where(and(eq(columns.id, input.id), eq(columns.teamId, input.teamId)))
 		.returning();
 
 	if (!column) {

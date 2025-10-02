@@ -17,3 +17,7 @@ export const chatMessageSchema = messageSchema;
 export const chatResponseSchema = z.object({
 	messages: z.array(messageSchema),
 });
+
+export const getChatSchema = z.object({
+	chatId: z.string(),
+});

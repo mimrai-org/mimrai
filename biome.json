@@ -37,7 +37,8 @@
 		"rules": {
 			"recommended": true,
 			"correctness": {
-				"useExhaustiveDependencies": "info"
+				"useExhaustiveDependencies": "info",
+				"noUnusedImports": "warn"
 			},
 			"nursery": {
 				"useSortedClasses": {
@@ -58,7 +59,8 @@
 				"noUnusedTemplateLiteral": "error",
 				"useNumberNamespace": "error",
 				"noInferrableTypes": "error",
-				"noUselessElse": "error"
+				"noUselessElse": "error",
+				"noNonNullAssertion": "off"
 			}
 		}
 	},

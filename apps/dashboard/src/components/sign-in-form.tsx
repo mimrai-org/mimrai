@@ -1,0 +1,109 @@
+"use client";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import z from "zod/v3";
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@/components/ui/form";
+import { useZodForm } from "@/hooks/use-zod-form";
+import { authClient } from "@/lib/auth-client";
+import Loader from "./loader";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+
+const schema = z.object({
+	email: z.string().email("Invalid email address"),
+	password: z.string().min(8, "Password must be at least 8 characters"),
+});
+
+export default function SignInForm() {
+	const router = useRouter();
+	const { isPending } = authClient.useSession();
+
+	const form = useZodForm(schema, {
+		defaultValues: {
+			email: "",
+			password: "",
+		},
+	});
+
+	const handleSubmit = async (data: z.infer<typeof schema>) => {
+		await authClient.signIn.email(
+			{
+				email: data.email,
+				password: data.password,
+			},
+			{
+				onSuccess: () => {
+					router.push("/dashboard");
+					toast.success("Sign in successful");
+				},
+				onError: (error) => {
+					toast.error(error.error.message || error.error.statusText);
+				},
+			},
+		);
+	};
+
+	if (isPending) {
+		return <Loader />;
+	}
+
+	return (
+		<div className="mx-auto mt-10 w-full max-w-md p-6">
+			<h1 className="mb-6 text-center font-medium text-2xl">Welcome Back</h1>
+			<Form {...form}>
+				<form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+					<FormField
+						control={form.control}
+						name="email"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Email</FormLabel>
+								<FormControl>
+									<Input placeholder="jhondoe@example.com" {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name="password"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Password</FormLabel>
+								<FormControl>
+									<Input
+										type="password"
+										placeholder="Your password"
+										{...field}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<Button type="submit" className="w-full">
+						Sign In
+					</Button>
+				</form>
+			</Form>
+
+			<div className="mt-4 text-center">
+				<Button
+					variant="link"
+					onClick={() => router.push("/sign-up")}
+					className="text-indigo-600 hover:text-indigo-800"
+				>
+					Need an account? Sign Up
+				</Button>
+			</div>
+		</div>
+	);
+}

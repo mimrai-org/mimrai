@@ -1,0 +1,35 @@
+import { validateMattermost } from "./mattermost/validate";
+import {
+	type IntegrationConfig,
+	type IntegrationName,
+	integrationsRegistry,
+} from "./registry";
+
+export const validateIntegration = async (
+	type: IntegrationName,
+	config: IntegrationConfig,
+) => {
+	try {
+		const registry = integrationsRegistry[type];
+
+		if (!registry) {
+			throw new Error("Unsupported integration type");
+		}
+
+		const safeConfig = registry.configSchema.safeParse(config);
+
+		if (!safeConfig.success) {
+			throw new Error(`Invalid configuration: ${safeConfig.error.message}`);
+		}
+
+		switch (type) {
+			case "mattermost":
+				return await validateMattermost(safeConfig.data);
+			default:
+				throw new Error("Validation not implemented for this integration type");
+		}
+	} catch (error) {
+		console.error(error);
+		return false;
+	}
+};

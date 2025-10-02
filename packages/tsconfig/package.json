@@ -1,5 +1,5 @@
 {
-	"name": "@tywin/tsconfig",
+	"name": "@mimir/tsconfig",
 	"private": true,
 	"version": "1.0.0",
 	"files": [

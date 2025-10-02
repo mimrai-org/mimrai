@@ -34,6 +34,7 @@ export const saveChat = async (data: {
 	const [chat] = await db
 		.insert(chats)
 		.values({
+			id: data.chatId,
 			teamId: data.teamId,
 			userId: data.userId,
 			title: data.title,

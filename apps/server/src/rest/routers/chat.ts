@@ -1,5 +1,5 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { logger } from "@tywin/logger";
+import { logger } from "@mimir/logger";
 import {
 	convertToModelMessages,
 	createUIMessageStream,
@@ -42,6 +42,7 @@ app.post("/", async (c) => {
 	const { message, id, country, timezone, city } = validationresult.data;
 	const session = c.get("session");
 	const teamId = c.get("teamId");
+
 	const userId = session.userId;
 
 	const [userContext, previousMessages] = await Promise.all([
@@ -52,8 +53,8 @@ app.post("/", async (c) => {
 			city,
 			timezone,
 		}),
-		getChatById(id, "default"),
-	]); // TODO: use teamId from context
+		getChatById(id, teamId),
+	]);
 
 	const messageMetadata = message.metadata as ChatMessageMetadata;
 	const isToolCallMessage = messageMetadata?.toolCall;
@@ -178,7 +179,7 @@ app.post("/", async (c) => {
 				}
 
 				const result = streamText({
-					model: "google/gemini-2.5-turbo",
+					model: "openai/gpt-4o",
 					system: generateSystemPrompt(
 						userContext,
 						isToolCallMessage,

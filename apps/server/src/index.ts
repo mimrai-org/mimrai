@@ -1,22 +1,38 @@
 import "dotenv/config";
 import { trpcServer } from "@hono/trpc-server";
+import { OpenAPIHono } from "@hono/zod-openapi";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
+import { secureHeaders } from "hono/secure-headers";
 import { auth } from "./lib/auth";
 import { createContext } from "./lib/context";
-import { appRouter } from "./routers/index";
+import { initIntegrations } from "./lib/integrations/init";
+import { routers } from "./rest/routers";
+import { appRouter } from "./trpc/routers/index";
 
-const app = new Hono();
+const app = new OpenAPIHono();
 
 app.use(logger());
+app.use(secureHeaders());
 app.use(
-	"/*",
+	"*",
 	cors({
-		origin: process.env.CORS_ORIGIN || "",
-		allowMethods: ["GET", "POST", "OPTIONS"],
-		allowHeaders: ["Content-Type", "Authorization"],
+		origin: process.env.ALLOWED_API_ORIGINS?.split(",") ?? [],
+		allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+		allowHeaders: [
+			"Authorization",
+			"Content-Type",
+			"accept-language",
+			"user-agent",
+			"x-team-id",
+			"x-user-locale",
+			"x-user-timezone",
+			"x-user-country",
+		],
+		exposeHeaders: ["Content-Length"],
 		credentials: true,
+		maxAge: 86400,
 	}),
 );
 
@@ -32,8 +48,19 @@ app.use(
 	}),
 );
 
-app.get("/", (c) => {
-	return c.text("OK");
-});
+app.route("/api", routers);
 
-export default app;
+initIntegrations()
+	.catch((err) => {
+		console.error("Error initializing integrations:", err);
+		process.exit(1);
+	})
+	.then(() => {
+		console.log("All integrations initialized");
+	});
+
+export default {
+	port: process.env.PORT ? Number(process.env.PORT) : 3003,
+	fetch: app.fetch,
+	host: "::",
+};

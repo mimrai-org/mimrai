@@ -1,0 +1,77 @@
+"use client";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { ChevronsUpDownIcon, PlusIcon } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { useChatParams } from "@/hooks/use-chat-params";
+import { useTeamParams } from "@/hooks/use-team-params";
+import { useUser } from "@/hooks/use-user";
+import { queryClient, trpc } from "@/utils/trpc";
+import { Avatar, AvatarFallback } from "./ui/avatar";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+
+export const TeamSwitcher = () => {
+	const user = useUser();
+	const router = useRouter();
+	const pathname = usePathname();
+	const { setParams } = useTeamParams();
+	const { setParams: setChatParams } = useChatParams();
+	const { data: teams } = useQuery(trpc.teams.getAvailable.queryOptions());
+
+	const { mutateAsync: switchTeamAsync } = useMutation(
+		trpc.users.switchTeam.mutationOptions(),
+	);
+
+	const switchTeam = async (teamId: string) => {
+		const newUser = await switchTeamAsync({ teamId });
+		setChatParams(null);
+		window.location.reload();
+		// queryClient.setQueryData(trpc.users.getCurrent.queryKey(), newUser);
+		// queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
+	};
+
+	return (
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>
+				<div className="flex cursor-pointer items-center gap-2">
+					<Avatar className="size-6 text-xs">
+						<AvatarFallback className="bg-primary text-primary-foreground">
+							{user?.team.name.charAt(0).toUpperCase()}
+						</AvatarFallback>
+					</Avatar>
+					<div className="flex items-center justify-between gap-1">
+						<div className="text-sm">{user?.team.name}</div>
+						<ChevronsUpDownIcon className="size-3.5" />
+					</div>
+				</div>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent
+				className="w-48"
+				side="bottom"
+				align="start"
+				sideOffset={10}
+			>
+				{teams?.map((team) => (
+					<DropdownMenuItem key={team.id} onClick={() => switchTeam(team.id)}>
+						<Avatar className="size-6">
+							<AvatarFallback className="bg-primary text-primary-foreground">
+								{team.name.charAt(0).toUpperCase()}
+							</AvatarFallback>
+						</Avatar>
+						{team.name}
+					</DropdownMenuItem>
+				))}
+				<DropdownMenuSeparator />
+				<DropdownMenuItem onClick={() => setParams({ createTeam: true })}>
+					<PlusIcon className="size-4" />
+					Create Team
+				</DropdownMenuItem>
+			</DropdownMenuContent>
+		</DropdownMenu>
+	);
+};

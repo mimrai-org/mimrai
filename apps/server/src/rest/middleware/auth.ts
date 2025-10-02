@@ -1,25 +1,11 @@
+import type { Session } from "better-auth";
 import type { MiddlewareHandler } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { getUserById } from "@/db/queries/users";
 import { auth } from "@/lib/auth";
+import type { Context } from "../types";
 
 export const withAuth: MiddlewareHandler = async (c, next) => {
-	const authHeader = c.req.header("Authorization");
-
-	if (!authHeader) {
-		throw new HTTPException(401, { message: "Authorization header required" });
-	}
-
-	const [scheme, token] = authHeader.split(" ");
-
-	if (scheme !== "Bearer") {
-		throw new HTTPException(401, { message: "Invalid authorization scheme" });
-	}
-
-	if (!token) {
-		throw new HTTPException(401, { message: "Token required" });
-	}
-
 	const authSession = await auth.api.getSession({
 		headers: c.req.raw.headers,
 	});
@@ -33,17 +19,12 @@ export const withAuth: MiddlewareHandler = async (c, next) => {
 			throw new HTTPException(401, { message: "User not found" });
 		}
 
-		const session = {
-			teamId: user.teamId,
-			user: {
-				id: user.id,
-				email: user.email,
-				full_name: user.name,
-			},
+		const session: Session = {
+			...authSession.session,
 		};
 
 		c.set("session", session);
-		c.set("teamId", session.teamId);
+		c.set("teamId", user.teamId);
 		// Grant all scopes for authenticated users via Supabase
 		// c.set("scopes", expandScopes(["apis.all"]));
 

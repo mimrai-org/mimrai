@@ -10,6 +10,7 @@ export interface ChatUserContext {
 	userId: string;
 	teamId: string;
 	teamName?: string | null;
+	teamDescription?: string | null;
 	fullName?: string | null;
 	avatarUrl?: string | null;
 	countryCode?: string | null;

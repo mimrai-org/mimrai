@@ -19,6 +19,7 @@ export const getTasks = async ({
 		whereConditions.push(inArray(tasks.assigneeId, input.assigneeId));
 	input.columnId &&
 		whereConditions.push(inArray(tasks.columnId, input.columnId));
+	input.teamId && whereConditions.push(eq(tasks.teamId, input.teamId));
 
 	const query = db
 		.select({
@@ -80,9 +81,15 @@ export const createTask = async (input: CreateTaskInput) => {
 };
 
 export const deleteTask = async (input: DeleteTaskInput) => {
+	const whereClause: SQL[] = [eq(tasks.id, input.id)];
+
+	if (input.teamId) {
+		whereClause.push(eq(tasks.teamId, input.teamId));
+	}
+
 	const [task] = await db
 		.delete(tasks)
-		.where(eq(tasks.id, input.id))
+		.where(and(...whereClause))
 		.returning();
 
 	if (!task) {
@@ -93,18 +100,39 @@ export const deleteTask = async (input: DeleteTaskInput) => {
 };
 
 export const updateTask = async (input: UpdateTaskInput) => {
+	const whereClause: SQL[] = [eq(tasks.id, input.id)];
+
+	if (input.teamId) {
+		whereClause.push(eq(tasks.teamId, input.teamId));
+	}
+
 	const [task] = await db
 		.update(tasks)
 		.set({
 			...input,
 			updatedAt: new Date().toISOString(),
 		})
-		.where(eq(tasks.id, input.id))
+		.where(and(...whereClause))
 		.returning();
 
 	if (!task) {
 		throw new Error("Failed to update task");
 	}
+
+	return task;
+};
+
+export const getTaskById = async (id: string, teamId?: string) => {
+	const whereClause: SQL[] = [eq(tasks.id, id)];
+
+	if (teamId) {
+		whereClause.push(eq(tasks.teamId, teamId));
+	}
+	const [task] = await db
+		.select()
+		.from(tasks)
+		.where(and(...whereClause))
+		.limit(1);
 
 	return task;
 };

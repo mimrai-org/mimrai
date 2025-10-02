@@ -1,0 +1,85 @@
+"use client";
+import { useMutation } from "@tanstack/react-query";
+import { RocketIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import z from "zod/v3";
+import { Button } from "@/components/ui/button";
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useZodForm } from "@/hooks/use-zod-form";
+import { trpc } from "@/utils/trpc";
+
+const schema = z.object({
+	name: z.string().min(2, "Name must be at least 2 characters"),
+	description: z.string().optional(),
+});
+
+export default function Page() {
+	const router = useRouter();
+	const form = useZodForm(schema, {
+		defaultValues: {
+			name: "",
+			description: "",
+		},
+	});
+
+	const { mutateAsync: createTeam } = useMutation(
+		trpc.teams.create.mutationOptions(),
+	);
+
+	const handleSubmit = async (data: z.infer<typeof schema>) => {
+		await createTeam(data);
+		router.push("/dashboard");
+	};
+
+	return (
+		<div className="mx-auto my-auto">
+			<div className="mb-6 max-w-md">
+				<h1 className="mb-1 font-medium text-2xl">Create your team</h1>
+				<p className="text-balance text-muted-foreground text-sm">
+					The team is the core unit of collaboration in Mimir. You can always
+					change this later.
+				</p>
+			</div>
+			<Form {...form}>
+				<form onSubmit={form.handleSubmit(handleSubmit)} className="max-w-md">
+					<FormField
+						control={form.control}
+						name="name"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Name</FormLabel>
+								<FormControl>
+									<Input placeholder="Acme Inc." {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+
+					<div className="mt-6 flex justify-start">
+						<Button
+							className="flex w-32 items-center justify-between"
+							disabled={
+								!form.formState.isValid ||
+								form.formState.isSubmitting ||
+								form.formState.isSubmitted
+							}
+							type="submit"
+						>
+							Dive in
+							<RocketIcon />
+						</Button>
+					</div>
+				</form>
+			</Form>
+		</div>
+	);
+}

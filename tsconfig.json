@@ -1,0 +1,3 @@
+{
+	"extends": "@mimir/tsconfig/base.json"
+}

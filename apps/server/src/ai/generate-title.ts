@@ -30,7 +30,7 @@ export const generateTitle = async ({
 		const tzDate = new TZDate(new Date(), userTimezone);
 
 		const titleResult = await generateObject({
-			model: "google/gemini-1",
+			model: "google/gemini-2.5-flash",
 			schema: z.object({
 				title: z.string().describe("The title of the chat"),
 			}),

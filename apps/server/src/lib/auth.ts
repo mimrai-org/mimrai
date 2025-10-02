@@ -1,6 +1,7 @@
 import { checkout, polar, portal } from "@polar-sh/better-auth";
 import { type BetterAuthOptions, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { users } from "@/db/schema/schemas";
 import { db } from "../db";
 import * as schema from "../db/schema/auth";
 import { polarClient } from "./payments";
@@ -8,12 +9,26 @@ import { polarClient } from "./payments";
 export const auth = betterAuth<BetterAuthOptions>({
 	database: drizzleAdapter(db, {
 		provider: "pg",
-
-		schema: schema,
+		schema: {
+			...schema,
+			users,
+		},
 	}),
-	trustedOrigins: [process.env.CORS_ORIGIN || ""],
+	trustedOrigins: (process.env.ALLOWED_API_ORIGINS || "").split(","),
 	emailAndPassword: {
 		enabled: true,
+	},
+	user: {
+		modelName: "users",
+		additionalFields: {
+			teamId: {
+				type: "string",
+				required: false,
+				returned: true,
+				input: false,
+				fieldName: "teamId",
+			},
+		},
 	},
 	advanced: {
 		defaultCookieAttributes: {
