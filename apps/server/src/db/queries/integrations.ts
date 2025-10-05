@@ -7,7 +7,12 @@ import {
 	integrationsRegistry,
 } from "@/lib/integrations/registry";
 import { db } from "..";
-import { integrationLogs, integrations } from "../schema/schemas";
+import {
+	integrationLogs,
+	integrations,
+	integrationUserLink,
+	users,
+} from "../schema/schemas";
 
 export const installIntegration = async ({
 	type,
@@ -210,4 +215,67 @@ export const updateIntegration = async ({
 	await initIntegrationSingle(updated);
 
 	return updated;
+};
+
+export const getLinkedUsers = async ({
+	integrationId,
+	teamId,
+	cursor,
+	pageSize = 20,
+}: {
+	integrationId: string;
+	teamId?: string;
+	cursor?: string;
+	pageSize?: number;
+}) => {
+	const whereClause: SQL[] = [
+		eq(integrationUserLink.integrationId, integrationId),
+	];
+
+	if (teamId) whereClause.push(eq(integrations.teamId, teamId));
+
+	const query = db
+		.select({
+			id: integrationUserLink.id,
+			externalUserId: integrationUserLink.externalUserId,
+			externalUserName: integrationUserLink.externalUserName,
+			userId: integrationUserLink.userId,
+			user: {
+				name: users.name,
+				email: users.email,
+			},
+			integrationId: integrations.id,
+			type: integrations.type,
+			name: integrations.name,
+			createdAt: integrationUserLink.createdAt,
+		})
+		.from(integrationUserLink)
+		.where(and(...whereClause))
+		.rightJoin(
+			integrations,
+			eq(integrationUserLink.integrationId, integrations.id),
+		)
+		.rightJoin(users, eq(integrationUserLink.userId, users.id))
+		.orderBy(desc(integrationUserLink.createdAt));
+
+	const offset = cursor ? Number.parseInt(cursor, 10) : 0;
+	query.limit(pageSize).offset(offset);
+
+	// Execute query
+	const data = await query;
+
+	// Calculate next cursor
+	const nextCursor =
+		data && data.length === pageSize
+			? (offset + pageSize).toString()
+			: undefined;
+
+	return {
+		meta: {
+			cursor: nextCursor ?? null,
+			hasPreviousPage: offset > 0,
+			hasNextPage: data && data.length === pageSize,
+		},
+		data,
+	};
 };

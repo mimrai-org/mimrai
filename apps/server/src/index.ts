@@ -1,7 +1,6 @@
 import "dotenv/config";
 import { trpcServer } from "@hono/trpc-server";
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
@@ -9,6 +8,7 @@ import { auth } from "./lib/auth";
 import { createContext } from "./lib/context";
 import { initIntegrations } from "./lib/integrations/init";
 import { routers } from "./rest/routers";
+import { webhooksRouters } from "./rest/webhooks";
 import { appRouter } from "./trpc/routers/index";
 
 const app = new OpenAPIHono();
@@ -49,6 +49,7 @@ app.use(
 );
 
 app.route("/api", routers);
+app.route("/webhooks", webhooksRouters);
 
 initIntegrations()
 	.catch((err) => {

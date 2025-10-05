@@ -5,7 +5,9 @@ import { tasks } from "@/db/schema/schemas";
 import { getContext } from "../context";
 
 export const updateTaskToolSchema = z.object({
-	id: z.string().describe("ID of the task to update"),
+	id: z
+		.string()
+		.describe("ID of the task to update, get it from getTasks tool"),
 	title: z
 		.string()
 		.min(1)
@@ -37,30 +39,41 @@ export const updateTaskToolSchema = z.object({
 		.describe(
 			"New ID of the column to move the task to, the column is like the status of the task, use getColumns to retrieve the available columns, only provide if you want to update the column",
 		),
+
+	attachments: z
+		.array(z.url())
+		.optional()
+		.describe(
+			"New list of attachment URLs for the task, only provide if you want to update the attachments",
+		),
 });
 
 export const updateTaskTool = tool({
 	description: "Update an existing task in your task manager",
 	inputSchema: updateTaskToolSchema,
 	execute: async function* (input) {
-		const { db, user } = getContext();
+		try {
+			const { db, user } = getContext();
 
-		yield { type: "text", text: `Updating task: ${input.title}` };
-		const [updatedTask] = await db
-			.update(tasks)
-			.set({
-				title: input.title,
-				description: input.description,
-				dueDate: input.dueDate
-					? new Date(input.dueDate).toISOString()
-					: undefined,
-				columnId: input.columnId,
-				assigneeId: input.assigneeId,
-				teamId: user.teamId,
-			})
-			.where(and(eq(tasks.id, input.id), eq(tasks.teamId, user.teamId)))
-			.returning();
+			yield { type: "text", text: `Updating task: ${input.title}` };
+			const [updatedTask] = await db
+				.update(tasks)
+				.set({
+					title: input.title,
+					description: input.description,
+					dueDate: input.dueDate
+						? new Date(input.dueDate).toISOString()
+						: undefined,
+					columnId: input.columnId,
+					assigneeId: input.assigneeId,
+					teamId: user.teamId,
+				})
+				.where(and(eq(tasks.id, input.id), eq(tasks.teamId, user.teamId)))
+				.returning();
 
-		yield { type: "text", text: `Task updated: ${updatedTask.title}` };
+			yield { type: "text", text: `Task updated: ${updatedTask.title}` };
+		} catch (error) {
+			console.error("Error updating task:", error);
+		}
 	},
 });

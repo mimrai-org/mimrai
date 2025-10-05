@@ -3,6 +3,7 @@ import {
 	getIntegrationByType,
 	getIntegrationLogs,
 	getIntegrations,
+	getLinkedUsers,
 	installIntegration,
 	updateIntegration,
 } from "@/db/queries/integrations";
@@ -12,6 +13,7 @@ import {
 	getIntegrationByIdSchema,
 	getIntegrationByTypeSchema,
 	getIntegrationLogsSchema,
+	getLinkedUsersSchema,
 	installIntegrationSchema,
 	updateIntegrationSchema,
 	validateIntegrationSchema,
@@ -55,6 +57,7 @@ export const integrationsRouter = router({
 		}),
 
 	install: protectedProcedure
+		.meta({ scopes: ["team:write"] })
 		.input(installIntegrationSchema)
 		.mutation(async ({ ctx, input }) => {
 			return await installIntegration({
@@ -65,6 +68,7 @@ export const integrationsRouter = router({
 		}),
 
 	update: protectedProcedure
+		.meta({ scopes: ["team:write"] })
 		.input(updateIntegrationSchema)
 		.mutation(async ({ ctx, input }) => {
 			return await updateIntegration({
@@ -75,6 +79,7 @@ export const integrationsRouter = router({
 		}),
 
 	validate: protectedProcedure
+		.meta({ scopes: ["team:write"] })
 		.input(validateIntegrationSchema)
 		.mutation(async ({ input }) => {
 			return await validateIntegration(input.type, input.config);
@@ -93,6 +98,15 @@ export const integrationsRouter = router({
 		.input(getIntegrationByIdSchema)
 		.query(async ({ ctx, input }) => {
 			return getIntegrationById({
+				...input,
+				teamId: ctx.user.teamId!,
+			});
+		}),
+
+	getLinkedUsers: protectedProcedure
+		.input(getLinkedUsersSchema)
+		.query(async ({ ctx, input }) => {
+			return getLinkedUsers({
 				...input,
 				teamId: ctx.user.teamId!,
 			});

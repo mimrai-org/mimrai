@@ -8,6 +8,7 @@ import {
 	stepCountIs,
 	type UIMessage,
 } from "ai";
+import { fetch } from "bun";
 import { randomUUID } from "crypto";
 import { eq } from "drizzle-orm";
 import WebSocket from "ws";
@@ -16,7 +17,8 @@ import { generateSystemPrompt } from "@/ai/generate-system-prompt";
 import { createToolRegistry } from "@/ai/tool-types";
 import { getUserContext } from "@/ai/utils/get-user-context";
 import { db } from "@/db";
-import { integrations, mattermostUser } from "@/db/schema/schemas";
+import { integrations, integrationUserLink } from "@/db/schema/schemas";
+import { createAdminClient } from "@/lib/supabase";
 import { shouldForceStop } from "@/utils/streaming-utils";
 import { log } from "../logger";
 
@@ -175,15 +177,17 @@ export const initMattermostSingle = async (
 				if (isDirect || isMentioned) {
 					const [associetedUser] = await db
 						.select()
-						.from(mattermostUser)
-						.where(eq(mattermostUser.mattermostUserId, senderId))
+						.from(integrationUserLink)
+						.where(eq(integrationUserLink.externalUserId, senderId))
 						.limit(1);
 
 					if (!associetedUser) {
 						// associate the user
 
 						// send the association linking message
-						const url = `${process.env.API_URL}/api/integrations/mattermost/associate?integrationId=${integration.id}&mattermostUserId=${senderId}`;
+						const url = `${process.env.API_URL}/api/integrations/mattermost/associate?integrationId=${integration.id}&mattermostUserId=${senderId}&mattermostUserName=${encodeURIComponent(
+							senderName,
+						)}`;
 						await client.createPost({
 							channel_id: typedData.post.channel_id,
 							message: `To link your Mattermost account with Mimir, please click the following link: ${url}`,
@@ -208,19 +212,60 @@ export const initMattermostSingle = async (
 							postsArray.sort((a, b) => a.create_at - b.create_at);
 
 							for (const post of postsArray) {
+								const files = post.metadata.files;
+
+								const message: UIMessage = {
+									id: post.id,
+									role: post.user_id === me.id ? "assistant" : "user",
+									parts: [],
+								};
+
+								// Attach files if any
+								if (files && files.length > 0) {
+									for (const file of files) {
+										const fileRemoteUrl = client.getFileUrl(
+											file.id,
+											file.create_at,
+										);
+										const fileResponse = await fetch(fileRemoteUrl, {
+											headers: {
+												Authorization: `Bearer ${integration.config.token}`,
+											},
+										});
+										const fileBlob = await fileResponse.blob();
+
+										const supabase = await createAdminClient();
+										const storageFile = await supabase.storage
+											.from("vault")
+											.upload(
+												`${associetedUser.userId}/${file.id}-${file.name}`,
+												fileBlob,
+												{
+													upsert: true,
+												},
+											);
+										const fullPath = `${process.env.SUPABASE_URL}/storage/v1/object/public/${storageFile.data?.fullPath}`;
+
+										console.log("Attaching file to message:", fullPath);
+
+										if (fullPath) {
+											message.parts.push({
+												type: "text",
+												text: `Save the next url as an attachment: ${fullPath}`,
+											});
+										}
+									}
+								}
+
 								// Simple heuristic: include messages that are not too long
 								if (post.message.split(" ").length < 100) {
-									relevantMessages.push({
-										id: post.id,
-										role: post.user_id === me.id ? "assistant" : "user",
-										parts: [
-											{
-												text: safeMessage(post.message),
-												type: "text",
-											},
-										],
+									message.parts.push({
+										text: safeMessage(post.message),
+										type: "text",
 									});
 								}
+
+								if (message.parts.length > 0) relevantMessages.push(message);
 							}
 						} else {
 							const latestPostInChannel = await client.getPosts(
@@ -257,6 +302,7 @@ export const initMattermostSingle = async (
 								user: userContext,
 								//@ts-expect-error
 								writer: undefined,
+								artifactSupport: false,
 							});
 
 							console.log(`genering response for thread ${threadId}`);

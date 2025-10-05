@@ -22,9 +22,11 @@ export const getColumns = async ({
 			name: columns.name,
 			description: columns.description,
 			order: columns.order,
+			isFinalState: columns.isFinalState,
 		})
 		.from(columns)
-		.where(and(...whereConditions));
+		.where(and(...whereConditions))
+		.orderBy(columns.order);
 
 	// Apply pagination
 	const offset = cursor ? Number.parseInt(cursor, 10) : 0;
@@ -53,6 +55,7 @@ export const createColumn = async (input: {
 	name: string;
 	description?: string;
 	order?: number;
+	isFinalState?: boolean;
 	teamId: string;
 }) => {
 	const [column] = await db
@@ -87,6 +90,7 @@ export const updateColumn = async (input: {
 	name?: string;
 	description?: string;
 	order?: number;
+	isFinalState?: boolean;
 	teamId: string;
 }) => {
 	const [column] = await db
@@ -99,6 +103,35 @@ export const updateColumn = async (input: {
 
 	if (!column) {
 		throw new Error("Failed to update column");
+	}
+
+	return column;
+};
+
+export const getColumnById = async ({
+	id,
+	teamId,
+}: {
+	id: string;
+	teamId?: string;
+}) => {
+	const whereClause: SQL[] = [eq(columns.id, id)];
+	if (teamId) whereClause.push(eq(columns.teamId, teamId));
+
+	const [column] = await db
+		.select({
+			id: columns.id,
+			name: columns.name,
+			description: columns.description,
+			order: columns.order,
+			isFinalState: columns.isFinalState,
+		})
+		.from(columns)
+		.where(and(...whereClause))
+		.limit(1);
+
+	if (!column) {
+		throw new Error("Column not found");
 	}
 
 	return column;

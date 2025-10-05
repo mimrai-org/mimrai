@@ -1,6 +1,9 @@
 "use client";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 import z from "zod/v3";
 import { useZodForm } from "@/hooks/use-zod-form";
+import { trpc } from "@/utils/trpc";
 import { Button } from "../ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import { Input } from "../ui/input";
@@ -16,7 +19,18 @@ export const MemberInviteForm = () => {
 		},
 	});
 
-	const handleSubmit = (data: z.infer<typeof schema>) => {};
+	const { mutateAsync: inviteMember } = useMutation(
+		trpc.teams.invite.mutationOptions(),
+	);
+
+	const handleSubmit = async (data: z.infer<typeof schema>) => {
+		try {
+			await inviteMember({ email: data.email });
+			form.reset();
+		} catch (error) {
+			toast.error("Failed to send invite.");
+		}
+	};
 
 	return (
 		<Form {...form}>

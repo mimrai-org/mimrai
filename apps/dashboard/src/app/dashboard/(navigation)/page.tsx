@@ -1,8 +1,11 @@
+import { Provider as ChatProvider } from "@ai-sdk-tools/store";
+import type { UIChatMessage } from "@mimir/server/ai/types";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { ChatComponent } from "@/components/chat/chat-component";
-import { KanbanBoard } from "@/components/kanban-board";
+import { ChatContainer } from "@/components/chat/chat-container";
+import { KanbanBoard } from "@/components/kanban/kanban-board";
 import { authClient } from "@/lib/auth-client";
+import { queryClient, trpc } from "@/utils/trpc";
 
 type Props = {
 	searchParams: Promise<{
@@ -23,22 +26,24 @@ export default async function DashboardPage({ searchParams }: Props) {
 		redirect("/sign-in");
 	}
 
-	console.log(session);
-
 	if ("teamId" in session.user && !session.user.teamId) {
 		redirect("/dashboard/onboarding");
 	}
 
+	const chat = chatId
+		? await queryClient.fetchQuery(trpc.chats.get.queryOptions({ chatId }))
+		: null;
+
 	return (
 		<div className="mr-6">
-			<div className="grid h-[calc(100vh-110px)] grid-cols-[450px_1fr] gap-6">
-				<div className="h-full border-r">
-					<ChatComponent chatId={chatId} />
+			<ChatProvider initialMessages={(chat?.messages as UIChatMessage[]) || []}>
+				<div className="flex h-[calc(100vh-110px)] flex-row gap-6">
+					<ChatContainer chatId={chatId} />
+					<div className="h-full w-full overflow-hidden py-8">
+						<KanbanBoard />
+					</div>
 				</div>
-				<div className="py-8">
-					<KanbanBoard />
-				</div>
-			</div>
+			</ChatProvider>
 		</div>
 	);
 }

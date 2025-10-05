@@ -11,6 +11,7 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
+import { useAuthParams } from "@/hooks/use-auth-params";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { authClient } from "@/lib/auth-client";
 import Loader from "./loader";
@@ -24,6 +25,7 @@ const signUpSchema = z.object({
 });
 
 export default function SignUpForm() {
+	useAuthParams();
 	const router = useRouter();
 	const { isPending } = authClient.useSession();
 
@@ -44,7 +46,10 @@ export default function SignUpForm() {
 			},
 			{
 				onSuccess: () => {
-					router.push("/dashboard");
+					const callbackUrl =
+						localStorage.getItem("callbackUrl") ?? "/dashboard";
+					router.push(callbackUrl);
+					localStorage.removeItem("callbackUrl");
 					toast.success("Sign up successful");
 				},
 				onError: (error) => {

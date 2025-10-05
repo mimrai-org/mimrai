@@ -4,7 +4,8 @@
 	"private": true,
 	"exports": {
 		"./redis-client": "./src/redis-client.ts",
-		"./integrations-cache": "./src/integrations-cache.ts"
+		"./integrations-cache": "./src/integrations-cache.ts",
+		"./users-cache": "./src/users-cache.ts"
 	},
 	"dependencies": {
 		"@mimir/tsconfig": "workspace:*",

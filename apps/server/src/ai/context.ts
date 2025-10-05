@@ -5,6 +5,7 @@ import type { ChatUserContext } from "./chat-cache";
 interface ChatContext extends BaseContext {
 	db: typeof db;
 	user: ChatUserContext;
+	artifactSupport?: boolean;
 }
 
 export const { setContext, getContext } = createTypedContext<ChatContext>();

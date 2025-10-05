@@ -7,6 +7,7 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { queryClient, trpc } from "@/utils/trpc";
+import { LinkedUsersList } from "./linked-users-list";
 import { LogsList } from "./logs-list";
 
 type Props = {
@@ -29,12 +30,13 @@ export default async function Page({ params }: Props) {
 					<CardTitle>Settings</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<IntegrationConfigForm
-						scrollarea={false}
-						id={id}
-						type={integration.type}
-						defaultValues={integration.config}
-					/>
+					{integration && (
+						<IntegrationConfigForm
+							id={id}
+							type={integration.type}
+							defaultValues={integration.config}
+						/>
+					)}
 				</CardContent>
 			</Card>
 			<Card>
@@ -43,6 +45,14 @@ export default async function Page({ params }: Props) {
 				</CardHeader>
 				<CardContent>
 					<LogsList integrationId={id} />
+				</CardContent>
+			</Card>
+			<Card>
+				<CardHeader>
+					<CardDescription>Linked Users</CardDescription>
+				</CardHeader>
+				<CardContent>
+					<LinkedUsersList integrationId={id} />
 				</CardContent>
 			</Card>
 		</div>

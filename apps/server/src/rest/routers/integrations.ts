@@ -1,6 +1,6 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { db } from "@/db";
-import { mattermostUser } from "@/db/schema/schemas";
+import { integrationUserLink } from "@/db/schema/schemas";
 import { associateMattermostUserSchema } from "@/schemas/integrations";
 import type { Context } from "../types";
 
@@ -17,10 +17,11 @@ app.get("/mattermost/associate", async (c) => {
 	const session = c.get("session");
 	const userId = session.userId;
 
-	await db.insert(mattermostUser).values({
+	await db.insert(integrationUserLink).values({
 		integrationId: safeQuery.data.integrationId,
 		userId: userId,
-		mattermostUserId: safeQuery.data.mattermostUserId,
+		externalUserId: safeQuery.data.mattermostUserId,
+		externalUserName: safeQuery.data.mattermostUserName,
 	});
 
 	const html_body = `

@@ -16,7 +16,7 @@ const Editor = dynamic(() => import("./markdown-input-init"), {
 export const MarkdownInput = forwardRef<MDXEditorMethods, MDXEditorProps>(
 	({ className, contentEditableClassName, ...props }, ref) => (
 		<Editor
-			className={cn("w-full border text-sm", className)}
+			className={cn("w-full text-sm", className)}
 			contentEditableClassName={cn("font-sans", contentEditableClassName)}
 			{...props}
 			editorRef={ref}

@@ -22,8 +22,8 @@ export const integrationsCache = {
 			callback(event.integrationId);
 		});
 		return async () => {
-			await subscriber.unsubscribe("runner:start");
-			await subscriber.quit();
+			await subscriber?.unsubscribe("runner:start");
+			await subscriber?.quit();
 		};
 	},
 
@@ -45,8 +45,8 @@ export const integrationsCache = {
 
 		return async () => {
 			// Unsubscribe from events
-			await subscriber.unsubscribe(`runner:${integrationId}`);
-			await subscriber.quit();
+			await subscriber?.unsubscribe(`runner:${integrationId}`);
+			await subscriber?.quit();
 		};
 	},
 	isRunning: async (integrationId: string): Promise<boolean> => {

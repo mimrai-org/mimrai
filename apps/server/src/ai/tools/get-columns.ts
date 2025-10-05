@@ -12,6 +12,8 @@ export const getColumnsTool = tool({
 	execute: async function* (input) {
 		const { db, user } = getContext();
 
+		yield { text: "Retrieving columns..." };
+
 		const data = await db
 			.select({
 				id: columns.id,
@@ -20,6 +22,9 @@ export const getColumnsTool = tool({
 			.from(columns)
 			.where(eq(columns.teamId, user.teamId));
 
-		yield data;
+		yield {
+			text: `Found ${data.length} columns.`,
+			data,
+		};
 	},
 });

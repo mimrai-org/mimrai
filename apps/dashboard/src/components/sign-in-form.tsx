@@ -10,6 +10,7 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
+import { useAuthParams } from "@/hooks/use-auth-params";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { authClient } from "@/lib/auth-client";
 import Loader from "./loader";
@@ -22,6 +23,7 @@ const schema = z.object({
 });
 
 export default function SignInForm() {
+	useAuthParams();
 	const router = useRouter();
 	const { isPending } = authClient.useSession();
 
@@ -40,7 +42,10 @@ export default function SignInForm() {
 			},
 			{
 				onSuccess: () => {
-					router.push("/dashboard");
+					const callbackUrl =
+						localStorage.getItem("callbackUrl") ?? "/dashboard";
+					router.push(callbackUrl);
+					localStorage.removeItem("callbackUrl");
 					toast.success("Sign in successful");
 				},
 				onError: (error) => {

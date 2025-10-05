@@ -1,6 +1,7 @@
 "use client";
 import { useMutation } from "@tanstack/react-query";
 import z from "zod/v3";
+import { useScopes } from "@/hooks/use-user";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { cn } from "@/lib/utils";
 import { queryClient, trpc } from "@/utils/trpc";
@@ -23,6 +24,7 @@ export const teamFormSchema = z.object({
 		.string()
 		.min(2, "Team name must be at least 2 characters")
 		.max(50, "Team name must be at most 50 characters"),
+	email: z.string().email("Invalid email address"),
 	description: z
 		.string()
 		.max(500, "Description must be at most 500 characters")
@@ -36,12 +38,15 @@ export const TeamForm = ({
 	defaultValues?: Partial<z.infer<typeof teamFormSchema>>;
 	scrollarea?: boolean;
 }) => {
+	const canWriteTeam = useScopes(["team:write"]);
 	const form = useZodForm(teamFormSchema, {
 		defaultValues: {
 			name: "",
+			email: "",
 			description: "",
 			...defaultValues,
 		},
+		disabled: !canWriteTeam,
 	});
 
 	const { mutateAsync: createTeam } = useMutation(
@@ -91,6 +96,20 @@ export const TeamForm = ({
 
 					<FormField
 						control={form.control}
+						name="email"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Email</FormLabel>
+								<FormControl>
+									<Input placeholder="acme@example.com" {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+
+					<FormField
+						control={form.control}
 						name="description"
 						render={({ field }) => (
 							<FormItem>
@@ -108,9 +127,11 @@ export const TeamForm = ({
 					/>
 				</div>
 				{/* </ScrollArea> */}
-				<div className="flex items-center justify-end px-4">
-					<Button type="submit">Save</Button>
-				</div>
+				{canWriteTeam && (
+					<div className="flex items-center justify-end px-4">
+						<Button type="submit">Save</Button>
+					</div>
+				)}
 			</form>
 		</Form>
 	);

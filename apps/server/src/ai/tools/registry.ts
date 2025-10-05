@@ -1,3 +1,6 @@
+import type { artifact } from "@ai-sdk-tools/artifacts";
+import type z from "zod";
+
 // Tool metadata for title generation and UI display
 export const toolMetadata: Record<
 	string,
@@ -6,24 +9,24 @@ export const toolMetadata: Record<
 	createTask: {
 		name: "createTask",
 		title: "Create Task",
-		description: "Create a new task in your task manager",
-		relatedTools: ["getTasks", "getColumns"],
+		description: "Create a new task in your board",
+		relatedTools: ["getTasks", "getColumns", "getUsers"],
 	},
 	getTasks: {
 		name: "getTasks",
 		title: "Get Tasks",
-		description: "Retrieve tasks from your task manager",
+		description: "Retrieve tasks from your board",
 		relatedTools: ["getColumns"],
 	},
 	getColumns: {
 		name: "getColumns",
 		title: "Get Columns",
-		description: "Retrieve columns from your task manager",
+		description: "Retrieve columns from your board",
 	},
 	updateTask: {
 		name: "updateTask",
 		title: "Update Task",
-		description: "Update an existing task in your task manager",
+		description: "Update an existing task in your board",
 		relatedTools: ["getTasks", "getColumns"],
 	},
 	getUsers: {
@@ -34,6 +37,9 @@ export const toolMetadata: Record<
 } as const;
 
 export type ToolName = keyof typeof toolMetadata;
+export type ArtifactOutput<A extends ReturnType<typeof artifact>> = {
+	payload: z.infer<A["schema"]>;
+};
 
 export type MessageDataParts = {
 	title: {

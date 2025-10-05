@@ -20,7 +20,13 @@ export const createTaskToolSchema = z.object({
 		.string()
 		.optional()
 		.describe(
-			"ID of the user to assign the task to, do not ask if not provided, if provided you can use the getUsers tool to get the ID",
+			"ID of the user to assign the task to. Try to assign it to someone if possible guessing from the users description from the getUsers tool output, do not ask if not provided",
+		),
+	priority: z
+		.enum(["low", "medium", "high"])
+		.optional()
+		.describe(
+			"Priority of the task, can be low, medium or high, do not ask if not provided, evaluate from the title and description if possible",
 		),
 	dueDate: z
 		.string()
@@ -31,29 +37,48 @@ export const createTaskToolSchema = z.object({
 		.describe(
 			"ID of the column to add the task to, do not ask, get it from the getColumns tool",
 		),
+
+	attachments: z
+		.array(z.url())
+		.optional()
+		.describe(
+			"List of attachment URLs for the task, only provide if you want to add attachments",
+		),
 });
 
 export const createTaskTool = tool({
-	description: "Create a new task in your task manager",
+	description:
+		"Create a new task in your board. Always call the getUsers and getColumns tools before using this tool to get the IDs needed for assigneeId and columnId",
 	inputSchema: createTaskToolSchema,
 	execute: async function* (input) {
-		const { db, user } = getContext();
+		try {
+			const { db, user, artifactSupport } = getContext();
 
-		yield { type: "text", text: `Creating task: ${input.title}` };
-		const [newTask] = await db
-			.insert(tasks)
-			.values({
-				title: input.title,
-				description: input.description,
-				dueDate: input.dueDate
-					? new Date(input.dueDate).toISOString()
-					: undefined,
-				columnId: input.columnId,
-				assigneeId: input.assigneeId,
-				teamId: user.teamId,
-			})
-			.returning();
+			yield { text: `Creating task: ${input.title}` };
+			const [newTask] = await db
+				.insert(tasks)
+				.values({
+					title: input.title,
+					description: input.description,
+					dueDate: input.dueDate
+						? new Date(input.dueDate).toISOString()
+						: undefined,
+					columnId: input.columnId,
+					assigneeId: input.assigneeId,
+					priority: input.priority || "medium",
+					teamId: user.teamId,
+					attachments: input.attachments || [],
+				})
+				.returning();
 
-		yield { type: "text", text: `Task created: ${newTask.title}` };
+			yield {
+				type: "text",
+				text: `Task created: ${newTask.title}`,
+				forceStop: artifactSupport,
+			};
+		} catch (error) {
+			console.error("Error creating task:", error);
+			yield { type: "text", text: "Error creating task" };
+		}
 	},
 });

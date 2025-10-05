@@ -69,11 +69,7 @@ export const ChatInterface = ({ id }: { id?: string }) => {
 	return (
 		<div className="h-full">
 			<div className="flex h-[calc(100vh-120px)] w-full flex-col overflow-hidden px-4">
-				<ChatContainerRoot className="flex-1">
-					<ChatContainerContent>
-						<Messages />
-					</ChatContainerContent>
-				</ChatContainerRoot>
+				<Messages />
 				<ChatInput />
 			</div>
 			{process.env.NODE_ENV === "development" && (

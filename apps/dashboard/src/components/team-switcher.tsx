@@ -1,11 +1,10 @@
 "use client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ChevronsUpDownIcon, PlusIcon } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
 import { useChatParams } from "@/hooks/use-chat-params";
 import { useTeamParams } from "@/hooks/use-team-params";
 import { useUser } from "@/hooks/use-user";
-import { queryClient, trpc } from "@/utils/trpc";
+import { trpc } from "@/utils/trpc";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import {
 	DropdownMenu,
@@ -17,8 +16,6 @@ import {
 
 export const TeamSwitcher = () => {
 	const user = useUser();
-	const router = useRouter();
-	const pathname = usePathname();
 	const { setParams } = useTeamParams();
 	const { setParams: setChatParams } = useChatParams();
 	const { data: teams } = useQuery(trpc.teams.getAvailable.queryOptions());
@@ -38,7 +35,10 @@ export const TeamSwitcher = () => {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<div className="flex cursor-pointer items-center gap-2">
+				<button
+					type="button"
+					className="flex cursor-pointer items-center gap-2"
+				>
 					<Avatar className="size-6 text-xs">
 						<AvatarFallback className="bg-primary text-primary-foreground">
 							{user?.team.name.charAt(0).toUpperCase()}
@@ -48,7 +48,7 @@ export const TeamSwitcher = () => {
 						<div className="text-sm">{user?.team.name}</div>
 						<ChevronsUpDownIcon className="size-3.5" />
 					</div>
-				</div>
+				</button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent
 				className="w-48"

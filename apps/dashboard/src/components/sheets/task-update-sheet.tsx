@@ -2,7 +2,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { trpc } from "@/utils/trpc";
-import { TaskForm } from "../forms/task-form";
+import { TaskAttachments } from "../forms/task-form/attachments";
+import { TaskForm } from "../forms/task-form/task-form";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import {
 	Sheet,
 	SheetContent,
@@ -10,6 +12,7 @@ import {
 	SheetHeader,
 	SheetTitle,
 } from "../ui/sheet";
+import { Skeleton } from "../ui/skeleton";
 
 export const TaskUpdateSheet = () => {
 	const { taskId, setParams } = useTaskParams();
@@ -28,14 +31,12 @@ export const TaskUpdateSheet = () => {
 	);
 
 	return (
-		<Sheet open={isOpen} onOpenChange={() => setParams({ taskId: null })}>
-			<SheetContent className="sm:min-w-[900px]">
-				<SheetHeader>
-					<SheetTitle>Update Task</SheetTitle>
-					<SheetDescription>Make changes to your task here.</SheetDescription>
-				</SheetHeader>
-
-				{task && (
+		<Dialog open={isOpen} onOpenChange={() => setParams({ taskId: null })}>
+			<DialogHeader>
+				<DialogTitle />
+			</DialogHeader>
+			<DialogContent showCloseButton={false} className="p-0 sm:min-w-[60%]">
+				{task ? (
 					<TaskForm
 						defaultValues={{
 							id: task.id,
@@ -44,11 +45,15 @@ export const TaskUpdateSheet = () => {
 							assigneeId: task.assigneeId || undefined,
 							columnId: task.columnId,
 							teamId: task.teamId,
+							priority: task.priority || "medium",
 							dueDate: task.dueDate || undefined,
+							attachments: task.attachments || [],
 						}}
 					/>
+				) : (
+					<Skeleton className="h-[800px] w-full" />
 				)}
-			</SheetContent>
-		</Sheet>
+			</DialogContent>
+		</Dialog>
 	);
 };

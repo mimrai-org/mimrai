@@ -1,17 +1,16 @@
-import { getTeamById } from "@/db/queries/teams";
-import { getUserById, switchTeam } from "@/db/queries/users";
+import { getCurrentUser, switchTeam } from "@/db/queries/users";
+import { roleScopes } from "@/lib/scopes";
 import { switchTeamSchema } from "@/schemas/users";
 import { protectedProcedure, router } from "@/trpc/init";
 
 export const usersRouter = router({
 	getCurrent: protectedProcedure.query(async ({ ctx }) => {
-		const user = await getUserById(ctx.user.id);
-		const currentTeam = await getTeamById(ctx.user.teamId!);
+		const user = await getCurrentUser(ctx.user.id, ctx.user.teamId!);
 		return {
 			...user,
 			team: {
-				id: currentTeam.id,
-				name: currentTeam.name,
+				...user.team,
+				scopes: roleScopes[user.team.role],
 			},
 		};
 	}),

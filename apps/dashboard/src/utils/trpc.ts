@@ -1,20 +1,13 @@
 import type { AppRouter } from "@mimir/server/trpc";
 import { QueryCache, QueryClient } from "@tanstack/react-query";
-import { createTRPCClient, httpBatchLink } from "@trpc/client";
+import { createTRPCClient, httpBatchLink, loggerLink } from "@trpc/client";
 import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
+import { toast } from "sonner";
 
 export const queryClient = new QueryClient({
 	queryCache: new QueryCache({
 		onError: (error) => {
 			console.error("Query Error:", error);
-			// toast.error(error.message, {
-			// 	action: {
-			// 		label: "retry",
-			// 		onClick: () => {
-			// 			queryClient.invalidateQueries();
-			// 		},
-			// 	},
-			// });
 		},
 	}),
 });
@@ -39,11 +32,18 @@ const trpcClient = createTRPCClient<AppRouter>({
 				}
 
 				// Client-side, include cookies
-				return fetch(url, {
+				const response = await fetch(url, {
 					...options,
 					credentials: "include",
 				});
+
+				return response;
 			},
+		}),
+		loggerLink({
+			enabled: (opts) =>
+				process.env.NODE_ENV === "development" ||
+				(opts.direction === "down" && opts.result instanceof Error),
 		}),
 	],
 });

@@ -5,11 +5,13 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useIntegrationParams } from "@/hooks/use-integration-params";
+import { useScopes } from "@/hooks/use-user";
 import { trpc } from "@/utils/trpc";
 
 export const IntegrationsList = () => {
 	const { setParams } = useIntegrationParams();
 	const { data } = useQuery(trpc.integrations.get.queryOptions());
+	const canWriteTeam = useScopes(["team:write"]);
 
 	return (
 		<Card>
@@ -30,24 +32,30 @@ export const IntegrationsList = () => {
 								</p>
 							</div>
 							<div>
-								{integration.isInstalled ? (
-									<div className="flex items-center gap-4">
-										<span className="text-muted-foreground">Installed</span>
-										<Link
-											href={`/dashboard/settings/integrations/${integration.id}`}
-										>
-											<Button size={"sm"} variant="outline">
-												Configure
+								{canWriteTeam && (
+									<div>
+										{integration.isInstalled ? (
+											<div className="flex items-center gap-4">
+												<span className="text-muted-foreground">Installed</span>
+												<Link
+													href={`/dashboard/settings/integrations/${integration.id}`}
+												>
+													<Button size={"sm"} variant="outline">
+														Configure
+													</Button>
+												</Link>
+											</div>
+										) : (
+											<Button
+												size={"sm"}
+												onClick={() =>
+													setParams({ installType: integration.type })
+												}
+											>
+												Install
 											</Button>
-										</Link>
+										)}
 									</div>
-								) : (
-									<Button
-										size={"sm"}
-										onClick={() => setParams({ installType: integration.type })}
-									>
-										Install
-									</Button>
 								)}
 							</div>
 						</li>

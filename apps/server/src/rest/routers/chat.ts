@@ -167,6 +167,7 @@ app.post("/", async (c) => {
 					db,
 					user: userContext,
 					writer,
+					artifactSupport: true,
 				});
 
 				// Generate chat title artifact if we have a title

@@ -17,7 +17,7 @@ export const SettingsSidebar = () => {
 	const pathname = usePathname();
 
 	return (
-		<div className="h-full w-full border-r p-4">
+		<div className="sticky top-0 h-full w-full border-r p-4">
 			<ul className="flex flex-col space-y-1 text-sm">
 				{settingsLinks.map(({ to, label }) => (
 					<Link

@@ -17,7 +17,6 @@ export const tasksRouter = router({
 	get: protectedProcedure
 		.input(getTasksSchema.optional())
 		.query(({ ctx, input }) => {
-			console.log("Fetching tasks with input:", ctx.user.teamId);
 			return getTasks({
 				pageSize: 100,
 				...input,

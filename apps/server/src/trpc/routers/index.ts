@@ -1,4 +1,6 @@
+import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { protectedProcedure, publicProcedure, router } from "../init";
+import { billingRouter } from "./billing";
 import { chatRouter } from "./chats";
 import { columnsRouter } from "./columns";
 import { integrationsRouter } from "./integrations";
@@ -22,5 +24,8 @@ export const appRouter = router({
 	users: usersRouter,
 	teams: teamsRouter,
 	integrations: integrationsRouter,
+	billing: billingRouter,
 });
 export type AppRouter = typeof appRouter;
+export type RouterOutputs = inferRouterOutputs<AppRouter>;
+export type RouterInputs = inferRouterInputs<AppRouter>;

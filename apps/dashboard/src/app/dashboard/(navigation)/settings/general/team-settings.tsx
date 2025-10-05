@@ -18,6 +18,7 @@ export const TeamSettings = async () => {
 					defaultValues={{
 						description: team?.description || undefined,
 						name: team?.name || undefined,
+						email: team?.email || undefined,
 						id: team?.id || undefined,
 					}}
 				/>

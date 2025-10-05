@@ -1,81 +1,55 @@
 import { useChatMessages } from "@ai-sdk-tools/store";
-import { useEffect } from "react";
-import { cn } from "@/lib/utils";
-import { Markdown } from "../ui/markdown";
-import { Message, MessageAvatar, MessageContent } from "../ui/message";
-import { useTextStream } from "../ui/response-stream";
-import { Response } from "./response";
+import type { UIChatMessage } from "@mimir/server/ai/types";
+import { Fragment } from "react";
+import { Conversation, ConversationContent } from "../ai-elements/conversation";
+import { Message, MessageAvatar, MessageContent } from "../ai-elements/message";
+import { Response } from "../ai-elements/response";
 
 export const Messages = () => {
-	const messages = useChatMessages();
-
-	return messages.map((message, messageIndex) => (
-		<div key={message.id} className="mb-4 flex flex-col">
-			{message.parts.map((part, index) => {
-				const isAssistant = message.role === "assistant";
-
-				switch (part.type) {
-					case "text":
-						return (
-							<Message
-								key={`${message.id}-${index}`}
-								className={cn("mb-4 text-sm", {
-									"self-end": message.role === "user",
-									"pt-8": messageIndex === 0,
-								})}
-							>
-								{/* <div className={cn(
-											"border p-2 text-sm",
-											{
-												"self-end": message.role === "user",
-											}
-										)}> */}
-								{isAssistant ? (
-									<Response>{part.text}</Response>
-								) : (
-									<MessageContent>{part.text}</MessageContent>
-								)}
-								{/* </div> */}
-								{message.role === "user" && (
-									<MessageAvatar
-										src="https://avatars.githubusercontent.com/u/40124537?s=40&v=4"
-										alt="Alain00"
-										className="size-9"
-									/>
-								)}
-							</Message>
-						);
-
-					default:
-						return null;
-				}
-			})}
-		</div>
-	));
-};
-
-export function ResponseStreamWithMarkdown({
-	markdownText,
-	state,
-}: {
-	markdownText: string;
-	state?: "done" | "streaming";
-}) {
-	const { displayedText, startStreaming } = useTextStream({
-		textStream: markdownText,
-		mode: "typewriter",
-		speed: 30,
-	});
-
-	useEffect(() => {
-		startStreaming();
-	}, [startStreaming]);
+	const messages = useChatMessages<UIChatMessage>();
 
 	return (
-		<div className="w-full min-w-full">
-			<Markdown className="prose prose-sm dark:prose-invert prose-h2:mt-0! prose-h2:scroll-m-0!">
-				{state === "streaming" ? displayedText : markdownText}
-			</Markdown>
-		</div>
+		<Conversation className="h-full w-full">
+			<ConversationContent>
+				{messages.map((message) => (
+					<div key={message.id} className="mb-4 flex flex-col">
+						{message.parts.map((part, index) => {
+							switch (part.type) {
+								case "text":
+									return (
+										<Message from={message.role} key={`${message.id}-${index}`}>
+											<MessageContent>
+												<Response>{part.text}</Response>
+											</MessageContent>
+											{message.role === "user" && (
+												<MessageAvatar
+													src="https://avatars.githubusercontent.com/u/40124537?s=40&v=4"
+													className="size-9"
+												/>
+											)}
+										</Message>
+									);
+
+								default: {
+									if (part.type.startsWith("tool-")) {
+										console.log("Rendering tool part:", part);
+										return (
+											<Fragment key={`${message.id}-${index}`}>
+												<Message from={message.role}>
+													<MessageContent>
+														<Response>{(part as any)?.output?.text}</Response>
+													</MessageContent>
+												</Message>
+											</Fragment>
+										);
+									}
+									return null;
+								}
+							}
+						})}
+					</div>
+				))}
+			</ConversationContent>
+		</Conversation>
 	);
-}
+};

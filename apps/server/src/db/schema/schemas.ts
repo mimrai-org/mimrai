@@ -1,3 +1,4 @@
+import { randomColor } from "@mimir/utils/random";
 import { randomUUID } from "crypto";
 import { relations } from "drizzle-orm";
 import {
@@ -8,8 +9,10 @@ import {
 	jsonb,
 	pgEnum,
 	pgTable,
+	primaryKey,
 	text,
 	timestamp,
+	unique,
 } from "drizzle-orm/pg-core";
 import type { UIChatMessage } from "@/ai/types";
 import type {
@@ -17,12 +20,20 @@ import type {
 	IntegrationName,
 } from "@/lib/integrations/registry";
 
+export const plansEnum = pgEnum("plans", ["starter", "enterprise"]);
+
 export const teams = pgTable("teams", {
 	id: text("id")
 		.$defaultFn(() => randomUUID())
 		.primaryKey(),
 	name: text("name").notNull(),
 	description: text("description"),
+	email: text("email").notNull(),
+	plan: plansEnum("plan"),
+	customerId: text("customer_id"),
+	canceledAt: timestamp("canceled_at"),
+	createdAt: timestamp("created_at").defaultNow().notNull(),
+	updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const users = pgTable(
@@ -35,6 +46,7 @@ export const users = pgTable(
 		image: text("image"),
 		locale: text("locale"),
 		teamId: text("team_id"),
+		color: text("color").$defaultFn(() => randomColor()),
 		dateFormat: text("date_format"),
 		createdAt: timestamp("created_at").notNull(),
 		updatedAt: timestamp("updated_at").notNull(),
@@ -48,17 +60,25 @@ export const users = pgTable(
 	],
 );
 
+export const teamRoleEnum = pgEnum("team_role", ["owner", "member"]);
+
 export const usersOnTeams = pgTable(
 	"users_on_teams",
 	{
 		userId: text("user_id").notNull(),
 		teamId: text("team_id").notNull(),
+		role: teamRoleEnum().default("member").notNull(),
+		description: text("description").default(""),
 		createdAt: timestamp("created_at", {
 			withTimezone: true,
 			mode: "string",
 		}).defaultNow(),
 	},
 	(table) => [
+		primaryKey({
+			columns: [table.userId, table.teamId],
+			name: "users_on_teams_pkey",
+		}),
 		foreignKey({
 			columns: [table.teamId],
 			foreignColumns: [teams.id],
@@ -81,6 +101,38 @@ export const usersOnTeamsRelations = relations(usersOnTeams, ({ one }) => ({
 	user: one(users, { fields: [usersOnTeams.userId], references: [users.id] }),
 }));
 
+export const userInvites = pgTable(
+	"user_invites",
+	{
+		id: text()
+			.$defaultFn(() => randomUUID())
+			.primaryKey()
+			.notNull(),
+		email: text().notNull(),
+		teamId: text("team_id").notNull(),
+		code: text().default("nanoid(24)"),
+		invitedBy: text("invited_by").notNull(),
+		createdAt: timestamp("created_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
+	},
+	(table) => [
+		index("user_invites_team_id_index").on(table.teamId),
+		unique("unique_team_invite").on(table.email, table.teamId),
+		foreignKey({
+			columns: [table.teamId],
+			foreignColumns: [teams.id],
+			name: "user_invites_team_id_fkey",
+		}),
+		foreignKey({
+			columns: [table.invitedBy],
+			foreignColumns: [users.id],
+			name: "user_invites_invited_by_fkey",
+		}),
+	],
+);
+
 export const priorityEnum = pgEnum("task_priority", ["low", "medium", "high"]);
 
 export const tasks = pgTable(
@@ -97,6 +149,7 @@ export const tasks = pgTable(
 		teamId: text("team_id").notNull(),
 		order: integer("order").default(0).notNull(),
 		columnId: text("column_id").notNull(),
+		attachments: jsonb("attachments").$type<string[]>().default([]),
 		dueDate: timestamp("due_date", {
 			withTimezone: true,
 			mode: "string",
@@ -153,8 +206,18 @@ export const columns = pgTable(
 		teamId: text("team_id").notNull(),
 		order: integer("order").default(0).notNull(),
 		description: text("description"),
+		isFinalState: boolean("is_final_state").default(false).notNull(),
+		createdAt: timestamp("created_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
+		updatedAt: timestamp("updated_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
 	},
 	(table) => [
+		unique("unique_column_name_per_team").on(table.name, table.teamId),
 		foreignKey({
 			columns: [table.teamId],
 			foreignColumns: [teams.id],
@@ -274,22 +337,27 @@ export const integrationLogs = pgTable("integration_logs", {
 	}).defaultNow(),
 });
 
-export const mattermostUser = pgTable(
-	"mattermost_users",
+export const integrationUserLink = pgTable(
+	"integration_user_link",
 	{
 		id: text("id")
 			.$defaultFn(() => randomUUID())
 			.primaryKey()
 			.notNull(),
 		userId: text("user_id").notNull(),
-		mattermostUserId: text("mattermost_user_id").notNull(),
+		externalUserId: text("external_user_id").notNull(),
+		externalUserName: text("external_user_name").notNull(),
 		integrationId: text("integration_id").notNull(),
+		createdAt: timestamp("created_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
 	},
 	(table) => [
 		foreignKey({
 			columns: [table.userId],
 			foreignColumns: [users.id],
-			name: "mattermost_users_user_id_fkey",
+			name: "integration_user_link_user_id_fkey",
 		}),
 	],
 );

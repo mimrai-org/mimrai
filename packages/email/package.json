@@ -1,0 +1,37 @@
+{
+	"name": "@mimir/email",
+	"version": "1.0.0",
+	"private": true,
+	"exports": {
+		"./emails/*": "./emails/*.tsx",
+		"./locales": "./locales/index.ts"
+	},
+	"scripts": {
+		"clean": "rm -rf .turbo node_modules",
+		"lint": "biome check .",
+		"format": "biome format --write .",
+		"typecheck": "tsc --noEmit",
+		"dev": "bunx react-email dev -p 3002",
+		"build": "email build",
+		"start": "email start"
+	},
+	"dependencies": {
+		"@mimir/utils": "workspace:*",
+		"@mimir/tsconfig": "workspace:*",
+		"@react-email/components": "0.0.42",
+		"@react-email/render": "1.1.2",
+		"@react-email/tailwind": "1.0.5",
+		"hono": "^4.8.2",
+		"date-fns": "^4.1.0",
+		"react-email": "4.0.16",
+		"responsive-react-email": "^0.0.5"
+	},
+	"devDependencies": {
+		"@react-email/preview-server": "4.2.12",
+		"@types/react": "~19.1.10",
+		"@types/react-dom": "^19",
+		"react": "19.1.0",
+		"react-dom": "19.1.0",
+		"typescript": "^5.9.2"
+	}
+}

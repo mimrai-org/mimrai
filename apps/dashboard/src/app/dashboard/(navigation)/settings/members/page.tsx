@@ -1,4 +1,5 @@
 import { MemberInvite } from "./member-invite";
+import { MembersInvitesList } from "./members-invites-list";
 import { MembersList } from "./members-list";
 
 export default function Page() {
@@ -6,6 +7,7 @@ export default function Page() {
 		<div className="space-y-6">
 			<MemberInvite />
 			<MembersList />
+			<MembersInvitesList />
 		</div>
 	);
 }

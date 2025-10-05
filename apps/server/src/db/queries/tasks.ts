@@ -1,25 +1,34 @@
-import { and, eq, inArray, type SQL } from "drizzle-orm";
+import { and, eq, ilike, inArray, type SQL } from "drizzle-orm";
 import type {
 	CreateTaskInput,
 	DeleteTaskInput,
-	GetTasksInput,
 	UpdateTaskInput,
 } from "@/schemas/tasks";
 import { db } from "..";
-import { columns, tasks } from "../schema/schemas";
+import { columns, tasks, users } from "../schema/schemas";
 
 export const getTasks = async ({
-	pageSize,
+	pageSize = 20,
 	cursor,
 	...input
-}: GetTasksInput) => {
+}: {
+	pageSize?: number;
+	cursor?: string;
+	assigneeId?: string[];
+	columnId?: string[];
+	teamId?: string;
+	search?: string;
+}) => {
+	console.log("Input:", input);
 	const whereConditions: SQL[] = [];
 
 	input.assigneeId &&
+		input.assigneeId.length > 0 &&
 		whereConditions.push(inArray(tasks.assigneeId, input.assigneeId));
 	input.columnId &&
 		whereConditions.push(inArray(tasks.columnId, input.columnId));
 	input.teamId && whereConditions.push(eq(tasks.teamId, input.teamId));
+	input.search && whereConditions.push(ilike(tasks.title, `%${input.search}%`));
 
 	const query = db
 		.select({
@@ -27,20 +36,34 @@ export const getTasks = async ({
 			title: tasks.title,
 			description: tasks.description,
 			assigneeId: tasks.assigneeId,
+			assignee: {
+				id: users.id,
+				name: users.name,
+				email: users.email,
+				image: users.image,
+				color: users.color,
+			},
 			columnId: tasks.columnId,
 			order: tasks.order,
 			priority: tasks.priority,
 			dueDate: tasks.dueDate,
+			createdAt: tasks.createdAt,
+			updatedAt: tasks.updatedAt,
+			teamId: tasks.teamId,
+			attachments: tasks.attachments,
 			column: {
 				id: columns.id,
 				name: columns.name,
 				description: columns.description,
 				order: columns.order,
+				isFinalState: columns.isFinalState,
 			},
 		})
 		.from(tasks)
 		.where(and(...whereConditions))
-		.leftJoin(columns, eq(tasks.columnId, columns.id));
+		.innerJoin(columns, eq(tasks.columnId, columns.id))
+		.leftJoin(users, eq(tasks.assigneeId, users.id))
+		.orderBy(tasks.order);
 
 	// Apply pagination
 	const offset = cursor ? Number.parseInt(cursor, 10) : 0;

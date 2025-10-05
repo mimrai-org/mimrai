@@ -1,9 +1,14 @@
 import { initTRPC, TRPCError } from "@trpc/server";
-import superjson from "superjson";
+import type { Scope } from "@/lib/scopes";
 import type { Context } from "../lib/context";
 
 type Meta = {
-	requiresTeam?: boolean;
+	/**
+	 * @default true
+	 */
+	team?: boolean;
+
+	scopes?: Scope[];
 };
 export const t = initTRPC.context<Context>().meta<Meta>().create({
 	// transformer: superjson,
@@ -14,7 +19,7 @@ export const router = t.router;
 export const publicProcedure = t.procedure;
 
 export const protectedProcedure = t.procedure
-	.meta({ requiresTeam: true })
+	.meta({ team: true })
 	.use(({ ctx, next, meta }) => {
 		if (!ctx.session) {
 			throw new TRPCError({
@@ -24,12 +29,25 @@ export const protectedProcedure = t.procedure
 			});
 		}
 
-		if (!ctx.user.teamId && meta?.requiresTeam) {
+		if (!ctx.user.teamId && meta?.team) {
 			throw new TRPCError({
 				code: "FORBIDDEN",
 				message: "User does not belong to a team",
 				cause: "No team",
 			});
+		}
+
+		if (meta?.scopes) {
+			const hasRequiredScopes = meta.scopes.every((scope) =>
+				ctx.user.scopes.includes(scope),
+			);
+			if (!hasRequiredScopes) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Insufficient permissions",
+					cause: "Insufficient permissions",
+				});
+			}
 		}
 
 		return next({

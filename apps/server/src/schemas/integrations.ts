@@ -43,6 +43,7 @@ export const validateIntegrationSchema = z.object({
 export const associateMattermostUserSchema = z.object({
 	integrationId: z.string(),
 	mattermostUserId: z.string(),
+	mattermostUserName: z.string(),
 });
 
 export const getIntegrationLogsSchema = z.object({
@@ -58,4 +59,10 @@ export const getIntegrationByIdSchema = z.object({
 export const updateIntegrationSchema = z.object({
 	id: z.string(),
 	config: z.custom<IntegrationConfig>(),
+});
+
+export const getLinkedUsersSchema = z.object({
+	integrationId: z.string(),
+	cursor: z.string().optional(),
+	pageSize: z.number().min(1).max(100).optional(),
 });

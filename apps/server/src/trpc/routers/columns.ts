@@ -1,12 +1,14 @@
 import {
 	createColumn,
 	deleteColumn,
+	getColumnById,
 	getColumns,
 	updateColumn,
 } from "@/db/queries/columns";
 import {
 	createColumnSchema,
 	deleteColumnSchema,
+	getColumnByIdSchema,
 	getColumnsSchema,
 	updateColumnSchema,
 } from "@/schemas/columns";
@@ -22,6 +24,15 @@ export const columnsRouter = router({
 				teamId: ctx.user.teamId!,
 			});
 		}),
+	getById: protectedProcedure
+		.input(getColumnByIdSchema)
+		.query(({ ctx, input }) => {
+			return getColumnById({
+				...input,
+				teamId: ctx.user.teamId!,
+			});
+		}),
+
 	create: protectedProcedure
 		.input(createColumnSchema)
 		.mutation(async ({ ctx, input }) => {

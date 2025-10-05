@@ -5,7 +5,7 @@
 
 @theme {
 	--font-sans:
-		"Inter", "Geist", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+		"Geist", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
 		"Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
@@ -14,6 +14,8 @@ body {
 	@media (prefers-color-scheme: dark) {
 		color-scheme: dark;
 	}
+
+	@apply selection:bg-primary selection:text-primary-foreground;
 }
 
 :root {
