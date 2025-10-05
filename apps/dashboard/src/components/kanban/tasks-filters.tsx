@@ -1,6 +1,6 @@
 "use client";
 import { useArtifact } from "@ai-sdk-tools/artifacts/client";
-import { taskFiltersArtifact } from "@mimir/server/ai/artifacts/task-filters";
+import { taskFiltersArtifact } from "@mimir/api/ai/artifacts/task-filters";
 import { useEffect, useRef, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";

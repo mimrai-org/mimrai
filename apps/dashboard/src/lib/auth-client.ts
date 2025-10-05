@@ -1,4 +1,4 @@
-import type { auth } from "@mimir/server/auth";
+import type { auth } from "@mimir/api/auth";
 import { polarClient } from "@polar-sh/better-auth";
 import { inferAdditionalFields } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";

@@ -1,5 +1,5 @@
 "use client";
-import type { IntegrationName } from "@mimir/server/integrations/registry";
+import type { IntegrationName } from "@mimir/api/integrations/registry";
 import { useQuery } from "@tanstack/react-query";
 import { useIntegrationParams } from "@/hooks/use-integration-params";
 import { trpc } from "@/utils/trpc";

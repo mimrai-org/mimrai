@@ -1,6 +1,6 @@
 "use client";
 
-import type { RouterOutputs } from "@mimir/server/trpc";
+import type { RouterOutputs } from "@mimir/api/trpc";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FlagIcon, GripVertical, PlusIcon } from "lucide-react";
 import { AnimatePresence } from "motion/react";

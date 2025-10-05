@@ -1,4 +1,4 @@
-import type { AppRouter } from "@mimir/server/trpc";
+import type { AppRouter } from "@mimir/api/trpc";
 import { QueryCache, QueryClient } from "@tanstack/react-query";
 import { createTRPCClient, httpBatchLink, loggerLink } from "@trpc/client";
 import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";

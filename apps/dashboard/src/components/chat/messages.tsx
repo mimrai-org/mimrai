@@ -1,5 +1,5 @@
 import { useChatMessages } from "@ai-sdk-tools/store";
-import type { UIChatMessage } from "@mimir/server/ai/types";
+import type { UIChatMessage } from "@mimir/api/ai/types";
 import { Fragment } from "react";
 import { Conversation, ConversationContent } from "../ai-elements/conversation";
 import { Message, MessageAvatar, MessageContent } from "../ai-elements/message";

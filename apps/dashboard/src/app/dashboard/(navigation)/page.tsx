@@ -1,5 +1,5 @@
 import { Provider as ChatProvider } from "@ai-sdk-tools/store";
-import type { UIChatMessage } from "@mimir/server/ai/types";
+import type { UIChatMessage } from "@mimir/api/ai/types";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { ChatContainer } from "@/components/chat/chat-container";

@@ -1,4 +1,4 @@
-import type { RouterOutputs } from "@mimir/server/trpc";
+import type { RouterOutputs } from "@mimir/api/trpc";
 import { format } from "date-fns";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";

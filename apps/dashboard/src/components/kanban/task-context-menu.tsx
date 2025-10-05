@@ -1,4 +1,4 @@
-import type { RouterOutputs } from "@mimir/server/trpc";
+import type { RouterOutputs } from "@mimir/api/trpc";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ArrowUpNarrowWideIcon, TrashIcon, UserIcon } from "lucide-react";
 import { queryClient, trpc } from "@/utils/trpc";

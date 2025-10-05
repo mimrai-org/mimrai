@@ -1,7 +1,7 @@
 "use client";
 import { AIDevtools } from "@ai-sdk-tools/devtools";
 import { useChat } from "@ai-sdk-tools/store";
-import type { UIChatMessage } from "@mimir/server/ai/types";
+import type { UIChatMessage } from "@mimir/api/ai/types";
 import { DefaultChatTransport, generateId } from "ai";
 import { useMemo } from "react";
 import { useChatParams } from "@/hooks/use-chat-params";

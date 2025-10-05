@@ -1,5 +1,5 @@
 "use client";
-import type { RouterOutputs } from "@mimir/server/trpc";
+import type { RouterOutputs } from "@mimir/api/trpc";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useColumnParams } from "@/hooks/use-column-params";

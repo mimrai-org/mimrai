@@ -1,6 +1,6 @@
 "use client";
 
-import type { IntegrationName } from "@mimir/server/integrations/registry";
+import type { IntegrationName } from "@mimir/api/integrations/registry";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import z from "zod/v3";
