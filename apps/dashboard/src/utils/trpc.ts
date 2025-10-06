@@ -29,7 +29,7 @@ const trpcClient = createTRPCClient<AppRouter>({
 						...options,
 						headers: {
 							...options?.headers,
-							cookies: headersObject.cookies!,
+							Cookie: headersObject.Cookie!,
 						},
 					});
 				}
