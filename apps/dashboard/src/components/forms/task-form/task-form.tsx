@@ -153,14 +153,14 @@ export const TaskForm = ({
 							/>
 							<Button
 								type="submit"
-								variant={defaultValues.id ? "ghost" : "default"}
+								variant={defaultValues?.id ? "ghost" : "default"}
 								size={"sm"}
 								className="text-sm"
 								disabled={
 									!form.formState.isDirty || form.formState.isSubmitting
 								}
 							>
-								{defaultValues.id
+								{defaultValues?.id
 									? `Last saved at ${format(lastSavedDate, "pp")}`
 									: "Create Task"}
 							</Button>
@@ -233,7 +233,7 @@ export const TaskForm = ({
 												onValueChange={field.onChange}
 											>
 												<SelectTrigger className="w-full rounded-xs border-none shadow-none transition-colors hover:bg-muted focus:ring-0 dark:bg-transparent">
-													<PriorityBadge value={field.value} />
+													{field.value && <PriorityBadge value={field.value} />}
 												</SelectTrigger>
 												<SelectContent>
 													<SelectItem value="low">Low</SelectItem>
