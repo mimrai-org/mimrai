@@ -4,9 +4,9 @@ import {
 	Container,
 	Heading,
 	Preview,
+	Section,
 	Text,
 } from "@react-email/components";
-import { Section } from "node_modules/@react-email/components/dist/index.mjs";
 import { Footer } from "../components/footer";
 import { Logo } from "../components/logo";
 import {

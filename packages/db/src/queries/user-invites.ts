@@ -1,7 +1,6 @@
-import { addMeterUsage } from "@api/lib/meters";
 import { and, eq, type SQL } from "drizzle-orm";
 import { db } from "..";
-import { teams, userInvites, usersOnTeams } from "../schema";
+import { teams, userInvites, users, usersOnTeams } from "../schema";
 import { switchTeam } from "./users";
 
 export const acceptTeamInvite = async ({
@@ -21,13 +20,40 @@ export const acceptTeamInvite = async ({
 		throw new Error("Invite not found");
 	}
 
+	const [user] = await db
+		.select()
+		.from(users)
+		.where(eq(users.id, userId))
+		.limit(1);
+
+	if (!user) {
+		throw new Error("User not found");
+	}
+
+	if (user.email !== invite.email) {
+		throw new Error("This invite is not for your email address");
+	}
+
+	const [existing] = await db
+		.select()
+		.from(usersOnTeams)
+		.where(
+			and(
+				eq(usersOnTeams.userId, userId),
+				eq(usersOnTeams.teamId, invite.teamId),
+			),
+		)
+		.limit(1);
+
+	if (existing) {
+		throw new Error("User is already a member of this team");
+	}
+
 	// add user to team
 	await db.insert(usersOnTeams).values({
 		userId,
 		teamId: invite.teamId,
 	});
-
-	await addMeterUsage(invite.teamId, "users", 1);
 
 	// switch user's current team
 	await switchTeam(userId, invite.teamId);

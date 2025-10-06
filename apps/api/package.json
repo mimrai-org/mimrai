@@ -11,7 +11,7 @@
 		"clean": "rm -rf node_modules"
 	},
 	"dependencies": {
-		"@ai-sdk-tools/artifacts": "beta",
+		"@ai-sdk-tools/artifacts": "0.7.0-beta.5",
 		"@ai-sdk/openai": "^2.0.42",
 		"@ai-sdk/react": "^2.0.54",
 		"@date-fns/tz": "^1.4.1",
@@ -19,13 +19,11 @@
 		"@hono/zod-openapi": "^1.1.3",
 		"@hono/zod-validator": "^0.7.3",
 		"@mimir/cache": "workspace:*",
+		"@mimir/db": "workspace:*",
 		"@mimir/email": "workspace:*",
+		"@mimir/integration": "workspace:*",
 		"@mimir/logger": "workspace:*",
 		"@mimir/utils": "workspace:*",
-		"@mimir/db": "workspace:*",
-		"@mimir/integration": "workspace:*",
-		"@polar-sh/better-auth": "^1.1.3",
-		"@polar-sh/sdk": "^0.34.16",
 		"@supabase/supabase-js": "^2.58.0",
 		"@trpc/server": "^11.6.0",
 		"ai": "^5.0.56",
@@ -35,7 +33,7 @@
 		"hono-rate-limiter": "^0.4.2",
 		"resend": "^6.1.2",
 		"stripe": "^19.1.0",
-		"zod": "^4.1.11",
+		"zod": "4.1.10",
 		"zod-openapi": "^5.4.1"
 	},
 	"trustedDependencies": [

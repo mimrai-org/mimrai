@@ -2,16 +2,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { trpc } from "@/utils/trpc";
-import { TaskAttachments } from "../forms/task-form/attachments";
 import { TaskForm } from "../forms/task-form/task-form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
-import {
-	Sheet,
-	SheetContent,
-	SheetDescription,
-	SheetHeader,
-	SheetTitle,
-} from "../ui/sheet";
 import { Skeleton } from "../ui/skeleton";
 
 export const TaskUpdateSheet = () => {
@@ -26,6 +18,7 @@ export const TaskUpdateSheet = () => {
 			},
 			{
 				enabled: isOpen,
+				placeholderData: (prev) => prev,
 			},
 		),
 	);
@@ -35,7 +28,7 @@ export const TaskUpdateSheet = () => {
 			<DialogHeader>
 				<DialogTitle />
 			</DialogHeader>
-			<DialogContent showCloseButton={false} className="p-0 sm:min-w-[60%]">
+			<DialogContent showCloseButton={false} className="pt-0 sm:min-w-[70%]">
 				{task ? (
 					<TaskForm
 						defaultValues={{

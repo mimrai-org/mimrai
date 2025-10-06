@@ -1,4 +1,4 @@
-import { polarClient, stripeClient } from "@api/lib/payments";
+import { stripeClient } from "@api/lib/payments";
 import { createCheckoutSchema } from "@api/schemas/billing";
 import { protectedProcedure, router } from "@api/trpc/init";
 import { getTeamById } from "@mimir/db/queries/teams";
@@ -8,7 +8,7 @@ export const billingRouter = router({
 	subscription: protectedProcedure.query(async ({ ctx }) => {
 		const team = await getTeamById(ctx.user.teamId!);
 		const result = await stripeClient.subscriptions.list({
-			customer: team.customerId!,
+			customer: team!.customerId!,
 			expand: [],
 			limit: 1,
 		});
@@ -39,7 +39,7 @@ export const billingRouter = router({
 
 			return await stripeClient.checkout.sessions.create({
 				mode: "subscription",
-				customer: team.customerId!,
+				customer: team!.customerId!,
 				saved_payment_method_options: {
 					payment_method_save: "enabled",
 					allow_redisplay_filters: ["always"],
@@ -51,7 +51,7 @@ export const billingRouter = router({
 				subscription_data: {
 					metadata: {
 						planName: product.name,
-						teamId: team.id,
+						teamId: team!.id,
 					},
 				},
 				success_url: `${getAppUrl()}/dashboard/settings/billing?checkout=success`,
@@ -62,7 +62,7 @@ export const billingRouter = router({
 		const team = await getTeamById(ctx.user.teamId!);
 
 		const result = await stripeClient.billingPortal.sessions.create({
-			customer: team.customerId!,
+			customer: team!.customerId!,
 			return_url: `${getAppUrl()}/dashboard/settings/billing`,
 		});
 

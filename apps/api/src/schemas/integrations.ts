@@ -1,7 +1,7 @@
 import {
 	type IntegrationConfig,
 	integrationsRegistry,
-} from "@api/lib/integrations/registry";
+} from "@mimir/integration/registry";
 import z from "zod/v4";
 
 export const installIntegrationSchema = z.object({

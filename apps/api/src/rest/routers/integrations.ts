@@ -1,6 +1,6 @@
 import { associateMattermostUserSchema } from "@api/schemas/integrations";
-import { db } from "@db";
-import { integrationUserLink } from "@db/schema/schemas";
+import { db } from "@db/index";
+import { integrationUserLink } from "@db/schema";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import type { Context } from "../types";
 

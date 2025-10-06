@@ -1,5 +1,5 @@
 import { type BaseContext, createTypedContext } from "@ai-sdk-tools/artifacts";
-import type { db } from "@db";
+import type { db } from "@db/index";
 import type { ChatUserContext } from "./chat-cache";
 
 interface ChatContext extends BaseContext {

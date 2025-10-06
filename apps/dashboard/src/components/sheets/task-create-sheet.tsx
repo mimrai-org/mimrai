@@ -1,20 +1,7 @@
 "use client";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { TaskForm } from "../forms/task-form/task-form";
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogTitle,
-} from "../ui/dialog";
-import {
-	Sheet,
-	SheetContent,
-	SheetDescription,
-	SheetHeader,
-	SheetTitle,
-} from "../ui/sheet";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 
 export const TaskCreateSheet = () => {
 	const { createTask, taskColumnId, setParams } = useTaskParams();
@@ -26,7 +13,7 @@ export const TaskCreateSheet = () => {
 			<DialogHeader>
 				<DialogTitle />
 			</DialogHeader>
-			<DialogContent className="sm:min-w-[80%]">
+			<DialogContent className="sm:min-w-[70%]">
 				<TaskForm
 					defaultValues={{
 						columnId: taskColumnId || "backlog",

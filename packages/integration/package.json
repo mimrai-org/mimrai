@@ -10,7 +10,8 @@
 	},
 	"exports": {
 		"./init": "./src/init.ts",
-		"./validate": "./src/validate.ts"
+		"./validate": "./src/validate.ts",
+		"./registry": "./src/registry.ts"
 	},
 	"dependencies": {
 		"redis": "^5.8.2",

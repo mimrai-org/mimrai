@@ -1,6 +1,11 @@
 import { useFormContext } from "react-hook-form";
 import { DataSelectInput } from "@/components/ui/data-select-input";
-import { FormControl, FormField, FormItem } from "@/components/ui/form";
+import {
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+} from "@/components/ui/form";
 import { trpc } from "@/utils/trpc";
 import type { TaskFormValues } from "./task-form";
 
@@ -13,10 +18,11 @@ export const ColumnSelect = () => {
 			control={form.control}
 			render={({ field }) => (
 				<FormItem>
+					<FormLabel>Column</FormLabel>
 					<FormControl>
 						<DataSelectInput
 							size="sm"
-							className="w-32"
+							className="w-full"
 							// @ts-expect-error
 							queryOptions={trpc.columns.get.queryOptions(
 								{},
@@ -28,7 +34,7 @@ export const ColumnSelect = () => {
 							onChange={(value) => field.onChange(value || undefined)}
 							getLabel={(item) => item?.name ?? ""}
 							getValue={(item) => item?.id ?? ""}
-							variant={"outline"}
+							variant={"ghost"}
 						/>
 					</FormControl>
 				</FormItem>

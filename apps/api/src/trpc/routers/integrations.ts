@@ -1,9 +1,4 @@
 import {
-	type IntegrationName,
-	integrationsRegistry,
-} from "@api/lib/integrations/registry";
-import { validateIntegration } from "@api/lib/integrations/validate";
-import {
 	getIntegrationByIdSchema,
 	getIntegrationByTypeSchema,
 	getIntegrationLogsSchema,
@@ -22,6 +17,11 @@ import {
 	installIntegration,
 	updateIntegration,
 } from "@mimir/db/queries/integrations";
+import {
+	type IntegrationName,
+	integrationsRegistry,
+} from "@mimir/integration/registry";
+import { validateIntegration } from "@mimir/integration/validate";
 
 export const integrationsRouter = router({
 	get: protectedProcedure.query(async ({ ctx }) => {

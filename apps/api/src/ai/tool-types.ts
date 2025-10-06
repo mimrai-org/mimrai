@@ -12,10 +12,10 @@ export const createToolRegistry = () => {
 	const context = getContext();
 
 	return {
-		// createTask: createTaskTool,
-		// getColumns: getColumnsTool,
-		// getTasks: getTasksTool,
-		// updateTask: updateTaskTool,
+		createTask: createTaskTool,
+		getColumns: getColumnsTool,
+		getTasks: getTasksTool,
+		updateTask: updateTaskTool,
 		getUsers: getUsersTool,
 		web_search: openai.tools.webSearch({
 			searchContextSize: "medium",

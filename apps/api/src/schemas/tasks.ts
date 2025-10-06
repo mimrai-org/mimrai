@@ -1,4 +1,4 @@
-import { priorityEnum } from "@db/schema/schemas";
+import { priorityEnum } from "@db/schema";
 import z from "zod";
 import { paginationSchema } from "./base";
 

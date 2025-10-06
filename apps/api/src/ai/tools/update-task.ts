@@ -1,4 +1,4 @@
-import { tasks } from "@db/schema/schemas";
+import { tasks } from "@db/schema";
 import { tool } from "ai";
 import { and, eq } from "drizzle-orm";
 import z from "zod";

@@ -1,4 +1,3 @@
-import { addMeterUsage } from "@api/lib/meters";
 import { stripeClient } from "@api/lib/payments";
 import { and, eq, ilike, ne, type SQL } from "drizzle-orm";
 import { db } from "..";
@@ -199,8 +198,6 @@ export const leaveTeam = async (userId: string, teamId: string) => {
 		.where(
 			and(eq(usersOnTeams.userId, userId), eq(usersOnTeams.teamId, teamId)),
 		);
-
-	await addMeterUsage(teamId, "users", -1);
 
 	// If the user's current team is the one they left, unset it
 	const [user] = await db

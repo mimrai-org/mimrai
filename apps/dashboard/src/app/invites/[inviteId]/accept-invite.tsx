@@ -1,9 +1,9 @@
 "use client";
 
 import type { RouterOutputs } from "@mimir/api/trpc";
+import { useMutation } from "@tanstack/react-query";
 import { CheckCircleIcon, Loader2Icon } from "lucide-react";
-import { redirect, useRouter } from "next/navigation";
-import { useMutation } from "node_modules/@tanstack/react-query/build/modern/useMutation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";

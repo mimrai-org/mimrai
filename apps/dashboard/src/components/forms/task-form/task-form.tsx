@@ -129,19 +129,19 @@ export const TaskForm = ({
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)}>
-				<ScrollArea className="h-[calc(100vh-200px)]">
-					<div className="mb-4 space-y-1 py-4">
+				<ScrollArea className="min-h-[50vh]">
+					<div className="space-y-1 py-2">
 						<input className="size-0 opacity-0" />
 						<div className="flex items-center justify-between px-4">
 							<FormField
 								control={form.control}
 								name="title"
 								render={({ field }) => (
-									<FormItem className="mx-4 flex-1">
+									<FormItem className="flex-1">
 										<FormControl>
 											<Input
 												variant={"ghost"}
-												className="h-9 w-full px-0 font-medium focus:border-0 md:text-2xl"
+												className="h-10 w-full font-medium focus:border-0 md:text-xl"
 												placeholder="Task title"
 												autoFocus={false}
 												{...field}
@@ -163,23 +163,19 @@ export const TaskForm = ({
 								Last saved at {format(lastSavedDate, "pp")}
 							</Button>
 						</div>
-						<div className="mx-8">
-							<ColumnSelect />
-						</div>
 					</div>
 					<div className="mx-4 grid grid-cols-[1fr_300px] gap-4">
-						<div className="space-y-4 px-4 pb-4">
+						<div className="space-y-4 pb-4">
 							<FormField
 								control={form.control}
 								name="description"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Description</FormLabel>
 										<FormControl>
 											<MarkdownInput
 												className="min-h-[160px]"
 												contentEditableClassName="min-h-[160px] hover:bg-muted focus:bg-transparent transition-colors"
-												placeholder="Description"
+												placeholder="Add description..."
 												markdown={field.value ?? ""}
 												onChange={(value) => field.onChange(value)}
 											/>
@@ -188,7 +184,7 @@ export const TaskForm = ({
 								)}
 							/>
 
-							<div className="">
+							<div className="px-4">
 								<FormField
 									control={form.control}
 									name="attachments"
@@ -248,6 +244,7 @@ export const TaskForm = ({
 									</FormItem>
 								)}
 							/>
+							<ColumnSelect />
 						</div>
 					</div>
 				</ScrollArea>

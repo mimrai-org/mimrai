@@ -1,4 +1,4 @@
-import { columns } from "@db/schema/schemas";
+import { columns } from "@db/schema";
 import { tool } from "ai";
 import { eq } from "drizzle-orm";
 import z from "zod";
