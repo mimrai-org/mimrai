@@ -1,4 +1,5 @@
 "use client";
+import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
@@ -13,7 +14,7 @@ const links: {
 	active?: boolean;
 }[] = [
 	{ to: "/", label: "Home" },
-	{ to: "/dashboard", label: "Dashboard" },
+	{ to: "/dashboard", label: "Board" },
 	{ to: "/dashboard/settings/general", label: "Settings" },
 ] as const;
 
@@ -48,7 +49,7 @@ export default function Header() {
 								key={to}
 								href={to}
 								className={cn(
-									"border-b-3 pb-3 opacity-80 transition-all hover:opacity-100",
+									"relative pb-3 opacity-80 transition-all hover:opacity-100",
 									{
 										"border-primary font-medium opacity-100": active,
 										"border-transparent": !active,
@@ -56,6 +57,13 @@ export default function Header() {
 								)}
 							>
 								{label}
+								{active && (
+									<motion.div
+										layout
+										layoutId="header-underline"
+										className="absolute bottom-0 h-[3px] w-full bg-foreground"
+									/>
+								)}
 							</Link>
 						);
 					})}
