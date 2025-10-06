@@ -1,3 +1,4 @@
+"use client";
 import { parseAsString, useQueryStates } from "nuqs";
 import { useEffect } from "react";
 

@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useDebounceValue } from "usehooks-ts";
 import z from "zod/v3";
+import { PriorityBadge } from "@/components/kanban/priority";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { trpc } from "@/utils/trpc";
 import { Assignee } from "../../kanban/asignee";
-import { Badge } from "../../ui/badge";
 import { Button } from "../../ui/button";
 import { DataSelectInput } from "../../ui/data-select-input";
 import {
@@ -132,7 +132,7 @@ export const TaskForm = ({
 				<ScrollArea className="min-h-[50vh]">
 					<div className="space-y-1 py-2">
 						<input className="size-0 opacity-0" />
-						<div className="flex items-center justify-between px-4">
+						<div className="flex items-center justify-between gap-4 px-4">
 							<FormField
 								control={form.control}
 								name="title"
@@ -153,14 +153,16 @@ export const TaskForm = ({
 							/>
 							<Button
 								type="submit"
-								variant="ghost"
+								variant={defaultValues.id ? "ghost" : "default"}
 								size={"sm"}
 								className="text-sm"
 								disabled={
 									!form.formState.isDirty || form.formState.isSubmitting
 								}
 							>
-								Last saved at {format(lastSavedDate, "pp")}
+								{defaultValues.id
+									? `Last saved at ${format(lastSavedDate, "pp")}`
+									: "Create Task"}
 							</Button>
 						</div>
 					</div>
@@ -231,7 +233,7 @@ export const TaskForm = ({
 												onValueChange={field.onChange}
 											>
 												<SelectTrigger className="w-full rounded-xs border-none shadow-none transition-colors hover:bg-muted focus:ring-0 dark:bg-transparent">
-													<Badge>{field.value}</Badge>
+													<PriorityBadge value={field.value} />
 												</SelectTrigger>
 												<SelectContent>
 													<SelectItem value="low">Low</SelectItem>

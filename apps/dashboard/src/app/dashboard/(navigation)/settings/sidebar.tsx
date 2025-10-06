@@ -24,7 +24,7 @@ export const SettingsSidebar = () => {
 						href={to}
 						key={to}
 						className={cn(
-							"rounded-md px-4 py-2 hover:bg-accent hover:text-accent-foreground",
+							"rounded-none border border-transparent px-4 py-2 transition-all hover:border-muted hover:text-accent-foreground",
 							{
 								"bg-accent font-medium text-accent-foreground":
 									pathname.includes(to),

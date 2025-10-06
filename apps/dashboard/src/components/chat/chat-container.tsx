@@ -2,6 +2,7 @@
 import { BotIcon, BotOffIcon } from "lucide-react";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { ChatInterface } from "./chat-interface";
 
@@ -28,7 +29,9 @@ export const ChatContainer = ({ chatId }: { chatId?: string }) => {
 
 	return (
 		<div
-			className="h-full border-r transition-[transform] duration-300"
+			className={cn("h-full transition-[transform] duration-300", {
+				"border-r": show,
+			})}
 			style={{
 				width: show ? 700 : 0,
 				// transform: show ? "none" : "translateX(-500px)",

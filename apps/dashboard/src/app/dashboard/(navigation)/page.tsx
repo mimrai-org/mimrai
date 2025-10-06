@@ -16,20 +16,6 @@ type Props = {
 export default async function DashboardPage({ searchParams }: Props) {
 	const { chatId } = await searchParams;
 
-	const { data: session } = await authClient.getSession({
-		fetchOptions: {
-			headers: await headers(),
-		},
-	});
-
-	if (!session?.user) {
-		redirect("/sign-in");
-	}
-
-	if ("teamId" in session.user && !session.user.teamId) {
-		redirect("/dashboard/onboarding");
-	}
-
 	const chat = chatId
 		? await queryClient.fetchQuery(trpc.chats.get.queryOptions({ chatId }))
 		: null;
