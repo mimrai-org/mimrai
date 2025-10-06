@@ -1,5 +1,5 @@
 import { CheckCircle2Icon, Loader2Icon, XCircleIcon } from "lucide-react";
-import z from "zod/v3";
+import z from "zod";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Button } from "../ui/button";

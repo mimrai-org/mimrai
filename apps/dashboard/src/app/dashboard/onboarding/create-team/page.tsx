@@ -2,7 +2,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { RocketIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import z from "zod/v3";
+import { useEffect } from "react";
+import z from "zod";
 import { Button } from "@/components/ui/button";
 import {
 	Form,
@@ -13,22 +14,32 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useUser } from "@/hooks/use-user";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { trpc } from "@/utils/trpc";
 
 const schema = z.object({
 	name: z.string().min(2, "Name must be at least 2 characters"),
+	email: z.string().email(),
 	description: z.string().optional(),
 });
 
 export default function Page() {
 	const router = useRouter();
+	const user = useUser();
 	const form = useZodForm(schema, {
 		defaultValues: {
 			name: "",
+			email: user?.email || "",
 			description: "",
 		},
 	});
+
+	useEffect(() => {
+		if (user?.email) {
+			form.setValue("email", user.email);
+		}
+	}, [user?.email]);
 
 	const { mutateAsync: createTeam } = useMutation(
 		trpc.teams.create.mutationOptions(),

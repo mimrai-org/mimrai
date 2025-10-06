@@ -1,7 +1,7 @@
 "use client";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import z from "zod/v3";
+import z from "zod";
 import { useMemberParams } from "@/hooks/use-member-params";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { queryClient, trpc } from "@/utils/trpc";

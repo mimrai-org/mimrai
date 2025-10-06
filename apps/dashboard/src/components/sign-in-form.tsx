@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import z from "zod/v3";
+import z from "zod";
 import {
 	Form,
 	FormControl,

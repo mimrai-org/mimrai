@@ -1,6 +1,6 @@
 "use client";
 import { useMutation } from "@tanstack/react-query";
-import { z } from "zod/v3";
+import { z } from "zod";
 import { useTaskLabelParams } from "@/hooks/use-task-label-params";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { queryClient, trpc } from "@/utils/trpc";

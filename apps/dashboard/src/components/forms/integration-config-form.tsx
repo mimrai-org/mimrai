@@ -3,7 +3,7 @@
 import type { IntegrationName } from "@mimir/api/integrations/registry";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import z from "zod/v3";
+import z from "zod";
 import { useIntegrationParams } from "@/hooks/use-integration-params";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { queryClient, trpc } from "@/utils/trpc";
