@@ -1,4 +1,4 @@
-import { tasks } from "@db/schema";
+import { labelsOnTasks, tasks } from "@db/schema";
 import { tool } from "ai";
 import z from "zod";
 import { getContext } from "../context";
@@ -37,6 +37,12 @@ export const createTaskToolSchema = z.object({
 		.describe(
 			"ID of the column to add the task to, do not ask, get it from the getColumns tool",
 		),
+	labels: z
+		.array(z.string())
+		.optional()
+		.describe(
+			"List of label IDs to assign to the task. Do not ask, get it from the getLabels tool always (it is used to categorize and filter tasks)",
+		),
 
 	attachments: z
 		.array(z.url())
@@ -48,7 +54,7 @@ export const createTaskToolSchema = z.object({
 
 export const createTaskTool = tool({
 	description:
-		"Create a new task in your board. Always call the getUsers and getColumns tools before using this tool to get the IDs needed for assigneeId and columnId",
+		"Create a new task in your board. Always call the getUsers, getLabels, getColumns tools before using this tool to get the IDs needed for assigneeId, columnId and labels",
 	inputSchema: createTaskToolSchema,
 	execute: async function* (input) {
 		try {
@@ -70,6 +76,15 @@ export const createTaskTool = tool({
 					attachments: input.attachments || [],
 				})
 				.returning();
+
+			if (input.labels && input.labels.length > 0) {
+				// Then, insert new labels
+				const labelInserts = input.labels.map((labelId) => ({
+					taskId: newTask.id,
+					labelId,
+				}));
+				await db.insert(labelsOnTasks).values(labelInserts);
+			}
 
 			yield {
 				type: "text",

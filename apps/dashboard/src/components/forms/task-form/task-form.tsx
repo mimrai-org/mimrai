@@ -28,8 +28,11 @@ import {
 	SelectItem,
 	SelectTrigger,
 } from "../../ui/select";
+import { TaskActivitiesList } from "./activities-list";
 import { TaskAttachments } from "./attachments";
 import { ColumnSelect } from "./column-select";
+import { CommentInput } from "./comment-input";
+import { LabelInput } from "./label-input";
 
 export const taskFormSchema = z.object({
 	id: z.string().optional(),
@@ -39,6 +42,7 @@ export const taskFormSchema = z.object({
 	columnId: z.string(),
 	teamId: z.string(),
 	dueDate: z.string().optional(),
+	labels: z.array(z.string()).optional(),
 	priority: z.enum(["low", "medium", "high"]).optional(),
 	attachments: z.array(z.string()).optional(),
 });
@@ -58,6 +62,7 @@ export const TaskForm = ({
 			description: "",
 			teamId: "",
 			priority: "medium",
+			labels: [],
 			...defaultValues,
 		},
 	});
@@ -66,10 +71,10 @@ export const TaskForm = ({
 		trpc.tasks.create.mutationOptions({
 			onSuccess: (task) => {
 				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
-				queryClient.setQueryData(
-					trpc.tasks.getById.queryKey({ id: task.id }),
-					task,
-				);
+				// queryClient.setQueryData(
+				// 	trpc.tasks.getById.queryKey({ id: task.id }),
+				// 	task,
+				// );
 				setParams(null);
 			},
 			onError: (error) => {
@@ -81,11 +86,16 @@ export const TaskForm = ({
 	const { mutate: updateTask } = useMutation(
 		trpc.tasks.update.mutationOptions({
 			onSuccess: (task) => {
-				queryClient.setQueryData(
-					trpc.tasks.getById.queryKey({ id: task.id }),
-					task,
-				);
+				// queryClient.setQueryData(
+				// 	trpc.tasks.getById.queryKey({ id: task.id }),
+				// 	task,
+				// );
 				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
+				queryClient.invalidateQueries(
+					trpc.activities.get.queryOptions({
+						groupId: task.id,
+					}),
+				);
 			},
 		}),
 	);
@@ -129,7 +139,7 @@ export const TaskForm = ({
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)}>
-				<ScrollArea className="min-h-[50vh]">
+				<div className="max-h-[80vh] overflow-y-auto">
 					<div className="space-y-1 py-2">
 						<input className="size-0 opacity-0" />
 						<div className="flex items-center justify-between gap-4 px-4">
@@ -186,7 +196,24 @@ export const TaskForm = ({
 								)}
 							/>
 
-							<div className="px-4">
+							<FormField
+								control={form.control}
+								name="labels"
+								render={({ field }) => (
+									<FormItem>
+										<FormControl>
+											<LabelInput
+												className="justify-start"
+												placeholder="Add labels..."
+												value={field.value ?? []}
+												onChange={(value) => field.onChange(value)}
+											/>
+										</FormControl>
+									</FormItem>
+								)}
+							/>
+
+							<div className="space-y-4 px-4">
 								<FormField
 									control={form.control}
 									name="attachments"
@@ -194,10 +221,22 @@ export const TaskForm = ({
 										<TaskAttachments attachments={field.value ?? []} />
 									)}
 								/>
+
+								{defaultValues?.id && (
+									<div>
+										<div>
+											<FormLabel className="mb-4">Activity</FormLabel>
+											<TaskActivitiesList taskId={defaultValues?.id} />
+										</div>
+										<div className="mt-4">
+											<CommentInput taskId={defaultValues?.id} />
+										</div>
+									</div>
+								)}
 							</div>
 						</div>
 
-						<div className="space-y-4 border px-4 py-4">
+						<div className="h-fit space-y-4 border px-4 py-4">
 							<FormField
 								control={form.control}
 								name="assigneeId"
@@ -249,7 +288,7 @@ export const TaskForm = ({
 							<ColumnSelect />
 						</div>
 					</div>
-				</ScrollArea>
+				</div>
 				{/* <div className="flex items-center justify-end p-4">
 					
 				</div> */}

@@ -12,12 +12,9 @@
     "dev": "turbo dev",
     "build": "turbo build",
     "check-types": "turbo check-types",
-    "dev:dashboard": "turbo -F dashboard dev",
-    "dev:api": "turbo -F api dev",
-    "db:push": "turbo -F db db:push",
-    "db:studio": "turbo -F db db:studio",
-    "db:generate": "turbo -F db db:generate",
-    "db:migrate": "turbo -F db db:migrate"
+    "dev:dashboard": "turbo -F @mimir/dashboard dev",
+    "dev:api": "turbo -F @mimir/api dev",
+    "db:push": "turbo -F @mimir/db db:push"
   },
   "dependencies": {},
   "devDependencies": {

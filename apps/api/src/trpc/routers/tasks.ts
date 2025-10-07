@@ -1,4 +1,5 @@
 import {
+	commentTaskSchema,
 	createTaskSchema,
 	deleteTaskSchema,
 	getTasksSchema,
@@ -7,6 +8,7 @@ import {
 import { protectedProcedure, router } from "@api/trpc/init";
 import {
 	createTask,
+	createTaskComment,
 	deleteTask,
 	getTaskById,
 	getTasks,
@@ -28,6 +30,7 @@ export const tasksRouter = router({
 		.mutation(async ({ ctx, input }) => {
 			return createTask({
 				...input,
+				userId: ctx.user.id,
 				teamId: ctx.user.teamId!,
 			});
 		}),
@@ -36,6 +39,7 @@ export const tasksRouter = router({
 		.mutation(async ({ ctx, input }) => {
 			return updateTask({
 				...input,
+				userId: ctx.user.id,
 				teamId: ctx.user.teamId!,
 			});
 		}),
@@ -51,5 +55,16 @@ export const tasksRouter = router({
 		.input(updateTaskSchema.pick({ id: true }))
 		.query(async ({ ctx, input }) => {
 			return getTaskById(input.id, ctx.user.teamId!);
+		}),
+
+	comment: protectedProcedure
+		.input(commentTaskSchema)
+		.mutation(async ({ ctx, input }) => {
+			return createTaskComment({
+				taskId: input.id,
+				comment: input.comment,
+				userId: ctx.user.id,
+				teamId: ctx.user.teamId!,
+			});
 		}),
 });

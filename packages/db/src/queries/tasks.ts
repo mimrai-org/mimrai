@@ -4,9 +4,10 @@ import type {
 	UpdateTaskInput,
 } from "@api/schemas/tasks";
 import { subDays } from "date-fns";
-import { and, eq, gte, ilike, inArray, or, type SQL } from "drizzle-orm";
+import { and, eq, gte, ilike, inArray, or, type SQL, sql } from "drizzle-orm";
 import { db } from "..";
-import { columns, tasks, users } from "../schema";
+import { columns, labels, labelsOnTasks, tasks, users } from "../schema";
+import { createActivity } from "./activities";
 
 export const getTasks = async ({
 	pageSize = 20,
@@ -17,6 +18,7 @@ export const getTasks = async ({
 	cursor?: string;
 	assigneeId?: string[];
 	columnId?: string[];
+	labels?: string[];
 	teamId?: string;
 	search?: string;
 }) => {
@@ -30,6 +32,9 @@ export const getTasks = async ({
 		whereConditions.push(inArray(tasks.columnId, input.columnId));
 	input.teamId && whereConditions.push(eq(tasks.teamId, input.teamId));
 	input.search && whereConditions.push(ilike(tasks.title, `%${input.search}%`));
+	input.labels &&
+		input.labels.length > 0 &&
+		whereConditions.push(inArray(labelsOnTasks.labelId, input.labels));
 
 	// exlude done tasks with more than 3 days
 	whereConditions.push(
@@ -70,12 +75,26 @@ export const getTasks = async ({
 				order: columns.order,
 				isFinalState: columns.isFinalState,
 			},
+			labels: sql<
+				{
+					id: string;
+					name: string;
+					color: string;
+				}[]
+			>`COALESCE(json_agg(DISTINCT jsonb_build_object('id', ${labels.id}, 'name', ${labels.name}, 'color', ${labels.color}) ) FILTER (WHERE ${labels.id} IS NOT NULL), '[]'::json)`.as(
+				"labels",
+			),
 		})
 		.from(tasks)
 		.where(and(...whereConditions))
 		.innerJoin(columns, eq(tasks.columnId, columns.id))
+		.leftJoin(labelsOnTasks, eq(labelsOnTasks.taskId, tasks.id))
+		.leftJoin(labels, eq(labels.id, labelsOnTasks.labelId))
 		.leftJoin(users, eq(tasks.assigneeId, users.id))
+		.groupBy(tasks.id, users.id, columns.id)
 		.orderBy(tasks.order);
+
+	console.log(query.toSQL());
 
 	// Apply pagination
 	const offset = cursor ? Number.parseInt(cursor, 10) : 0;
@@ -100,7 +119,23 @@ export const getTasks = async ({
 	};
 };
 
-export const createTask = async (input: CreateTaskInput) => {
+export const createTask = async ({
+	labels,
+	userId,
+	...input
+}: {
+	labels?: string[];
+	title: string;
+	description?: string;
+	assigneeId?: string;
+	columnId: string;
+	teamId: string;
+	order?: number;
+	priority?: "low" | "medium" | "high";
+	dueDate?: string;
+	attachments?: string[];
+	userId?: string;
+}) => {
 	const [task] = await db
 		.insert(tasks)
 		.values({
@@ -108,9 +143,25 @@ export const createTask = async (input: CreateTaskInput) => {
 		})
 		.returning();
 
+	if (labels && labels.length > 0 && task) {
+		// Then, insert new labels
+		const labelInserts = labels.map((labelId) => ({
+			taskId: task.id,
+			labelId,
+		}));
+		await db.insert(labelsOnTasks).values(labelInserts);
+	}
+
 	if (!task) {
 		throw new Error("Failed to create task");
 	}
+
+	await createActivity({
+		userId,
+		teamId: task.teamId,
+		type: "task_created",
+		groupId: task.id,
+	});
 
 	return task;
 };
@@ -134,11 +185,38 @@ export const deleteTask = async (input: DeleteTaskInput) => {
 	return task;
 };
 
-export const updateTask = async (input: UpdateTaskInput) => {
+export const updateTask = async ({
+	labels,
+	userId,
+	...input
+}: {
+	id: string;
+	labels?: string[];
+	title?: string;
+	description?: string;
+	assigneeId?: string;
+	columnId?: string;
+	teamId?: string;
+	order?: number;
+	priority?: "low" | "medium" | "high";
+	dueDate?: string;
+	attachments?: string[];
+	userId?: string;
+}) => {
 	const whereClause: SQL[] = [eq(tasks.id, input.id)];
 
 	if (input.teamId) {
 		whereClause.push(eq(tasks.teamId, input.teamId));
+	}
+
+	const [oldTask] = await db
+		.select()
+		.from(tasks)
+		.where(and(...whereClause))
+		.limit(1);
+
+	if (!oldTask) {
+		throw new Error("Task not found");
 	}
 
 	const [task] = await db
@@ -150,9 +228,31 @@ export const updateTask = async (input: UpdateTaskInput) => {
 		.where(and(...whereClause))
 		.returning();
 
+	if (labels) {
+		// First, delete existing labels for the task
+		await db.delete(labelsOnTasks).where(eq(labelsOnTasks.taskId, input.id));
+
+		// Then, insert new labels
+		if (labels.length > 0) {
+			const labelInserts = labels.map((labelId) => ({
+				taskId: input.id,
+				labelId,
+			}));
+			await db.insert(labelsOnTasks).values(labelInserts);
+		}
+	}
+
 	if (!task) {
 		throw new Error("Failed to update task");
 	}
+
+	// TODO: only create activity if something changed
+	await createActivity({
+		userId,
+		teamId: task.teamId,
+		type: "task_updated",
+		groupId: task.id,
+	});
 
 	return task;
 };
@@ -164,10 +264,125 @@ export const getTaskById = async (id: string, teamId?: string) => {
 		whereClause.push(eq(tasks.teamId, teamId));
 	}
 	const [task] = await db
+		.select({
+			id: tasks.id,
+			title: tasks.title,
+			description: tasks.description,
+			assigneeId: tasks.assigneeId,
+			assignee: {
+				id: users.id,
+				name: users.name,
+				email: users.email,
+				image: users.image,
+				color: users.color,
+			},
+			columnId: tasks.columnId,
+			order: tasks.order,
+			priority: tasks.priority,
+			dueDate: tasks.dueDate,
+			createdAt: tasks.createdAt,
+			updatedAt: tasks.updatedAt,
+			teamId: tasks.teamId,
+			attachments: tasks.attachments,
+			column: {
+				id: columns.id,
+				name: columns.name,
+				description: columns.description,
+				order: columns.order,
+				isFinalState: columns.isFinalState,
+			},
+			labels: sql<
+				{
+					id: string;
+					name: string;
+					color: string;
+				}[]
+			>`COALESCE(json_agg(DISTINCT jsonb_build_object('id', ${labels.id}, 'name', ${labels.name}, 'color', ${labels.color}) ) FILTER (WHERE ${labels.id} IS NOT NULL), '[]'::json)`.as(
+				"labels",
+			),
+		})
+		.from(tasks)
+		.where(and(...whereClause))
+		.innerJoin(columns, eq(tasks.columnId, columns.id))
+		.leftJoin(labelsOnTasks, eq(labelsOnTasks.taskId, tasks.id))
+		.leftJoin(labels, eq(labels.id, labelsOnTasks.labelId))
+		.leftJoin(users, eq(tasks.assigneeId, users.id))
+		.groupBy(tasks.id, users.id, columns.id)
+		.limit(1);
+
+	return task;
+};
+
+export const createDefaultTasks = async ({
+	columnId,
+	labelId,
+	assigneeId,
+	teamId,
+}: {
+	columnId: string;
+	labelId: string;
+	assigneeId: string;
+	teamId: string;
+}) => {
+	const defaultTasks = [
+		{
+			title: "Welcome to Mimir!",
+			description: "This is your first task. Feel free to edit or delete it.",
+		},
+	];
+
+	const data = await db
+		.insert(tasks)
+		.values(
+			defaultTasks.map((task, index) => ({
+				...task,
+				columnId,
+				teamId,
+				assigneeId,
+				order: index,
+			})),
+		)
+		.returning();
+
+	for (const task of data) {
+		await db.insert(labelsOnTasks).values({ taskId: task.id, labelId });
+	}
+
+	return data;
+};
+
+export const createTaskComment = async ({
+	taskId,
+	userId,
+	teamId,
+	comment,
+}: {
+	taskId: string;
+	userId: string;
+	teamId?: string;
+	comment: string;
+}) => {
+	const whereClause: SQL[] = [eq(tasks.id, taskId)];
+
+	if (teamId) whereClause.push(eq(tasks.teamId, teamId));
+
+	const [task] = await db
 		.select()
 		.from(tasks)
 		.where(and(...whereClause))
 		.limit(1);
 
-	return task;
+	if (!task) {
+		throw new Error("Task not found");
+	}
+
+	const activity = await createActivity({
+		userId,
+		teamId: task.teamId,
+		type: "task_comment",
+		groupId: task.id,
+		metadata: { comment },
+	});
+
+	return activity;
 };

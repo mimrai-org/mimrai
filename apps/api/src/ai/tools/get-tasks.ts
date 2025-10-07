@@ -55,11 +55,24 @@ export const getTasksTool = tool({
 				return;
 			}
 
+			const mappedData = result.data.map((task) => ({
+				id: task.id,
+				title: task.title,
+				description: task.description,
+				priority: task.priority,
+				column: task.column,
+				columnId: task.columnId,
+				assigneeId: task.assigneeId,
+				dueDate: task.dueDate,
+				createdAt: task.createdAt,
+				updatedAt: task.updatedAt,
+			}));
+
 			yield {
 				text: "I've applied the task filters you provided. You can view the filtered tasks in your board.",
 				link: `${getAppUrl()}/dashboard`,
 				status: "success",
-				data: result.data,
+				data: mappedData,
 				forceStop: artifactSupport,
 			};
 		} catch (error) {

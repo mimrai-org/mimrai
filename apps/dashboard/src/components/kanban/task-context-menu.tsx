@@ -2,18 +2,19 @@ import type { RouterOutputs } from "@mimir/api/trpc";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ArrowUpNarrowWideIcon, TrashIcon, UserIcon } from "lucide-react";
 import { queryClient, trpc } from "@/utils/trpc";
+import { Checkbox } from "../ui/checkbox";
 import {
 	ContextMenu,
 	ContextMenuContent,
 	ContextMenuItem,
-	ContextMenuLabel,
 	ContextMenuSub,
 	ContextMenuSubContent,
 	ContextMenuSubTrigger,
 	ContextMenuTrigger,
 } from "../ui/context-menu";
+import { LabelBadge } from "../ui/label-badge";
 import { Assignee } from "./asignee";
-import { Priority, PriorityBadge } from "./priority";
+import { PriorityBadge } from "./priority";
 
 export const TaskContextMenu = ({
 	task,
@@ -30,6 +31,7 @@ export const TaskContextMenu = ({
 	);
 
 	const { data } = useQuery(trpc.teams.getMembers.queryOptions());
+	const { data: labels } = useQuery(trpc.labels.get.queryOptions({}));
 
 	const handleDeleteTask = async (taskId: string) => {
 		await deleteTask({ id: taskId });
@@ -38,6 +40,7 @@ export const TaskContextMenu = ({
 
 	const handleUpdateTask = async (data: {
 		priority?: "low" | "medium" | "high";
+		labels?: string[];
 		assigneeId?: string;
 	}) => {
 		await updateTask({ id: task.id, ...data });
@@ -53,8 +56,42 @@ export const TaskContextMenu = ({
 				</ContextMenuLabel> */}
 				<ContextMenuSub>
 					<ContextMenuSubTrigger className="flex items-center gap-2">
+						Labels
+					</ContextMenuSubTrigger>
+					<ContextMenuSubContent className="w-32">
+						{labels?.map((label) => {
+							const isAssigned = task.labels?.some((l) => l.id === label.id);
+							return (
+								<ContextMenuItem
+									key={label.id}
+									onClick={() => {
+										if (isAssigned) {
+											handleUpdateTask({
+												labels: task.labels
+													?.filter((l) => l.id !== label.id)
+													.map((l) => l.id),
+											});
+										} else {
+											handleUpdateTask({
+												labels: [
+													...(task.labels?.map((l) => l.id) || []),
+													label.id,
+												],
+											});
+										}
+									}}
+								>
+									<Checkbox checked={isAssigned} className="mr-2" />
+									<LabelBadge {...label} />
+								</ContextMenuItem>
+							);
+						})}
+					</ContextMenuSubContent>
+				</ContextMenuSub>
+				<ContextMenuSub>
+					<ContextMenuSubTrigger className="flex items-center gap-2">
 						<ArrowUpNarrowWideIcon />
-						Set Priority
+						Priority
 					</ContextMenuSubTrigger>
 					<ContextMenuSubContent className="w-32">
 						{["low", "medium", "high"].map((level) => (

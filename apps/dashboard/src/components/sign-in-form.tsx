@@ -101,11 +101,7 @@ export default function SignInForm() {
 			</Form>
 
 			<div className="mt-4 text-center">
-				<Button
-					variant="link"
-					onClick={() => router.push("/sign-up")}
-					className="text-indigo-600 hover:text-indigo-800"
-				>
+				<Button variant="link" onClick={() => router.push("/sign-up")}>
 					Need an account? Sign Up
 				</Button>
 			</div>

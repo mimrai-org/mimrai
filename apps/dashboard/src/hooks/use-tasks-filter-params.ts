@@ -4,6 +4,7 @@ import { createLoader, parseAsArrayOf, parseAsString } from "nuqs/server";
 export const tasksFilterParams = {
 	assigneeId: parseAsArrayOf(parseAsString),
 	search: parseAsString,
+	labels: parseAsArrayOf(parseAsString),
 };
 
 export const useTasksFilterParams = () => {

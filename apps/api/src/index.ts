@@ -67,5 +67,6 @@ initIntegrations()
 export default {
 	port: process.env.PORT ? Number(process.env.PORT) : 3003,
 	fetch: app.fetch,
+	idleTimeout: 60,
 	host: "::",
 };

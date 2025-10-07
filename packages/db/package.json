@@ -1,36 +1,33 @@
 {
-	"name": "@mimir/db",
-	"private": true,
-	"scripts": {
-		"clean": "rm -rf .turbo node_modules",
-		"lint": "biome check .",
-		"format": "biome format --write .",
-		"typecheck": "tsc --noEmit",
-		"db:push": "drizzle-kit generate:pg --schema src/schema.ts --out ./drizzle --connection $DATABASE_URL && drizzle-kit push:pg --schema src/schema.ts --connection $DATABASE_URL",
-		"db:studio": "drizzle-kit studio --schema src/schema.ts --connection $DATABASE_URL",
-		"db:migrate": "drizzle-kit migrate:up --schema src/schema.ts --connection $DATABASE_URL",
-		"db:generate": "drizzle-kit generate:pg --schema src/schema.ts --out ./drizzle --connection $DATABASE_URL"
-	},
-	"exports": {
-		"./client": "./src/index.ts",
-		"./queries/*": "./src/queries/*.ts",
-		"./schema": "./src/schema.ts"
-	},
-	"dependencies": {
-		"@date-fns/utc": "^2.1.1",
-		"date-fns": "^4.1.0",
-		"@mimir/logger": "workspace:*",
-		"@mimir/utils": "workspace:*",
-		"@mimir/cache": "workspace:*",
-		"@types/pg": "^8.15.5",
-		"camelcase-keys": "^10.0.0",
-		"drizzle-orm": "^0.44.5",
-		"pg": "^8.16.3",
-		"snakecase-keys": "^9.0.2"
-	},
-	"devDependencies": {
-		"@mimir/tsconfig": "workspace:*",
-		"drizzle-kit": "^0.31.4",
-		"@types/bun": "latest"
-	}
+  "name": "@mimir/db",
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf .turbo node_modules",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "typecheck": "tsc --noEmit",
+    "db:push": "drizzle-kit push"
+  },
+  "exports": {
+    "./client": "./src/index.ts",
+    "./queries/*": "./src/queries/*.ts",
+    "./schema": "./src/schema.ts"
+  },
+  "dependencies": {
+    "@date-fns/utc": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "@mimir/logger": "workspace:*",
+    "@mimir/utils": "workspace:*",
+    "@mimir/cache": "workspace:*",
+    "@types/pg": "^8.15.5",
+    "camelcase-keys": "^10.0.0",
+    "drizzle-orm": "^0.44.5",
+    "pg": "^8.16.3",
+    "snakecase-keys": "^9.0.2"
+  },
+  "devDependencies": {
+    "@mimir/tsconfig": "workspace:*",
+    "drizzle-kit": "^0.31.4",
+    "@types/bun": "latest"
+  }
 }

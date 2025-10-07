@@ -8,6 +8,7 @@ export const getTasksSchema = z.object({
 	columnId: z.array(z.string()).optional(),
 	teamId: z.string().optional(),
 	search: z.string().optional(),
+	labels: z.array(z.string()).optional(),
 });
 export type GetTasksInput = z.infer<typeof getTasksSchema>;
 
@@ -19,6 +20,7 @@ export const createTaskSchema = z.object({
 	teamId: z.string(),
 	order: z.number().optional(),
 	priority: z.enum(priorityEnum.enumValues).optional(),
+	labels: z.array(z.string()).optional(),
 	dueDate: z.string().optional(),
 });
 export type CreateTaskInput = z.infer<typeof createTaskSchema>;
@@ -33,6 +35,7 @@ export const updateTaskSchema = z.object({
 	dueDate: z.string().optional(),
 	order: z.number().optional(),
 	columnId: z.string().optional(),
+	labels: z.array(z.string()).optional(),
 });
 export type UpdateTaskInput = z.infer<typeof updateTaskSchema>;
 
@@ -41,3 +44,8 @@ export const deleteTaskSchema = z.object({
 	teamId: z.string().optional(),
 });
 export type DeleteTaskInput = z.infer<typeof deleteTaskSchema>;
+
+export const commentTaskSchema = z.object({
+	id: z.string(),
+	comment: z.string().min(1).max(5000),
+});

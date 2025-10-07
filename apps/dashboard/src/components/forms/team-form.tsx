@@ -2,6 +2,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { use, useEffect } from "react";
 import z from "zod";
+import { useTeamParams } from "@/hooks/use-team-params";
 import { useScopes, useUser } from "@/hooks/use-user";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { cn } from "@/lib/utils";
@@ -39,6 +40,7 @@ export const TeamForm = ({
 	defaultValues?: Partial<z.infer<typeof teamFormSchema>>;
 	scrollarea?: boolean;
 }) => {
+	const { setParams } = useTeamParams();
 	const user = useUser();
 	const canWriteTeam = useScopes(["team:write"]);
 	const form = useZodForm(teamFormSchema, {
@@ -55,12 +57,27 @@ export const TeamForm = ({
 		form.setValue("email", user?.email || "");
 	}, [user?.email]);
 
+	const { mutateAsync: switchTeam } = useMutation(
+		trpc.users.switchTeam.mutationOptions(),
+	);
+
 	const { mutateAsync: createTeam } = useMutation(
-		trpc.teams.create.mutationOptions(),
+		trpc.teams.create.mutationOptions({
+			onSuccess: async (team) => {
+				setParams(null);
+				await switchTeam({ teamId: team.id });
+				window.location.href = "/dashboard";
+			},
+		}),
 	);
 
 	const { mutateAsync: updateTeam } = useMutation(
-		trpc.teams.update.mutationOptions(),
+		trpc.teams.update.mutationOptions({
+			onSuccess: () => {
+				queryClient.invalidateQueries(trpc.teams.getCurrent.queryOptions());
+				queryClient.invalidateQueries(trpc.users.getCurrent.queryOptions());
+			},
+		}),
 	);
 
 	const handleSubmit = async (data: z.infer<typeof teamFormSchema>) => {
@@ -70,13 +87,11 @@ export const TeamForm = ({
 				...data,
 				id: data.id,
 			});
-			queryClient.invalidateQueries(trpc.teams.getCurrent.queryOptions());
-			queryClient.invalidateQueries(trpc.users.getCurrent.queryOptions());
 		} else {
 			const team = await createTeam({
 				...data,
 			});
-			queryClient.invalidateQueries(trpc.teams.getAvailable.queryOptions());
+
 			// Create new team
 		}
 	};

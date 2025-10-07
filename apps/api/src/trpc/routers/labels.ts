@@ -7,18 +7,18 @@ import {
 } from "@api/schemas/task-label";
 import { protectedProcedure, router } from "@api/trpc/init";
 import {
-	createTaskLabel,
-	deleteTaskLabel,
-	getTaskLabelById,
-	getTaskLabels,
-	updateTaskLabel,
-} from "@mimir/db/queries/task-labels";
+	createLabel,
+	deleteLabel,
+	getLabelById,
+	getLabels,
+	updateLabel,
+} from "@mimir/db/queries/labels";
 
-export const taskLabelsRouter = router({
+export const labelsRouter = router({
 	get: protectedProcedure
 		.input(getTaskLabelsSchema)
 		.query(async ({ ctx, input }) => {
-			return getTaskLabels({
+			return getLabels({
 				...input,
 				teamId: ctx.user.teamId!,
 			});
@@ -27,7 +27,7 @@ export const taskLabelsRouter = router({
 	create: protectedProcedure
 		.input(createTaskLabelSchema)
 		.mutation(async ({ ctx, input }) => {
-			return await createTaskLabel({
+			return await createLabel({
 				...input,
 				teamId: ctx.user.teamId!,
 			});
@@ -36,7 +36,7 @@ export const taskLabelsRouter = router({
 	update: protectedProcedure
 		.input(updateTaskLabelSchema)
 		.mutation(async ({ ctx, input }) => {
-			return updateTaskLabel({
+			return updateLabel({
 				...input,
 				teamId: ctx.user.teamId!,
 			});
@@ -45,7 +45,7 @@ export const taskLabelsRouter = router({
 	getById: protectedProcedure
 		.input(getTaskLabelByIdSchema)
 		.query(async ({ ctx, input }) => {
-			return getTaskLabelById({
+			return getLabelById({
 				...input,
 				teamId: ctx.user.teamId!,
 			});
@@ -54,7 +54,7 @@ export const taskLabelsRouter = router({
 	delete: protectedProcedure
 		.input(deleteTaskLabelSchema)
 		.mutation(async ({ ctx, input }) => {
-			return deleteTaskLabel({
+			return deleteLabel({
 				...input,
 				teamId: ctx.user.teamId!,
 			});

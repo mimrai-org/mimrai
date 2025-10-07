@@ -1,12 +1,7 @@
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { FileTextIcon } from "lucide-react";
 import Image from "next/image";
-import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { FormLabel } from "@/components/ui/form";
 
 export const TaskAttachments = ({
@@ -16,8 +11,11 @@ export const TaskAttachments = ({
 }) => {
 	return (
 		<div className="">
-			<FormLabel className="mb-2">Attachments</FormLabel>
-			<ul>
+			<FormLabel className="mb-4">Attachments</FormLabel>
+			<ul className="min-h-[32px] border">
+				{attachments?.length === 0 && (
+					<li className="p-4 text-muted-foreground text-sm">No attachments</li>
+				)}
 				{attachments.map((attachment) => (
 					<li key={attachment}>
 						<TaskAttachmentPreview attachment={attachment} />
@@ -49,8 +47,8 @@ export const TaskAttachmentPreview = ({
 							height={64}
 						/>
 					) : (
-						<div>
-							<FileTextIcon />
+						<div className="flex h-full w-full items-center justify-center">
+							<FileTextIcon className="size-4" />
 						</div>
 					)}
 				</div>

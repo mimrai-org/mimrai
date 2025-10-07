@@ -3,6 +3,7 @@ import type { InferUITools } from "ai";
 import { getContext } from "./context";
 import { createTaskTool } from "./tools/create-task";
 import { getColumnsTool } from "./tools/get-columns";
+import { getLabelsTool } from "./tools/get-labels";
 import { getTasksTool } from "./tools/get-tasks";
 import { getUsersTool } from "./tools/get-users";
 import { updateTaskTool } from "./tools/update-task";
@@ -17,6 +18,7 @@ export const createToolRegistry = () => {
 		getTasks: getTasksTool,
 		updateTask: updateTaskTool,
 		getUsers: getUsersTool,
+		getLabels: getLabelsTool,
 		web_search: openai.tools.webSearch({
 			searchContextSize: "medium",
 			userLocation: {

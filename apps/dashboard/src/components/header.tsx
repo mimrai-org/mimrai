@@ -1,11 +1,20 @@
 "use client";
-import { AnimatePresence, motion } from "motion/react";
+import {
+	BotIcon,
+	BotOffIcon,
+	PanelLeftCloseIcon,
+	PanelLeftOpenIcon,
+	PanelRightIcon,
+} from "lucide-react";
+import { motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
+import { useChatContainer } from "./chat/chat-container";
 import { ModeToggle } from "./mode-toggle";
 import { TeamSwitcher } from "./team-switcher";
+import { Button } from "./ui/button";
 import UserMenu from "./user-menu";
 
 const links: {
@@ -13,12 +22,12 @@ const links: {
 	label: string;
 	active?: boolean;
 }[] = [
-	{ to: "/", label: "Home" },
 	{ to: "/dashboard", label: "Board" },
 	{ to: "/dashboard/settings/general", label: "Settings" },
 ] as const;
 
 export default function Header() {
+	const { show, toggle } = useChatContainer();
 	const pathname = usePathname();
 
 	const computedLinks = useMemo(() => {
@@ -43,6 +52,24 @@ export default function Header() {
 					</div>
 				</div>
 				<nav className="flex items-center gap-4 pt-4 text-sm">
+					<Button
+						size={"sm"}
+						variant={"ghost"}
+						className={cn(
+							"bg-transparent px-0! pt-0 pb-3 opacity-80 hover:bg-transparent hover:opacity-100 focus:bg-transparent dark:hover:bg-transparent",
+							{
+								"opacity-100": show,
+							},
+						)}
+						onClick={toggle}
+					>
+						{show ? (
+							<PanelLeftCloseIcon className="size-4" />
+						) : (
+							<PanelLeftOpenIcon className="size-4" />
+						)}
+						Chat
+					</Button>
 					{computedLinks.map(({ to, label, active }) => {
 						return (
 							<Link

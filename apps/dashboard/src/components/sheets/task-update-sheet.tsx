@@ -40,6 +40,7 @@ export const TaskUpdateSheet = () => {
 							teamId: task.teamId,
 							priority: task.priority || "medium",
 							dueDate: task.dueDate || undefined,
+							labels: task.labels?.map((label) => label.id) || [],
 							attachments: task.attachments || [],
 						}}
 					/>

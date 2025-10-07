@@ -2,6 +2,9 @@ import { stripeClient } from "@api/lib/payments";
 import { and, eq, ilike, ne, type SQL } from "drizzle-orm";
 import { db } from "..";
 import { type plansEnum, teams, users, usersOnTeams } from "../schema";
+import { createDefaultColumns } from "./columns";
+import { createDefaultLabels } from "./labels";
+import { createDefaultTasks } from "./tasks";
 
 export const getTeamById = async (teamId: string) => {
 	const [team] = await db
@@ -32,12 +35,16 @@ export const createTeam = async ({
 		})
 		.returning();
 
+	if (!team) {
+		throw new Error("Failed to create team");
+	}
+
 	// Create a customer in Stripe
 	const customer = await stripeClient.customers.create({
 		name: name,
 		email: email,
 		metadata: {
-			teamId: team!.id,
+			teamId: team.id,
 		},
 	});
 
@@ -45,11 +52,11 @@ export const createTeam = async ({
 	await db
 		.update(teams)
 		.set({ customerId: customer.id })
-		.where(eq(teams.id, team!.id));
+		.where(eq(teams.id, team.id));
 
 	await db
 		.insert(usersOnTeams)
-		.values({ teamId: team!.id, userId, role: "owner" });
+		.values({ teamId: team.id, userId, role: "owner" });
 
 	const userTeams = await db
 		.select({ id: usersOnTeams.teamId })
@@ -59,11 +66,22 @@ export const createTeam = async ({
 
 	if (userTeams.length === 1) {
 		// This is the first team, set it as the user's current team
-		await db
-			.update(users)
-			.set({ teamId: team!.id })
-			.where(eq(users.id, userId));
+		await db.update(users).set({ teamId: team.id }).where(eq(users.id, userId));
 	}
+
+	// Create default labels
+	const defaultLabels = await createDefaultLabels(team.id);
+
+	// Create default columns
+	const defaultColumns = await createDefaultColumns(team.id);
+
+	// Create default tasks
+	await createDefaultTasks({
+		columnId: defaultColumns[0]!.id,
+		labelId: defaultLabels[0]!.id,
+		assigneeId: userId,
+		teamId: team.id,
+	});
 
 	return team;
 };

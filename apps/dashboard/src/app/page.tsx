@@ -1,5 +1,7 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { trpc } from "@/utils/trpc";
 
 export default function Home() {
@@ -7,8 +9,22 @@ export default function Home() {
 
 	return (
 		<div className="container mx-auto mt-32 max-w-3xl px-4 py-2">
-			<pre className="overflow-x-auto font-mono text-sm">Mimir</pre>
-			<div className="grid gap-6">
+			<h1 className="mb-4 text-6xl">
+				Welcome to <span className="font-medium">Mimir</span>
+			</h1>
+			<p className="max-w-2xl text-balance text-lg text-muted-foreground">
+				Mimir is the next generation AI task manager for developers. It helps
+				you and your team stay organized, prioritize tasks, and get more done
+				with the power of AI.
+			</p>
+
+			<div className="mt-4">
+				<Link href="/dashboard">
+					<Button variant={"outline"}>Get Started</Button>
+				</Link>
+			</div>
+
+			<div className="mt-12 grid gap-6">
 				<section className="rounded-lg border p-4">
 					<h2 className="mb-2 font-medium">API Status</h2>
 					<div className="flex items-center gap-2">

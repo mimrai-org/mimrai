@@ -1,6 +1,7 @@
 "use client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { EllipsisIcon } from "lucide-react";
+import { AssigneeAvatar } from "@/components/kanban/asignee";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -55,11 +56,7 @@ export const MembersList = () => {
 							className="flex items-center justify-between gap-2 border-b px-2 py-4 last:border-0"
 						>
 							<div className="flex items-center gap-2">
-								<Avatar>
-									<AvatarFallback>
-										{member.name.charAt(0).toUpperCase()}
-									</AvatarFallback>
-								</Avatar>
+								<AssigneeAvatar className="size-8" {...member} />
 								<div className="text-sm">
 									<div className="font-medium">{member.name}</div>
 									<div className="text-muted-foreground">{member.email}</div>

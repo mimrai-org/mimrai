@@ -2,6 +2,7 @@ import type { RouterOutputs } from "@mimir/api/trpc";
 import { format } from "date-fns";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
+import { LabelBadge } from "../ui/label-badge";
 import { Assignee } from "./asignee";
 import { Priority } from "./priority";
 
@@ -17,6 +18,7 @@ export const KanbanTask = ({
 	task: Task;
 	ref?: React.Ref<HTMLDivElement>;
 }) => {
+	console.log("Rendering task:", task.labels);
 	return (
 		<motion.div
 			className={cn(
@@ -40,6 +42,13 @@ export const KanbanTask = ({
 				<div className="flex items-center justify-between gap-2">
 					<span className="font-medium text-sm">{task.title}</span>
 				</div>
+				{task.labels?.length > 0 && (
+					<div className="mb-2 flex flex-wrap gap-1">
+						{task.labels?.slice(0, 3).map((label) => (
+							<LabelBadge key={label.id} {...label} />
+						))}
+					</div>
+				)}
 				<div className="flex items-center justify-between text-muted-foreground text-xs">
 					<Assignee {...task.assignee} />
 					{task.priority ? <Priority value={task.priority} /> : <div />}

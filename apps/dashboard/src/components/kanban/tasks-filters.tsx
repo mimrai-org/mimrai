@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";
 import { trpc } from "@/utils/trpc";
+import { LabelInput } from "../forms/task-form/label-input";
 import { DataSelectInput } from "../ui/data-select-input";
 import { Input } from "../ui/input";
 import { Assignee, AssigneeAvatar } from "./asignee";
@@ -16,11 +17,12 @@ export const TasksFilters = () => {
 	const firstRender = useRef(true);
 	useArtifact(taskFiltersArtifact, {
 		onUpdate: (data) => {
+			const typedData = data as typeof params;
 			if (firstRender.current) {
 				firstRender.current = false;
 				return;
 			}
-			setFilter({ ...data });
+			setFilter({ ...typedData });
 		},
 	});
 
@@ -70,6 +72,13 @@ export const TasksFilters = () => {
 					</div>
 				)}
 				renderItem={(item) => <Assignee {...item} />}
+			/>
+
+			<LabelInput
+				value={filter.labels || []}
+				onChange={(labels) => setFilter({ ...filter, labels })}
+				placeholder="Add labels to filter"
+				className="min-w-[120px]"
 			/>
 		</div>
 	);

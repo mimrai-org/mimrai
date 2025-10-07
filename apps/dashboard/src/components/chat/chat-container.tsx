@@ -1,7 +1,9 @@
 "use client";
 import { BotIcon, BotOffIcon } from "lucide-react";
+import { useEffect } from "react";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { useChatParams } from "@/hooks/use-chat-params";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { ChatInterface } from "./chat-interface";
@@ -37,19 +39,6 @@ export const ChatContainer = ({ chatId }: { chatId?: string }) => {
 				// transform: show ? "none" : "translateX(-500px)",
 			}}
 		>
-			<Button
-				className="fixed bottom-4 size-12 rounded-full"
-				onClick={toggle}
-				style={{
-					left: show ? 500 : 24,
-				}}
-			>
-				{show ? (
-					<BotOffIcon className="size-4" />
-				) : (
-					<BotIcon className="size-4" />
-				)}
-			</Button>
 			<div className="h-full overflow-hidden">
 				<ChatInterface id={chatId} />
 			</div>

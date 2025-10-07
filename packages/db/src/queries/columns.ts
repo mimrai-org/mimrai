@@ -135,3 +135,38 @@ export const getColumnById = async ({
 
 	return column;
 };
+
+export const createDefaultColumns = async (teamId: string) => {
+	const defaultColumns = [
+		{
+			name: "To Do",
+			description: "Tasks to be done",
+			order: 1,
+			isFinalState: false,
+		},
+		{
+			name: "In Progress",
+			description: "Tasks in progress",
+			order: 2,
+			isFinalState: false,
+		},
+		{
+			name: "Done",
+			description: "Completed tasks",
+			order: 3,
+			isFinalState: true,
+		},
+	];
+
+	const data = await db
+		.insert(columns)
+		.values(
+			defaultColumns.map((column) => ({
+				...column,
+				teamId,
+			})),
+		)
+		.returning();
+
+	return data;
+};

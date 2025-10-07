@@ -399,8 +399,8 @@ export const integrationUserLink = pgTable(
 	],
 );
 
-export const taskLabels = pgTable(
-	"task_labels",
+export const labels = pgTable(
+	"labels",
 	{
 		id: text()
 			.primaryKey()
@@ -412,17 +412,88 @@ export const taskLabels = pgTable(
 		createdAt: timestamp("created_at", {
 			withTimezone: true,
 			mode: "string",
-		}).defaultNow(),
+		})
+			.notNull()
+			.defaultNow(),
 		updatedAt: timestamp("updated_at", {
+			withTimezone: true,
+			mode: "string",
+		})
+			.notNull()
+			.defaultNow(),
+	},
+	(table) => [
+		foreignKey({
+			columns: [table.teamId],
+			foreignColumns: [teams.id],
+			name: "labels_team_id_fkey",
+		}),
+	],
+);
+
+export const labelsOnTasks = pgTable(
+	"labels_on_tasks",
+	{
+		labelId: text("label_id").notNull(),
+		taskId: text("task_id").notNull(),
+	},
+	(table) => [
+		primaryKey({
+			columns: [table.labelId, table.taskId],
+			name: "labels_on_tasks_pkey",
+		}),
+		foreignKey({
+			columns: [table.labelId],
+			foreignColumns: [labels.id],
+			name: "labels_on_tasks_label_id_fkey",
+		})
+			.onDelete("cascade")
+			.onUpdate("cascade"),
+		foreignKey({
+			columns: [table.taskId],
+			foreignColumns: [tasks.id],
+			name: "labels_on_tasks_task_id_fkey",
+		})
+			.onDelete("cascade")
+			.onUpdate("cascade"),
+	],
+);
+
+export const activityTypeEnum = pgEnum("activity_type", [
+	// User actions
+	"task_column_changed",
+	"task_created",
+	"task_updated",
+	"task_comment",
+]);
+
+export const activities = pgTable(
+	"activities",
+	{
+		id: text("id")
+			.$defaultFn(() => randomUUID())
+			.primaryKey()
+			.notNull(),
+		userId: text("user_id"),
+		teamId: text("team_id").notNull(),
+		groupId: text("group_id"),
+		type: activityTypeEnum("type").notNull(),
+		metadata: jsonb("metadata"),
+		createdAt: timestamp("created_at", {
 			withTimezone: true,
 			mode: "string",
 		}).defaultNow(),
 	},
 	(table) => [
 		foreignKey({
+			columns: [table.userId],
+			foreignColumns: [users.id],
+			name: "activity_log_user_id_fkey",
+		}),
+		foreignKey({
 			columns: [table.teamId],
 			foreignColumns: [teams.id],
-			name: "task_labels_team_id_fkey",
+			name: "activity_log_team_id_fkey",
 		}),
 	],
 );

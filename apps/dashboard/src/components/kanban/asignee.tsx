@@ -1,3 +1,4 @@
+import { getContrast } from "@mimir/utils/random";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 
@@ -15,6 +16,7 @@ export const AssigneeAvatar = ({ name, color, email, className }: Props) => {
 				className="bg-primary text-primary-foreground"
 				style={{
 					backgroundColor: color || undefined,
+					color: color ? getContrast(color) : undefined,
 				}}
 			>
 				{name ? name.charAt(0).toUpperCase() : null}

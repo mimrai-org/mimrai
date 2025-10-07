@@ -1,9 +1,9 @@
 import { parseAsBoolean, parseAsString, useQueryStates } from "nuqs";
 
-export function useTaskLabelParams() {
+export function useLabelParams() {
 	const [params, setParams] = useQueryStates({
-		taskLabelId: parseAsString,
-		createTaskLabel: parseAsBoolean,
+		labelId: parseAsString,
+		createLabel: parseAsBoolean,
 	});
 
 	return {
