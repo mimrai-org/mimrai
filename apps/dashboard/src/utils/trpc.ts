@@ -19,18 +19,14 @@ const trpcClient = createTRPCClient<AppRouter>({
 			async fetch(url, options) {
 				if (typeof window === "undefined") {
 					const headersImport = await import("next/headers");
-
-					const currentHeaders = await headersImport.headers();
-					const headersObject = Object.fromEntries(currentHeaders.entries());
-
-					console.log({ url });
+					const cookieHeader = (await headersImport.headers()).get("cookie");
 
 					// Server-side, embed the request headers
 					const response = await fetch(url, {
 						...options,
 						headers: {
 							...options?.headers,
-							Cookie: headersObject.Cookie!,
+							cookie: cookieHeader || "",
 						},
 						credentials: "include",
 					});
