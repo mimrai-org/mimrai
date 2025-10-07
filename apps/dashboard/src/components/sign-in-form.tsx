@@ -44,9 +44,9 @@ export default function SignInForm() {
 				onSuccess: () => {
 					const callbackUrl =
 						localStorage.getItem("callbackUrl") ?? "/dashboard";
-					router.push(callbackUrl);
 					localStorage.removeItem("callbackUrl");
 					toast.success("Sign in successful");
+					window.location.href = callbackUrl;
 				},
 				onError: (error) => {
 					toast.error(error.error.message || error.error.statusText);
