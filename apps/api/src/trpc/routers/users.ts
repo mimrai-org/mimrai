@@ -8,12 +8,20 @@ export const usersRouter = router({
 		.meta({ team: false })
 		.query(async ({ ctx }) => {
 			const user = await getCurrentUser(ctx.user.id, ctx.user.teamId!);
+			if (user.team) {
+				// Attach scopes to team
+				return {
+					...user,
+					team: {
+						...user.team,
+						scopes: roleScopes[user.team.role],
+					},
+				};
+			}
+
 			return {
 				...user,
-				team: {
-					...user.team,
-					scopes: roleScopes[user.team.role],
-				},
+				team: null,
 			};
 		}),
 	switchTeam: protectedProcedure
