@@ -1,4 +1,4 @@
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Header from "@/components/header";
 import { GlobalSheets } from "@/components/sheets/global-sheets";
@@ -9,26 +9,20 @@ export default async function DashboardLayout({
 }: {
 	children: React.ReactNode;
 }) {
-	const cookie = await cookies();
 	const { data: session } = await authClient.getSession({
 		fetchOptions: {
-			headers: {
-				cookie: cookie.toString(),
-			},
-			onRequest(context) {
-				console.log("Request Context:", context);
-			},
+			headers: await headers(),
 		},
 	});
 
-	console.log({ session });
+	console.log("Session in layout:", session);
 
 	if (!session?.user) {
-		redirect("/sign-in");
+		return redirect("/sign-in");
 	}
 
 	if ("teamId" in session.user && !session.user.teamId) {
-		redirect("/dashboard/onboarding");
+		return redirect("/dashboard/onboarding");
 	}
 
 	return (

@@ -11,6 +11,6 @@
   "editor.formatOnPaste": true,
   "emmet.showExpandedAbbreviation": "never",
   "[json]": {
-    "editor.defaultFormatter": "biomejs.biome"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }
