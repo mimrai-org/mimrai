@@ -24,17 +24,17 @@ export function KanbanBoard() {
 	const { ...filters } = useTasksFilterParams();
 	const { data: columns } = useQuery(trpc.columns.get.queryOptions());
 
-	const queryKey = React.useMemo(() => {
-		return {
-			assigneeId: filters.assigneeId ?? undefined,
-			search: filters.search ?? undefined,
-			labels: filters.labels ?? undefined,
-		};
-	}, [filters]);
 	const { data: tasks } = useQuery(
-		trpc.tasks.get.queryOptions(queryKey, {
-			placeholderData: (prev) => prev,
-		}),
+		trpc.tasks.get.queryOptions(
+			{
+				assigneeId: filters.assigneeId ?? undefined,
+				search: filters.search ?? undefined,
+				labels: filters.labels ?? undefined,
+			},
+			{
+				placeholderData: (prev) => prev,
+			},
+		),
 	);
 
 	const { mutateAsync: updateTask } = useMutation(

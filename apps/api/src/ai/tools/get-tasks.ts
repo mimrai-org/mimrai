@@ -33,14 +33,17 @@ export const getTasksTool = tool({
 	inputSchema: getTasksToolSchema,
 	execute: async function* ({ search, cursor, pageSize, assigneeId }) {
 		try {
-			const { user, artifactSupport, writer } = getContext();
+			const { user, artifactSupport } = getContext();
 
 			yield { text: "Fetching tasks...", status: "loading" };
-			const taskFilters = taskFiltersArtifact.stream({
-				search,
-				assigneeId,
-			});
-			taskFilters.complete();
+
+			if (artifactSupport) {
+				const taskFilters = taskFiltersArtifact.stream({
+					search,
+					assigneeId,
+				});
+				taskFilters.complete();
+			}
 
 			const result = await getTasks({
 				teamId: user.teamId,
