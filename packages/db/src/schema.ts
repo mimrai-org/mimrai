@@ -391,6 +391,11 @@ export const integrationUserLink = pgTable(
 		}).defaultNow(),
 	},
 	(table) => [
+		unique("unique_integration_user").on(
+			table.integrationId,
+			table.userId,
+			table.externalUserId,
+		),
 		foreignKey({
 			columns: [table.userId],
 			foreignColumns: [users.id],
