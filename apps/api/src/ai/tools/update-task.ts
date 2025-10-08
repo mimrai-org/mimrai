@@ -46,6 +46,13 @@ export const updateTaskToolSchema = z.object({
 		.describe(
 			"New list of attachment URLs for the task, only provide if you want to update the attachments",
 		),
+
+	priority: z
+		.enum(["low", "medium", "high"])
+		.optional()
+		.describe(
+			"New priority level for the task, only provide if you want to update the priority",
+		),
 });
 
 export const updateTaskTool = tool({
@@ -67,6 +74,7 @@ export const updateTaskTool = tool({
 					columnId: input.columnId,
 					assigneeId: input.assigneeId,
 					teamId: user.teamId,
+					priority: input.priority,
 				})
 				.where(and(eq(tasks.id, input.id), eq(tasks.teamId, user.teamId)))
 				.returning();
