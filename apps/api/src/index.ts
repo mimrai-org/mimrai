@@ -29,6 +29,7 @@ app.use(
 		allowHeaders: [
 			"Authorization",
 			"Content-Type",
+			"accept",
 			"accept-language",
 			"user-agent",
 			"cookie",
@@ -37,7 +38,6 @@ app.use(
 			"x-user-timezone",
 			"x-user-country",
 		],
-		exposeHeaders: ["Content-Length"],
 		credentials: true,
 		maxAge: 86400,
 	}),
