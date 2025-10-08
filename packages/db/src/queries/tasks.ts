@@ -22,7 +22,6 @@ export const getTasks = async ({
 	teamId?: string;
 	search?: string;
 }) => {
-	console.log("Input:", input);
 	const whereConditions: (SQL | undefined)[] = [];
 
 	input.assigneeId &&
@@ -93,8 +92,6 @@ export const getTasks = async ({
 		.leftJoin(users, eq(tasks.assigneeId, users.id))
 		.groupBy(tasks.id, users.id, columns.id)
 		.orderBy(tasks.order);
-
-	console.log(query.toSQL());
 
 	// Apply pagination
 	const offset = cursor ? Number.parseInt(cursor, 10) : 0;

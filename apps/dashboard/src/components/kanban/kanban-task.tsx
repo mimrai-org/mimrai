@@ -18,7 +18,6 @@ export const KanbanTask = ({
 	task: Task;
 	ref?: React.Ref<HTMLDivElement>;
 }) => {
-	console.log("Rendering task:", task.labels);
 	return (
 		<motion.div
 			className={cn(

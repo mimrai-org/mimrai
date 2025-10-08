@@ -21,8 +21,6 @@ export const CurrentPlan = () => {
 		trpc.billing.subscription.queryOptions(),
 	);
 
-	console.log("subscription", subscription);
-
 	const { mutateAsync: createCheckout } = useMutation(
 		trpc.billing.checkout.mutationOptions(),
 	);

@@ -8,12 +8,6 @@ export const getSession = async () => {
 				cookie: (await headers()).get("cookie") || "",
 			},
 			credentials: "include",
-			onRequest(context) {
-				console.log("Requesting session:", context);
-			},
-			onResponse(context) {
-				console.log("Received session response:", context);
-			},
 		},
 	});
 

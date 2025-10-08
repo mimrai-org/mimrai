@@ -121,6 +121,25 @@ export function KanbanBoard() {
 								overItem.order++;
 							}
 
+							queryClient.setQueryData(
+								trpc.tasks.get.queryKey(),
+								(oldData: any) => {
+									if (!oldData) return oldData;
+									return {
+										...oldData,
+										data: oldData.data.map((task: any) => {
+											if (task.id === activeItem.id) {
+												return activeItem;
+											}
+											if (task.id === overItem.id) {
+												return overItem;
+											}
+											return task;
+										}),
+									};
+								},
+							);
+
 							await updateTask({
 								id: activeItem.id,
 								columnId: activeItem.columnId,
@@ -140,6 +159,22 @@ export function KanbanBoard() {
 							if (!overColumnId) return;
 							activeItem.columnId = overColumnId;
 							activeItem.order = 0;
+
+							queryClient.setQueryData(
+								trpc.tasks.get.queryKey(),
+								(oldData: any) => {
+									if (!oldData) return oldData;
+									return {
+										...oldData,
+										data: oldData.data.map((task: any) => {
+											if (task.id === activeItem.id) {
+												return activeItem;
+											}
+											return task;
+										}),
+									};
+								},
+							);
 							await updateTask({
 								id: activeItem.id,
 								columnId: activeItem.columnId,
