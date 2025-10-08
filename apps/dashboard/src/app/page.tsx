@@ -19,9 +19,9 @@ export default function Home() {
 			</p>
 
 			<div className="mt-4">
-				<Link href="/dashboard">
+				<a href="/dashboard">
 					<Button variant={"outline"}>Get Started</Button>
-				</Link>
+				</a>
 			</div>
 
 			<div className="mt-12 grid gap-6">
