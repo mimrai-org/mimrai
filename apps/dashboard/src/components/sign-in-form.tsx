@@ -56,7 +56,7 @@ export default function SignInForm() {
 		// 	},
 		// );
 		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_API_URL}/api/auth/sign-in/email`,
+			`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/sign-in/email`,
 			{
 				credentials: "include",
 				headers: {
