@@ -126,6 +126,28 @@ export const initMattermostSingle = async (
 	);
 	const wsClient = wsClients[integration.id]!;
 
+	wsClient.on("close", (code, reason) => {
+		// try to reconnect in 10 seconds if not stopped
+		console.log(
+			`Mattermost WebSocket closed for integration ${integration.id}. Code: ${code}, Reason: ${reason.toString()}`,
+		);
+		setTimeout(async () => {
+			const isRunning = await integrationsCache.isRunning(integration.id);
+			if (isRunning) {
+				console.log(
+					`Mattermost integration ${integration.id} reconnecting WebSocket...`,
+				);
+				delete wsClients[integration.id];
+				await unregister();
+				await initMattermostSingle(integration);
+			} else {
+				console.log(
+					`Mattermost integration ${integration.id} is not running, not reconnecting.`,
+				);
+			}
+		}, 10_000);
+	});
+
 	wsClient.on("message", async (data) => {
 		const parsedData = JSON.parse(data.toString()) as WebSocketMessage;
 		switch (parsedData.event) {
