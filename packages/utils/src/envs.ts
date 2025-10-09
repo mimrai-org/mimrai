@@ -1,9 +1,13 @@
+export function getEmailFrom() {
+	return "Mimir <mimir@grupo-titanio.com>";
+}
+
 export function getAppUrl() {
 	if (
 		process.env.VERCEL_ENV === "production" ||
 		process.env.NODE_ENV === "production"
 	) {
-		return "https://app.mimir.ai";
+		return "https://www.start-mimir.app";
 	}
 
 	if (process.env.VERCEL_ENV === "preview") {
@@ -18,7 +22,7 @@ export function getEmailUrl() {
 		return "http://localhost:3000";
 	}
 
-	return "https://mimir.ai";
+	return "https://www.start-mimir.app";
 }
 
 export function getWebsiteUrl() {

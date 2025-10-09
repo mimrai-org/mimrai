@@ -51,8 +51,12 @@ export default function SignInForm() {
 					toast.success("Sign in successful");
 					window.location.href = callbackUrl;
 				},
-				onError: (error) => {
-					toast.error(error.error.message || error.error.statusText);
+				onError: (ctx) => {
+					if (ctx.error.status === 403) {
+						toast.error("Your email is not verified. Please check your inbox.");
+						return;
+					}
+					toast.error(ctx.error.message || ctx.error.statusText);
 				},
 			},
 		);

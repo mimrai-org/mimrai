@@ -1,5 +1,6 @@
 "use client";
 
+import type { ErrorContext } from "better-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -46,14 +47,13 @@ export default function SignUpForm() {
 			},
 			{
 				onSuccess: () => {
-					const callbackUrl =
-						localStorage.getItem("callbackUrl") ?? "/redirect";
-					localStorage.removeItem("callbackUrl");
-					toast.success("Sign up successful");
-					window.location.href = callbackUrl;
+					toast.success(
+						"Sign up successful. Please check your email to verify.",
+					);
+					form.reset();
 				},
-				onError: (error) => {
-					toast.error(error.error.message || error.error.statusText);
+				onError: (ctx: ErrorContext) => {
+					toast.error(ctx.error.message || ctx.error.statusText);
 				},
 			},
 		);

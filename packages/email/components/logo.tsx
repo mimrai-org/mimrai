@@ -15,7 +15,7 @@ export function Logo() {
           /* Regular dark mode - exclude Outlook.com and disable-dark-mode class */
           @media (prefers-color-scheme: dark) {
             .logo-blend:not([class^="x_"]):not(.disable-dark-mode .logo-blend) {
-              filter: invert(1) brightness(1);
+              filter: invert(0) brightness(1);
             }
           }
 
@@ -34,9 +34,9 @@ export function Logo() {
         `}</style>
 
 			<Img
-				src={`${baseUrl}/email/logo.png`}
-				width="40"
-				height="40"
+				src={`${baseUrl}/logo.png`}
+				width="60"
+				height="60"
 				alt="Mimir"
 				className="logo-blend mx-auto my-0 block"
 			/>
