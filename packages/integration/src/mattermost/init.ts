@@ -328,7 +328,7 @@ export const initMattermostSingle = async (
 
 								const thinkingPost = await client.createPost({
 									channel_id: typedData.post.channel_id,
-									message: "_Generating response..._",
+									message: "_Mimir is forging your tasks..._",
 									root_id: threadId ?? typedData.post.id,
 								});
 
