@@ -13,7 +13,7 @@ export const TaskCreateSheet = () => {
 			<DialogHeader>
 				<DialogTitle />
 			</DialogHeader>
-			<DialogContent className="sm:min-w-[70%]">
+			<DialogContent className="sm:min-w-[1000px]">
 				<TaskForm
 					defaultValues={{
 						columnId: taskColumnId || "backlog",

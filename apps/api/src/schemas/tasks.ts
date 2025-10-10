@@ -49,3 +49,38 @@ export const commentTaskSchema = z.object({
 	id: z.string(),
 	comment: z.string().min(1).max(5000),
 });
+
+export const smartCompleteSchema = z.object({
+	prompt: z.string().min(1).max(5000),
+});
+
+export const smartCompleteResponseSchema = z.object({
+	title: z
+		.string()
+		.min(1)
+		.max(255)
+		.describe("Title of the task, must be self explanatory"),
+	description: z
+		.string()
+		.max(50_000)
+		.optional()
+		.describe("Detailed description of the task"),
+	priority: z
+		.enum(priorityEnum.enumValues)
+		.optional()
+		.describe("Priority of the task"),
+	dueDate: z
+		.string()
+		.optional()
+		.describe("Due date of the task in ISO 8601 format"),
+	labels: z
+		.array(z.string())
+		.optional()
+		.describe(
+			"Array of IDs labels to assign to the task. Always try to apply at least one label",
+		),
+	assigneeId: z
+		.string()
+		.optional()
+		.describe("ID of the user to assign the task to"),
+});

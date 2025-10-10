@@ -28,7 +28,7 @@ export const TaskUpdateSheet = () => {
 			<DialogHeader>
 				<DialogTitle />
 			</DialogHeader>
-			<DialogContent showCloseButton={false} className="pt-0 sm:min-w-[70%]">
+			<DialogContent showCloseButton={false} className="pt-0 sm:min-w-[1000px]">
 				{task ? (
 					<TaskForm
 						defaultValues={{
@@ -37,7 +37,6 @@ export const TaskUpdateSheet = () => {
 							description: task.description || "",
 							assigneeId: task.assigneeId || undefined,
 							columnId: task.columnId,
-							teamId: task.teamId,
 							priority: task.priority || "medium",
 							dueDate: task.dueDate ? new Date(task.dueDate) : undefined,
 							labels: task.labels?.map((label) => label.id) || [],
