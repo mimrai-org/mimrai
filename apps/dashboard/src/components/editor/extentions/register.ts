@@ -7,6 +7,7 @@ import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
 import StarterKit from "@tiptap/starter-kit";
+import { Markdown } from "tiptap-markdown";
 
 // Add your extensions here
 const extensions = [
@@ -14,11 +15,13 @@ const extensions = [
 	Underline,
 	Image,
 	CodeBlock,
+	Markdown,
 	Link.configure({
 		openOnClick: false,
 		autolink: true,
 		defaultProtocol: "https",
 	}),
+
 	FileHandler.configure({
 		onDrop: (currentEditor, files, pos) => {
 			const fileReader = new FileReader();

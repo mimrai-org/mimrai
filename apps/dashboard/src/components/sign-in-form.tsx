@@ -67,8 +67,13 @@ export default function SignInForm() {
 	}
 
 	return (
-		<div className="mx-auto mt-10 w-full max-w-md p-6">
-			<h1 className="mb-6 text-center font-medium text-2xl">Welcome Back</h1>
+		<div className="mx-auto my-auto w-full max-w-lg p-6">
+			<h1 className="mb-2 text-center font-semibold text-2xl">
+				Nice to see you again
+			</h1>
+			<p className="mb-8 text-balance text-center text-muted-foreground">
+				Welcome back! Enter your credentials to unlock your Mimir experience.
+			</p>
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
 					<FormField
@@ -101,7 +106,7 @@ export default function SignInForm() {
 							</FormItem>
 						)}
 					/>
-					<Button type="submit" className="w-full">
+					<Button type="submit" className="w-full" disabled={isPending}>
 						Sign In
 					</Button>
 				</form>

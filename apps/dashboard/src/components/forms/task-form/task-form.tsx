@@ -111,10 +111,11 @@ export const TaskForm = ({
 
 	const formValues = form.watch();
 	const isDirty = form.formState.isDirty;
+	const isValid = form.formState.isValid;
 	const [debouncedValue] = useDebounceValue(formValues, 500);
 
 	useEffect(() => {
-		if (debouncedValue.id && isDirty) {
+		if (isValid && isDirty) {
 			const values = form.getValues();
 			if (!values.id) return;
 

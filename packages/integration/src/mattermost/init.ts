@@ -120,37 +120,30 @@ export const initMattermostSingle = async (
 
 		console.log("Logged in as:", me.username, me.id);
 
-		wsClients[integration.id] = new WebSocket(
-			`${integration.config.url.replace("http", "ws")}/api/v4/websocket`,
-			{
-				headers: {
-					Authorization: `Bearer ${integration.config.token}`,
+		const initializeSocket = async () => {
+			delete wsClients[integration.id];
+			wsClients[integration.id] = new WebSocket(
+				`${integration.config.url.replace("http", "ws")}/api/v4/websocket`,
+				{
+					headers: {
+						Authorization: `Bearer ${integration.config.token}`,
+					},
 				},
-			},
-		);
-		const wsClient = wsClients[integration.id]!;
-
-		wsClient.on("close", (code, reason) => {
-			// try to reconnect in 10 seconds if not stopped
-			console.log(
-				`Mattermost WebSocket closed for integration ${integration.id}. Code: ${code}, Reason: ${reason.toString()}`,
 			);
-			setTimeout(async () => {
-				const isRunning = await integrationsCache.isRunning(integration.id);
-				if (isRunning) {
-					console.log(
-						`Mattermost integration ${integration.id} reconnecting WebSocket...`,
-					);
-					delete wsClients[integration.id];
-					await unregister();
-					await initMattermostSingle(integration);
-				} else {
-					console.log(
-						`Mattermost integration ${integration.id} is not running, not reconnecting.`,
-					);
-				}
-			}, 10_000);
-		});
+			return wsClients[integration.id]!;
+		};
+
+		let wsClient = await initializeSocket();
+
+		setInterval(async () => {
+			if (wsClient.readyState === WebSocket.OPEN) {
+				wsClient.ping();
+			} else {
+				// socket is not open, try to reconnect
+				wsClient = await initializeSocket();
+				console.log("Reconnecting Mattermost websocket...");
+			}
+		}, 20_000);
 
 		wsClient.on("message", async (data) => {
 			const parsedData = JSON.parse(data.toString()) as WebSocketMessage;
@@ -344,7 +337,6 @@ export const initMattermostSingle = async (
 									system: systemPrompt,
 									messages: convertToModelMessages(relevantMessages),
 									temperature: 0.7,
-									// @ts-expect-error
 									tools: createToolRegistry(),
 									stopWhen: (step) => {
 										// Stop if we've reached 10 steps (original condition)
