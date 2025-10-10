@@ -4,7 +4,7 @@ import SignInForm from "@/components/sign-in-form";
 export default function LoginPage() {
 	return (
 		<div className="grid grid-cols-2">
-			<div>
+			<div className="w-full">
 				<Image
 					src={"/sign-in2.png"}
 					width={1600}

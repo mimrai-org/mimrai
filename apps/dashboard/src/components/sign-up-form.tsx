@@ -64,7 +64,7 @@ export default function SignUpForm() {
 	}
 
 	return (
-		<div className="mx-auto mt-10 w-full max-w-md p-6">
+		<div className="mx-auto my-auto w-full max-w-md p-6">
 			<h1 className="mb-6 text-center font-medium text-2xl">Create Account</h1>
 
 			<Form {...form}>
