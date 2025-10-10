@@ -27,7 +27,7 @@ export const LogsList = ({ integrationId }: { integrationId: string }) => {
 					key={log.id}
 					className={cn(
 						gricClass,
-						"rounded-xs py-1 text-sm transition-[background] hover:bg-muted",
+						"rounded-xs border-b py-2 text-sm transition-[background] last:border-0 hover:bg-muted",
 					)}
 				>
 					<span>{log.message}</span>

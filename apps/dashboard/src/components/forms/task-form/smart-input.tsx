@@ -23,6 +23,7 @@ export const SmartInput = ({
 
 	const handleSubmit = () => {
 		const prompt = inputRef.current?.value;
+		console.log("Prompt:", prompt);
 		if (prompt && prompt.trim().length > 0) {
 			mutate({ prompt });
 		}
@@ -59,7 +60,12 @@ export const SmartInput = ({
 				>
 					use form
 				</Button>
-				<Button type="button" size={"sm"} disabled={isPending}>
+				<Button
+					type="button"
+					size={"sm"}
+					disabled={isPending}
+					onClick={handleSubmit}
+				>
 					{isPending ? (
 						<>
 							<Loader2Icon className="mr-2 size-4 animate-spin" />

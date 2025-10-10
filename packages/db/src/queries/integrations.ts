@@ -5,7 +5,7 @@ import {
 } from "@integration/registry";
 import { integrationsCache } from "@mimir/cache/integrations-cache";
 import { and, desc, eq, type SQL } from "drizzle-orm";
-import { db } from "..";
+import { db } from "../index";
 import {
 	integrationLogs,
 	integrations,
@@ -140,7 +140,7 @@ export const getIntegrationLogs = async ({
 		})
 		.from(integrationLogs)
 		.where(and(...whereClause))
-		.rightJoin(integrations, eq(integrationLogs.integrationId, integrations.id))
+		.innerJoin(integrations, eq(integrationLogs.integrationId, integrations.id))
 		.orderBy(desc(integrationLogs.createdAt));
 
 	const offset = cursor ? Number.parseInt(cursor, 10) : 0;

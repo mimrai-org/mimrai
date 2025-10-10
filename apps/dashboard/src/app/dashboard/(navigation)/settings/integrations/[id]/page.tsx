@@ -41,18 +41,18 @@ export default async function Page({ params }: Props) {
 			</Card>
 			<Card>
 				<CardHeader>
-					<CardDescription>Integration logs</CardDescription>
-				</CardHeader>
-				<CardContent>
-					<LogsList integrationId={id} />
-				</CardContent>
-			</Card>
-			<Card>
-				<CardHeader>
 					<CardDescription>Linked Users</CardDescription>
 				</CardHeader>
 				<CardContent>
 					<LinkedUsersList integrationId={id} />
+				</CardContent>
+			</Card>
+			<Card>
+				<CardHeader>
+					<CardDescription>Integration logs</CardDescription>
+				</CardHeader>
+				<CardContent>
+					<LogsList integrationId={id} />
 				</CardContent>
 			</Card>
 		</div>
