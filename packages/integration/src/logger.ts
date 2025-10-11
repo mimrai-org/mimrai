@@ -6,6 +6,8 @@ export const log = (
 	level: "info" | "error",
 	message: string,
 	details?: object,
+	inputTokens?: number,
+	outputTokens?: number,
 ) => {
 	console.log(`[${level.toUpperCase()}] ${message}`, details || "");
 	db.insert(integrationLogs)
@@ -14,6 +16,8 @@ export const log = (
 			level,
 			message,
 			details,
+			inputTokens,
+			outputTokens,
 		})
 		.catch((err) => {
 			console.error("Failed to log integration event:", err);

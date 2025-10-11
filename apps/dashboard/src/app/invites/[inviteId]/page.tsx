@@ -17,7 +17,7 @@ export default async function Page({ params }: Props) {
 	const session = await getSession();
 
 	if (!session?.user) {
-		return redirect(`/sign-in?callbackUrl=/invites/${inviteId}`);
+		return redirect(`/sign-up?callbackUrl=/invites/${inviteId}`);
 	}
 
 	const invite = await queryClient.fetchQuery(

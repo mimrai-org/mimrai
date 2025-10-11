@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { IntegrationConfigForm } from "@/components/forms/integration-config-form";
 import {
 	Card,
@@ -7,21 +8,23 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { queryClient, trpc } from "@/utils/trpc";
+import { LogsList } from "../logs-list";
 import { LinkedUsersList } from "./linked-users-list";
-import { LogsList } from "./logs-list";
 
-type Props = {
-	params: Promise<{ id: string }>;
-};
-
-export default async function Page({ params }: Props) {
-	const { id } = await params;
-
-	const integration = await queryClient.fetchQuery(
-		trpc.integrations.getById.queryOptions({
-			id,
+export default async function Page() {
+	const integrationInfo = await queryClient.fetchQuery(
+		trpc.integrations.getByType.queryOptions({
+			type: "mattermost",
 		}),
 	);
+
+	const integration = integrationInfo.installedIntegration[0];
+
+	if (!integration) {
+		return notFound();
+	}
+
+	const id = integration.id;
 
 	return (
 		<div className="space-y-6">

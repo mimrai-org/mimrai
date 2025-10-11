@@ -385,10 +385,10 @@ export const initMattermostSingle = async (
 										"info",
 										`Response: ${text.text.slice(0, 80)}...`,
 										{
-											outputTokens: text.usage.outputTokens,
-											inputTokens: text.usage.outputTokens,
 											message: text.text,
 										},
+										text.usage.inputTokens,
+										text.usage.outputTokens,
 									);
 
 									// Post the response back to the thread

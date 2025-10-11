@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { trpc } from "@/utils/trpc";
 
 export const LogsList = ({ integrationId }: { integrationId: string }) => {
-	const gricClass = "grid grid-cols-2 gap-4 px-2";
+	const gricClass = "grid grid-cols-3 gap-4 px-2";
 
 	const { data: logs } = useQuery(
 		trpc.integrations.getLogs.queryOptions({ integrationId, pageSize: 20 }),
@@ -20,7 +20,8 @@ export const LogsList = ({ integrationId }: { integrationId: string }) => {
 				)}
 			>
 				<span>Message</span>
-				<span className="flex justify-start">Created At</span>
+				<span className="flex justify-end">Used Tokens</span>
+				<span className="flex justify-end">Created At</span>
 			</li>
 			{logs?.data.map((log) => (
 				<li
@@ -31,7 +32,10 @@ export const LogsList = ({ integrationId }: { integrationId: string }) => {
 					)}
 				>
 					<span>{log.message}</span>
-					<span className="flex justify-start">
+					<span className="flex justify-end">
+						{log.inputTokens} / {log.outputTokens}
+					</span>
+					<span className="flex justify-end">
 						{format(new Date(log.createdAt ?? ""), "PPpp")}
 					</span>
 				</li>

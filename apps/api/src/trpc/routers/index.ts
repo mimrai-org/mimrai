@@ -4,6 +4,7 @@ import { activitiesRouter } from "./activities";
 import { billingRouter } from "./billing";
 import { chatRouter } from "./chats";
 import { columnsRouter } from "./columns";
+import { githubRouter } from "./github";
 import { integrationsRouter } from "./integrations";
 import { labelsRouter } from "./labels";
 import { tasksRouter } from "./tasks";
@@ -29,6 +30,7 @@ export const appRouter = router({
 	billing: billingRouter,
 	labels: labelsRouter,
 	activities: activitiesRouter,
+	github: githubRouter,
 });
 export type AppRouter = typeof appRouter;
 export type RouterOutputs = inferRouterOutputs<AppRouter>;

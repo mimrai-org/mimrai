@@ -23,7 +23,7 @@ export const IntegrationsList = () => {
 					{data?.map((integration) => (
 						<li
 							key={integration.name}
-							className="flex items-center justify-between text-sm"
+							className="flex items-center justify-between border-b py-4 text-sm last:border-0"
 						>
 							<div>
 								<span>{integration.name}</span>
@@ -38,7 +38,7 @@ export const IntegrationsList = () => {
 											<div className="flex items-center gap-4">
 												<span className="text-muted-foreground">Installed</span>
 												<Link
-													href={`/dashboard/settings/integrations/${integration.id}`}
+													href={`/dashboard/settings/integrations/${integration.type}`}
 												>
 													<Button size={"sm"} variant="outline">
 														Configure

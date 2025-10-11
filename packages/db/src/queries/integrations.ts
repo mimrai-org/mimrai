@@ -27,6 +27,16 @@ export const installIntegration = async ({
 		throw new Error("Unsupported integration type");
 	}
 
+	const [existing] = await db
+		.select()
+		.from(integrations)
+		.where(and(eq(integrations.type, type), eq(integrations.teamId, teamId)))
+		.limit(1);
+
+	if (existing) {
+		return existing;
+	}
+
 	const installed = await db
 		.select()
 		.from(integrations)
@@ -136,6 +146,8 @@ export const getIntegrationLogs = async ({
 			level: integrationLogs.level,
 			message: integrationLogs.message,
 			details: integrationLogs.details,
+			inputTokens: integrationLogs.inputTokens,
+			outputTokens: integrationLogs.outputTokens,
 			createdAt: integrationLogs.createdAt,
 		})
 		.from(integrationLogs)

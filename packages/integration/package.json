@@ -1,33 +1,34 @@
 {
-	"name": "@mimir/integration",
-	"version": "0.0.1",
-	"private": true,
-	"scripts": {
-		"clean": "rm -rf .turbo node_modules",
-		"lint": "biome check .",
-		"format": "biome format --write .",
-		"typecheck": "tsc --noEmit"
-	},
-	"exports": {
-		"./init": "./src/init.ts",
-		"./validate": "./src/validate.ts",
-		"./registry": "./src/registry.ts"
-	},
-	"dependencies": {
-		"redis": "^5.8.2",
-		"@mimir/cache": "workspace:*",
-		"@mimir/db": "workspace:*",
-		"ai": "^5.0.56",
-		"drizzle-orm": "^0.44.5",
-		"zod": "^4.1.11",
-		"ws": "^8.18.3",
-		"@mattermost/client": "^10.12.0"
-	},
-	"devDependencies": {
-		"@types/bun": "latest",
-		"@types/ws": "^8.18.1",
-		"@mimir/tsconfig": "workspace:*",
-		"@types/redis": "^4.0.11",
-		"@mattermost/types": "^10.12.0"
-	}
+  "name": "@mimir/integration",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf .turbo node_modules",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    "./init": "./src/init.ts",
+    "./validate": "./src/validate.ts",
+    "./registry": "./src/registry.ts",
+    "./logger": "./src/logger.ts"
+  },
+  "dependencies": {
+    "redis": "^5.8.2",
+    "@mimir/cache": "workspace:*",
+    "@mimir/db": "workspace:*",
+    "ai": "^5.0.56",
+    "drizzle-orm": "^0.44.5",
+    "zod": "^4.1.11",
+    "ws": "^8.18.3",
+    "@mattermost/client": "^10.12.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/ws": "^8.18.1",
+    "@mimir/tsconfig": "workspace:*",
+    "@types/redis": "^4.0.11",
+    "@mattermost/types": "^10.12.0"
+  }
 }

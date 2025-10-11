@@ -10,6 +10,15 @@ export const integrationsRegistry = {
 			url: z.string().url("Invalid URL"),
 		}),
 	},
+	github: {
+		name: "GitHub",
+		type: "github" as const,
+		description: "GitHub integration",
+		configSchema: z.object({
+			token: z.string().min(1, "Token ID is required"),
+			installationId: z.string().min(1, "Installation ID is required"),
+		}),
+	},
 } as const;
 
 export type IntegrationName = keyof typeof integrationsRegistry;

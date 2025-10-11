@@ -32,3 +32,8 @@ export type DeleteColumnInput = z.infer<typeof deleteColumnSchema>;
 export const getColumnByIdSchema = z.object({
 	id: z.string(),
 });
+
+export const updateConnectedRepositorySchema = z.object({
+	id: z.string(),
+	branches: z.array(z.string()).optional(),
+});

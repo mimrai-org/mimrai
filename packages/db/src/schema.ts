@@ -371,6 +371,8 @@ export const integrationLogs = pgTable("integration_logs", {
 	level: text("level").notNull(),
 	message: text("message").notNull(),
 	details: jsonb("details"),
+	inputTokens: integer("input_tokens"),
+	outputTokens: integer("output_tokens"),
 	createdAt: timestamp("created_at", {
 		withTimezone: true,
 		mode: "string",
@@ -503,5 +505,40 @@ export const activities = pgTable(
 			foreignColumns: [teams.id],
 			name: "activity_log_team_id_fkey",
 		}),
+	],
+);
+
+export const githubRepositoryConnected = pgTable(
+	"github_repository_connected",
+	{
+		id: text("id")
+			.$defaultFn(() => randomUUID())
+			.primaryKey()
+			.notNull(),
+		installationId: integer("installation_id").notNull(),
+		teamId: text("team_id").notNull(),
+		repositoryId: integer("repository_id").notNull(),
+		repositoryName: text("repository_name").notNull(),
+		integrationId: text("integration_id").notNull(),
+		branches: jsonb("branches").$type<string[]>().default(sql`'[]'::jsonb`),
+		createdAt: timestamp("created_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
+	},
+	(table) => [
+		unique("unique_github_repo_per_team").on(table.teamId, table.repositoryId),
+		foreignKey({
+			columns: [table.teamId],
+			foreignColumns: [teams.id],
+			name: "github_repository_connected_team_id_fkey",
+		}),
+		foreignKey({
+			columns: [table.integrationId],
+			foreignColumns: [integrations.id],
+			name: "github_repository_connected_integration_id_fkey",
+		})
+			.onDelete("cascade")
+			.onUpdate("cascade"),
 	],
 );

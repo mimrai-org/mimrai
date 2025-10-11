@@ -43,3 +43,11 @@ export function getWebsiteUrl() {
 export function getCdnUrl() {
 	return "https://cdn.mimir.ai";
 }
+
+export function getApiUrl() {
+	if (process.env.NEXT_PUBLIC_SERVER_URL) {
+		return process.env.NEXT_PUBLIC_SERVER_URL;
+	}
+
+	return "http://localhost:3003";
+}

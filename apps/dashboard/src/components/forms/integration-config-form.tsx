@@ -1,12 +1,14 @@
 "use client";
 
-import type { IntegrationName } from "@mimir/api/integrations/registry";
+import type { IntegrationName } from "@mimir/integration/registry";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { github } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import z from "zod";
 import { useIntegrationParams } from "@/hooks/use-integration-params";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { queryClient, trpc } from "@/utils/trpc";
+import { IntegrationGithubForm } from "./integration-github-form";
 import { IntegrationMattermostForm } from "./integration-mattermost-form";
 
 const schemas = {
@@ -14,6 +16,7 @@ const schemas = {
 		token: z.string().min(1, "Token ID is required"),
 		url: z.string().url("Invalid URL"),
 	}),
+	github: z.object({}),
 	example: z.object({}),
 };
 
@@ -29,9 +32,6 @@ export const IntegrationConfigForm = <N extends IntegrationName>({
 	const [error, setError] = useState<string | null>(null);
 	const [isValid, setIsValid] = useState(false);
 	const { setParams } = useIntegrationParams();
-	const form = useZodForm(schemas[type], {
-		defaultValues: defaultValues as any,
-	});
 
 	const { mutateAsync: installIntegration } = useMutation(
 		trpc.integrations.install.mutationOptions(),
@@ -69,15 +69,21 @@ export const IntegrationConfigForm = <N extends IntegrationName>({
 		}
 	};
 
-	form.watch(() => {
-		setIsValid(false);
-	});
-
 	const getForm = () => {
 		switch (type) {
 			case "mattermost":
 				return (
 					<IntegrationMattermostForm
+						defaultValues={defaultValues}
+						onSubmit={handleSubmit}
+						isValid={isValid}
+						error={error}
+						integrationId={id!}
+					/>
+				);
+			case "github":
+				return (
+					<IntegrationGithubForm
 						defaultValues={defaultValues}
 						onSubmit={handleSubmit}
 						isValid={isValid}
