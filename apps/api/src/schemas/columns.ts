@@ -37,3 +37,8 @@ export const updateConnectedRepositorySchema = z.object({
 	id: z.string(),
 	branches: z.array(z.string()).optional(),
 });
+
+export const removeTaskFromPullRequestPlanSchema = z.object({
+	id: z.string(),
+	taskIds: z.array(z.string()),
+});

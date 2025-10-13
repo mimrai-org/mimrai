@@ -1,7 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as chrono from "chrono-node";
 import { format, formatRelative } from "date-fns";
-import { ChevronDownIcon, GitPullRequestIcon } from "lucide-react";
+import {
+	ChevronDownIcon,
+	GitPullRequestIcon,
+	TrashIcon,
+	XIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -85,14 +90,23 @@ export const TaskForm = ({
 		},
 	});
 
+	const { mutate: removeTaskFromPullRequestPlan } = useMutation(
+		trpc.github.removeTrasksFromPullRequestPlan.mutationOptions({
+			onSuccess: () => {
+				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
+				queryClient.invalidateQueries(
+					trpc.tasks.getById.queryOptions({
+						id: defaultValues?.id!,
+					}),
+				);
+			},
+		}),
+	);
+
 	const { mutate: createTask } = useMutation(
 		trpc.tasks.create.mutationOptions({
 			onSuccess: (task) => {
 				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
-				// queryClient.setQueryData(
-				// 	trpc.tasks.getById.queryKey({ id: task.id }),
-				// 	task,
-				// );
 				setParams(null);
 			},
 			onError: (error) => {
@@ -104,10 +118,6 @@ export const TaskForm = ({
 	const { mutate: updateTask } = useMutation(
 		trpc.tasks.update.mutationOptions({
 			onSuccess: (task) => {
-				// queryClient.setQueryData(
-				// 	trpc.tasks.getById.queryKey({ id: task.id }),
-				// 	task,
-				// );
 				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
 				queryClient.invalidateQueries(
 					trpc.activities.get.queryOptions({
@@ -393,15 +403,32 @@ export const TaskForm = ({
 								{pullRequestPlan?.prUrl && (
 									<div className="mb-4">
 										<FormLabel>Linked Pull Request</FormLabel>
-										<Link
-											href={pullRequestPlan.prUrl}
-											target="_blank"
-											className="mx-3 mt-2 flex items-center text-primary text-sm hover:text-primary/80"
-											onClick={(e) => e.stopPropagation()}
-										>
-											<GitPullRequestIcon className="mr-1 inline size-3" />
-											{pullRequestPlan.prTitle}
-										</Link>
+										<div className="mt-2 mr-1 ml-3 flex items-center justify-between">
+											<Link
+												href={pullRequestPlan.prUrl}
+												target="_blank"
+												className="flex items-center text-primary text-sm hover:text-primary/80"
+												onClick={(e) => e.stopPropagation()}
+											>
+												<GitPullRequestIcon className="mr-1 inline size-3" />
+												{pullRequestPlan.prTitle}
+											</Link>
+											<Button
+												variant="link"
+												type="button"
+												className="h-fit py-0 text-muted-foreground hover:text-red-600"
+												size="icon"
+												onClick={() => {
+													if (!defaultValues?.id) return;
+													removeTaskFromPullRequestPlan({
+														id: pullRequestPlan.id,
+														taskIds: [defaultValues.id],
+													});
+												}}
+											>
+												<XIcon className="size-3!" />
+											</Button>
+										</div>
 									</div>
 								)}
 

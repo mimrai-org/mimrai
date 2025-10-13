@@ -1,4 +1,4 @@
-import { and, eq, type SQL } from "drizzle-orm";
+import { and, eq, inArray, type SQL } from "drizzle-orm";
 import { db } from "..";
 import {
 	githubRepositoryConnected,
@@ -376,6 +376,53 @@ export const cancelPullRequestPlan = async ({
 			pullRequestPlanId: null,
 		})
 		.where(eq(tasks.pullRequestPlanId, id));
+
+	return record;
+};
+
+export const removeTasksFromPullRequestPlan = async ({
+	id,
+	teamId,
+	taskIds,
+}: {
+	id: string;
+	teamId?: string;
+	taskIds: string[];
+}) => {
+	const whereClause: SQL[] = [eq(pullRequestPlan.id, id)];
+	if (teamId) {
+		whereClause.push(eq(pullRequestPlan.teamId, teamId));
+	}
+
+	const [existing] = await db
+		.select()
+		.from(pullRequestPlan)
+		.where(and(...whereClause))
+		.limit(1);
+
+	if (!existing) {
+		throw new Error("Pull request plan not found");
+	}
+
+	const updatedPlan = existing.plan.filter(
+		(item) => !taskIds.includes(item.taskId),
+	);
+
+	const [record] = await db
+		.update(pullRequestPlan)
+		.set({
+			plan: updatedPlan,
+		})
+		.where(eq(pullRequestPlan.id, id))
+		.returning();
+
+	// Disassociate the task from the pull request plan
+	await db
+		.update(tasks)
+		.set({
+			pullRequestPlanId: null,
+		})
+		.where(and(eq(tasks.pullRequestPlanId, id), inArray(tasks.id, taskIds)));
 
 	return record;
 };

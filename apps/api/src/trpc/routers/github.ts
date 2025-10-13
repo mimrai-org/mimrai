@@ -1,5 +1,6 @@
 import {
 	getColumnsSchema,
+	removeTaskFromPullRequestPlanSchema,
 	updateConnectedRepositorySchema,
 } from "@api/schemas/columns";
 import {
@@ -14,6 +15,7 @@ import {
 	disconnectRepository,
 	getConnectedRepositories,
 	getConnectedRepositoryByRepoId,
+	removeTasksFromPullRequestPlan,
 	updateConnectedRepository,
 } from "@mimir/db/queries/github";
 import {
@@ -117,6 +119,15 @@ export const githubRouter = router({
 		.input(updateConnectedRepositorySchema)
 		.mutation(async ({ ctx, input }) => {
 			return updateConnectedRepository({
+				...input,
+				teamId: ctx.user.teamId!,
+			});
+		}),
+
+	removeTrasksFromPullRequestPlan: protectedProcedure
+		.input(removeTaskFromPullRequestPlanSchema)
+		.mutation(async ({ ctx, input }) => {
+			return removeTasksFromPullRequestPlan({
 				...input,
 				teamId: ctx.user.teamId!,
 			});
