@@ -42,7 +42,7 @@ export const getDuplicateTaskEmbedding = async ({
 	task: { title: string; description?: string | null };
 	teamId: string;
 }) => {
-	const THRESHOLD = 0.3; // Adjust this value based on your requirements
+	const THRESHOLD = 0.9; // Adjust this value based on your requirements
 
 	const { embedding } = await generateTaskEmbedding(task);
 

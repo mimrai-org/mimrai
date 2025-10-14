@@ -44,7 +44,12 @@ export const TaskDuplicated = ({ title }: { title?: string }) => {
 
 	return (
 		<>
-			{duplicates && duplicates.length > 0 && (
+			{isRefetching ? (
+				<div className="flex items-center space-x-1 text-muted-foreground text-sm">
+					<Loader2Icon className="size-4 animate-spin" />
+					<span>Looking for similar tasks...</span>
+				</div>
+			) : duplicates && duplicates.length > 0 ? (
 				<Popover>
 					<PopoverTrigger>
 						<div className="flex cursor-pointer items-center space-x-1 text-muted-foreground text-sm transition-colors hover:text-primary">
@@ -84,6 +89,8 @@ export const TaskDuplicated = ({ title }: { title?: string }) => {
 						</ScrollArea>
 					</PopoverContent>
 				</Popover>
+			) : (
+				<span />
 			)}
 		</>
 	);
