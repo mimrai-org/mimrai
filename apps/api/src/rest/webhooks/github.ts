@@ -219,7 +219,7 @@ app.post(validateGithubWebhook, async (c) => {
 						pageSize: 20,
 						teamId,
 						columnId: columns
-							.filter((col) => col.type !== "finished")
+							.filter((col) => !["backlog", "finished"].includes(col.type))
 							.map((col) => col.id),
 					})
 				).data.map((task) => ({
