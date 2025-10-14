@@ -129,20 +129,20 @@ export const TaskForm = ({
 	const [debouncedValue] = useDebounceValue(formValues, 500);
 
 	useEffect(() => {
-		if (isValid && isDirty) {
-			const values = form.getValues();
-			if (!values.id) return;
+		return () => {
+			if (isValid && isDirty) {
+				const values = form.getValues();
+				if (!values.id) return;
 
-			// Auto save for existing tasks
-			updateTask({
-				id: values.id,
-				...values,
-				dueDate: values.dueDate?.toISOString(),
-			});
-			form.reset(values, { keepDirty: false });
-			setLastSavedDate(new Date());
-		}
-	}, [debouncedValue]);
+				// Auto save for existing tasks
+				updateTask({
+					id: values.id,
+					...values,
+					dueDate: values.dueDate?.toISOString(),
+				});
+			}
+		};
+	}, [isValid, isDirty]);
 
 	const onSubmit = async (data: z.infer<typeof taskFormSchema>) => {
 		if (data.id) {
@@ -233,9 +233,11 @@ export const TaskForm = ({
 										: "Create Task"}
 								</Button>
 							</div>
-							<div className="px-8">
-								<TaskDuplicated title={debouncedValue.title} />
-							</div>
+							{createMode && (
+								<div className="px-8">
+									<TaskDuplicated title={debouncedValue.title} />
+								</div>
+							)}
 						</div>
 
 						<div className="mx-4 grid grid-cols-[1fr_300px] gap-4">
