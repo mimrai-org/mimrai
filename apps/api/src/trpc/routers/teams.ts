@@ -1,3 +1,4 @@
+import { stripeClient } from "@api/lib/payments";
 import { resend } from "@api/lib/resend";
 import {
 	acceptTeamInviteSchema,
@@ -19,6 +20,7 @@ import {
 	getMembers,
 	getTeamById,
 	leaveTeam,
+	linkCustomerToTeam,
 	updateMember,
 	updateTeam,
 } from "@mimir/db/queries/teams";
@@ -44,6 +46,22 @@ export const teamsRouter = router({
 		})
 		.mutation(async ({ ctx, input }) => {
 			const team = await createTeam({ ...input, userId: ctx.user.id });
+
+			// Create a customer in Stripe
+			const customer = await stripeClient.customers.create({
+				name: team.name,
+				email: team.email,
+				metadata: {
+					teamId: team.id,
+				},
+			});
+
+			// Link the customer to the team
+			await linkCustomerToTeam({
+				teamId: team.id,
+				customerId: customer.id,
+			});
+
 			return team;
 		}),
 
@@ -56,10 +74,39 @@ export const teamsRouter = router({
 		.meta({ scopes: ["team:write"] })
 		.input(updateTeamSchema)
 		.mutation(async ({ ctx, input }) => {
-			return updateTeam({
+			const oldTeam = await getTeamById(ctx.user.teamId!);
+			const team = await updateTeam({
 				...input,
 				id: ctx.user.teamId!,
 			});
+
+			const {
+				data: [existingCustomer],
+			} = await stripeClient.customers.list({
+				email: oldTeam.email,
+				limit: 1,
+			});
+
+			// Update the customer in Stripe if it exists
+			if (existingCustomer) {
+				await stripeClient.customers.update(existingCustomer.id, {
+					name: team!.name,
+					email: team!.email,
+				});
+			} else {
+				// Create a new customer in Stripe if it doesn't exist
+				const customer = await stripeClient.customers.create({
+					name: team!.name,
+					email: team!.email,
+					metadata: {
+						teamId: team!.id,
+					},
+				});
+				await linkCustomerToTeam({
+					teamId: team!.id,
+					customerId: customer.id,
+				});
+			}
 		}),
 
 	getMembers: protectedProcedure.query(async ({ ctx }) => {

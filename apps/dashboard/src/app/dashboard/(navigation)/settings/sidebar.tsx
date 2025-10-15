@@ -12,6 +12,7 @@ export const settingsLinks: {
 	{ to: "/dashboard/settings/members", label: "Members" },
 	{ to: "/dashboard/settings/labels", label: "Labels" },
 	{ to: "/dashboard/settings/integrations", label: "Integrations" },
+	{ to: "/dashboard/settings/import", label: "Import" },
 ];
 
 export const SettingsSidebar = () => {

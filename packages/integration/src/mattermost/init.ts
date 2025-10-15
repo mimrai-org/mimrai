@@ -369,6 +369,23 @@ export const initMattermostSingle = async (
 										messages: convertToModelMessages(relevantMessages),
 										// temperature: 0.7,
 										tools: createToolRegistry(),
+										onStepFinish: async (step) => {
+											if (step.text) {
+												await client.updatePost({
+													...thinkingPost,
+													message: `_${step.text}_`,
+												});
+												return;
+											}
+
+											if (step.reasoningText) {
+												await client.updatePost({
+													...thinkingPost,
+													message: `_${step.reasoningText}_`,
+												});
+												return;
+											}
+										},
 										stopWhen: (step) => {
 											// Stop if we've reached 10 steps (original condition)
 											if (stepCountIs(10)(step)) {

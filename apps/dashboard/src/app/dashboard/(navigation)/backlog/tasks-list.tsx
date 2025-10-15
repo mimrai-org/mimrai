@@ -73,20 +73,20 @@ export const TasksList = () => {
 							</li>
 						</TaskContextMenu>
 					))}
-					{hasNextPage && (
-						<li className="flex justify-center">
-							<Button
-								variant="outline"
-								onClick={() => fetchNextPage()}
-								disabled={!hasNextPage || isLoading}
-							>
-								{isLoading && <Loader2Icon className="animate-spin" />}
-								Load more
-							</Button>
-						</li>
-					)}
 				</ul>
 			</AnimatePresence>
+			{hasNextPage && (
+				<div className="flex justify-center">
+					<Button
+						variant="outline"
+						onClick={() => fetchNextPage()}
+						disabled={!hasNextPage || isLoading}
+					>
+						{isLoading && <Loader2Icon className="animate-spin" />}
+						Load more
+					</Button>
+				</div>
+			)}
 		</div>
 	);
 };

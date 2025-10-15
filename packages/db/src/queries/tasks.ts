@@ -440,3 +440,18 @@ export const createTaskComment = async ({
 
 	return activity;
 };
+
+export const getTaskByTitle = async ({
+	title,
+	teamId,
+}: {
+	title: string;
+	teamId: string;
+}) => {
+	const [task] = await db
+		.select()
+		.from(tasks)
+		.where(and(eq(tasks.title, title), eq(tasks.teamId, teamId)))
+		.limit(1);
+	return task;
+};

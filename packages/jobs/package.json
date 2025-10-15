@@ -1,0 +1,35 @@
+{
+  "name": "@mimir/jobs",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "trigger dev",
+    "deploy": "trigger deploy",
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    "./*": "./src/jobs/*.ts",
+    "./schema": "./src/schema.ts"
+  },
+  "dependencies": {
+    "@fast-csv/format": "5.0.2",
+    "@mimir/db": "workspace:*",
+    "@mimir/email": "workspace:*",
+    "@sindresorhus/slugify": "^2.2.1",
+    "@supabase/supabase-js": "^2.58.0",
+    "@trigger.dev/sdk": "^4.0.4",
+    "@zip.js/zip.js": "^2.7.62",
+    "ai": "^5.0.56",
+    "camelcase-keys": "^10.0.0",
+    "codepage": "^1.15.0",
+    "heic-convert": "1.2.4",
+    "node-xlsx": "^0.24.0",
+    "sharp": "0.34.4",
+    "trigger.dev": "^4.0.4",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/heic-convert": "2.1.0",
+    "@types/bun": "latest"
+  }
+}

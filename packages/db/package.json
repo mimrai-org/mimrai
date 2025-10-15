@@ -11,7 +11,8 @@
   "exports": {
     "./client": "./src/index.ts",
     "./queries/*": "./src/queries/*.ts",
-    "./schema": "./src/schema.ts"
+    "./schema": "./src/schema.ts",
+    "./job-client": "./src/job-client.ts"
   },
   "dependencies": {
     "@date-fns/utc": "^2.1.1",

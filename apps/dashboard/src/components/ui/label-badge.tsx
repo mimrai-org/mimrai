@@ -1,4 +1,4 @@
-import { getContrastHex } from "@mimir/utils/random";
+import { getContrast } from "@mimir/utils/random";
 import { Badge } from "./badge";
 
 export const LabelBadge = ({
@@ -10,7 +10,7 @@ export const LabelBadge = ({
 }) => {
 	return (
 		<Badge
-			style={{ backgroundColor: color, color: getContrastHex(color) }}
+			style={{ backgroundColor: color, color: getContrast(color) }}
 			className="rounded-xs"
 			variant="secondary"
 		>

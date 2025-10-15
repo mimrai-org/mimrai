@@ -611,3 +611,29 @@ export const pullRequestPlan = pgTable("pull_request_plans", {
 		mode: "string",
 	}).defaultNow(),
 });
+
+export const taskImportStatusEnum = pgEnum("task_import_status", [
+	"pending",
+	"processing",
+	"completed",
+	"failed",
+]);
+
+export const imports = pgTable("imports", {
+	id: text("id")
+		.$defaultFn(() => randomUUID())
+		.primaryKey()
+		.notNull(),
+	teamId: text("team_id").notNull(),
+	userId: text("user_id").notNull(),
+	fileName: text("file_name").notNull(),
+	fileUrl: text("file_url"),
+	filePath: text("file_path").notNull(),
+	error: jsonb("error").$type<{ message: string }>(),
+	status: taskImportStatusEnum("status").default("pending").notNull(),
+	jobId: text("job_id"),
+	createdAt: timestamp("created_at", {
+		withTimezone: true,
+		mode: "string",
+	}).defaultNow(),
+});

@@ -1,5 +1,4 @@
-import { stripeClient } from "@api/lib/payments";
-import { and, eq, ilike, ne, type SQL, sql } from "drizzle-orm";
+import { and, eq, ilike, ne, type SQL } from "drizzle-orm";
 import { db } from "..";
 import { type plansEnum, teams, users, usersOnTeams } from "../schema";
 import { createDefaultColumns } from "./columns";
@@ -39,21 +38,6 @@ export const createTeam = async ({
 		throw new Error("Failed to create team");
 	}
 
-	// Create a customer in Stripe
-	const customer = await stripeClient.customers.create({
-		name: name,
-		email: email,
-		metadata: {
-			teamId: team.id,
-		},
-	});
-
-	// Link the customer to the team
-	await db
-		.update(teams)
-		.set({ customerId: customer.id })
-		.where(eq(teams.id, team.id));
-
 	await db
 		.insert(usersOnTeams)
 		.values({ teamId: team.id, userId, role: "owner" });
@@ -86,6 +70,26 @@ export const createTeam = async ({
 	return team;
 };
 
+export const linkCustomerToTeam = async ({
+	teamId,
+	customerId,
+}: {
+	teamId: string;
+	customerId: string;
+}) => {
+	const [team] = await db
+		.update(teams)
+		.set({ customerId })
+		.where(eq(teams.id, teamId))
+		.returning();
+
+	if (!team) {
+		throw new Error("Failed to link customer to team");
+	}
+
+	return team;
+};
+
 export const updateTeam = async ({
 	name,
 	description,
@@ -99,16 +103,6 @@ export const updateTeam = async ({
 	locale?: string;
 	id: string;
 }) => {
-	const [oldTeam] = await db
-		.select()
-		.from(teams)
-		.where(eq(teams.id, id))
-		.limit(1);
-
-	if (!oldTeam) {
-		throw new Error("Team not found");
-	}
-
 	const [team] = await db
 		.update(teams)
 		.set({
@@ -119,34 +113,6 @@ export const updateTeam = async ({
 		})
 		.where(eq(teams.id, id))
 		.returning();
-
-	const {
-		data: [existingCustomer],
-	} = await stripeClient.customers.list({
-		email: oldTeam.email,
-		limit: 1,
-	});
-
-	// Update the customer in Stripe if it exists
-	if (existingCustomer) {
-		await stripeClient.customers.update(existingCustomer.id, {
-			name: team!.name,
-			email: team!.email,
-		});
-	} else {
-		// Create a new customer in Stripe if it doesn't exist
-		const customer = await stripeClient.customers.create({
-			name: team!.name,
-			email: team!.email,
-			metadata: {
-				teamId: team!.id,
-			},
-		});
-		await db
-			.update(teams)
-			.set({ customerId: customer.id })
-			.where(eq(teams.id, team!.id));
-	}
 
 	return team;
 };
@@ -370,4 +336,28 @@ export const updateTeamPlan = async ({
 		.returning();
 
 	return team;
+};
+
+export const getMemberByEmail = async ({
+	email,
+	teamId,
+}: {
+	email: string;
+	teamId: string;
+}) => {
+	const [member] = await db
+		.select({
+			id: users.id,
+			email: users.email,
+			name: users.name,
+			image: users.image,
+			color: users.color,
+			role: usersOnTeams.role,
+			description: usersOnTeams.description,
+		})
+		.from(usersOnTeams)
+		.innerJoin(users, eq(users.id, usersOnTeams.userId))
+		.where(and(eq(usersOnTeams.teamId, teamId), eq(users.email, email)))
+		.limit(1);
+	return member;
 };

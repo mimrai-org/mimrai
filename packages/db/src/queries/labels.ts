@@ -138,3 +138,22 @@ export const createDefaultLabels = async (teamId: string) => {
 
 	return data;
 };
+
+export const getLabelByName = async ({
+	name,
+	teamId,
+}: {
+	name: string;
+	teamId?: string;
+}) => {
+	const whereClause: SQL[] = [eq(labels.name, name)];
+	teamId && whereClause.push(eq(labels.teamId, teamId));
+
+	const [label] = await db
+		.select()
+		.from(labels)
+		.where(and(...whereClause))
+		.limit(1);
+
+	return label;
+};

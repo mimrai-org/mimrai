@@ -19,7 +19,7 @@ export const randomColor = () => {
 export const getContrast = (hslColor: string) => {
 	const hslMatch = hslColor.match(/hsl\(\s*(\d+),\s*(\d+)%,\s*(\d+)%\s*\)/);
 	if (!hslMatch) {
-		return "black";
+		return getContrastHex(hslColor);
 	}
 
 	const h = Number.parseInt(hslMatch[1]!, 10);
