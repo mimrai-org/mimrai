@@ -70,11 +70,19 @@ export const getLabelById = async ({
 	return label;
 };
 
-export const getLabels = async ({ teamId }: { teamId?: string }) => {
+export const getLabels = async ({
+	teamId,
+	pageSize = 20,
+	cursor,
+}: {
+	teamId?: string;
+	pageSize?: number;
+	cursor?: string;
+}) => {
 	const whereClause: SQL[] = [];
 	teamId && whereClause.push(eq(labels.teamId, teamId));
 
-	const labelList = await db
+	const query = db
 		.select({
 			id: labels.id,
 			name: labels.name,
@@ -91,7 +99,13 @@ export const getLabels = async ({ teamId }: { teamId?: string }) => {
 		.groupBy(labels.id)
 		.orderBy(labels.name);
 
-	return labelList;
+	// Apply pagination
+	const offset = cursor ? Number.parseInt(cursor, 10) : 0;
+	query.limit(pageSize).offset(offset);
+
+	const data = await query;
+
+	return data;
 };
 
 export const deleteLabel = async ({

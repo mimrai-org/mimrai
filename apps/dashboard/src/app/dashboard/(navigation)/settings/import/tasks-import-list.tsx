@@ -1,17 +1,34 @@
 "use client";
 import { getApiUrl } from "@mimir/utils/envs";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { queryClient, trpc } from "@/utils/trpc";
 
-export const TasksImport = () => {
+export const TasksImportList = () => {
 	const [loading, setLoading] = useState(false);
+	const [autoRefresh, setAutoRefresh] = useState(false);
 
-	const { data: imports } = useQuery(trpc.imports.get.queryOptions());
+	const { data: imports } = useQuery(
+		trpc.imports.get.queryOptions(
+			{},
+			{
+				refetchInterval: autoRefresh ? 3000 : false,
+			},
+		),
+	);
+
+	const shouldAutoRefresh = useMemo(() => {
+		if (!imports?.data) return false;
+		return imports.data.some((imp) => imp.status === "processing");
+	}, [imports?.data]);
+
+	useEffect(() => {
+		setAutoRefresh(shouldAutoRefresh);
+	}, [shouldAutoRefresh]);
 
 	const handleFileUpload = async (
 		event: React.ChangeEvent<HTMLInputElement>,

@@ -18,19 +18,32 @@ export const TasksList = () => {
 	const { data: tasks } = useQuery(
 		trpc.tasks.get.queryOptions({
 			assigneeId: user?.id ? [user?.id] : [],
+			view: "board",
 		}),
 	);
 
 	const groupedTasks = useMemo(() => {
 		if (!tasks?.data || !columns) return [];
-		return columns?.data.map((column) => ({
+		const grouped = columns?.data.map((column) => ({
 			...column,
 			tasks: tasks?.data.filter((task) => task.columnId === column.id) || [],
 		}));
+
+		return grouped.filter((group) => group.tasks.length > 0);
 	}, [tasks, columns]);
 
 	return (
 		<ul className="flex flex-col gap-4 px-8 py-4">
+			{groupedTasks.length === 0 && (
+				<div className="mt-8 flex flex-col items-start justify-center gap-2 text-center">
+					<h3 className="text-2xl text-muted-foreground">
+						No tasks assigned to you
+					</h3>
+					<p className="max-w-md text-balance text-muted-foreground text-sm">
+						You can assign tasks to yourself from the task details or the board.
+					</p>
+				</div>
+			)}
 			<AnimatePresence>
 				{groupedTasks.map((column) => (
 					<li key={column.id}>

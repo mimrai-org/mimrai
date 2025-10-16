@@ -20,7 +20,7 @@ export default async function DashboardPage({ searchParams }: Props) {
 	return (
 		<div className="mr-6">
 			<ChatProvider initialMessages={(chat?.messages as UIChatMessage[]) || []}>
-				<div className="flex h-[calc(100vh-110px)] flex-row gap-6">
+				<div className="flex flex-row gap-6">
 					<ChatContainer chatId={chatId} />
 					<div className="h-full w-full overflow-hidden py-8">
 						<KanbanBoard />

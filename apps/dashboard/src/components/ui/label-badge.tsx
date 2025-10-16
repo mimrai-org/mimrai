@@ -10,10 +10,14 @@ export const LabelBadge = ({
 }) => {
 	return (
 		<Badge
-			style={{ backgroundColor: color, color: getContrast(color) }}
-			className="rounded-xs"
+			// style={{ backgroundColor: color, color: getContrast(color) }}
+			className="flex justify-start rounded-xs text-start"
 			variant="secondary"
 		>
+			<div
+				className="size-3 rounded-full"
+				style={{ backgroundColor: color, color: getContrast(color) }}
+			/>
 			{name}
 		</Badge>
 	);

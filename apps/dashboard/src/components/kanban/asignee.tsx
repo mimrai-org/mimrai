@@ -1,4 +1,5 @@
 import { getContrast } from "@mimir/utils/random";
+import { UserIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 
@@ -10,6 +11,19 @@ type Props = {
 };
 
 export const AssigneeAvatar = ({ name, color, email, className }: Props) => {
+	if (!name && !email) {
+		return (
+			<div
+				className={cn(
+					"flex size-6 min-h-6 min-w-6 items-center justify-center rounded-full border border-dashed text-muted-foreground",
+					className,
+				)}
+			>
+				<UserIcon className="size-3" />
+			</div>
+		);
+	}
+
 	return (
 		<Avatar className={cn("size-6", className)}>
 			<AvatarFallback

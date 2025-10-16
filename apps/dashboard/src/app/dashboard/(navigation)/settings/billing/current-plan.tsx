@@ -36,15 +36,18 @@ export const CurrentPlan = () => {
 		window.location.href = data.url;
 	};
 
-	const handleCheckout = async (productId: string) => {
+	const handleCheckout = async (
+		productId: string,
+		recurringInterval: "month" | "year",
+	) => {
 		if (!team) return;
 
 		const data = await createCheckout({
 			productId,
-			recurringInterval: "month",
+			recurringInterval,
 		});
 
-		window.location.href = data.url!;
+		window.open(data.url!, "_blank");
 	};
 
 	if (isLoading) {

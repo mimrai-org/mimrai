@@ -60,7 +60,7 @@ export const KanbanTask = ({
 						)}
 						{task.title}
 					</span>
-					{task.assignee && <AssigneeAvatar {...task.assignee} />}
+					<AssigneeAvatar {...task.assignee} />
 				</div>
 				{task.labels?.length > 0 && (
 					<div className="mb-2 flex flex-wrap gap-1">

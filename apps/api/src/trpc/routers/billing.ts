@@ -32,6 +32,7 @@ export const billingRouter = router({
 			const product = await stripeClient.products.retrieve(input.productId);
 			const prices = await stripeClient.prices.list({
 				product: product.id,
+				active: true,
 				recurring: {
 					interval: input.recurringInterval,
 				},

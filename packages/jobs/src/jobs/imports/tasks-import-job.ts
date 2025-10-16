@@ -7,8 +7,8 @@ import { getMemberByEmail } from "@mimir/db/queries/teams";
 import { randomColor } from "@mimir/utils/random";
 import { logger, schemaTask } from "@trigger.dev/sdk";
 import { generateObject } from "ai";
-import * as XLSX from "xlsx";
 import * as cptable from "xlsx/dist/cpexcel.full.mjs";
+import * as XLSX from "xlsx/xlsx.mjs";
 import { z } from "zod";
 
 export const tasksImportJob = schemaTask({

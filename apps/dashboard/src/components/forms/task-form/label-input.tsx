@@ -1,7 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
+import {
+	Command,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+} from "@/components/ui/command";
 import { LabelBadge } from "@/components/ui/label-badge";
 import {
 	Popover,
@@ -44,6 +49,7 @@ export const LabelInput = ({
 			</PopoverTrigger>
 			<PopoverContent>
 				<Command>
+					<CommandInput placeholder="Search labels..." />
 					<CommandGroup>
 						{labels?.map((label) => {
 							const isSelected = value.includes(label.id);

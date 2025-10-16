@@ -131,6 +131,7 @@ export const tasksRouter = router({
 				- When assigning, choose the most relevant member based on the task description
 				- If no suitable member is found, leave the task unassigned
 				
+				Current date: ${new Date().toISOString()}
 				User locale: ${userContext.locale} (IMPORTANT:ALWAYS respond in this language no matter what)
 				`,
 				model: "openai/gpt-4o",

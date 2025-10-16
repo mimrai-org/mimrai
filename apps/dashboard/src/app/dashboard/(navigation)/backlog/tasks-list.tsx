@@ -1,11 +1,19 @@
 "use client";
 
 import type { RouterOutputs } from "@api/trpc/routers";
+import { filter } from "@mdxeditor/editor";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { task } from "better-auth/react";
 import { formatRelative } from "date-fns";
-import { Loader2Icon, PlusIcon } from "lucide-react";
+import {
+	BrushCleaningIcon,
+	Loader2Icon,
+	PlusIcon,
+	SquareDashedIcon,
+} from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo } from "react";
+import { AssigneeAvatar } from "@/components/kanban/asignee";
 import { KanbanTask } from "@/components/kanban/kanban-task";
 import { Priority } from "@/components/kanban/priority";
 import { TaskContextMenu } from "@/components/kanban/task-context-menu";
@@ -18,7 +26,11 @@ import { queryClient, trpc } from "@/utils/trpc";
 
 export const TasksList = () => {
 	const { setParams } = useTaskParams();
-	const { setParams: setFilters, ...filters } = useTasksFilterParams();
+	const {
+		setParams: setFilters,
+		hasParams: hasFilters,
+		...filters
+	} = useTasksFilterParams();
 	const { data: backlogColumn } = useQuery(
 		trpc.columns.getBacklogColumn.queryOptions(),
 	);
@@ -48,6 +60,29 @@ export const TasksList = () => {
 		return tasks?.pages.flatMap((page) => page.data) || [];
 	}, [tasks]);
 
+	if (listData.length === 0 && !isLoading && !hasFilters) {
+		return (
+			<div className="mt-12 flex flex-col items-start justify-center gap-2 px-8 text-center">
+				<h3 className="flex items-center gap-2 text-2xl text-muted-foreground">
+					You have no tasks in your backlog
+				</h3>
+				<p className="max-w-md text-balance text-muted-foreground text-sm">
+					Backlog is empty. Create tasks to see them listed here.
+				</p>
+				<Button
+					variant="default"
+					className="mt-4"
+					onClick={() =>
+						setParams({ createTask: true, taskColumnId: backlogColumnId })
+					}
+				>
+					<PlusIcon />
+					Create your first task
+				</Button>
+			</div>
+		);
+	}
+
 	return (
 		<div className="px-8 py-4">
 			<div className="flex justify-between">
@@ -64,12 +99,13 @@ export const TasksList = () => {
 					Add Task
 				</Button>
 			</div>
+
 			<AnimatePresence>
-				<ul className="grid gap-4 py-4 md:grid-cols-2 lg:grid-cols-4">
+				<ul className="flex flex-col py-4">
 					{listData.map((task) => (
 						<TaskContextMenu key={task.id} task={task}>
 							<li>
-								<KanbanTask task={task} />
+								<TaskItem task={task} />
 							</li>
 						</TaskContextMenu>
 					))}
@@ -104,7 +140,9 @@ export const TaskItem = ({
 			initial={{ opacity: 0, y: 10 }}
 			animate={{ opacity: 1, y: 0 }}
 			exit={{ opacity: 0, y: 10 }}
-			className="flex w-full flex-col gap-2 border p-4 transition-colors hover:bg-accent/50"
+			layout
+			layoutId={`task-${task.id}`}
+			className="flex w-full flex-row justify-between gap-2 border-b p-4 transition-colors hover:bg-accent/50"
 			onClick={() => {
 				queryClient.setQueryData(
 					trpc.tasks.getById.queryKey({ id: task.id }),
@@ -113,23 +151,19 @@ export const TaskItem = ({
 				setParams({ taskId: task.id });
 			}}
 		>
-			<div className="flex items-center justify-between text-sm">
-				<div className="flex items-center gap-2">
-					<h3 className="font-medium">{task.title}</h3>
-				</div>
-				<span className="text-muted-foreground text-xs">
-					{task.dueDate
-						? formatRelative(new Date(task.dueDate!), new Date())
-						: "No due date"}
-				</span>
+			<div className="flex items-center gap-2 text-start text-sm">
+				{task.sequence && (
+					<span className="text-muted-foreground">{task.sequence}</span>
+				)}
+				<h3 className="font-medium">{task.title}</h3>
 			</div>
-			<div className="flex items-center justify-between">
+			<div className="flex items-center gap-4">
 				<div className="flex gap-2">
 					{task.labels?.map((label) => (
 						<LabelBadge key={label.id} {...label} />
 					))}
 				</div>
-				<Priority value={task.priority} />
+				<AssigneeAvatar {...task.assignee} />
 			</div>
 		</motion.button>
 	);

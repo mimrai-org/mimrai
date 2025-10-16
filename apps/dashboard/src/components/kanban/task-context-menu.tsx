@@ -111,7 +111,7 @@ export const TaskContextMenu = ({
 					<ContextMenuSubTrigger className="flex items-center gap-2">
 						Labels
 					</ContextMenuSubTrigger>
-					<ContextMenuSubContent className="w-32">
+					<ContextMenuSubContent className="w-52">
 						{labels?.map((label) => {
 							const isAssigned = task.labels?.some((l) => l.id === label.id);
 							return (

@@ -1,9 +1,9 @@
-import { TasksImport } from "./tasks-import";
+import { TasksImportList } from "./tasks-import-list";
 
 export default function Page() {
 	return (
 		<div>
-			<TasksImport />
+			<TasksImportList />
 		</div>
 	);
 }

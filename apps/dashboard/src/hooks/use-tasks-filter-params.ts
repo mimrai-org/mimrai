@@ -12,6 +12,7 @@ export const useTasksFilterParams = () => {
 
 	return {
 		...params,
+		hasParams: Object.values(params).some((v) => Boolean(v && v.length !== 0)),
 		setParams,
 	};
 };
