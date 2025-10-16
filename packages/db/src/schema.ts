@@ -2,10 +2,11 @@ import { randomUUID } from "node:crypto";
 import type { UIChatMessage } from "@api/ai/types";
 import type { IntegrationConfig, IntegrationName } from "@integration/registry";
 import { randomColor } from "@mimir/utils/random";
-import { relations, sql } from "drizzle-orm";
+import { relations, type SQL, sql } from "drizzle-orm";
 import {
 	bigint,
 	boolean,
+	customType,
 	foreignKey,
 	index,
 	integer,
@@ -20,6 +21,14 @@ import {
 	unique,
 	vector,
 } from "drizzle-orm/pg-core";
+
+export const tsvector = customType<{
+	data: string;
+}>({
+	dataType() {
+		return "tsvector";
+	},
+});
 
 export const session = pgTable("session", {
 	id: text("id").primaryKey(),
@@ -194,6 +203,11 @@ export const tasks = pgTable(
 		columnId: text("column_id").notNull(),
 		attachments: jsonb("attachments").$type<string[]>().default([]),
 		pullRequestPlanId: text("pull_request_plan_id"),
+		score: integer("score").default(1).notNull(),
+		fts: tsvector("fts").generatedAlwaysAs(
+			(): SQL =>
+				sql`to_tsvector('english', coalesce("title",'') || ' ' || coalesce("description",''))`,
+		),
 		dueDate: timestamp("due_date", {
 			withTimezone: true,
 			mode: "string",
@@ -209,6 +223,10 @@ export const tasks = pgTable(
 		}).defaultNow(),
 	},
 	(table) => [
+		index("tasks_fts").using(
+			"gin",
+			table.fts.asc().nullsLast().op("tsvector_ops"),
+		),
 		foreignKey({
 			columns: [table.assigneeId],
 			foreignColumns: [users.id],

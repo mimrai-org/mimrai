@@ -11,6 +11,7 @@ import {
 	type SQL,
 	sql,
 } from "drizzle-orm";
+import { buildSearchQuery } from "src/utils/search-query";
 import { db } from "..";
 import {
 	columns,
@@ -47,22 +48,27 @@ export const getTasks = async ({
 	search?: string;
 	view?: "board" | "backlog";
 }) => {
-	const whereConditions: (SQL | undefined)[] = [];
+	const whereClause: (SQL | undefined)[] = [];
 
 	input.assigneeId &&
 		input.assigneeId.length > 0 &&
-		whereConditions.push(inArray(tasks.assigneeId, input.assigneeId));
-	input.columnId &&
-		whereConditions.push(inArray(tasks.columnId, input.columnId));
-	input.teamId && whereConditions.push(eq(tasks.teamId, input.teamId));
-	input.search && whereConditions.push(ilike(tasks.title, `%${input.search}%`));
+		whereClause.push(inArray(tasks.assigneeId, input.assigneeId));
+	input.columnId && whereClause.push(inArray(tasks.columnId, input.columnId));
+	input.teamId && whereClause.push(eq(tasks.teamId, input.teamId));
 	input.labels &&
 		input.labels.length > 0 &&
-		whereConditions.push(inArray(labelsOnTasks.labelId, input.labels));
+		whereClause.push(inArray(labelsOnTasks.labelId, input.labels));
+
+	if (input.search) {
+		const query = buildSearchQuery(input.search);
+		whereClause.push(
+			sql`(to_tsquery('english', unaccent(${query})) @@ ${tasks.fts})`,
+		);
+	}
 
 	// exlude done tasks with more than 3 days
 	if (input.view === "board") {
-		whereConditions.push(
+		whereClause.push(
 			or(
 				eq(columns.type, "normal"),
 				and(
@@ -118,7 +124,7 @@ export const getTasks = async ({
 			),
 		})
 		.from(tasks)
-		.where(and(...whereConditions))
+		.where(and(...whereClause))
 		.innerJoin(columns, eq(tasks.columnId, columns.id))
 		.leftJoin(labelsOnTasks, eq(labelsOnTasks.taskId, tasks.id))
 		.leftJoin(labels, eq(labels.id, labelsOnTasks.labelId))

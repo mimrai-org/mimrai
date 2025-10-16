@@ -13,6 +13,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 import { trpc } from "@/utils/trpc";
 
 export const LabelInput = ({
@@ -34,7 +35,7 @@ export const LabelInput = ({
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
-				<Button type="button" variant={"ghost"} className={className}>
+				<Button type="button" variant={"ghost"} className={cn(className, "")}>
 					{selectedLabels.length > 0 && (
 						<div className="flex flex-wrap gap-1">
 							{selectedLabels.map((label) => (

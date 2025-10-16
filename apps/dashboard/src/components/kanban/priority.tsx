@@ -1,30 +1,52 @@
 import { Badge } from "../ui/badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+
+const PriorityTooltip = ({
+	value,
+	children,
+}: {
+	value: "low" | "medium" | "high";
+	children: React.ReactNode;
+}) => {
+	return (
+		<Tooltip delayDuration={500}>
+			<TooltipTrigger>{children}</TooltipTrigger>
+			<TooltipContent className="capitalize">{value}</TooltipContent>
+		</Tooltip>
+	);
+};
 
 export const Priority = ({ value }: { value: "low" | "medium" | "high" }) => {
 	if (value === "low") {
 		return (
-			<div className="flex items-center gap-1">
-				<div className="size-1 bg-secondary" />
-			</div>
+			<PriorityTooltip value={value}>
+				<div className="flex items-center gap-1">
+					<div className="size-1 bg-secondary" />
+				</div>
+			</PriorityTooltip>
 		);
 	}
 
 	if (value === "medium") {
 		return (
-			<div className="flex items-center gap-1">
-				<div className="size-1 bg-primary" />
-				<div className="size-1 bg-primary" />
-			</div>
+			<PriorityTooltip value={value}>
+				<div className="flex items-center gap-1">
+					<div className="size-1 bg-primary" />
+					<div className="size-1 bg-primary" />
+				</div>
+			</PriorityTooltip>
 		);
 	}
 
 	if (value === "high") {
 		return (
-			<div className="flex items-center gap-1">
-				<div className="size-1 bg-red-500" />
-				<div className="size-1 bg-red-500" />
-				<div className="size-1 bg-red-500" />
-			</div>
+			<PriorityTooltip value={value}>
+				<div className="flex items-center gap-1">
+					<div className="size-1 bg-red-500" />
+					<div className="size-1 bg-red-500" />
+					<div className="size-1 bg-red-500" />
+				</div>
+			</PriorityTooltip>
 		);
 	}
 

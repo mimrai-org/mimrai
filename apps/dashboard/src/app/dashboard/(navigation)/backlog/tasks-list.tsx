@@ -91,6 +91,7 @@ export const TasksList = () => {
 				</div>
 				<Button
 					variant="default"
+					size={"sm"}
 					onClick={() =>
 						setParams({ createTask: true, taskColumnId: backlogColumnId })
 					}

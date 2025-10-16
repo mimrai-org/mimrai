@@ -23,7 +23,9 @@ export const TasksImportList = () => {
 
 	const shouldAutoRefresh = useMemo(() => {
 		if (!imports?.data) return false;
-		return imports.data.some((imp) => imp.status === "processing");
+		return imports.data.some(
+			(imp) => imp.status === "processing" || imp.status === "pending",
+		);
 	}, [imports?.data]);
 
 	useEffect(() => {

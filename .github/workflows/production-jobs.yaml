@@ -11,7 +11,7 @@ on:
       - "packages/db/**"
 jobs:
   deploy:
-    name: 🚀 Deploy to Fly Production
+    name: 🚀 Deploy to Trigger
     runs-on: ubuntu-latest
     timeout-minutes: 30
     concurrency: fly-production

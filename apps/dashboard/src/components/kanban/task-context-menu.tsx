@@ -168,7 +168,7 @@ export const TaskContextMenu = ({
 								key={member.id}
 								onClick={handleUpdateTask.bind(null, { assigneeId: member.id })}
 							>
-								<Assignee name={member.name} email={member.email} />
+								<Assignee {...member} />
 							</ContextMenuItem>
 						))}
 					</ContextMenuSubContent>
