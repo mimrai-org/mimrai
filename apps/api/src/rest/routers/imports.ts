@@ -35,6 +35,7 @@ app.post("/tasks/upload", async (c) => {
 	// create a new record in the imports table
 	let taskImport = await createImport({
 		userId,
+		type: "tasks_csv",
 		fileName: file.name,
 		filePath: data.path,
 		teamId,

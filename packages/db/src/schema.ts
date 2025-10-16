@@ -630,12 +630,14 @@ export const pullRequestPlan = pgTable("pull_request_plans", {
 	}).defaultNow(),
 });
 
-export const taskImportStatusEnum = pgEnum("task_import_status", [
+export const importStatusEnum = pgEnum("task_import_status", [
 	"pending",
 	"processing",
 	"completed",
 	"failed",
 ]);
+
+export const importTypeEnum = pgEnum("import_type", ["tasks_csv"]);
 
 export const imports = pgTable("imports", {
 	id: text("id")
@@ -648,7 +650,8 @@ export const imports = pgTable("imports", {
 	fileUrl: text("file_url"),
 	filePath: text("file_path").notNull(),
 	error: jsonb("error").$type<{ message: string }>(),
-	status: taskImportStatusEnum("status").default("pending").notNull(),
+	type: importTypeEnum("type").notNull(),
+	status: importStatusEnum("status").default("pending").notNull(),
 	jobId: text("job_id"),
 	createdAt: timestamp("created_at", {
 		withTimezone: true,

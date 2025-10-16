@@ -1,16 +1,18 @@
 import { and, desc, eq, inArray, type SQL } from "drizzle-orm";
 import { db } from "../index";
-import { imports, type taskImportStatusEnum } from "../schema";
+import { type importStatusEnum, imports, type importTypeEnum } from "../schema";
 
 export const createImport = async ({
 	userId,
 	teamId,
 	fileUrl,
+	type,
 	filePath,
 	fileName,
 }: {
 	userId: string;
 	teamId: string;
+	type: (typeof importTypeEnum.enumValues)[number];
 	fileUrl?: string;
 	filePath: string;
 	fileName: string;
@@ -20,6 +22,7 @@ export const createImport = async ({
 		.values({
 			userId,
 			teamId,
+			type,
 			fileUrl,
 			filePath,
 			fileName,
@@ -38,7 +41,7 @@ export const updateImportStatus = async ({
 }: {
 	id: string;
 	teamId?: string;
-	status: (typeof taskImportStatusEnum.enumValues)[number];
+	status: (typeof importStatusEnum.enumValues)[number];
 	jobId?: string;
 }) => {
 	const whereClause: SQL[] = [eq(imports.id, id)];
@@ -86,7 +89,7 @@ export const getImports = async ({
 	pageSize = 10,
 	teamId,
 }: {
-	status?: (typeof taskImportStatusEnum.enumValues)[number][];
+	status?: (typeof importStatusEnum.enumValues)[number][];
 	cursor?: string;
 	pageSize?: number;
 	teamId?: string;
