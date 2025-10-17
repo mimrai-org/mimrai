@@ -26,6 +26,7 @@
         "@mimir/integration": "workspace:*",
         "@mimir/jobs": "workspace:*",
         "@mimir/logger": "workspace:*",
+        "@mimir/notifications": "workspace:*",
         "@mimir/utils": "workspace:*",
         "@sentry/node": "^10.17.0",
         "@supabase/supabase-js": "^2.58.0",

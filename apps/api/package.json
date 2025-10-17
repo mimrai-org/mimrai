@@ -22,6 +22,7 @@
     "@mimir/db": "workspace:*",
     "@mimir/email": "workspace:*",
     "@mimir/integration": "workspace:*",
+    "@mimir/notifications": "workspace:*",
     "@mimir/logger": "workspace:*",
     "@mimir/utils": "workspace:*",
     "@mimir/jobs": "workspace:*",
