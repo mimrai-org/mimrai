@@ -16,7 +16,6 @@
     "dev:api": "turbo -F @mimir/api dev",
     "db:push": "turbo -F @mimir/db db:push"
   },
-  "dependencies": {},
   "devDependencies": {
     "@mimir/tsconfig": "workspace:*",
     "@biomejs/biome": "^2.2.0",

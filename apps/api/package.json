@@ -1,7 +1,7 @@
 {
   "name": "@mimir/api",
   "scripts": {
-    "dev": "TZ=UTC PORT=3003 NODE_ENV=development bun --watch src/index.ts",
+    "dev": "TZ=UTC NODE_ENV=development bun --watch src/index.ts",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
