@@ -3,9 +3,11 @@ import {
   and,
   desc,
   eq,
+  gte,
   type InferSelectModel,
   inArray,
   type SQL,
+  sql,
 } from "drizzle-orm";
 import { db } from "..";
 import {
@@ -46,7 +48,8 @@ export const createActivity = async (input: CreateActivityInput) => {
         and(
           eq(activities.groupId, input.groupId),
           eq(activities.userId, userId),
-          eq(activities.type, input.type)
+          eq(activities.type, input.type),
+          gte(activities.createdAt, sql`now() - interval '5 minutes'`)
         )
       )
       .orderBy(desc(activities.createdAt))

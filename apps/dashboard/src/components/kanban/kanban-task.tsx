@@ -84,15 +84,17 @@ export const KanbanTask = ({
 						<Link
 							href={task.pullRequestPlan.prUrl}
 							target="_blank"
-							className="flex items-center text-primary text-sm hover:text-primary/80"
+							className="flex items-start text-primary text-sm hover:text-primary/80"
 							onClick={(e) => e.stopPropagation()}
 						>
 							{task.pullRequestPlan.status === "pending" && (
-								<GitPullRequestArrowIcon className={cn("mr-1 inline size-3")} />
+								<GitPullRequestArrowIcon
+									className={cn("mt-1 mr-1 inline size-3")}
+								/>
 							)}
 							{task.pullRequestPlan.status === "completed" && (
 								<GitPullRequestIcon
-									className={cn("mr-1 inline size-3 text-violet-600")}
+									className={cn("mt-1 mr-1 inline size-3 text-violet-600")}
 								/>
 							)}
 							{task.pullRequestPlan.prTitle}

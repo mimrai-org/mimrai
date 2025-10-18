@@ -421,12 +421,14 @@ export const TaskForm = ({
 											>
 												{pullRequestPlan.status === "pending" && (
 													<GitPullRequestArrowIcon
-														className={cn("mr-1 inline size-4")}
+														className={cn("mt-1 mr-1 inline size-3")}
 													/>
 												)}
 												{pullRequestPlan.status === "completed" && (
 													<GitPullRequestIcon
-														className={cn("mr-1 inline size-4 text-violet-600")}
+														className={cn(
+															"mt-1 mr-1 inline size-3 text-violet-600",
+														)}
 													/>
 												)}
 												{pullRequestPlan.prTitle}
