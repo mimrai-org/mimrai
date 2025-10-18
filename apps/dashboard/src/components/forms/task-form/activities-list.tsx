@@ -1,5 +1,6 @@
 "use client";
 import type { RouterOutputs } from "@api/trpc/routers";
+import { t } from "@mimir/locale";
 import { useQuery } from "@tanstack/react-query";
 import { formatRelative } from "date-fns";
 import { DotIcon } from "lucide-react";
@@ -69,7 +70,7 @@ const ActivityItem = ({
 			if (metadata?.changes) {
 				const propertiesChanged = Object.keys(metadata.changes);
 				if (propertiesChanged.length > 0) {
-					message = `updated the ${propertiesChanged.join(", ")}`;
+					message = `updated the ${propertiesChanged.map((key) => t(`activities.changes.${key}`)).join(", ")}`;
 				}
 			}
 			return (

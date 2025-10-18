@@ -244,6 +244,7 @@
         "@fast-csv/format": "5.0.2",
         "@mimir/db": "workspace:*",
         "@mimir/email": "workspace:*",
+        "@mimir/notifications": "workspace:*",
         "@mimir/utils": "workspace:*",
         "@sindresorhus/slugify": "^2.2.1",
         "@supabase/supabase-js": "^2.58.0",
