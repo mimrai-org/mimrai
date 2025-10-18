@@ -1,6 +1,6 @@
 import type { RouterOutputs } from "@mimir/api/trpc";
 import { format } from "date-fns";
-import { GitPullRequestIcon } from "lucide-react";
+import { GitPullRequestArrowIcon, GitPullRequestIcon } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useTaskParams } from "@/hooks/use-task-params";
@@ -87,7 +87,14 @@ export const KanbanTask = ({
 							className="flex items-center text-primary text-sm hover:text-primary/80"
 							onClick={(e) => e.stopPropagation()}
 						>
-							<GitPullRequestIcon className="mr-1 inline size-3" />
+							{task.pullRequestPlan.status === "pending" && (
+								<GitPullRequestArrowIcon className={cn("mr-1 inline size-3")} />
+							)}
+							{task.pullRequestPlan.status === "completed" && (
+								<GitPullRequestIcon
+									className={cn("mr-1 inline size-3 text-violet-600")}
+								/>
+							)}
 							{task.pullRequestPlan.prTitle}
 						</Link>
 					)}

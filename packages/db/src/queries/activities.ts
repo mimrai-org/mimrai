@@ -18,6 +18,7 @@ import {
   notificationChannels,
   shouldSendNotification,
 } from "./notification-settings";
+import { getSystemUser } from "./users";
 
 export type CreateActivityInput = {
   userId?: string | null;
@@ -28,8 +29,15 @@ export type CreateActivityInput = {
 };
 
 export const createActivity = async (input: CreateActivityInput) => {
+  let userId = input.userId;
+
+  // If userId is not set, get system user id
+  if (!userId) {
+    userId = (await getSystemUser())!.id;
+  }
+
   let metadataChanges = input.metadata?.changes;
-  if (input.groupId && input.userId) {
+  if (input.groupId && userId) {
     // Check if the last activity is the same type and from the same user
     const [lastActivity] = await db
       .select()
@@ -37,7 +45,7 @@ export const createActivity = async (input: CreateActivityInput) => {
       .where(
         and(
           eq(activities.groupId, input.groupId),
-          eq(activities.userId, input.userId),
+          eq(activities.userId, userId),
           eq(activities.type, input.type)
         )
       )
@@ -58,7 +66,7 @@ export const createActivity = async (input: CreateActivityInput) => {
   const [result] = await db
     .insert(activities)
     .values({
-      userId: input.userId,
+      userId: userId,
       teamId: input.teamId,
       type: input.type,
       groupId: input.groupId,
@@ -72,7 +80,7 @@ export const createActivity = async (input: CreateActivityInput) => {
   if (input.userId && result) {
     for (const channel of notificationChannels) {
       const shouldSend = await shouldSendNotification(
-        input.userId,
+        userId,
         input.teamId,
         input.type,
         channel

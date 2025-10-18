@@ -1,6 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format, formatRelative } from "date-fns";
-import { ChevronDownIcon, GitPullRequestIcon, XIcon } from "lucide-react";
+import {
+	ChevronDownIcon,
+	GitPullRequestArrowIcon,
+	GitPullRequestClosedIcon,
+	GitPullRequestIcon,
+	XIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -16,6 +22,7 @@ import {
 } from "@/components/ui/popover";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useZodForm } from "@/hooks/use-zod-form";
+import { cn } from "@/lib/utils";
 import { trpc } from "@/utils/trpc";
 import { Assignee } from "../../kanban/asignee";
 import { Button } from "../../ui/button";
@@ -67,6 +74,7 @@ export const TaskForm = ({
 		id: string;
 		prTitle: string | null;
 		prUrl: string | null;
+		status: "pending" | "completed" | "canceled" | "processing";
 	} | null;
 }) => {
 	const [lastSavedDate, setLastSavedDate] = useState<Date>(new Date());
@@ -403,15 +411,24 @@ export const TaskForm = ({
 
 								{pullRequestPlan?.prUrl && (
 									<div className="mb-4">
-										<FormLabel>Linked Pull Request</FormLabel>
+										<FormLabel>Pull Request</FormLabel>
 										<div className="mt-2 mr-1 ml-3 flex items-center justify-between">
 											<Link
 												href={pullRequestPlan.prUrl}
 												target="_blank"
-												className="flex items-center text-primary text-sm hover:text-primary/80"
+												className="flex items-start text-primary text-sm hover:text-primary/80"
 												onClick={(e) => e.stopPropagation()}
 											>
-												<GitPullRequestIcon className="mr-1 inline size-3" />
+												{pullRequestPlan.status === "pending" && (
+													<GitPullRequestArrowIcon
+														className={cn("mr-1 inline size-4")}
+													/>
+												)}
+												{pullRequestPlan.status === "completed" && (
+													<GitPullRequestIcon
+														className={cn("mr-1 inline size-4 text-violet-600")}
+													/>
+												)}
 												{pullRequestPlan.prTitle}
 											</Link>
 											<Button
