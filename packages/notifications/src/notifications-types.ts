@@ -17,6 +17,20 @@ export const allNotificationTypes: NotificationType[] = [
     order: 2,
   },
   {
+    type: "task_column_changed",
+    channels: ["email", "mattermost"],
+    showInSettings: true,
+    category: "tasks",
+    order: 3,
+  },
+  {
+    type: "task_comment",
+    channels: ["email", "mattermost"],
+    showInSettings: true,
+    category: "tasks",
+    order: 4,
+  },
+  {
     type: "resume_generated",
     channels: ["mattermost"],
     showInSettings: true,

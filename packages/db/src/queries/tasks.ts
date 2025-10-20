@@ -21,6 +21,7 @@ import {
   tasks,
   users,
 } from "../schema";
+import { unionArray } from "../utils/array";
 import { createActivity, createTaskUpdateActivity } from "./activities";
 import { upsertTaskEmbedding } from "./tasks-embeddings";
 
@@ -184,6 +185,7 @@ export const createTask = async ({
     .values({
       ...input,
       sequence: await getNextTaskSequence(input.teamId),
+      subscribers: unionArray([userId, input.assigneeId]),
     })
     .returning();
 
@@ -273,6 +275,7 @@ export const updateTask = async ({
     .set({
       ...input,
       updatedAt: new Date().toISOString(),
+      subscribers: unionArray(oldTask.subscribers, [input.assigneeId]),
     })
     .where(and(...whereClause))
     .returning();
@@ -316,6 +319,7 @@ export const getTaskById = async (id: string, teamId?: string) => {
   if (teamId) {
     whereClause.push(eq(tasks.teamId, teamId));
   }
+
   const [task] = await db
     .select({
       id: tasks.id,
@@ -437,15 +441,22 @@ export const createTaskComment = async ({
     throw new Error("Task not found");
   }
 
-  const activity = await createActivity({
+  await db
+    .update(tasks)
+    .set({
+      subscribers: unionArray(task.subscribers, [userId]),
+    })
+    .where(and(...whereClause));
+
+  createActivity({
     userId,
     teamId: task.teamId,
     type: "task_comment",
     groupId: task.id,
-    metadata: { comment },
+    metadata: { comment, title: task.title, subscribers: task.subscribers },
   });
 
-  return activity;
+  return task;
 };
 
 export const getTaskByTitle = async ({
@@ -461,4 +472,116 @@ export const getTaskByTitle = async ({
     .where(and(eq(tasks.title, title), eq(tasks.teamId, teamId)))
     .limit(1);
   return task;
+};
+
+export const subscribeUserToTask = async ({
+  taskId,
+  userId,
+  teamId,
+}: {
+  taskId: string;
+  userId: string;
+  teamId?: string;
+}) => {
+  const whereClause: SQL[] = [eq(tasks.id, taskId)];
+
+  if (teamId) {
+    whereClause.push(eq(tasks.teamId, teamId));
+  }
+
+  const [oldTask] = await db
+    .select()
+    .from(tasks)
+    .where(and(...whereClause))
+    .limit(1);
+
+  if (!oldTask) {
+    throw new Error("Task not found");
+  }
+
+  const [task] = await db
+    .update(tasks)
+    .set({
+      subscribers: unionArray(oldTask.subscribers, [userId]),
+    })
+    .where(and(...whereClause))
+    .returning();
+
+  if (!task) {
+    throw new Error("Failed to subscribe to task");
+  }
+
+  return task;
+};
+
+export const unsubscribeUserFromTask = async ({
+  taskId,
+  userId,
+  teamId,
+}: {
+  taskId: string;
+  userId: string;
+  teamId?: string;
+}) => {
+  const whereClause: SQL[] = [eq(tasks.id, taskId)];
+
+  if (teamId) {
+    whereClause.push(eq(tasks.teamId, teamId));
+  }
+
+  const [oldTask] = await db
+    .select()
+    .from(tasks)
+    .where(and(...whereClause))
+    .limit(1);
+
+  if (!oldTask) {
+    throw new Error("Task not found");
+  }
+
+  const updatedSubscribers = oldTask.subscribers.filter((id) => id !== userId);
+
+  const [task] = await db
+    .update(tasks)
+    .set({
+      subscribers: updatedSubscribers,
+    })
+    .where(and(...whereClause))
+    .returning();
+
+  if (!task) {
+    throw new Error("Failed to unsubscribe from task");
+  }
+
+  return task;
+};
+
+export const getTaskSubscribers = async ({
+  taskId,
+  teamId,
+}: {
+  taskId: string;
+  teamId?: string;
+}) => {
+  const whereClause: SQL[] = [
+    eq(tasks.id, taskId),
+    sql`${users.id} = ANY(${tasks.subscribers})`,
+  ];
+
+  if (teamId) {
+    whereClause.push(eq(tasks.teamId, teamId));
+  }
+
+  const subscribers = await db
+    .select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      image: users.image,
+      color: users.color,
+    })
+    .from(users)
+    .innerJoin(tasks, and(...whereClause));
+
+  return subscribers;
 };

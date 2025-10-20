@@ -213,6 +213,7 @@ export const tasks = pgTable(
       withTimezone: true,
       mode: "string",
     }),
+    subscribers: text("subscribers").array().default([]).notNull(),
 
     createdAt: timestamp("created_at", {
       withTimezone: true,

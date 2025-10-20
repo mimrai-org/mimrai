@@ -11,6 +11,7 @@ export interface CreateNotificationInput {
   title: string;
   message: string;
   type: "customer" | "team" | "owners";
+  additionalRecipients?: string[];
   url?: string;
 }
 
@@ -32,6 +33,7 @@ export interface NotificationHandler {
   ) => Partial<CreateEmailOptions> & {
     data: Record<string, any>;
     template?: string;
+    additionalRecipients?: string[];
     emailType: "customer" | "team" | "owners"; // Explicit: customer emails go to external recipients, team emails go to all team members, owners emails go to team owners only
   };
 }

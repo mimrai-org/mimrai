@@ -3,22 +3,22 @@ import { getAppUrl } from "@mimir/utils/envs";
 import { getTaskMarkdownLink } from "@mimir/utils/tasks";
 import type { NotificationHandler } from "@notifications/base";
 
-export const taskAssigned: NotificationHandler = {
+export const taskComment: NotificationHandler = {
   createNotification: (data, user) => {
     return {
-      title: "Task Assigned",
-      message: `> Task **${getTaskMarkdownLink(data.groupId!, data.metadata?.title)}** has been assigned to **${data.metadata?.assigneeName}**.`,
+      title: "Task Commented",
+      message: `> **${user.name}** commented on task **${getTaskMarkdownLink(data.groupId!, data.metadata?.title)}**:\n\n>${data.metadata?.comment}`,
       type: "customer",
       additionalRecipients: data.metadata?.subscribers ?? [],
     };
   },
   createEmail: (data, user, team) => {
     return {
-      subject: `New Task Assigned: ${data.metadata?.title}`,
+      subject: `New Comment on Task: ${data.metadata?.title}`,
       react: NotificationEmail({
-        message: `Task "${data.metadata?.title}" has been assigned to ${data.metadata?.assigneeName}.`,
+        message: `${user.name} commented on task "${data.metadata?.title}": ${data.metadata?.comment}`,
         teamName: team.name,
-        title: "Task Assigned",
+        title: "New Comment on Task",
         ctaLink: `${getAppUrl()}`,
       }),
       emailType: "customer",

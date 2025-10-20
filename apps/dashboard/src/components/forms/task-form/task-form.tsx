@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format, formatRelative } from "date-fns";
 import {
 	ChevronDownIcon,
@@ -20,6 +20,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import { Textarea } from "@/components/ui/textarea";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { cn } from "@/lib/utils";
@@ -48,6 +49,7 @@ import { ColumnSelect } from "./column-select";
 import { CommentInput } from "./comment-input";
 import { LabelInput } from "./label-input";
 import { SmartInput } from "./smart-input";
+import { SubscribersList } from "./subscribers-list";
 import { TaskDuplicated } from "./task-duplicated";
 
 export const taskFormSchema = z.object({
@@ -122,6 +124,9 @@ export const TaskForm = ({
 			onSuccess: (task) => {
 				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
 				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
+				queryClient.invalidateQueries(
+					trpc.tasks.getSubscribers.queryOptions({ id: task.id }),
+				);
 				queryClient.invalidateQueries(
 					trpc.activities.get.queryOptions({
 						groupId: task.id,
@@ -228,6 +233,9 @@ export const TaskForm = ({
 										</FormItem>
 									)}
 								/>
+								{defaultValues?.id && (
+									<SubscribersList taskId={defaultValues?.id!} />
+								)}
 								<Button
 									type="submit"
 									variant={defaultValues?.id ? "ghost" : "default"}

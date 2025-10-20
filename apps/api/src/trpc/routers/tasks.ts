@@ -1,119 +1,125 @@
 import { generateSystemPrompt } from "@api/ai/generate-system-prompt";
 import { getUserContext } from "@api/ai/utils/get-user-context";
 import {
-	commentTaskSchema,
-	createTaskSchema,
-	deleteTaskSchema,
-	getDuplicatedTasksSchema,
-	getTasksSchema,
-	smartCompleteResponseSchema,
-	smartCompleteSchema,
-	updateTaskSchema,
+  commentTaskSchema,
+  createTaskSchema,
+  deleteTaskSchema,
+  getDuplicatedTasksSchema,
+  getTaskSubscribersSchema,
+  getTasksSchema,
+  smartCompleteResponseSchema,
+  smartCompleteSchema,
+  subscribeTaskSchema,
+  unsubscribeTaskSchema,
+  updateTaskSchema,
 } from "@api/schemas/tasks";
 import { protectedProcedure, router } from "@api/trpc/init";
 import { getLabels } from "@db/queries/labels";
-import { getMembers } from "@db/queries/teams";
+import { getMemberById, getMembers } from "@db/queries/teams";
 import {
-	createTask,
-	createTaskComment,
-	deleteTask,
-	getTaskById,
-	getTasks,
-	updateTask,
+  createTask,
+  createTaskComment,
+  deleteTask,
+  getTaskById,
+  getTaskSubscribers,
+  getTasks,
+  subscribeUserToTask,
+  unsubscribeUserFromTask,
+  updateTask,
 } from "@mimir/db/queries/tasks";
 import { getDuplicateTaskEmbedding } from "@mimir/db/queries/tasks-embeddings";
 import { generateObject } from "ai";
 
 export const tasksRouter = router({
-	get: protectedProcedure
-		.input(getTasksSchema.optional())
-		.query(({ ctx, input }) => {
-			return getTasks({
-				pageSize: 100,
-				...input,
-				teamId: ctx.user.teamId!,
-			});
-		}),
-	create: protectedProcedure
-		.input(createTaskSchema)
-		.mutation(async ({ ctx, input }) => {
-			return createTask({
-				...input,
-				userId: ctx.user.id,
-				teamId: ctx.user.teamId!,
-			});
-		}),
-	update: protectedProcedure
-		.input(updateTaskSchema.omit({ teamId: true }))
-		.mutation(async ({ ctx, input }) => {
-			return updateTask({
-				...input,
-				userId: ctx.user.id,
-				teamId: ctx.user.teamId!,
-			});
-		}),
-	delete: protectedProcedure
-		.input(deleteTaskSchema.omit({ teamId: true }))
-		.mutation(async ({ ctx, input }) => {
-			return deleteTask({
-				...input,
-				teamId: ctx.user.teamId!,
-			});
-		}),
-	getById: protectedProcedure
-		.input(updateTaskSchema.pick({ id: true }))
-		.query(async ({ ctx, input }) => {
-			return getTaskById(input.id, ctx.user.teamId!);
-		}),
+  get: protectedProcedure
+    .input(getTasksSchema.optional())
+    .query(({ ctx, input }) => {
+      return getTasks({
+        pageSize: 100,
+        ...input,
+        teamId: ctx.user.teamId!,
+      });
+    }),
+  create: protectedProcedure
+    .input(createTaskSchema)
+    .mutation(async ({ ctx, input }) => {
+      return createTask({
+        ...input,
+        userId: ctx.user.id,
+        teamId: ctx.user.teamId!,
+      });
+    }),
+  update: protectedProcedure
+    .input(updateTaskSchema.omit({ teamId: true }))
+    .mutation(async ({ ctx, input }) => {
+      return updateTask({
+        ...input,
+        userId: ctx.user.id,
+        teamId: ctx.user.teamId!,
+      });
+    }),
+  delete: protectedProcedure
+    .input(deleteTaskSchema.omit({ teamId: true }))
+    .mutation(async ({ ctx, input }) => {
+      return deleteTask({
+        ...input,
+        teamId: ctx.user.teamId!,
+      });
+    }),
+  getById: protectedProcedure
+    .input(updateTaskSchema.pick({ id: true }))
+    .query(async ({ ctx, input }) => {
+      return getTaskById(input.id, ctx.user.teamId!);
+    }),
 
-	comment: protectedProcedure
-		.input(commentTaskSchema)
-		.mutation(async ({ ctx, input }) => {
-			return createTaskComment({
-				taskId: input.id,
-				comment: input.comment,
-				userId: ctx.user.id,
-				teamId: ctx.user.teamId!,
-			});
-		}),
+  comment: protectedProcedure
+    .input(commentTaskSchema)
+    .mutation(async ({ ctx, input }) => {
+      return createTaskComment({
+        taskId: input.id,
+        comment: input.comment,
+        userId: ctx.user.id,
+        teamId: ctx.user.teamId!,
+      });
+    }),
 
-	getDuplicates: protectedProcedure
-		.input(getDuplicatedTasksSchema)
-		.query(async ({ ctx, input }) => {
-			return getDuplicateTaskEmbedding({
-				task: input,
-				teamId: ctx.user.teamId!,
-			});
-		}),
+  getDuplicates: protectedProcedure
+    .input(getDuplicatedTasksSchema)
+    .query(async ({ ctx, input }) => {
+      return getDuplicateTaskEmbedding({
+        task: input,
+        teamId: ctx.user.teamId!,
+      });
+    }),
 
-	smartComplete: protectedProcedure
-		.input(smartCompleteSchema)
-		.mutation(async ({ input, ctx }) => {
-			const userContext = await getUserContext({
-				userId: ctx.user.id,
-				teamId: ctx.user.teamId!,
-			});
-			const labels = (
-				await getLabels({
-					teamId: ctx.user.teamId!,
-				})
-			).map((label) => ({
-				id: label.id,
-				name: label.name,
-				description: label.description,
-			}));
-			const members = (
-				await getMembers({
-					teamId: ctx.user.teamId!,
-				})
-			).map((member) => ({
-				id: member.id,
-				name: member.name,
-				description: member.description,
-			}));
+  smartComplete: protectedProcedure
+    .input(smartCompleteSchema)
+    .mutation(async ({ input, ctx }) => {
+      const userContext = await getUserContext({
+        userId: ctx.user.id,
+        teamId: ctx.user.teamId!,
+      });
+      const labels = (
+        await getLabels({
+          teamId: ctx.user.teamId!,
+        })
+      ).map((label) => ({
+        id: label.id,
+        name: label.name,
+        description: label.description,
+      }));
+      const members = (
+        await getMembers({
+          teamId: ctx.user.teamId!,
+        })
+      ).map((member) => ({
+        id: member.id,
+        name: member.name,
+        description: member.description,
+      }));
 
-			const response = await generateObject({
-				system: `You are an AI assistant that helps users manage their tasks effectively and efficiently.
+      const response = await generateObject({
+        system: `You are an AI assistant that helps users manage their tasks effectively and efficiently.
 				You can create tasks based on user prompts, ensuring they are well-defined and actionable.
 				
 				TASK CREATION GUIDELINES:
@@ -134,9 +140,9 @@ export const tasksRouter = router({
 				Current date: ${new Date().toISOString()}
 				User locale: ${userContext.locale} (IMPORTANT:ALWAYS respond in this language no matter what)
 				`,
-				model: "openai/gpt-4o",
-				schema: smartCompleteResponseSchema,
-				prompt: `Generate a task using the following context, you not need to use tools to complete this task.
+        model: "openai/gpt-4o",
+        schema: smartCompleteResponseSchema,
+        prompt: `Generate a task using the following context, you not need to use tools to complete this task.
 					Labels: 
 						${JSON.stringify(labels, null, 2)}
 					Members: 
@@ -144,8 +150,46 @@ export const tasksRouter = router({
 
 					Task prompt: ${input.prompt}
 				`,
-			});
+      });
 
-			return response.object;
-		}),
+      return response.object;
+    }),
+
+  getSubscribers: protectedProcedure
+    .input(getTaskSubscribersSchema)
+    .query(async ({ ctx, input }) => {
+      return await getTaskSubscribers({
+        taskId: input.id,
+        teamId: ctx.user.teamId!,
+      });
+    }),
+
+  unsubscribe: protectedProcedure
+    .input(unsubscribeTaskSchema)
+    .mutation(async ({ ctx, input }) => {
+      return await unsubscribeUserFromTask({
+        taskId: input.id,
+        userId: ctx.user.id,
+        teamId: ctx.user.teamId!,
+      });
+    }),
+
+  subscribe: protectedProcedure
+    .input(subscribeTaskSchema)
+    .mutation(async ({ ctx, input }) => {
+      const userOnTeam = await getMemberById({
+        userId: input.userId,
+        teamId: ctx.user.teamId!,
+      });
+
+      if (!userOnTeam) {
+        throw new Error("User not found on team");
+      }
+
+      return await subscribeUserToTask({
+        taskId: input.id,
+        userId: input.userId,
+        teamId: ctx.user.teamId!,
+      });
+    }),
 });

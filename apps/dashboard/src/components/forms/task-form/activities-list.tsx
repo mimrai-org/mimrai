@@ -62,6 +62,17 @@ const ActivityItem = ({
 					{formatRelative(new Date(activity.createdAt!), new Date())}
 				</div>
 			);
+		case "task_assigned":
+			return (
+				<div className="flex items-center px-4 text-muted-foreground text-xs">
+					<AssigneeAvatar {...activity.user} className="mr-2 size-4 text-xs" />
+					<span className="mr-1 font-medium">{activity.user!.name}</span>
+					assigned the task to {activity.metadata?.assigneeName}
+					<DotIcon />
+					{formatRelative(new Date(activity.createdAt!), new Date())}
+				</div>
+			);
+		case "task_column_changed":
 		case "task_updated": {
 			const metadata = activity.metadata as {
 				changes: Record<string, { value: string }>;

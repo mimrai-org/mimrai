@@ -16,11 +16,13 @@ import {
   type tasks,
   users,
 } from "../schema";
+import { getColumnById } from "./columns";
 import {
   notificationChannels,
   shouldSendNotification,
 } from "./notification-settings";
-import { getSystemUser } from "./users";
+import { getMemberById } from "./teams";
+import { getSystemUser, getUserById } from "./users";
 
 export type CreateActivityInput = {
   userId?: string | null;
@@ -122,7 +124,7 @@ export const createTaskUpdateActivity = async ({
   const changes: Partial<
     Record<
       (typeof changeKeys)[number],
-      { value: string | null; oldValue: string | null }
+      { value: string | null; display?: string | null; oldValue: string | null }
     >
   > = {};
   if (oldTask.title !== newTask.title)
@@ -132,27 +134,58 @@ export const createTaskUpdateActivity = async ({
       value: newTask.description,
       oldValue: oldTask.description,
     };
-  if (oldTask.columnId !== newTask.columnId)
-    changes.columnId = { value: newTask.columnId, oldValue: oldTask.columnId };
+  if (oldTask.columnId !== newTask.columnId) {
+    const newColumn = await getColumnById({ id: newTask.columnId, teamId });
+    changes.columnId = {
+      value: newTask.columnId,
+      display: newColumn.name,
+      oldValue: oldTask.columnId,
+    };
+  }
   if (oldTask.dueDate !== newTask.dueDate)
     changes.dueDate = { value: newTask.dueDate, oldValue: oldTask.dueDate };
-  if (oldTask.assigneeId !== newTask.assigneeId)
+  if (oldTask.assigneeId !== newTask.assigneeId && newTask.assigneeId) {
+    const newAssignee = await getMemberById({
+      userId: newTask.assigneeId,
+      teamId,
+    });
     changes.assigneeId = {
       value: newTask.assigneeId,
+      display: newAssignee?.name || null,
       oldValue: oldTask.assigneeId,
     };
+  }
 
   if (changes.assigneeId) {
     await createActivity({
-      userId: changes.assigneeId.value,
+      userId,
       teamId,
       groupId: newTask.id,
       type: "task_assigned",
       metadata: {
         title: newTask.title,
+        assigneeName: changes.assigneeId.display,
+        subscribers: newTask.subscribers,
       },
     });
     delete changes.assigneeId;
+  }
+
+  if (changes.columnId) {
+    await createActivity({
+      userId,
+      teamId,
+      groupId: newTask.id,
+      type: "task_column_changed",
+      metadata: {
+        fromColumnId: changes.columnId.oldValue,
+        toColumnId: changes.columnId.value,
+        toColumnName: changes.columnId.display,
+        title: newTask.title,
+        subscribers: newTask.subscribers,
+      },
+    });
+    delete changes.columnId;
   }
 
   if (Object.keys(changes).length === 0) {
@@ -167,6 +200,7 @@ export const createTaskUpdateActivity = async ({
     metadata: {
       changes,
       title: newTask.title,
+      subscribers: newTask.subscribers,
     },
   });
 

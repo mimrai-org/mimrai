@@ -38,9 +38,9 @@ export const sendNotification = async (
       if (!team) {
         throw new Error(`Team not found: ${user.teamId}`);
       }
-      const recipients = [];
+      const recipients = new Set<string>();
       if (notification.type === "customer") {
-        recipients.push(user.id);
+        recipients.add(user.id);
       }
 
       if (notification.type === "team") {
@@ -55,7 +55,13 @@ export const sendNotification = async (
       if (notification.type === "owners") {
         const members = await getMembers({ teamId: team.id, role: "owner" });
         for (const member of members) {
-          recipients.push(member.id);
+          recipients.add(member.id);
+        }
+      }
+
+      if (notification.additionalRecipients) {
+        for (const recipient of notification.additionalRecipients) {
+          recipients.add(recipient);
         }
       }
 
@@ -90,23 +96,13 @@ export const sendNotification = async (
         name: team.name,
       });
 
-      const recipients = [];
-      if (emailPayload.emailType === "customer") {
-        recipients.push(user.email);
-      }
+      const recipients = await getEmailRecipients(emailPayload, user, team);
 
-      if (emailPayload.emailType === "team") {
-        const members = await getMembers({ teamId: team.id });
-        for (const member of members) {
-          recipients.push(member.email);
-        }
-      }
-
-      if (emailPayload.emailType === "owners") {
-        const members = await getMembers({ teamId: team.id, role: "owner" });
-        for (const member of members) {
-          recipients.push(member.email);
-        }
+      if (recipients.size === 0) {
+        console.warn(
+          `No email recipients found for notification type: ${type}`
+        );
+        return;
       }
 
       await resend.emails.send({
@@ -122,9 +118,47 @@ export const sendNotification = async (
         tags: emailPayload.tags,
         attachments: emailPayload.attachments,
         scheduledAt: emailPayload.scheduledAt,
-        to: recipients,
+        to: [...recipients],
         from: getEmailFrom(),
       });
     }
   }
+};
+
+const getEmailRecipients = async (
+  emailPayload: {
+    emailType: "customer" | "team" | "owners";
+    additionalRecipients?: string[];
+  },
+  user: UserData,
+  team: { id: string; name: string }
+) => {
+  const recipients = new Set<string>();
+  if (emailPayload.emailType === "customer") {
+    recipients.add(user.email);
+  }
+
+  const members = await getMembers({ teamId: team.id });
+
+  if (emailPayload.emailType === "team") {
+    for (const member of members) {
+      recipients.add(member.email);
+    }
+  }
+
+  if (emailPayload.emailType === "owners") {
+    for (const member of members.filter((m) => m.role === "owner")) {
+      recipients.add(member.email);
+    }
+  }
+
+  if (emailPayload.additionalRecipients) {
+    for (const recipient of emailPayload.additionalRecipients) {
+      const member = members.find((m) => m.id === recipient);
+      if (!member) continue;
+      recipients.add(member.email);
+    }
+  }
+
+  return recipients;
 };

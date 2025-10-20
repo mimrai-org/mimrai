@@ -1,0 +1,138 @@
+"use client";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { EyeIcon, EyeOffIcon, PlusIcon } from "lucide-react";
+import { AssigneeAvatar } from "@/components/kanban/asignee";
+import { Button } from "@/components/ui/button";
+import {
+	Command,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandList,
+} from "@/components/ui/command";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
+import { useUser } from "@/hooks/use-user";
+import { queryClient, trpc } from "@/utils/trpc";
+
+export const SubscribersList = ({ taskId }: { taskId: string }) => {
+	const user = useUser();
+	const { data: subscribers } = useQuery(
+		trpc.tasks.getSubscribers.queryOptions({
+			id: taskId,
+		}),
+	);
+
+	const { data: members } = useQuery(trpc.teams.getMembers.queryOptions());
+
+	const { mutate: unsubscribe } = useMutation(
+		trpc.tasks.unsubscribe.mutationOptions({
+			onSuccess: () => {
+				queryClient.invalidateQueries(
+					trpc.tasks.getSubscribers.queryOptions({ id: taskId }),
+				);
+			},
+		}),
+	);
+
+	const { mutate: subscribe } = useMutation(
+		trpc.tasks.subscribe.mutationOptions({
+			onSuccess: () => {
+				queryClient.invalidateQueries(
+					trpc.tasks.getSubscribers.queryOptions({ id: taskId }),
+				);
+			},
+		}),
+	);
+
+	const isSubscribed = subscribers?.some(
+		(subscriber) => subscriber.id === user?.id,
+	);
+
+	return (
+		<Popover>
+			<PopoverTrigger asChild>
+				<Button variant={"ghost"} size={"sm"}>
+					<EyeIcon />
+					{subscribers?.length ?? 0}
+				</Button>
+			</PopoverTrigger>
+			<PopoverContent className="p-0">
+				<div className="">
+					<div className="p-2">
+						{isSubscribed ? (
+							<Button
+								variant={"ghost"}
+								className="w-full justify-start text-start"
+								type="button"
+								onClick={() => {
+									unsubscribe({ id: taskId });
+								}}
+							>
+								<EyeOffIcon className="text-destructive" />
+								Unsubscribe from changes
+							</Button>
+						) : (
+							<Button
+								variant={"ghost"}
+								className="w-full justify-start text-start"
+								type="button"
+								onClick={() => {
+									subscribe({ id: taskId, userId: user?.id! });
+								}}
+							>
+								<EyeIcon />
+								Subscribe to changes
+							</Button>
+						)}
+					</div>
+					<div className="border-y">
+						{subscribers?.map((subscriber) => (
+							<div key={subscriber.id} className="flex items-center px-4 py-2">
+								<AssigneeAvatar {...subscriber} />
+								<span className="ml-2 text-sm">{subscriber.name}</span>
+							</div>
+						))}
+					</div>
+					<div className="p-2">
+						<Popover>
+							<PopoverTrigger asChild>
+								<Button
+									variant={"ghost"}
+									className="w-full justify-start text-start"
+									onClick={() => {
+										subscribe({ id: taskId, userId: "current" });
+									}}
+								>
+									<PlusIcon />
+									Add people
+								</Button>
+							</PopoverTrigger>
+							<PopoverContent>
+								<Command>
+									<CommandInput placeholder="Search members..." />
+									<CommandGroup>
+										{members?.map((member) => (
+											<CommandItem
+												key={member.id}
+												onSelect={() => {
+													subscribe({ id: taskId, userId: member.id });
+												}}
+											>
+												<AssigneeAvatar {...member} />
+												{member.name}
+											</CommandItem>
+										))}
+									</CommandGroup>
+								</Command>
+							</PopoverContent>
+						</Popover>
+					</div>
+				</div>
+			</PopoverContent>
+		</Popover>
+	);
+};

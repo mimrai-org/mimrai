@@ -298,6 +298,7 @@
         "@mimir/db": "workspace:*",
         "@mimir/email": "workspace:*",
         "@mimir/integration": "workspace:*",
+        "@mimir/utils": "workspace:*",
         "ai": "^5.0.56",
         "drizzle-orm": "^0.44.5",
         "redis": "^5.8.2",
