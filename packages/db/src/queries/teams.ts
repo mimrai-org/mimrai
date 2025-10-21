@@ -19,11 +19,15 @@ export const createTeam = async ({
   email,
   description,
   userId,
+  timezone,
+  locale,
 }: {
   name: string;
   email: string;
   description?: string;
   userId: string;
+  timezone?: string;
+  locale?: string;
 }) => {
   const [team] = await db
     .insert(teams)
@@ -31,6 +35,8 @@ export const createTeam = async ({
       name,
       email,
       description,
+      timezone,
+      locale,
     })
     .returning();
 
@@ -95,12 +101,14 @@ export const updateTeam = async ({
   description,
   email,
   locale,
+  timezone,
   id,
 }: {
   name?: string;
   description?: string;
   email?: string;
   locale?: string;
+  timezone?: string;
   id: string;
 }) => {
   const [team] = await db
@@ -110,6 +118,7 @@ export const updateTeam = async ({
       email,
       description,
       locale,
+      timezone,
     })
     .where(eq(teams.id, id))
     .returning();

@@ -22,6 +22,7 @@ export const TeamSettings = () => {
 							name: team?.name || undefined,
 							email: team?.email || undefined,
 							locale: team?.locale || undefined,
+							timezone: team?.timezone || undefined,
 							id: team?.id || undefined,
 						}}
 					/>

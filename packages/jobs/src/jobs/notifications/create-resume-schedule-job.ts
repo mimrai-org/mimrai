@@ -36,6 +36,7 @@ export const ResumeSchedule = schedules.task({
         cron: settings.cronExpression,
         deduplicationKey: `resume-schedule-${team.id}`,
         externalId: team.id,
+        timezone: team.timezone || "UTC",
       });
 
       await db

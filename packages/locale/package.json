@@ -19,6 +19,7 @@
   },
   "exports": {
     "./constants": "./src/constants.ts",
+    "./timezones": "./src/timezones.ts",
     ".": "./src/index.ts"
   }
 }

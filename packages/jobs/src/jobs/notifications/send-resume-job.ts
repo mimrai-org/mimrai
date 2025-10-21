@@ -165,12 +165,16 @@ export const sendResumeJob = schedules.task({
       - Do not ask for more information. Just provide the summary based on the activities provided.
       - If a column is of type "done" it means the task is completed, do not mention the column, just say the task is finished, and congratulate the user.
       - Add a motivational note at the end of the summary.
+      - Add a warming salute at the beginning of the summary.
+      - Group the activities by team members
 
-      RESPONSE EXAMPLE:
+      RESPONSE EXAMPLE (This is a format example, do not copy the content):
       Hello Team, you all are doing great! Here is a summary of your work so far:
-      - Task "Design Homepage" was created by Alice on 2024-10-01.
-      - Task "Implement Authentication" was finished by Bob on 2024-10-02.
-      - Task "Set up Database" was moved to "In Progress" by Charlie on 2024-10-03.
+      Alice:
+        - Task "Design Homepage" was created on 2024-10-01.
+      Bob:
+        - Task "Implement Authentication" was finished on 2024-10-02.
+        - Task "Set up Database" was moved to "In Progress" on 2024-10-03.
       You are making great progress! keep it up!
 
       IMPORTANT: Always respond in ${team.locale} language.

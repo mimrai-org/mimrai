@@ -1,8 +1,10 @@
 "use client";
 import { DEFAULT_LOCALE, LOCALES } from "@mimir/locale/constants";
+import { getTimezones } from "@mimir/locale/timezones";
+import { PopoverClose } from "@radix-ui/react-popover";
 import { useMutation } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
-import { useEffect } from "react";
+import { ChevronDown, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import z from "zod";
 import { useTeamParams } from "@/hooks/use-team-params";
@@ -11,6 +13,13 @@ import { useZodForm } from "@/hooks/use-zod-form";
 import { cn } from "@/lib/utils";
 import { queryClient, trpc } from "@/utils/trpc";
 import { Button } from "../ui/button";
+import {
+	Command,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+} from "../ui/command";
 import {
 	Form,
 	FormControl,
@@ -21,6 +30,7 @@ import {
 	FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
 	Select,
 	SelectContent,
@@ -42,6 +52,7 @@ export const teamFormSchema = z.object({
 		.max(500, "Description must be at most 500 characters")
 		.optional(),
 	locale: z.string().optional(),
+	timezone: z.string().optional(),
 });
 
 export const TeamForm = ({
@@ -52,6 +63,7 @@ export const TeamForm = ({
 	scrollarea?: boolean;
 }) => {
 	const { setParams } = useTeamParams();
+	const [openTimezone, setOpenTimezone] = useState(false);
 	const user = useUser();
 	const canWriteTeam = useScopes(["team:write"]);
 	const form = useZodForm(teamFormSchema, {
@@ -166,6 +178,57 @@ export const TeamForm = ({
 									This sets the default locale for your team. Actually it only
 									changes the language of the AI agent responses.
 								</FormDescription>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+
+					<FormField
+						control={form.control}
+						name="timezone"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Timezone</FormLabel>
+								<FormControl>
+									<Popover open={openTimezone} onOpenChange={setOpenTimezone}>
+										<PopoverTrigger className="w-full" asChild>
+											{/* <SelectValue placeholder="Select a timezone" {...field} /> */}
+											<Button
+												type="button"
+												variant="outline"
+												className="w-full justify-between"
+											>
+												{getTimezones().find((tz) => tz.tzCode === field.value)
+													?.name || (
+													<span className="text-muted-foreground">
+														Select a timezone
+													</span>
+												)}
+												<ChevronDown className="ml-2 size-4 text-muted-foreground" />
+											</Button>
+										</PopoverTrigger>
+										<PopoverContent align="start" className="w-92">
+											<Command>
+												<CommandInput placeholder="Search timezone..." />
+												<CommandEmpty>No timezone found.</CommandEmpty>
+												<CommandGroup>
+													{getTimezones().map((tz) => (
+														<CommandItem
+															value={tz.tzCode}
+															key={tz.tzCode}
+															onSelect={() => {
+																field.onChange(tz.tzCode);
+																setOpenTimezone(false);
+															}}
+														>
+															{tz.name}
+														</CommandItem>
+													))}
+												</CommandGroup>
+											</Command>
+										</PopoverContent>
+									</Popover>
+								</FormControl>
 								<FormMessage />
 							</FormItem>
 						)}
