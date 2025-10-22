@@ -252,11 +252,6 @@ app.post(validateGithubWebhook, async (c) => {
                 columnName: z
                   .string()
                   .describe("Name of the column to move the task to"),
-                reason: z
-                  .string()
-                  .describe(
-                    "Brief reason explaining why the task is being moved"
-                  ),
               })
             ),
           }),
@@ -317,8 +312,6 @@ app.post(validateGithubWebhook, async (c) => {
           const comment = await octokit.rest.issues.createComment({
             issue_number: pr.number,
             body: `> Task [${update.taskTitle}](${getTaskUrl(update.taskId)}) will be moved to column **${update.columnName}**.
-
-**Reason:** ${update.reason}
 
 [❌ Cancel this plan](${getApiUrl()}/api/github/plans/${newPlan.id}/cancel?integrationId=${connectedRepository.integrationId})
             `,
