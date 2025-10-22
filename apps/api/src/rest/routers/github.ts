@@ -1,3 +1,4 @@
+import { sentry } from "@api/lib/instrument";
 import {
   cancelPullRequestPlan,
   getConnectedRepositoryByRepoId,
@@ -22,6 +23,16 @@ app.get("/plans/:planId/cancel", async (c) => {
   });
 
   if (!plan) {
+    sentry.captureMessage(
+      `Attempt to cancel non-existing PR plan: ${planId}`,
+      "warning",
+      {
+        data: {
+          planId,
+          userId: session?.userId,
+        },
+      }
+    );
     return c.json({ success: false }, 404);
   }
 
@@ -33,6 +44,16 @@ app.get("/plans/:planId/cancel", async (c) => {
   });
 
   if (!integration) {
+    sentry.captureMessage(
+      `Attempt to cancel PR plan with non-existing integration: ${planId}`,
+      "warning",
+      {
+        data: {
+          planId,
+          userId: session?.userId,
+        },
+      }
+    );
     return c.json({ success: false }, 404);
   }
 

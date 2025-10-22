@@ -1,6 +1,6 @@
 import { init } from "@sentry/node";
 
-init({
+export const sentry = init({
   dsn: process.env.SENTRY_DSN!,
   sendDefaultPii: true,
   environment: process.env.NODE_ENV,
