@@ -136,207 +136,208 @@ app.post(validateGithubWebhook, async (c) => {
     }
 
     case "pull_request": {
-      const payload = body as PullRequestEvent;
-      const action = payload.action;
-      const repositoryId = payload.repository.id;
-      const installationId = payload.installation?.id;
-      console.log("Received pull_request event:", action, repositoryId);
+      //       const payload = body as PullRequestEvent;
+      //       const action = payload.action;
+      //       const repositoryId = payload.repository.id;
+      //       const installationId = payload.installation?.id;
+      //       console.log("Received pull_request event:", action, repositoryId);
 
-      const allowedActions: (typeof payload.action)[] = [
-        "opened",
-        "reopened",
-        "synchronize",
-      ];
-      if (!allowedActions.includes(action)) {
-        console.log(`Ignoring pull_request action: ${action}`);
-        break;
-      }
+      //       const allowedActions: (typeof payload.action)[] = [
+      //         "opened",
+      //         "reopened",
+      //         "synchronize",
+      //       ];
+      //       if (!allowedActions.includes(action)) {
+      //         console.log(`Ignoring pull_request action: ${action}`);
+      //         break;
+      //       }
 
-      const pr = payload.pull_request as PullRequest;
+      //       const pr = payload.pull_request as PullRequest;
 
-      const title = pr.title;
-      const prBody = pr.body || "";
-      const targetBranchName = pr.base.ref.split("/").pop() || "";
+      //       const title = pr.title;
+      //       const prBody = pr.body || "";
+      //       const targetBranchName = pr.base.ref.split("/").pop() || "";
 
-      if (!installationId) {
-        console.log("No installation ID found in the payload");
-        break;
-      }
+      //       if (!installationId) {
+      //         console.log("No installation ID found in the payload");
+      //         break;
+      //       }
 
-      const connectedRepository = await getConnectedRepositoryByInstallationId({
-        installationId: installationId,
-        repoId: repositoryId,
-      });
+      //       const connectedRepository = await getConnectedRepositoryByInstallationId({
+      //         installationId: installationId,
+      //         repoId: repositoryId,
+      //       });
 
-      if (!connectedRepository) {
-        console.log("Repository not connected");
-        break;
-      }
-      const teamId = connectedRepository.teamId;
+      //       if (!connectedRepository) {
+      //         console.log("Repository not connected");
+      //         break;
+      //       }
+      //       const teamId = connectedRepository.teamId;
 
-      const branches = connectedRepository.branches || [];
-      if (!branches.includes(targetBranchName)) {
-        console.log("Branch is not connected");
-        break;
-      }
+      //       const branches = connectedRepository.branches || [];
+      //       if (!branches.includes(targetBranchName)) {
+      //         console.log("Branch is not connected");
+      //         break;
+      //       }
 
-      const integration = await getIntegrationById({
-        id: connectedRepository.integrationId,
-      });
-      if (!integration) {
-        console.log("Integration not found for the connected repository");
-        break;
-      }
+      //       const integration = await getIntegrationById({
+      //         id: connectedRepository.integrationId,
+      //       });
+      //       if (!integration) {
+      //         console.log("Integration not found for the connected repository");
+      //         break;
+      //       }
 
-      const octokit = new Octokit({
-        auth: integration.config.token,
-      });
+      //       const octokit = new Octokit({
+      //         auth: integration.config.token,
+      //       });
 
-      console.log(`Received pull_request event with action: ${action}`);
-      if (
-        action === "opened" ||
-        action === "reopened" ||
-        action === "synchronize"
-      ) {
-        const commitsResponse = await fetch(pr._links.commits.href, {
-          headers: {
-            Accept: "application/vnd.github.v3+json",
-            Authorization: `Bearer ${integration.config.token}`,
-          },
-        });
-        const commits = (await commitsResponse.json()) as Array<{
-          commit: Commit;
-        }>;
+      //       console.log(`Received pull_request event with action: ${action}`);
+      //       if (
+      //         action === "opened" ||
+      //         action === "reopened" ||
+      //         action === "synchronize"
+      //       ) {
 
-        const columns = (
-          await getColumns({
-            teamId,
-            pageSize: 20,
-          })
-        ).data.map((column) => ({
-          id: column.id,
-          name: column.name,
-          description: column.description,
-          type: column.type,
-        }));
+      //         const commitsResponse = await fetch(pr._links.commits.href, {
+      //           headers: {
+      //             Accept: "application/vnd.github.v3+json",
+      //             Authorization: `Bearer ${integration.config.token}`,
+      //           },
+      //         });
+      //         const commits = (await commitsResponse.json()) as Array<{
+      //           commit: Commit;
+      //         }>;
 
-        const taskTitles = (
-          await getTasks({
-            pageSize: 20,
-            teamId,
-            columnId: columns
-              .filter((col) => !["backlog", "done"].includes(col.type))
-              .map((col) => col.id),
-          })
-        ).data.map((task) => ({
-          id: task.id,
-          title: task.title,
-          columnId: task.columnId,
-        }));
+      //         const columns = (
+      //           await getColumns({
+      //             teamId,
+      //             pageSize: 20,
+      //           })
+      //         ).data.map((column) => ({
+      //           id: column.id,
+      //           name: column.name,
+      //           description: column.description,
+      //           type: column.type,
+      //         }));
 
-        const messages = commits.map((commit) => commit.commit.message);
+      //         const taskTitles = (
+      //           await getTasks({
+      //             pageSize: 20,
+      //             teamId,
+      //             columnId: columns
+      //               .filter((col) => !["backlog", "done"].includes(col.type))
+      //               .map((col) => col.id),
+      //           })
+      //         ).data.map((task) => ({
+      //           id: task.id,
+      //           title: task.title,
+      //           columnId: task.columnId,
+      //         }));
 
-        const response = await generateObject({
-          model: "openai/gpt-4o",
-          schema: z.object({
-            updates: z.array(
-              z.object({
-                taskTitle: z.string().describe("Title of the task to move"),
-                taskId: z.string().describe("ID of the task to move"),
-                currentTaskColumnName: z
-                  .string()
-                  .describe("Current column name of the task"),
-                columnId: z
-                  .string()
-                  .describe("ID of the column to move the task to"),
-                columnName: z
-                  .string()
-                  .describe("Name of the column to move the task to"),
-              })
-            ),
-          }),
-          prompt: `You are an AI assistant that helps update tasks in a project management system based on commit messages from a git repository.
-				
-				You have a list of tasks with their IDs, titles, and current column IDs:
-				${JSON.stringify(taskTitles, null, 2)}
+      //         const messages = commits.map((commit) => commit.commit.message);
 
-				You also have a list of columns with their IDs, names, and descriptions:
-				${JSON.stringify(columns, null, 2)}
+      //         const response = await generateObject({
+      //           model: "openai/gpt-4o",
+      //           schema: z.object({
+      //             updates: z.array(
+      //               z.object({
+      //                 taskTitle: z.string().describe("Title of the task to move"),
+      //                 taskId: z.string().describe("ID of the task to move"),
+      //                 currentTaskColumnName: z
+      //                   .string()
+      //                   .describe("Current column name of the task"),
+      //                 columnId: z
+      //                   .string()
+      //                   .describe("ID of the column to move the task to"),
+      //                 columnName: z
+      //                   .string()
+      //                   .describe("Name of the column to move the task to"),
+      //               })
+      //             ),
+      //           }),
+      //           prompt: `You are an AI assistant that helps update tasks in a project management system based on commit messages from a git repository.
 
-				Based on the following commit messages of a push from repository ${payload.repository.full_name}, determine which tasks need to be moved to which columns.
-				Commit Messages:
-				${JSON.stringify(messages, null, 2)}
+      // 				You have a list of tasks with their IDs, titles, and current column IDs:
+      // 				${JSON.stringify(taskTitles, null, 2)}
 
-				Keep in mind that this is Pull Request to branch ${targetBranchName} with the following details:
-				Title: ${title}
-				Body: ${prBody}
+      // 				You also have a list of columns with their IDs, names, and descriptions:
+      // 				${JSON.stringify(columns, null, 2)}
 
-				HOW DETERMINE UPDATES:
-				- Analyze the commit messages to identify exact or close matches with task titles.
-        - For each identified task, decide the most appropriate column to move it to based on the content of the commit messages.
-				- Almost always unless specified by the user, the task should be moved to a "done" column.
-				`,
-        });
+      // 				Based on the following commit messages of a push from repository ${payload.repository.full_name}, determine which tasks need to be moved to which columns.
+      // 				Commit Messages:
+      // 				${JSON.stringify(messages, null, 2)}
 
-        console.log(`New PR opened on connected branch: ${targetBranchName}`);
+      // 				Keep in mind that this is Pull Request to branch ${targetBranchName} with the following details:
+      // 				Title: ${title}
+      // 				Body: ${prBody}
 
-        console.log("Task updates to perform:", response.object.updates);
+      // 				HOW DETERMINE UPDATES:
+      // 				- Analyze the commit messages to identify exact or close matches with task titles.
+      //         - For each identified task, decide the most appropriate column to move it to based on the content of the commit messages.
+      // 				- Almost always unless specified by the user, the task should be moved to a "done" column.
+      // 				`,
+      //         });
 
-        const existingPlans = await getPullRequestPlanByPrId({
-          prNumber: pr.number,
-          repoId: repositoryId,
-          teamId,
-        });
+      //         console.log(`New PR opened on connected branch: ${targetBranchName}`);
 
-        for (const plan of existingPlans) {
-          // delete existing comment
-          await octokit.rest.issues.deleteComment({
-            comment_id: plan.commentId!,
-            owner: payload.repository.owner.login,
-            repo: payload.repository.name,
-          });
-        }
+      //         console.log("Task updates to perform:", response.object.updates);
 
-        for (const update of response.object.updates) {
-          const newPlan = await upsertPullRequestPlan({
-            prNumber: pr.number,
-            teamId,
-            repoId: repositoryId,
-            headCommitSha: pr.head.sha,
-            prUrl: pr.html_url,
-            prTitle: pr.title,
-            status: "pending",
-            taskId: update.taskId,
-            columnId: update.columnId,
-          });
-          const comment = await octokit.rest.issues.createComment({
-            issue_number: pr.number,
-            body: `> Task [${update.taskTitle}](${getTaskUrl(update.taskId)}) will be moved to column **${update.columnName}**.
+      //         const existingPlans = await getPullRequestPlanByPrId({
+      //           prNumber: pr.number,
+      //           repoId: repositoryId,
+      //           teamId,
+      //         });
 
-[❌ Cancel this plan](${getApiUrl()}/api/github/plans/${newPlan.id}/cancel?integrationId=${connectedRepository.integrationId})
-            `,
-            owner: payload.repository.owner.login,
-            repo: payload.repository.name,
-          });
+      //         for (const plan of existingPlans) {
+      //           // delete existing comment
+      //           await octokit.rest.issues.deleteComment({
+      //             comment_id: plan.commentId!,
+      //             owner: payload.repository.owner.login,
+      //             repo: payload.repository.name,
+      //           });
+      //         }
 
-          await updatePullRequestPlanCommentId({
-            commentId: comment.data.id,
-            id: newPlan.id,
-          });
-        }
+      //         for (const update of response.object.updates) {
+      //           const newPlan = await upsertPullRequestPlan({
+      //             prNumber: pr.number,
+      //             teamId,
+      //             repoId: repositoryId,
+      //             headCommitSha: pr.head.sha,
+      //             prUrl: pr.html_url,
+      //             prTitle: pr.title,
+      //             status: "pending",
+      //             taskId: update.taskId,
+      //             columnId: update.columnId,
+      //           });
+      //           const comment = await octokit.rest.issues.createComment({
+      //             issue_number: pr.number,
+      //             body: `> Task [${update.taskTitle}](${getTaskUrl(update.taskId)}) will be moved to column **${update.columnName}**.
 
-        log(
-          integration.id,
-          "info",
-          `Created/Updated plan for PR #${pr.number} in repository ${payload.repository.full_name}`,
-          {
-            prNumber: pr.number,
-            repoId: repositoryId,
-          },
-          response.usage.inputTokens,
-          response.usage.outputTokens
-        );
-      }
+      // [❌ Cancel this plan](${getApiUrl()}/api/github/plans/${newPlan.id}/cancel?integrationId=${connectedRepository.integrationId})
+      //             `,
+      //             owner: payload.repository.owner.login,
+      //             repo: payload.repository.name,
+      //           });
+
+      //           await updatePullRequestPlanCommentId({
+      //             commentId: comment.data.id,
+      //             id: newPlan.id,
+      //           });
+      //         }
+
+      //         log(
+      //           integration.id,
+      //           "info",
+      //           `Created/Updated plan for PR #${pr.number} in repository ${payload.repository.full_name}`,
+      //           {
+      //             prNumber: pr.number,
+      //             repoId: repositoryId,
+      //           },
+      //           response.usage.inputTokens,
+      //           response.usage.outputTokens
+      //         );
+      //       }
       break;
     }
 

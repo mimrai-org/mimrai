@@ -1,4 +1,5 @@
 "use client";
+import { t } from "@mimir/locale";
 import { useQuery } from "@tanstack/react-query";
 import { RefreshCwIcon } from "lucide-react";
 import { Response } from "@/components/ai-elements/response";
@@ -36,7 +37,7 @@ export const ResumeActivityList = () => {
 		<Card>
 			<CardHeader>
 				<div className="flex items-center justify-between">
-					<CardTitle>Logs</CardTitle>
+					<CardTitle>{t("settings.resumes.activity.title")}</CardTitle>
 					<Button
 						type="button"
 						size={"sm"}

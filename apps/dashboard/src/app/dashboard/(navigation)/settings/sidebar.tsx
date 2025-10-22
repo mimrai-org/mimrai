@@ -1,24 +1,46 @@
 "use client";
+import { t } from "@mimir/locale";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useMemo } from "react";
 import { cn } from "@/lib/utils";
-
-export const settingsLinks: {
-	to: string;
-	label: string;
-}[] = [
-	{ to: "/dashboard/settings/general", label: "General" },
-	{ to: "/dashboard/settings/billing", label: "Billing" },
-	{ to: "/dashboard/settings/members", label: "Members" },
-	{ to: "/dashboard/settings/labels", label: "Labels" },
-	{ to: "/dashboard/settings/notifications", label: "Notifications" },
-	{ to: "/dashboard/settings/resumes", label: "Resumes" },
-	{ to: "/dashboard/settings/integrations", label: "Integrations" },
-	{ to: "/dashboard/settings/import", label: "Import" },
-];
 
 export const SettingsSidebar = () => {
 	const pathname = usePathname();
+	const settingsLinks = useMemo(() => {
+		return [
+			{
+				to: "/dashboard/settings/general",
+				label: t("settings.sidebar.general"),
+			},
+			{
+				to: "/dashboard/settings/profile",
+				label: t("settings.sidebar.profile"),
+			},
+			{
+				to: "/dashboard/settings/billing",
+				label: t("settings.sidebar.billing"),
+			},
+			{
+				to: "/dashboard/settings/members",
+				label: t("settings.sidebar.members"),
+			},
+			{ to: "/dashboard/settings/labels", label: t("settings.sidebar.labels") },
+			{
+				to: "/dashboard/settings/notifications",
+				label: t("settings.sidebar.notifications"),
+			},
+			{
+				to: "/dashboard/settings/resumes",
+				label: t("settings.sidebar.resumes"),
+			},
+			{
+				to: "/dashboard/settings/integrations",
+				label: t("settings.sidebar.integrations"),
+			},
+			{ to: "/dashboard/settings/import", label: t("settings.sidebar.import") },
+		];
+	}, []);
 
 	return (
 		<div className="sticky top-8 h-fit w-full border p-4">

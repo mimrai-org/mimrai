@@ -1,4 +1,5 @@
 "use client";
+import { t } from "@mimir/locale";
 import { useQuery } from "@tanstack/react-query";
 import {
 	Card,
@@ -15,7 +16,7 @@ export const ResumeSettings = () => {
 	return (
 		<Card>
 			<CardHeader>
-				<CardDescription>Configure your resume here.</CardDescription>
+				<CardDescription>{t("settings.resumes.description")}</CardDescription>
 			</CardHeader>
 			<CardContent>
 				{settings ? (

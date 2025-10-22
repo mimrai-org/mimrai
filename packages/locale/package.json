@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "date-fns": "^4.1.0"
+    "date-fns": "^4.1.0",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@mimir/tsconfig": "workspace:*",

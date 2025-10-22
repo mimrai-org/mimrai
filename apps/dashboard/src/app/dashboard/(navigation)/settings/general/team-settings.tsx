@@ -1,4 +1,5 @@
 "use client";
+import { t } from "@mimir/locale";
 import { useQuery } from "@tanstack/react-query";
 import { TeamForm } from "@/components/forms/team-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +12,7 @@ export const TeamSettings = () => {
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Team Settings</CardTitle>
+				<CardTitle>{t("settings.general.team.title")}</CardTitle>
 			</CardHeader>
 			<CardContent>
 				{team ? (

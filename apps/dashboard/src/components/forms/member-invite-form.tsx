@@ -1,4 +1,5 @@
 "use client";
+import { t } from "@mimir/locale";
 import { useMutation } from "@tanstack/react-query";
 import { Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
@@ -46,7 +47,7 @@ export const MemberInviteForm = () => {
 					control={form.control}
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Email</FormLabel>
+							<FormLabel>{t("forms.memberInviteForm.email.label")}</FormLabel>
 							<FormControl>
 								<Input placeholder="jhondoe@example.com" {...field} />
 							</FormControl>
@@ -57,7 +58,7 @@ export const MemberInviteForm = () => {
 				<div className="flex justify-end">
 					<Button type="submit" disabled={isPending}>
 						{isPending && <Loader2Icon className="animate-spin" />}
-						Invite
+						{t("forms.memberInviteForm.submitButton.label")}
 					</Button>
 				</div>
 			</form>

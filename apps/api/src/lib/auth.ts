@@ -7,56 +7,60 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { resend } from "./resend";
 
 export const auth = betterAuth<BetterAuthOptions>({
-	database: drizzleAdapter(db, {
-		provider: "pg",
-		schema: {
-			session,
-			account,
-			verification,
-			users,
-		},
-	}),
-	trustedOrigins: (process.env.ALLOWED_API_ORIGINS || "").split(","),
-	emailVerification: {
-		async sendVerificationEmail({ user, url }, request) {
-			const parsedUrl = new URL(url);
-			parsedUrl.searchParams.set("callbackURL", `${getAppUrl()}/redirect`);
-			await resend.emails.send({
-				from: getEmailFrom(),
-				to: user.email!,
-				subject: "Verify your email address",
-				react: EmailVerificationEmail({
-					userName: user.name,
-					url: parsedUrl.toString(),
-				}),
-			});
-		},
-		autoSignInAfterVerification: true,
-		sendOnSignUp: true,
-		sendOnSignIn: true,
-	},
-	emailAndPassword: {
-		enabled: true,
-		requireEmailVerification: true,
-	},
-	user: {
-		modelName: "users",
-		additionalFields: {
-			teamId: {
-				type: "string",
-				required: false,
-				returned: true,
-				input: false,
-				fieldName: "teamId",
-			},
-		},
-	},
-	advanced: {
-		useSecureCookies: true,
-		crossSubDomainCookies: {
-			enabled: true,
-			domain: process.env.BETTER_AUTH_DOMAIN || "localhost",
-		},
-	},
-	plugins: [],
+  database: drizzleAdapter(db, {
+    provider: "pg",
+    schema: {
+      session,
+      account,
+      verification,
+      users,
+    },
+  }),
+  trustedOrigins: (process.env.ALLOWED_API_ORIGINS || "").split(","),
+  emailVerification: {
+    async sendVerificationEmail({ user, url }, request) {
+      const parsedUrl = new URL(url);
+      parsedUrl.searchParams.set("callbackURL", `${getAppUrl()}/redirect`);
+      await resend.emails.send({
+        from: getEmailFrom(),
+        to: user.email!,
+        subject: "Verify your email address",
+        react: EmailVerificationEmail({
+          userName: user.name,
+          url: parsedUrl.toString(),
+        }),
+      });
+    },
+    autoSignInAfterVerification: true,
+    sendOnSignUp: true,
+    sendOnSignIn: true,
+  },
+  emailAndPassword: {
+    enabled: true,
+    requireEmailVerification: true,
+  },
+  user: {
+    modelName: "users",
+    additionalFields: {
+      locale: {
+        type: "string",
+        required: false,
+      },
+      teamId: {
+        type: "string",
+        required: false,
+        returned: true,
+        input: false,
+        fieldName: "teamId",
+      },
+    },
+  },
+  advanced: {
+    useSecureCookies: true,
+    crossSubDomainCookies: {
+      enabled: true,
+      domain: process.env.BETTER_AUTH_DOMAIN || "localhost",
+    },
+  },
+  plugins: [],
 });

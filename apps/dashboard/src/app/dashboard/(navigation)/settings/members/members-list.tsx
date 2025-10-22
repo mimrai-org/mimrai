@@ -1,4 +1,5 @@
 "use client";
+import { t } from "@mimir/locale";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { EllipsisIcon } from "lucide-react";
 import { AssigneeAvatar } from "@/components/kanban/asignee";
@@ -46,7 +47,7 @@ export const MembersList = () => {
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Members</CardTitle>
+				<CardTitle>{t("settings.members.membersList.title")}</CardTitle>
 			</CardHeader>
 			<CardContent>
 				<ul>

@@ -48,7 +48,7 @@ export const NotificationSettingsList = () => {
 		<Card>
 			<CardHeader>
 				<CardDescription>
-					Configure your notification preferences here.
+					{t("settings.notifications.description")}
 				</CardDescription>
 			</CardHeader>
 			<CardContent>

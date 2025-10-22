@@ -1,4 +1,5 @@
 "use client";
+import { t } from "@mimir/locale";
 import { DEFAULT_LOCALE, LOCALES } from "@mimir/locale/constants";
 import { getTimezones } from "@mimir/locale/timezones";
 import { PopoverClose } from "@radix-ui/react-popover";
@@ -131,7 +132,7 @@ export const TeamForm = ({
 						name="name"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Name</FormLabel>
+								<FormLabel>{t("forms.teamForm.name.label")}</FormLabel>
 								<FormControl>
 									<Input placeholder="ACME" {...field} />
 								</FormControl>
@@ -145,7 +146,7 @@ export const TeamForm = ({
 						name="email"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Email</FormLabel>
+								<FormLabel>{t("forms.teamForm.email.label")}</FormLabel>
 								<FormControl>
 									<Input placeholder="acme@example.com" {...field} />
 								</FormControl>
@@ -159,11 +160,14 @@ export const TeamForm = ({
 						name="locale"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Locale</FormLabel>
+								<FormLabel>{t("forms.teamForm.locale.label")}</FormLabel>
 								<FormControl>
 									<Select value={field.value} onValueChange={field.onChange}>
 										<SelectTrigger className="w-full">
-											<SelectValue placeholder="Select a locale" {...field} />
+											<SelectValue
+												placeholder={t("forms.teamForm.locale.placeholder")}
+												{...field}
+											/>
 										</SelectTrigger>
 										<SelectContent>
 											{LOCALES.map((locale) => (
@@ -174,10 +178,6 @@ export const TeamForm = ({
 										</SelectContent>
 									</Select>
 								</FormControl>
-								<FormDescription>
-									This sets the default locale for your team. Actually it only
-									changes the language of the AI agent responses.
-								</FormDescription>
 								<FormMessage />
 							</FormItem>
 						)}
@@ -188,7 +188,7 @@ export const TeamForm = ({
 						name="timezone"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Timezone</FormLabel>
+								<FormLabel>{t("forms.teamForm.timezone.label")}</FormLabel>
 								<FormControl>
 									<Popover open={openTimezone} onOpenChange={setOpenTimezone}>
 										<PopoverTrigger className="w-full" asChild>
@@ -201,7 +201,7 @@ export const TeamForm = ({
 												{getTimezones().find((tz) => tz.tzCode === field.value)
 													?.name || (
 													<span className="text-muted-foreground">
-														Select a timezone
+														{t("forms.teamForm.timezone.placeholder")}
 													</span>
 												)}
 												<ChevronDown className="ml-2 size-4 text-muted-foreground" />
@@ -239,10 +239,10 @@ export const TeamForm = ({
 						name="description"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Description</FormLabel>
+								<FormLabel>{t("forms.teamForm.description.label")}</FormLabel>
 								<FormControl>
 									<Textarea
-										placeholder="ACME is a company that specializes in..."
+										placeholder={t("forms.teamForm.description.placeholder")}
 										className="min-h-[200px]"
 										{...field}
 									/>

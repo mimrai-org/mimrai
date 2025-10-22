@@ -1,4 +1,5 @@
 "use client";
+import { t } from "@mimir/locale";
 import { useMutation } from "@tanstack/react-query";
 import { InfoIcon, Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
@@ -95,7 +96,9 @@ export const ResumeSettingsForm = ({
 										onCheckedChange={field.onChange}
 									/>
 								</FormControl>
-								<FormLabel>Enable Resume Feature</FormLabel>
+								<FormLabel>
+									{t("forms.resumeSettingsForm.enabled.label")}
+								</FormLabel>
 							</div>
 						</FormItem>
 					)}
@@ -107,7 +110,9 @@ export const ResumeSettingsForm = ({
 					disabled={!enabled}
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>When you want to receive the resume</FormLabel>
+							<FormLabel>
+								{t("forms.resumeSettingsForm.cronPrompt.label")}
+							</FormLabel>
 							<FormControl>
 								<div className="flex">
 									<Input type="text" {...field} />
@@ -120,9 +125,7 @@ export const ResumeSettingsForm = ({
 								</div>
 							</FormControl>
 							<FormDescription>
-								Describe in natural language when you want to receive the
-								resume. For example: "Every Monday at 9am" or "On the first day
-								of each month at 8am".
+								{t("forms.resumeSettingsForm.cronPrompt.description")}
 							</FormDescription>
 							<FormMessage />
 						</FormItem>
@@ -135,7 +138,9 @@ export const ResumeSettingsForm = ({
 					disabled={!enabled}
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Instructions</FormLabel>
+							<FormLabel>
+								{t("forms.resumeSettingsForm.instructions.label")}
+							</FormLabel>
 							<FormControl>
 								<Textarea {...field} />
 							</FormControl>
@@ -147,8 +152,7 @@ export const ResumeSettingsForm = ({
 				<Alert>
 					<InfoIcon />
 					<AlertDescription className="inline">
-						Keep in mind that your next resume wont be generated{" "}
-						<span className="underline">today</span>
+						{t("forms.resumeSettingsForm.alert.description")}
 					</AlertDescription>
 				</Alert>
 
@@ -160,11 +164,11 @@ export const ResumeSettingsForm = ({
 						disabled={isTesting}
 					>
 						{isTesting && <Loader2Icon className="animate-spin" />}
-						Test Settings
+						{t("forms.resumeSettingsForm.testButton.label")}
 					</Button>
 					<Button type="submit" disabled={isPending}>
 						{isPending && <Loader2Icon className="animate-spin" />}
-						Save Settings
+						{t("forms.resumeSettingsForm.submitButton.label")}
 					</Button>
 				</div>
 			</form>

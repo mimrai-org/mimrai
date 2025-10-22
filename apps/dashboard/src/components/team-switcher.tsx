@@ -1,6 +1,10 @@
 "use client";
+import { useLocaleStore } from "@mimir/locale";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ChevronsUpDownIcon, PlusIcon } from "lucide-react";
+import { useEffect } from "react";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 import { useChatParams } from "@/hooks/use-chat-params";
 import { useTeamParams } from "@/hooks/use-team-params";
 import { useUser } from "@/hooks/use-user";
@@ -19,10 +23,20 @@ export const TeamSwitcher = () => {
 	const { setParams } = useTeamParams();
 	const { setParams: setChatParams } = useChatParams();
 	const { data: teams } = useQuery(trpc.teams.getAvailable.queryOptions());
+	const { setLocale } = useLocaleStore();
 
 	const { mutateAsync: switchTeamAsync } = useMutation(
 		trpc.users.switchTeam.mutationOptions(),
 	);
+
+	useEffect(() => {
+		if (user?.team) {
+			setLocale({
+				locale: user.team.locale,
+				timezone: user.team.timezone,
+			});
+		}
+	}, [user?.team]);
 
 	const switchTeam = async (teamId: string) => {
 		const newUser = await switchTeamAsync({ teamId });

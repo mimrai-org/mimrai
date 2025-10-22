@@ -1,4 +1,5 @@
 "use client";
+import { t } from "@mimir/locale";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { EllipsisIcon } from "lucide-react";
@@ -39,7 +40,7 @@ export const MembersInvitesList = () => {
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Pending invites</CardTitle>
+				<CardTitle>{t("settings.members.pendingInvites.title")}</CardTitle>
 			</CardHeader>
 			<CardContent>
 				<ul>

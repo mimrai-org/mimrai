@@ -1,5 +1,6 @@
 "use client";
 
+import { t } from "@mimir/locale";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -16,7 +17,7 @@ export const IntegrationsList = () => {
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Integrations</CardTitle>
+				<CardTitle>{t("settings.integrations.title")}</CardTitle>
 			</CardHeader>
 			<CardContent>
 				<ul>

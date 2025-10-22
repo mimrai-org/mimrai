@@ -1,4 +1,5 @@
 "use client";
+import { t } from "@mimir/locale";
 import { MemberInviteForm } from "@/components/forms/member-invite-form";
 import {
 	Card,
@@ -16,7 +17,9 @@ export const MemberInvite = () => {
 	return (
 		<Card>
 			<CardHeader>
-				<CardDescription>Invite new members by email</CardDescription>
+				<CardDescription>
+					{t("settings.members.invite.description")}
+				</CardDescription>
 			</CardHeader>
 			<CardContent>
 				<MemberInviteForm />

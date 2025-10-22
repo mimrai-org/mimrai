@@ -1,4 +1,5 @@
 "use client";
+import { t } from "@mimir/locale";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { EllipsisIcon, PlusIcon } from "lucide-react";
@@ -40,8 +41,10 @@ export const LabelList = () => {
 			<CardHeader>
 				<div className="flex justify-between">
 					<div className="space-y-1">
-						<CardTitle>Labels</CardTitle>
-						<CardDescription>Manage the labels for your tasks.</CardDescription>
+						<CardTitle>{t("settings.labels.title")}</CardTitle>
+						<CardDescription>
+							{t("settings.labels.description")}
+						</CardDescription>
 					</div>
 					<div>
 						<Button
@@ -61,9 +64,13 @@ export const LabelList = () => {
 							"font-medium text-muted-foreground text-sm",
 						)}
 					>
-						<span>Name</span>
-						<span className="flex justify-end">Tasks</span>
-						<span className="flex justify-end">Created At</span>
+						<span>{t("settings.labels.table.name")}</span>
+						<span className="flex justify-end">
+							{t("settings.labels.table.tasks")}
+						</span>
+						<span className="flex justify-end">
+							{t("settings.labels.table.createdAt")}
+						</span>
 						<span />
 					</li>
 					{labels?.map((label) => (

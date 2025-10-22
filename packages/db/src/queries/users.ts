@@ -18,6 +18,7 @@ export const getCurrentUser = async (userId: string, teamId?: string) => {
       id: users.id,
       name: users.name,
       email: users.email,
+      locale: users.locale,
     })
     .from(users)
     .where(eq(users.id, userId))
@@ -29,6 +30,8 @@ export const getCurrentUser = async (userId: string, teamId?: string) => {
         id: teams.id,
         name: teams.name,
         role: usersOnTeams.role,
+        locale: teams.locale,
+        timezone: teams.timezone,
       })
       .from(usersOnTeams)
       .innerJoin(teams, eq(teams.id, usersOnTeams.teamId))
@@ -160,4 +163,26 @@ export const getSystemUser = async () => {
   }
 
   return systemUser;
+};
+
+export const updateUser = async ({
+  userId,
+  name,
+  locale,
+}: {
+  userId: string;
+  name?: string;
+  locale?: string;
+}) => {
+  const [record] = await db
+    .update(users)
+    .set({
+      name: name,
+      locale: locale,
+      updatedAt: new Date(),
+    })
+    .where(eq(users.id, userId))
+    .returning();
+
+  return record;
 };
