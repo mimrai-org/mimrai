@@ -49,6 +49,9 @@
           }
         }
       },
+      "a11y": {
+        "useSemanticElements": "off"
+      },
       "suspicious": {
         "noArrayIndexKey": "off"
       },

@@ -1,5 +1,6 @@
 "use client";
 
+import { arrayMove } from "@dnd-kit/sortable";
 import type { RouterOutputs } from "@mimir/api/trpc";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FlagIcon, GripVertical, PlusIcon } from "lucide-react";
@@ -67,6 +68,17 @@ export function KanbanBoard() {
 		);
 	}, [tasks?.data, columns?.data]);
 
+	// const [kanbanState, setKanbanState] = React.useState(columnsData);
+
+	// React.useEffect(() => {
+	// 	console.log("Updating kanban state");
+	// 	setKanbanState(columnsData);
+	// }, [columnsData]);
+
+	// React.useEffect(() => {
+	// 	console.log("Kanban state changed:", kanbanState);
+	// }, [kanbanState]);
+
 	return (
 		<div className="h-full grow-1">
 			<div className="flex justify-between pb-4">
@@ -81,7 +93,11 @@ export function KanbanBoard() {
 			</div>
 			<Kanban.Root
 				value={columnsData}
-				onMove={async ({ active, over }) => {
+				// onValueChange={setKanbanState}
+				onDragOver={async ({ active, over }) => {
+					return;
+				}}
+				onDragEnd={async ({ active, over }) => {
 					if (!tasks) return;
 
 					const activeColumn = columns?.data.find(
@@ -117,15 +133,38 @@ export function KanbanBoard() {
 						const overItem = tasks.data.find((task) => task.id === over?.id);
 
 						if (activeItem && overItem) {
+							const prevOverItemOrder = Math.max(
+								0,
+								...tasks.data
+									.filter(
+										(task) =>
+											task.columnId === overItem.columnId &&
+											task.order < overItem.order,
+									)
+									.map((task) => task.order),
+							);
+							const nextOverItemOrder = Math.min(
+								74000,
+								...tasks.data
+									.filter(
+										(task) =>
+											task.columnId === overItem.columnId &&
+											task.order > overItem.order,
+									)
+									.map((task) => task.order),
+							);
+
 							const newActiveItem = { ...activeItem };
 							const newOverItem = { ...overItem };
 
 							newActiveItem.columnId = overItem.columnId;
 							newActiveItem.order = overItem.order;
 							if (activeItem.order < overItem.order) {
-								newOverItem.order = overItem.order - 1;
+								// Moving down
+								newActiveItem.order = (nextOverItemOrder + overItem.order) / 2;
 							} else {
-								newOverItem.order = overItem.order + 1;
+								// Moving up
+								newActiveItem.order = (prevOverItemOrder + overItem.order) / 2;
 							}
 
 							queryClient.setQueryData(
@@ -151,10 +190,6 @@ export function KanbanBoard() {
 									columnId: newActiveItem.columnId,
 									order: newActiveItem.order,
 								}),
-								updateTask({
-									id: newOverItem.id,
-									order: newOverItem.order,
-								}),
 							]);
 							// queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
 						} else if (activeItem && !overItem) {
@@ -166,7 +201,7 @@ export function KanbanBoard() {
 							if (!overColumnId) return;
 							const newActiveItem = { ...activeItem };
 							newActiveItem.columnId = overColumnId;
-							newActiveItem.order = 50;
+							newActiveItem.order = 64000;
 
 							queryClient.setQueryData(
 								trpc.tasks.get.queryKey(queryKey),
@@ -196,59 +231,61 @@ export function KanbanBoard() {
 				}}
 				getItemValue={(item) => item.id}
 			>
-				<Kanban.Board className="flex w-full items-stretch gap-4 overflow-x-auto">
-					{Object.entries(columnsData).map(([columnValue, tasks]) => {
-						const column = columns?.data.find(
-							(col) => col.name === columnValue,
-						);
-						if (!column) return null;
+				<AnimatePresence>
+					<Kanban.Board className="flex w-full items-stretch gap-4 overflow-x-auto">
+						{Object.entries(columnsData).map(([columnValue, tasks]) => {
+							const column = columns?.data.find(
+								(col) => col.name === columnValue,
+							);
+							if (!column) return null;
 
-						return (
-							<Kanban.Column
-								className="h-auto min-h-[200px] max-w-86 grow-1 bg-accent/10"
-								key={columnValue}
-								value={columnValue}
-							>
-								<ColumnContextMenu column={column}>
-									<div className="flex items-center justify-between">
-										<div className="flex items-center gap-2">
-											<Badge
-												variant="outline"
-												className="pointer-events-none rounded-sm"
-											>
-												{column.type === "done" && (
-													<FlagIcon className="size-4" />
-												)}
-												{tasks.length}
-											</Badge>
-											<span className="font-medium text-sm">{columnValue}</span>
-										</div>
-										<div className="flex items-center gap-2">
-											<Button
-												size={"sm"}
-												variant={"ghost"}
-												onClick={() =>
-													setParams({
-														createTask: true,
-														taskColumnId:
-															columns?.data.find(
-																(col) => col.name === columnValue,
-															)?.id || null,
-													})
-												}
-											>
-												<PlusIcon />
-											</Button>
-											<Kanban.ColumnHandle asChild>
-												<Button variant="ghost" size="icon">
-													<GripVertical className="h-4 w-4" />
+							return (
+								<Kanban.Column
+									className="h-auto min-h-[200px] max-w-86 grow-1 bg-accent/10"
+									key={columnValue}
+									value={columnValue}
+								>
+									<ColumnContextMenu column={column}>
+										<div className="flex items-center justify-between">
+											<div className="flex items-center gap-2">
+												<Badge
+													variant="outline"
+													className="pointer-events-none rounded-sm"
+												>
+													{column.type === "done" && (
+														<FlagIcon className="size-4" />
+													)}
+													{tasks.length}
+												</Badge>
+												<span className="font-medium text-sm">
+													{columnValue}
+												</span>
+											</div>
+											<div className="flex items-center gap-2">
+												<Button
+													size={"sm"}
+													variant={"ghost"}
+													onClick={() =>
+														setParams({
+															createTask: true,
+															taskColumnId:
+																columns?.data.find(
+																	(col) => col.name === columnValue,
+																)?.id || null,
+														})
+													}
+												>
+													<PlusIcon />
 												</Button>
-											</Kanban.ColumnHandle>
+												<Kanban.ColumnHandle asChild>
+													<Button variant="ghost" size="icon">
+														<GripVertical className="h-4 w-4" />
+													</Button>
+												</Kanban.ColumnHandle>
+											</div>
 										</div>
-									</div>
-								</ColumnContextMenu>
-								<div className="flex flex-col gap-2 p-0.5">
-									<AnimatePresence>
+									</ColumnContextMenu>
+									<div className="flex flex-col gap-2 p-0.5">
 										{tasks.map((task) => (
 											<TaskContextMenu task={task} key={task.id}>
 												<Kanban.Item
@@ -265,19 +302,22 @@ export function KanbanBoard() {
 														setParams({ taskId: task.id });
 													}}
 												>
-													<KanbanTask
-														task={task}
-														// className="border-b-0 last:border-b"
-													/>
+													<div>
+														<KanbanTask
+															task={task}
+															// className="border-b-0 last:border-b"
+														/>
+														{task.order}
+													</div>
 												</Kanban.Item>
 											</TaskContextMenu>
 										))}
-									</AnimatePresence>
-								</div>
-							</Kanban.Column>
-						);
-					})}
-				</Kanban.Board>
+									</div>
+								</Kanban.Column>
+							);
+						})}
+					</Kanban.Board>
+				</AnimatePresence>
 				<Kanban.Overlay>
 					<div className="size-full bg-primary/10" />
 				</Kanban.Overlay>

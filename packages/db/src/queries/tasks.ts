@@ -27,12 +27,18 @@ import { upsertTaskEmbedding } from "./tasks-embeddings";
 
 export const getNextTaskSequence = async (teamId: string) => {
   const [result] = await db
-    .select({ maxSequence: sql<number>`MAX(${tasks.sequence})` })
+    .select({
+      maxSequence: sql<number>`MAX(${tasks.sequence}) + 1`,
+      maxOrder: sql<number>`MAX(${tasks.order}) + 1`,
+    })
     .from(tasks)
     .where(eq(tasks.teamId, teamId))
     .limit(1);
 
-  return (result?.maxSequence ?? 0) + 1;
+  return {
+    sequence: result?.maxSequence ?? 0,
+    order: result?.maxOrder ?? 6000,
+  };
 };
 
 export const getTasks = async ({
@@ -186,11 +192,13 @@ export const createTask = async ({
   attachments?: string[];
   userId?: string;
 }) => {
+  const { sequence, order } = await getNextTaskSequence(input.teamId);
   const [task] = await db
     .insert(tasks)
     .values({
       ...input,
-      sequence: await getNextTaskSequence(input.teamId),
+      sequence,
+      order,
       subscribers: unionArray([userId, input.assigneeId]),
     })
     .returning();

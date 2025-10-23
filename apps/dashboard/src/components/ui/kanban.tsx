@@ -42,7 +42,6 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Slot } from "@radix-ui/react-slot";
-import { motion } from "motion/react";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
@@ -324,7 +323,10 @@ function KanbanRoot<T>(props: KanbanRootProps<T>) {
 
 	const onDragOver = React.useCallback(
 		(event: DragOverEvent) => {
-			kanbanProps.onDragOver?.(event);
+			if (kanbanProps.onDragOver) {
+				kanbanProps.onDragOver?.(event);
+				return;
+			}
 
 			if (event.activatorEvent.defaultPrevented) return;
 
@@ -384,7 +386,10 @@ function KanbanRoot<T>(props: KanbanRootProps<T>) {
 
 	const onDragEnd = React.useCallback(
 		(event: DragEndEvent) => {
-			kanbanProps.onDragEnd?.(event);
+			if (kanbanProps.onDragEnd) {
+				kanbanProps.onDragEnd?.(event);
+				return;
+			}
 
 			if (event.activatorEvent.defaultPrevented) return;
 
@@ -1089,6 +1094,7 @@ interface KanbanOverlayProps
 
 function KanbanOverlay(props: KanbanOverlayProps) {
 	const { container: containerProp, children, ...overlayProps } = props;
+
 	const context = useKanbanContext(OVERLAY_NAME);
 
 	const [mounted, setMounted] = React.useState(false);
@@ -1103,25 +1109,23 @@ function KanbanOverlay(props: KanbanOverlayProps) {
 		context.activeId && context.activeId in context.items ? "column" : "item";
 
 	return ReactDOM.createPortal(
-		<motion.div>
-			<DragOverlay
-				dropAnimation={dropAnimation}
-				modifiers={context.modifiers}
-				className={cn(!context.flatCursor && "cursor-grabbing")}
-				{...overlayProps}
-			>
-				<KanbanOverlayContext.Provider value={true}>
-					{context.activeId && children
-						? typeof children === "function"
-							? children({
-									value: context.activeId,
-									variant,
-								})
-							: children
-						: null}
-				</KanbanOverlayContext.Provider>
-			</DragOverlay>
-		</motion.div>,
+		<DragOverlay
+			dropAnimation={dropAnimation}
+			modifiers={context.modifiers}
+			className={cn(!context.flatCursor && "cursor-grabbing")}
+			{...overlayProps}
+		>
+			<KanbanOverlayContext.Provider value={true}>
+				{context.activeId && children
+					? typeof children === "function"
+						? children({
+								value: context.activeId,
+								variant,
+							})
+						: children
+					: null}
+			</KanbanOverlayContext.Provider>
+		</DragOverlay>,
 		container,
 	);
 }
