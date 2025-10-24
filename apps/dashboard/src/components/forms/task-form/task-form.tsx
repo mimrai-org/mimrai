@@ -50,6 +50,7 @@ import { CommentInput } from "./comment-input";
 import { LabelInput } from "./label-input";
 import { SmartInput } from "./smart-input";
 import { SubscribersList } from "./subscribers-list";
+import { TaskChecklist } from "./taks-checklist";
 import { TaskDuplicated } from "./task-duplicated";
 
 export const taskFormSchema = z.object({
@@ -181,294 +182,303 @@ export const TaskForm = ({
 	const showSmartInput = createMode && formValues.showSmartInput;
 
 	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)}>
-				{showSmartInput ? (
-					<SmartInput
-						onFinish={(data) => {
-							form.reset(
-								{
-									...defaultValues,
-									...data,
-									dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
-									showSmartInput: false,
-								},
-								{
-									keepDirty: true,
-									keepDirtyValues: true,
-									keepDefaultValues: true,
-								},
-							);
+		<div className="max-h-[80vh] overflow-y-auto">
+			<Form {...form}>
+				<form onSubmit={form.handleSubmit(onSubmit)}>
+					{showSmartInput ? (
+						<SmartInput
+							onFinish={(data) => {
+								form.reset(
+									{
+										...defaultValues,
+										...data,
+										dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
+										showSmartInput: false,
+									},
+									{
+										keepDirty: true,
+										keepDirtyValues: true,
+										keepDefaultValues: true,
+									},
+								);
 
-							// If title was generated, set it in the form and trigger validation
-							if (data.title) {
-								form.setValue("title", data.title, {
-									shouldDirty: true,
-									shouldValidate: true,
-								});
-								form.trigger();
-							}
-						}}
-					/>
-				) : (
-					<div className="max-h-[80vh] overflow-y-auto">
-						<div className="space-y-1 py-2">
-							<input className="size-0 opacity-0" />
-							<div className="flex items-center justify-between gap-4 px-4">
-								<FormField
-									control={form.control}
-									name="title"
-									render={({ field }) => (
-										<FormItem className="flex-1">
-											<FormControl>
-												<Input
-													variant={"ghost"}
-													className="h-10 w-full font-medium focus:border-0 md:text-xl"
-													placeholder="Task title"
-													autoFocus={false}
-													{...field}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								{defaultValues?.id && (
-									<SubscribersList taskId={defaultValues?.id!} />
-								)}
-								<Button
-									type="submit"
-									variant={defaultValues?.id ? "ghost" : "default"}
-									size={"sm"}
-									className="text-sm"
-									disabled={
-										!form.formState.isDirty || form.formState.isSubmitting
-									}
-								>
-									{defaultValues?.id
-										? `Last saved at ${format(lastSavedDate, "pp")}`
-										: "Create Task"}
-								</Button>
-							</div>
-							{createMode && (
-								<div className="px-8">
-									<TaskDuplicated title={debouncedValue.title} />
-								</div>
-							)}
-						</div>
-
-						<div className="mx-4 grid grid-cols-[1fr_300px] gap-4">
-							<div className="space-y-4 pb-4">
-								<FormField
-									control={form.control}
-									name="description"
-									render={({ field }) => (
-										<FormItem>
-											<FormControl>
-												{/* <MarkdownInput
-												className="min-h-[160px]"
-												contentEditableClassName="min-h-[160px] hover:bg-muted focus:bg-transparent transition-colors"
-												placeholder="Add description..."
-												markdown={field.value ?? ""}
-												onChange={(value) => field.onChange(value)}
-											/> */}
-
-												<Editor
-													className="px-4 [&_div]:min-h-[160px]"
-													placeholder="Add description..."
-													value={field.value ?? ""}
-													onChange={(value) => field.onChange(value)}
-												/>
-											</FormControl>
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name="labels"
-									render={({ field }) => (
-										<FormItem>
-											<FormControl>
-												<LabelInput
-													className="justify-start"
-													placeholder="Add labels..."
-													value={field.value ?? []}
-													onChange={(value) => field.onChange(value)}
-												/>
-											</FormControl>
-										</FormItem>
-									)}
-								/>
-
-								<div className="space-y-4 px-4">
+								// If title was generated, set it in the form and trigger validation
+								if (data.title) {
+									form.setValue("title", data.title, {
+										shouldDirty: true,
+										shouldValidate: true,
+									});
+									form.trigger();
+								}
+							}}
+						/>
+					) : (
+						<div className="">
+							<div className="space-y-1 py-2">
+								<input className="size-0 opacity-0" />
+								<div className="flex items-center justify-between gap-4 px-4">
 									<FormField
 										control={form.control}
-										name="attachments"
+										name="title"
 										render={({ field }) => (
-											<TaskAttachments attachments={field.value ?? []} />
+											<FormItem className="flex-1">
+												<FormControl>
+													<Input
+														variant={"ghost"}
+														className="h-10 w-full font-medium focus:border-0 md:text-xl"
+														placeholder="Task title"
+														autoFocus={false}
+														{...field}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+									{defaultValues?.id && (
+										<SubscribersList taskId={defaultValues?.id!} />
+									)}
+									<Button
+										type="submit"
+										variant={defaultValues?.id ? "ghost" : "default"}
+										size={"sm"}
+										className="text-sm"
+										disabled={
+											!form.formState.isDirty || form.formState.isSubmitting
+										}
+									>
+										{defaultValues?.id
+											? `Last saved at ${format(lastSavedDate, "pp")}`
+											: "Create Task"}
+									</Button>
+								</div>
+								{createMode && (
+									<div className="px-8">
+										<TaskDuplicated title={debouncedValue.title} />
+									</div>
+								)}
+							</div>
+
+							<div className="mx-4 grid grid-cols-[1fr_300px] gap-4">
+								<div className="space-y-4 pb-4">
+									<FormField
+										control={form.control}
+										name="description"
+										render={({ field }) => (
+											<FormItem>
+												<FormControl>
+													{/* <MarkdownInput
+													className="min-h-[160px]"
+													contentEditableClassName="min-h-[160px] hover:bg-muted focus:bg-transparent transition-colors"
+													placeholder="Add description..."
+													markdown={field.value ?? ""}
+													onChange={(value) => field.onChange(value)}
+												/> */}
+
+													<Editor
+														className="px-4 [&_div]:min-h-[160px]"
+														placeholder="Add description..."
+														value={field.value ?? ""}
+														onChange={(value) => field.onChange(value)}
+													/>
+												</FormControl>
+											</FormItem>
 										)}
 									/>
 
-									{defaultValues?.id && (
-										<div>
-											<div>
-												<FormLabel className="mb-4">Activity</FormLabel>
-												<TaskActivitiesList taskId={defaultValues?.id} />
-											</div>
-											<div className="mt-4">
-												<CommentInput taskId={defaultValues?.id} />
+									<FormField
+										control={form.control}
+										name="labels"
+										render={({ field }) => (
+											<FormItem>
+												<FormControl>
+													<LabelInput
+														className="justify-start"
+														placeholder="Add labels..."
+														value={field.value ?? []}
+														onChange={(value) => field.onChange(value)}
+													/>
+												</FormControl>
+											</FormItem>
+										)}
+									/>
+
+									<div className="space-y-4 px-4">
+										<FormField
+											control={form.control}
+											name="attachments"
+											render={({ field }) => (
+												<TaskAttachments attachments={field.value ?? []} />
+											)}
+										/>
+									</div>
+								</div>
+
+								<div className="h-fit space-y-4 border px-4 py-4">
+									<FormField
+										control={form.control}
+										name="assigneeId"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Assignee</FormLabel>
+												<FormControl>
+													<DataSelectInput
+														queryOptions={trpc.teams.getMembers.queryOptions()}
+														value={field.value || null}
+														onChange={(value) =>
+															field.onChange(value || undefined)
+														}
+														getValue={(item) => item.id}
+														getLabel={(item) =>
+															item?.name || item?.email || "Unassigned"
+														}
+														variant={"ghost"}
+														renderItem={(item) => <Assignee {...item} />}
+													/>
+												</FormControl>
+											</FormItem>
+										)}
+									/>
+
+									<FormField
+										name="dueDate"
+										control={form.control}
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Due date</FormLabel>
+												<FormControl>
+													<Popover>
+														<PopoverTrigger asChild>
+															<Button
+																variant="ghost"
+																className="w-full justify-between font-normal"
+															>
+																{field.value
+																	? formatRelative(field.value, new Date())
+																	: "Select date"}
+																<ChevronDownIcon />
+															</Button>
+														</PopoverTrigger>
+														<PopoverContent
+															className="w-auto overflow-hidden p-0"
+															align="start"
+														>
+															<Calendar
+																mode="single"
+																selected={field.value}
+																captionLayout="dropdown"
+																onSelect={(date) => {
+																	field.onChange(date);
+																}}
+															/>
+														</PopoverContent>
+													</Popover>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+
+									<FormField
+										name="priority"
+										control={form.control}
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Priority</FormLabel>
+												<FormControl>
+													<Select
+														value={field.value}
+														onValueChange={field.onChange}
+													>
+														<SelectTrigger className="w-full rounded-xs border-none shadow-none transition-colors hover:bg-muted focus:ring-0 dark:bg-transparent">
+															{field.value && (
+																<PriorityBadge value={field.value} />
+															)}
+														</SelectTrigger>
+														<SelectContent>
+															<SelectItem value="low">Low</SelectItem>
+															<SelectItem value="medium">Medium</SelectItem>
+															<SelectItem value="high">High</SelectItem>
+														</SelectContent>
+													</Select>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+
+									{pullRequestPlan?.prUrl && (
+										<div className="mb-4">
+											<FormLabel>Pull Request</FormLabel>
+											<div className="mt-2 mr-1 ml-3 flex items-center justify-between">
+												<Link
+													href={pullRequestPlan.prUrl}
+													target="_blank"
+													className="flex items-start text-primary text-sm hover:text-primary/80"
+													onClick={(e) => e.stopPropagation()}
+												>
+													{pullRequestPlan.status === "pending" && (
+														<GitPullRequestArrowIcon
+															className={cn("mt-1 mr-1 inline size-3")}
+														/>
+													)}
+													{pullRequestPlan.status === "completed" && (
+														<GitPullRequestIcon
+															className={cn(
+																"mt-1 mr-1 inline size-3 text-violet-600",
+															)}
+														/>
+													)}
+													{pullRequestPlan.prTitle}
+												</Link>
+												<Button
+													variant="link"
+													type="button"
+													className="h-fit py-0 text-muted-foreground hover:text-red-600"
+													size="icon"
+													onClick={() => {
+														if (!defaultValues?.id) return;
+														removeTaskFromPullRequestPlan({
+															taskIds: [defaultValues.id],
+														});
+													}}
+												>
+													<XIcon className="size-3!" />
+												</Button>
 											</div>
 										</div>
 									)}
+
+									<ColumnSelect />
 								</div>
 							</div>
+						</div>
+					)}
+					{/* <div className="flex items-center justify-end p-4">
+						
+					</div> */}
+				</form>
+			</Form>
 
-							<div className="h-fit space-y-4 border px-4 py-4">
-								<FormField
-									control={form.control}
-									name="assigneeId"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Assignee</FormLabel>
-											<FormControl>
-												<DataSelectInput
-													queryOptions={trpc.teams.getMembers.queryOptions()}
-													value={field.value || null}
-													onChange={(value) =>
-														field.onChange(value || undefined)
-													}
-													getValue={(item) => item.id}
-													getLabel={(item) =>
-														item?.name || item?.email || "Unassigned"
-													}
-													variant={"ghost"}
-													renderItem={(item) => <Assignee {...item} />}
-												/>
-											</FormControl>
-										</FormItem>
-									)}
-								/>
+			<div className="px-8">
+				{defaultValues?.id && (
+					<div className="mb-4">
+						<TaskChecklist taskId={defaultValues?.id!} />
+					</div>
+				)}
 
-								<FormField
-									name="dueDate"
-									control={form.control}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Due date</FormLabel>
-											<FormControl>
-												<Popover>
-													<PopoverTrigger asChild>
-														<Button
-															variant="ghost"
-															className="w-full justify-between font-normal"
-														>
-															{field.value
-																? formatRelative(field.value, new Date())
-																: "Select date"}
-															<ChevronDownIcon />
-														</Button>
-													</PopoverTrigger>
-													<PopoverContent
-														className="w-auto overflow-hidden p-0"
-														align="start"
-													>
-														<Calendar
-															mode="single"
-															selected={field.value}
-															captionLayout="dropdown"
-															onSelect={(date) => {
-																field.onChange(date);
-															}}
-														/>
-													</PopoverContent>
-												</Popover>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									name="priority"
-									control={form.control}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Priority</FormLabel>
-											<FormControl>
-												<Select
-													value={field.value}
-													onValueChange={field.onChange}
-												>
-													<SelectTrigger className="w-full rounded-xs border-none shadow-none transition-colors hover:bg-muted focus:ring-0 dark:bg-transparent">
-														{field.value && (
-															<PriorityBadge value={field.value} />
-														)}
-													</SelectTrigger>
-													<SelectContent>
-														<SelectItem value="low">Low</SelectItem>
-														<SelectItem value="medium">Medium</SelectItem>
-														<SelectItem value="high">High</SelectItem>
-													</SelectContent>
-												</Select>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-
-								{pullRequestPlan?.prUrl && (
-									<div className="mb-4">
-										<FormLabel>Pull Request</FormLabel>
-										<div className="mt-2 mr-1 ml-3 flex items-center justify-between">
-											<Link
-												href={pullRequestPlan.prUrl}
-												target="_blank"
-												className="flex items-start text-primary text-sm hover:text-primary/80"
-												onClick={(e) => e.stopPropagation()}
-											>
-												{pullRequestPlan.status === "pending" && (
-													<GitPullRequestArrowIcon
-														className={cn("mt-1 mr-1 inline size-3")}
-													/>
-												)}
-												{pullRequestPlan.status === "completed" && (
-													<GitPullRequestIcon
-														className={cn(
-															"mt-1 mr-1 inline size-3 text-violet-600",
-														)}
-													/>
-												)}
-												{pullRequestPlan.prTitle}
-											</Link>
-											<Button
-												variant="link"
-												type="button"
-												className="h-fit py-0 text-muted-foreground hover:text-red-600"
-												size="icon"
-												onClick={() => {
-													if (!defaultValues?.id) return;
-													removeTaskFromPullRequestPlan({
-														id: pullRequestPlan.id,
-														taskIds: [defaultValues.id],
-													});
-												}}
-											>
-												<XIcon className="size-3!" />
-											</Button>
-										</div>
-									</div>
-								)}
-
-								<ColumnSelect />
-							</div>
+				{defaultValues?.id && (
+					<div>
+						<div>
+							<div className="mb-4 font-medium text-sm">Activity</div>
+							<TaskActivitiesList taskId={defaultValues?.id} />
+						</div>
+						<div className="mt-4">
+							<CommentInput taskId={defaultValues?.id} />
 						</div>
 					</div>
 				)}
-				{/* <div className="flex items-center justify-end p-4">
-					
-				</div> */}
-			</form>
-		</Form>
+			</div>
+		</div>
 	);
 };

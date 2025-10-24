@@ -76,6 +76,11 @@ export const Response = memo(
 				ul: (props) => <CustomUnorderedList {...props} />,
 				ol: (props) => <CustomOrderedList {...props} />,
 				li: (props) => <CustomListItem {...props} />,
+				p: ({ children, node, ...props }) => (
+					<p className="mb-2 text-sm" {...props}>
+						{children}
+					</p>
+				),
 				h2: ({ children, node, ...props }) => (
 					<h3
 						className="font-medium text-base text-primary tracking-wide"

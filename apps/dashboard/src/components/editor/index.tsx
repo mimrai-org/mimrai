@@ -14,6 +14,7 @@ import { registerExtensions } from "./extentions/register";
 type EditorProps = {
 	value?: string;
 	placeholder?: string;
+	autoFocus?: boolean;
 	onUpdate?: (editor: EditorInstance) => void;
 	onChange?: (value: string) => void;
 	onBlur?: () => void;
@@ -29,6 +30,7 @@ export function Editor({
 	onChange,
 	onBlur,
 	onFocus,
+	autoFocus,
 	className,
 	tabIndex,
 }: EditorProps) {
@@ -38,6 +40,7 @@ export function Editor({
 		immediatelyRender: false,
 		onBlur,
 		onFocus,
+		autofocus: autoFocus,
 		onUpdate: ({ editor }) => {
 			onChange?.(editor.getHTML());
 			onUpdate?.(editor);
@@ -52,6 +55,7 @@ export function Editor({
 				editor={editor}
 				className={className}
 				tabIndex={tabIndex}
+				autoFocus={autoFocus}
 			/>
 			<BubbleMenu editor={editor} />
 		</>

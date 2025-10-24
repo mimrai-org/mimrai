@@ -1,6 +1,10 @@
 import type { RouterOutputs } from "@mimir/api/trpc";
 import { format } from "date-fns";
-import { GitPullRequestArrowIcon, GitPullRequestIcon } from "lucide-react";
+import {
+	CheckSquareIcon,
+	GitPullRequestArrowIcon,
+	GitPullRequestIcon,
+} from "lucide-react";
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -71,6 +75,7 @@ export const KanbanTask = ({
 							))}
 						</div>
 					)}
+
 					<div className="flex min-h-4 items-center justify-between text-muted-foreground text-xs">
 						<div className="flex items-center gap-2">
 							{task.dueDate && (
@@ -79,7 +84,25 @@ export const KanbanTask = ({
 								</time>
 							)}
 						</div>
-						{task.priority ? <Priority value={task.priority} /> : <div />}
+						<div className="flex items-center gap-4">
+							{task.checklistSummary?.total > 0 && (
+								<div
+									className={cn(
+										"flex items-center text-muted-foreground text-xs",
+										{
+											"rounded-sm bg-green-500/10 px-2 py-1 text-green-500":
+												task.checklistSummary.completed ===
+												task.checklistSummary.total,
+										},
+									)}
+								>
+									<CheckSquareIcon className="mr-1 inline size-3.5" />
+									{task.checklistSummary.completed}/
+									{task.checklistSummary.total}
+								</div>
+							)}
+							{task.priority ? <Priority value={task.priority} /> : <div />}
+						</div>
 					</div>
 					<div className="flex items-center">
 						{task.pullRequestPlan?.prUrl && (

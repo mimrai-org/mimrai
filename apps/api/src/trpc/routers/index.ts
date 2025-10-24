@@ -1,8 +1,10 @@
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
+import { check } from "zod";
 import { protectedProcedure, publicProcedure, router } from "../init";
 import { activitiesRouter } from "./activities";
 import { billingRouter } from "./billing";
 import { chatRouter } from "./chats";
+import { checklistsRouter } from "./checklists";
 import { columnsRouter } from "./columns";
 import { githubRouter } from "./github";
 import { importsRouter } from "./imports";
@@ -39,6 +41,7 @@ export const appRouter = router({
   notificationSettings: notificationSettingsRouter,
   resumeSettings: resumeSettingsRouter,
   widgets: widgetsRouter,
+  checklists: checklistsRouter,
 });
 export type AppRouter = typeof appRouter;
 export type RouterOutputs = inferRouterOutputs<AppRouter>;

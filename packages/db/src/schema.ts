@@ -758,3 +758,54 @@ export const resumeSettings = pgTable(
     }).onDelete("cascade"),
   ]
 );
+
+export const checklistItems = pgTable(
+  "checklist_items",
+  {
+    id: text("id")
+      .$defaultFn(() => randomUUID())
+      .primaryKey()
+      .notNull(),
+
+    // Checklist belongs to
+    taskId: text("task_id"),
+
+    description: text("description").notNull(),
+    isCompleted: boolean("is_completed").default(false).notNull(),
+    order: numeric("order", {
+      precision: 100,
+      scale: 5,
+      mode: "number",
+    })
+      .default(0)
+      .notNull(),
+    assigneeId: text("assignee_id"),
+    teamId: text("team_id").notNull(),
+
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).defaultNow(),
+    updatedAt: timestamp("updated_at", {
+      withTimezone: true,
+      mode: "string",
+    }).defaultNow(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.taskId],
+      foreignColumns: [tasks.id],
+      name: "checklist_items_task_id_fkey",
+    }),
+    foreignKey({
+      columns: [table.assigneeId],
+      foreignColumns: [users.id],
+      name: "checklist_items_assignee_id_fkey",
+    }),
+    foreignKey({
+      columns: [table.teamId],
+      foreignColumns: [teams.id],
+      name: "checklist_items_team_id_fkey",
+    }),
+  ]
+);

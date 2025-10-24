@@ -15,6 +15,7 @@ import {
 import { buildSearchQuery } from "src/utils/search-query";
 import { db } from "..";
 import {
+  checklistItems,
   columns,
   labels,
   labelsOnTasks,
@@ -68,10 +69,14 @@ export const getTasks = async ({
     whereClause.push(inArray(labelsOnTasks.labelId, input.labels));
 
   if (input.search) {
-    const query = buildSearchQuery(input.search);
-    whereClause.push(
-      sql`(to_tsquery('english', unaccent(${query})) @@ ${tasks.fts})`
-    );
+    if (!Number.isNaN(Number.parseInt(input.search, 10))) {
+      whereClause.push(eq(tasks.sequence, Number.parseInt(input.search, 10)));
+    } else {
+      const query = buildSearchQuery(input.search);
+      whereClause.push(
+        sql`(to_tsquery('english', unaccent(${query})) @@ ${tasks.fts})`
+      );
+    }
   }
 
   // exlude done tasks with more than 3 days
@@ -109,6 +114,13 @@ export const getTasks = async ({
       updatedAt: tasks.updatedAt,
       teamId: tasks.teamId,
       attachments: tasks.attachments,
+      checklistSummary: sql<{
+        completed: number;
+        total: number;
+      }>`jsonb_build_object(
+        'completed', COUNT(CASE WHEN ${checklistItems.isCompleted} = true THEN 1 END),
+        'total', COUNT(${checklistItems.id})
+      )`.as("checklistSummary"),
       pullRequestPlan: {
         id: pullRequestPlan.id,
         prUrl: pullRequestPlan.prUrl,
@@ -138,6 +150,7 @@ export const getTasks = async ({
     .leftJoin(labelsOnTasks, eq(labelsOnTasks.taskId, tasks.id))
     .leftJoin(labels, eq(labels.id, labelsOnTasks.labelId))
     .leftJoin(users, eq(tasks.assigneeId, users.id))
+    .leftJoin(checklistItems, eq(checklistItems.taskId, tasks.id))
     .leftJoin(
       pullRequestPlan,
       and(

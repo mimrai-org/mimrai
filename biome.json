@@ -38,7 +38,8 @@
       "recommended": true,
       "correctness": {
         "useExhaustiveDependencies": "info",
-        "noUnusedImports": "warn"
+        "noUnusedImports": "warn",
+        "useUniqueElementIds": "off"
       },
       "nursery": {
         "useSortedClasses": {
@@ -50,7 +51,8 @@
         }
       },
       "a11y": {
-        "useSemanticElements": "off"
+        "useSemanticElements": "off",
+        "useKeyWithClickEvents": "off"
       },
       "suspicious": {
         "noArrayIndexKey": "off"
