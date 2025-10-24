@@ -16,7 +16,7 @@ export const TaskAttachments = ({
 				{attachments?.length === 0 && (
 					<li className="p-4 text-muted-foreground text-sm">No attachments</li>
 				)}
-				{attachments.map((attachment) => (
+				{attachments?.map((attachment) => (
 					<li key={attachment} className="flex items-center">
 						<TaskAttachmentPreview attachment={attachment} />
 					</li>

@@ -18,7 +18,6 @@ export const ColumnSelect = () => {
 			control={form.control}
 			render={({ field }) => (
 				<FormItem>
-					<FormLabel>Column</FormLabel>
 					<FormControl>
 						<DataSelectInput
 							size="sm"

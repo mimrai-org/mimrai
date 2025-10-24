@@ -248,7 +248,7 @@ export const TaskForm = ({
 										}
 									>
 										{defaultValues?.id
-											? `Last saved at ${format(lastSavedDate, "pp")}`
+											? `${format(lastSavedDate, "PP, p")}`
 											: "Create Task"}
 									</Button>
 								</div>
@@ -259,7 +259,7 @@ export const TaskForm = ({
 								)}
 							</div>
 
-							<div className="mx-4 grid grid-cols-[1fr_300px] gap-4">
+							<div className="gap-4 px-4">
 								<div className="space-y-4 pb-4">
 									<FormField
 										control={form.control}
@@ -286,22 +286,117 @@ export const TaskForm = ({
 										)}
 									/>
 
-									<FormField
-										control={form.control}
-										name="labels"
-										render={({ field }) => (
-											<FormItem>
-												<FormControl>
-													<LabelInput
-														className="justify-start"
-														placeholder="Add labels..."
-														value={field.value ?? []}
-														onChange={(value) => field.onChange(value)}
-													/>
-												</FormControl>
-											</FormItem>
-										)}
-									/>
+									<div>
+										<FormField
+											control={form.control}
+											name="labels"
+											render={({ field }) => (
+												<FormItem>
+													<FormControl>
+														<LabelInput
+															className="justify-start"
+															placeholder="Add labels..."
+															value={field.value ?? []}
+															onChange={(value) => field.onChange(value)}
+														/>
+													</FormControl>
+												</FormItem>
+											)}
+										/>
+
+										<div className="flex items-center gap-2">
+											<FormField
+												control={form.control}
+												name="assigneeId"
+												render={({ field }) => (
+													<FormItem>
+														<FormControl>
+															<DataSelectInput
+																queryOptions={trpc.teams.getMembers.queryOptions()}
+																value={field.value || null}
+																onChange={(value) =>
+																	field.onChange(value || undefined)
+																}
+																getValue={(item) => item.id}
+																getLabel={(item) =>
+																	item?.name || item?.email || "Unassigned"
+																}
+																variant={"ghost"}
+																className="w-fit px-4!"
+																renderItem={(item) => (
+																	<Assignee {...item} className="size-5" />
+																)}
+															/>
+														</FormControl>
+													</FormItem>
+												)}
+											/>
+											<FormField
+												name="dueDate"
+												control={form.control}
+												render={({ field }) => (
+													<FormItem>
+														<FormControl>
+															<Popover>
+																<PopoverTrigger asChild>
+																	<Button
+																		variant="ghost"
+																		className="w-fit justify-between font-normal"
+																	>
+																		{field.value
+																			? formatRelative(field.value, new Date())
+																			: "Due date"}
+																		<ChevronDownIcon />
+																	</Button>
+																</PopoverTrigger>
+																<PopoverContent
+																	className="w-auto overflow-hidden p-0"
+																	align="start"
+																>
+																	<Calendar
+																		mode="single"
+																		selected={field.value}
+																		captionLayout="dropdown"
+																		onSelect={(date) => {
+																			field.onChange(date);
+																		}}
+																	/>
+																</PopoverContent>
+															</Popover>
+														</FormControl>
+														<FormMessage />
+													</FormItem>
+												)}
+											/>
+											<FormField
+												name="priority"
+												control={form.control}
+												render={({ field }) => (
+													<FormItem>
+														<FormControl>
+															<Select
+																value={field.value}
+																onValueChange={field.onChange}
+															>
+																<SelectTrigger className="w-full rounded-xs border-none shadow-none transition-colors hover:bg-muted focus:ring-0 dark:bg-transparent">
+																	{field.value && (
+																		<PriorityBadge value={field.value} />
+																	)}
+																</SelectTrigger>
+																<SelectContent>
+																	<SelectItem value="low">Low</SelectItem>
+																	<SelectItem value="medium">Medium</SelectItem>
+																	<SelectItem value="high">High</SelectItem>
+																</SelectContent>
+															</Select>
+														</FormControl>
+														<FormMessage />
+													</FormItem>
+												)}
+											/>
+											<ColumnSelect />
+										</div>
+									</div>
 
 									<div className="space-y-4 px-4">
 										<FormField
@@ -313,150 +408,9 @@ export const TaskForm = ({
 										/>
 									</div>
 								</div>
-
-								<div className="h-fit space-y-4 border px-4 py-4">
-									<FormField
-										control={form.control}
-										name="assigneeId"
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel>Assignee</FormLabel>
-												<FormControl>
-													<DataSelectInput
-														queryOptions={trpc.teams.getMembers.queryOptions()}
-														value={field.value || null}
-														onChange={(value) =>
-															field.onChange(value || undefined)
-														}
-														getValue={(item) => item.id}
-														getLabel={(item) =>
-															item?.name || item?.email || "Unassigned"
-														}
-														variant={"ghost"}
-														renderItem={(item) => <Assignee {...item} />}
-													/>
-												</FormControl>
-											</FormItem>
-										)}
-									/>
-
-									<FormField
-										name="dueDate"
-										control={form.control}
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel>Due date</FormLabel>
-												<FormControl>
-													<Popover>
-														<PopoverTrigger asChild>
-															<Button
-																variant="ghost"
-																className="w-full justify-between font-normal"
-															>
-																{field.value
-																	? formatRelative(field.value, new Date())
-																	: "Select date"}
-																<ChevronDownIcon />
-															</Button>
-														</PopoverTrigger>
-														<PopoverContent
-															className="w-auto overflow-hidden p-0"
-															align="start"
-														>
-															<Calendar
-																mode="single"
-																selected={field.value}
-																captionLayout="dropdown"
-																onSelect={(date) => {
-																	field.onChange(date);
-																}}
-															/>
-														</PopoverContent>
-													</Popover>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-
-									<FormField
-										name="priority"
-										control={form.control}
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel>Priority</FormLabel>
-												<FormControl>
-													<Select
-														value={field.value}
-														onValueChange={field.onChange}
-													>
-														<SelectTrigger className="w-full rounded-xs border-none shadow-none transition-colors hover:bg-muted focus:ring-0 dark:bg-transparent">
-															{field.value && (
-																<PriorityBadge value={field.value} />
-															)}
-														</SelectTrigger>
-														<SelectContent>
-															<SelectItem value="low">Low</SelectItem>
-															<SelectItem value="medium">Medium</SelectItem>
-															<SelectItem value="high">High</SelectItem>
-														</SelectContent>
-													</Select>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-
-									{pullRequestPlan?.prUrl && (
-										<div className="mb-4">
-											<FormLabel>Pull Request</FormLabel>
-											<div className="mt-2 mr-1 ml-3 flex items-center justify-between">
-												<Link
-													href={pullRequestPlan.prUrl}
-													target="_blank"
-													className="flex items-start text-primary text-sm hover:text-primary/80"
-													onClick={(e) => e.stopPropagation()}
-												>
-													{pullRequestPlan.status === "pending" && (
-														<GitPullRequestArrowIcon
-															className={cn("mt-1 mr-1 inline size-3")}
-														/>
-													)}
-													{pullRequestPlan.status === "completed" && (
-														<GitPullRequestIcon
-															className={cn(
-																"mt-1 mr-1 inline size-3 text-violet-600",
-															)}
-														/>
-													)}
-													{pullRequestPlan.prTitle}
-												</Link>
-												<Button
-													variant="link"
-													type="button"
-													className="h-fit py-0 text-muted-foreground hover:text-red-600"
-													size="icon"
-													onClick={() => {
-														if (!defaultValues?.id) return;
-														removeTaskFromPullRequestPlan({
-															taskIds: [defaultValues.id],
-														});
-													}}
-												>
-													<XIcon className="size-3!" />
-												</Button>
-											</div>
-										</div>
-									)}
-
-									<ColumnSelect />
-								</div>
 							</div>
 						</div>
 					)}
-					{/* <div className="flex items-center justify-end p-4">
-						
-					</div> */}
 				</form>
 			</Form>
 

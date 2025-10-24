@@ -404,7 +404,7 @@ export const ChecklistItemAttachments = ({
 												alt="File"
 												width={32}
 												height={32}
-												className="size-6 rounded-sm object-cover"
+												className="size-6 rounded-sm border object-cover"
 											/>
 										) : (
 											<div className="flex size-6 items-center justify-center rounded-sm border bg-muted">
