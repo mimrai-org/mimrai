@@ -2,7 +2,10 @@ export const POLAR_ENVIRONMENT = process.env.POLAR_ENVIRONMENT;
 
 export const PLANS = [
   {
-    id: "prod_TAzjFHc3KAUZP1",
+    id:
+      process.env.NODE_ENV === "production"
+        ? "prod_TIsmjOQAzy7Bcu"
+        : "prod_TAzjFHc3KAUZP1",
     name: "Starter",
     slug: "starter" as const,
     description: "Basic features for small teams",
