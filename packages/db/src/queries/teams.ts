@@ -102,6 +102,8 @@ export const updateTeam = async ({
   email,
   locale,
   timezone,
+  plan,
+  subscriptionId,
   id,
 }: {
   name?: string;
@@ -109,6 +111,8 @@ export const updateTeam = async ({
   email?: string;
   locale?: string;
   timezone?: string;
+  subscriptionId?: string;
+  plan?: (typeof plansEnum.enumValues)[number] | null;
   id: string;
 }) => {
   const [team] = await db
@@ -119,6 +123,8 @@ export const updateTeam = async ({
       description,
       locale,
       timezone,
+      subscriptionId,
+      plan,
     })
     .where(eq(teams.id, id))
     .returning();
@@ -330,13 +336,11 @@ export const getMemberById = async ({
 };
 
 export const updateTeamPlan = async ({
-  teamId,
-  email,
+  customerId,
   plan,
   canceledAt,
 }: {
-  email: string;
-  teamId: string;
+  customerId: string;
 
   plan?: (typeof plansEnum.enumValues)[number] | null;
   canceledAt?: Date | null;
@@ -344,7 +348,7 @@ export const updateTeamPlan = async ({
   const [team] = await db
     .update(teams)
     .set({ plan, canceledAt })
-    .where(eq(teams.id, teamId))
+    .where(eq(teams.customerId, customerId))
     .returning();
 
   return team;

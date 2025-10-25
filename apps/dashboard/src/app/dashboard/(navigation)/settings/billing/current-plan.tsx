@@ -1,6 +1,8 @@
 "use client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
+import { useMemo } from "react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -20,6 +22,12 @@ export const CurrentPlan = () => {
 		trpc.billing.subscription.queryOptions(),
 	);
 
+	const { data: upcomingInvoice } = useQuery(
+		trpc.billing.upcomingInvoice.queryOptions(),
+	);
+
+	console.log("upcomingInvoice", upcomingInvoice);
+
 	const { mutateAsync: createCheckout } = useMutation(
 		trpc.billing.checkout.mutationOptions(),
 	);
@@ -27,6 +35,13 @@ export const CurrentPlan = () => {
 	const { mutateAsync: createPortal } = useMutation(
 		trpc.billing.portal.mutationOptions(),
 	);
+
+	const trialDaysLeft = useMemo(() => {
+		if (!subscription?.trial_end) return 0;
+		const now = Math.floor(Date.now() / 1000);
+		const diff = subscription.trial_end - now;
+		return Math.max(Math.ceil(diff / (60 * 60 * 24)), 0);
+	}, [subscription]);
 
 	const handleManageBilling = async () => {
 		if (!team) return;
@@ -76,14 +91,42 @@ export const CurrentPlan = () => {
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>{subscription.metadata.planName}</CardTitle>
+				<CardTitle className="flex items-center gap-2">
+					{subscription.metadata.planName}
+					{subscription.trial_end && !subscription.canceled_at && (
+						<Badge>{trialDaysLeft} days left</Badge>
+					)}
+				</CardTitle>
 				<CardDescription>
 					{startPeriod && format(new Date(startPeriod * 1000), "PPP")}
 					{" - "}
 					{endPeriod && format(new Date(endPeriod * 1000), "PPP")}
 				</CardDescription>
 			</CardHeader>
-			<CardContent />
+			<CardContent>
+				{upcomingInvoice && (
+					<div className="mb-4">
+						<h4 className="mb-2 font-medium">Upcoming Invoice</h4>
+						<div className="space-y-1">
+							<div className="flex justify-between">
+								<span>Amount Due:</span>
+								<span>
+									${((upcomingInvoice.amount_due || 0) / 100).toFixed(2)}
+								</span>
+							</div>
+							{upcomingInvoice.lines.data.map((line) => (
+								<div
+									key={line.id}
+									className="flex justify-between text-muted-foreground text-sm"
+								>
+									<span>{line.description}</span>
+									<span>${((line.amount || 0) / 100).toFixed(2)}</span>
+								</div>
+							))}
+						</div>
+					</div>
+				)}
+			</CardContent>
 			<CardFooter>
 				<Button variant="default" onClick={handleManageBilling}>
 					Manage

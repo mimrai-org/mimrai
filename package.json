@@ -26,5 +26,8 @@
   "trustedDependencies": [
     "@tailwindcss/oxide",
     "es5-ext"
-  ]
+  ],
+  "dependencies": {
+    "@trpc/next": "^11.6.0"
+  }
 }

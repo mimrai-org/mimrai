@@ -90,7 +90,7 @@ export const KanbanTask = ({
 									className={cn(
 										"flex items-center text-muted-foreground text-xs",
 										{
-											"rounded-sm bg-green-500/10 px-2 py-1 text-green-500":
+											"rounded-sm bg-primary px-2 py-1 text-primary-foreground":
 												task.checklistSummary.completed ===
 												task.checklistSummary.total,
 										},

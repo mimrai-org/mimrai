@@ -15,13 +15,14 @@ export const PlanList = ({
 	const { data } = useQuery(trpc.billing.plans.queryOptions());
 
 	const mergedPlans = PLANS.map((plan) => {
-		const matchingData = data?.find((d) => d.name === plan.name);
+		const matchingData = data?.find((d) => d.id === plan.id);
 		return {
-			id: matchingData?.id || "",
 			...plan,
 			stripePlan: matchingData,
 		};
 	});
+
+	console.log("MERGED PLANS", mergedPlans);
 
 	return (
 		<div className="grid auto-cols-fr grid-flow-col gap-4">

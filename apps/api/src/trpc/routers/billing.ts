@@ -5,68 +5,81 @@ import { getTeamById } from "@mimir/db/queries/teams";
 import { getAppUrl } from "@mimir/utils/envs";
 
 export const billingRouter = router({
-	subscription: protectedProcedure.query(async ({ ctx }) => {
-		const team = await getTeamById(ctx.user.teamId!);
-		const result = await stripeClient.subscriptions.list({
-			customer: team!.customerId!,
-			expand: [],
-			limit: 1,
-		});
+  subscription: protectedProcedure.query(async ({ ctx }) => {
+    const team = await getTeamById(ctx.user.teamId!);
+    const result = await stripeClient.subscriptions.list({
+      customer: team!.customerId!,
+      expand: [],
+      limit: 1,
+    });
 
-		return result.data[0] || null;
-	}),
+    return result.data[0] || null;
+  }),
 
-	plans: protectedProcedure.query(async () => {
-		const result = await stripeClient.products.list({
-			active: true,
-			type: "service",
-		});
+  upcomingInvoice: protectedProcedure.query(async ({ ctx }) => {
+    const team = await getTeamById(ctx.user.teamId!);
+    try {
+      const result = await stripeClient.invoices.createPreview({
+        customer: team!.customerId!,
+        subscription: team!.subscriptionId!,
+      });
+      return result;
+    } catch (e) {
+      return null;
+    }
+  }),
 
-		return result.data;
-	}),
+  plans: protectedProcedure.query(async () => {
+    const result = await stripeClient.products.list({
+      active: true,
+      type: "service",
+    });
 
-	checkout: protectedProcedure
-		.input(createCheckoutSchema)
-		.mutation(async ({ ctx, input }) => {
-			const team = await getTeamById(ctx.user.teamId!);
-			const product = await stripeClient.products.retrieve(input.productId);
-			const prices = await stripeClient.prices.list({
-				product: product.id,
-				active: true,
-				recurring: {
-					interval: input.recurringInterval,
-				},
-			});
+    return result.data;
+  }),
 
-			return await stripeClient.checkout.sessions.create({
-				mode: "subscription",
-				customer: team!.customerId!,
-				saved_payment_method_options: {
-					payment_method_save: "enabled",
-					allow_redisplay_filters: ["always"],
-				},
-				line_items: prices.data.map((price) => ({
-					price: price.id,
-					quantity: 1,
-				})),
-				subscription_data: {
-					metadata: {
-						planName: product.name,
-						teamId: team!.id,
-					},
-				},
-				success_url: `${getAppUrl()}/dashboard/settings/billing?checkout=success`,
-			});
-		}),
+  checkout: protectedProcedure
+    .input(createCheckoutSchema)
+    .mutation(async ({ ctx, input }) => {
+      const team = await getTeamById(ctx.user.teamId!);
+      const product = await stripeClient.products.retrieve(input.productId);
+      const prices = await stripeClient.prices.list({
+        product: product.id,
+        active: true,
+        recurring: {
+          interval: input.recurringInterval,
+        },
+      });
 
-	portal: protectedProcedure.mutation(async ({ ctx }) => {
-		const team = await getTeamById(ctx.user.teamId!);
+      return await stripeClient.checkout.sessions.create({
+        mode: "subscription",
+        customer: team!.customerId!,
+        saved_payment_method_options: {
+          payment_method_save: "enabled",
+          allow_redisplay_filters: ["always"],
+        },
+        line_items: prices.data.map((price) => ({
+          price: price.id,
+          quantity: 1,
+        })),
+        subscription_data: {
+          metadata: {
+            planName: product.name,
+            teamId: team!.id,
+          },
+        },
+        success_url: `${getAppUrl()}/dashboard/settings/billing?checkout=success`,
+      });
+    }),
 
-		const result = await stripeClient.billingPortal.sessions.create({
-			customer: team!.customerId!,
-			return_url: `${getAppUrl()}/dashboard/settings/billing`,
-		});
+  portal: protectedProcedure.mutation(async ({ ctx }) => {
+    const team = await getTeamById(ctx.user.teamId!);
 
-		return result;
-	}),
+    const result = await stripeClient.billingPortal.sessions.create({
+      customer: team!.customerId!,
+      return_url: `${getAppUrl()}/dashboard/settings/billing`,
+    });
+
+    return result;
+  }),
 });

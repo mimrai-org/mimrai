@@ -81,6 +81,7 @@ export const teams = pgTable("teams", {
   description: text("description"),
   email: text("email").notNull(),
   plan: plansEnum("plan"),
+  subscriptionId: text("subscription_id"),
   timezone: text("timezone").default("UTC").notNull(),
   locale: text("locale").default("en-US").notNull(),
   customerId: text("customer_id"),
@@ -178,7 +179,7 @@ export const userInvites = pgTable(
       columns: [table.teamId],
       foreignColumns: [teams.id],
       name: "user_invites_team_id_fkey",
-    }),
+    }).onDelete("cascade"),
     foreignKey({
       columns: [table.invitedBy],
       foreignColumns: [users.id],
@@ -245,7 +246,7 @@ export const tasks = pgTable(
       columns: [table.teamId],
       foreignColumns: [teams.id],
       name: "tasks_team_id_fkey",
-    }),
+    }).onDelete("cascade"),
     foreignKey({
       columns: [table.columnId],
       foreignColumns: [columns.id],
@@ -325,7 +326,7 @@ export const columns = pgTable(
       columns: [table.teamId],
       foreignColumns: [teams.id],
       name: "columns_team_id_fkey",
-    }),
+    }).onDelete("cascade"),
   ]
 );
 
@@ -500,7 +501,7 @@ export const labels = pgTable(
       columns: [table.teamId],
       foreignColumns: [teams.id],
       name: "labels_team_id_fkey",
-    }),
+    }).onDelete("cascade"),
   ]
 );
 
@@ -572,7 +573,7 @@ export const activities = pgTable(
       columns: [table.teamId],
       foreignColumns: [teams.id],
       name: "activity_log_team_id_fkey",
-    }),
+    }).onDelete("cascade"),
   ]
 );
 
@@ -602,7 +603,7 @@ export const githubRepositoryConnected = pgTable(
       columns: [table.teamId],
       foreignColumns: [teams.id],
       name: "github_repository_connected_team_id_fkey",
-    }),
+    }).onDelete("cascade"),
     foreignKey({
       columns: [table.integrationId],
       foreignColumns: [integrations.id],
@@ -797,7 +798,7 @@ export const checklistItems = pgTable(
       columns: [table.taskId],
       foreignColumns: [tasks.id],
       name: "checklist_items_task_id_fkey",
-    }),
+    }).onDelete("cascade"),
     foreignKey({
       columns: [table.assigneeId],
       foreignColumns: [users.id],
@@ -807,6 +808,6 @@ export const checklistItems = pgTable(
       columns: [table.teamId],
       foreignColumns: [teams.id],
       name: "checklist_items_team_id_fkey",
-    }),
+    }).onDelete("cascade"),
   ]
 );
