@@ -28,4 +28,6 @@ const track = (options: { event: string } & PostEventPayload["properties"]) => {
 	openTrack(event, rest);
 };
 
-export { Provider, track };
+export const hook = useOpenPanel;
+
+export { Provider, track, useOpenPanel };
