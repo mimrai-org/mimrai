@@ -1,9 +1,7 @@
 "use client";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
 import { useMemo } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -36,9 +34,9 @@ export const CurrentPlan = () => {
 	);
 
 	const trialDaysLeft = useMemo(() => {
-		if (!subscription?.trial_end) return 0;
+		if (!subscription?.trialEnd) return 0;
 		const now = Math.floor(Date.now() / 1000);
-		const diff = subscription.trial_end - now;
+		const diff = subscription.trialEnd - now;
 		return Math.max(Math.ceil(diff / (60 * 60 * 24)), 0);
 	}, [subscription]);
 
@@ -84,20 +82,12 @@ export const CurrentPlan = () => {
 		);
 	}
 
-	const endPeriod = subscription.items.data[0]?.current_period_end;
-	const startPeriod = subscription.items.data[0]?.current_period_start;
-
 	return (
 		<Card>
 			<CardHeader>
 				<CardTitle className="flex items-center gap-2">
-					{subscription.metadata.planName}
+					{subscription.planName}
 				</CardTitle>
-				<CardDescription>
-					{startPeriod && format(new Date(startPeriod * 1000), "PPP")}
-					{" - "}
-					{endPeriod && format(new Date(endPeriod * 1000), "PPP")}
-				</CardDescription>
 			</CardHeader>
 			<CardContent>
 				{trialDaysLeft > 0 && (
@@ -110,15 +100,17 @@ export const CurrentPlan = () => {
 				)}
 				{upcomingInvoice && (
 					<div className="mb-4">
-						<h4 className="mb-2 font-medium text-sm">Upcoming Invoice</h4>
-						{upcomingInvoice.amount_due === 0 ? (
+						<h4 className="font-medium text-muted-foreground text-sm">
+							Upcoming Invoice
+						</h4>
+						{upcomingInvoice.amountDue === 0 ? (
 							<p className="text-muted-foreground text-sm">
 								No upcoming charges.
 							</p>
 						) : (
 							<div className="space-y-1">
 								<p className="font-medium text-2xl">
-									${(upcomingInvoice.amount_due / 100).toFixed(2)}
+									${(upcomingInvoice.amountDue / 100).toFixed(2)}
 								</p>
 							</div>
 						)}

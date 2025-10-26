@@ -4,7 +4,7 @@ import { protectedProcedure, router } from "@api/trpc/init";
 import { buildSubscriptionItems } from "@api/utils/billing";
 import { getTeamById } from "@mimir/db/queries/teams";
 import { getAppUrl } from "@mimir/utils/envs";
-import { getPlans, type PlanSlug } from "@mimir/utils/plans";
+import { getPlanBySlug, getPlans, type PlanSlug } from "@mimir/utils/plans";
 
 export const billingRouter = router({
   subscription: protectedProcedure.query(async ({ ctx }) => {
@@ -14,8 +14,14 @@ export const billingRouter = router({
       expand: [],
       limit: 1,
     });
+    const plan = getPlanBySlug(team!.plan!);
+    const subscription = result.data[0];
 
-    return result.data[0] || null;
+    return {
+      trialEnd: subscription?.trial_end,
+      status: subscription?.status,
+      planName: plan?.name,
+    };
   }),
 
   upcomingInvoice: protectedProcedure.query(async ({ ctx }) => {
@@ -38,7 +44,9 @@ export const billingRouter = router({
         customer: team!.customerId!,
         subscription: team!.subscriptionId!,
       });
-      return result;
+      return {
+        amountDue: result.amount_due,
+      };
     } catch (e) {
       console.error("Error fetching upcoming invoice:", e);
       return null;
