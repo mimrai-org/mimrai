@@ -73,6 +73,9 @@ export const getSubscriptionItemByType = (
     items: {
       data: {
         id: string;
+        price: {
+          id: string;
+        };
       }[];
     };
   }
@@ -84,7 +87,7 @@ export const getSubscriptionItemByType = (
   for (const item of subscription.items.data) {
     for (const interval of Object.keys(pricesIds)) {
       const priceId = pricesIds[interval as keyof typeof pricesIds][type];
-      if (item.id === priceId) {
+      if (item.price.id === priceId) {
         return item;
       }
     }

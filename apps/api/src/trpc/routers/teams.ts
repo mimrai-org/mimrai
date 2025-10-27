@@ -5,6 +5,7 @@ import {
   createTeamInviteSchema,
   createTeamSchema,
   deleteTeamInviteSchema,
+  getInvitesByEmailSchema,
   getMemberByIdSchema,
   getTeamInviteByIdSchema,
   getTeamInvitesSchema,
@@ -35,16 +36,20 @@ import {
   deleteTeamInvite,
   getTeamInviteById,
   getTeamInvites,
+  getTeamInvitesByEmail,
 } from "@mimir/db/queries/user-invites";
 import { getAvailableTeams } from "@mimir/db/queries/users";
 import { InviteEmail } from "@mimir/email/emails/invite";
-import { PLANS } from "@mimir/utils/plans";
 
 export const teamsRouter = router({
-  getAvailable: protectedProcedure.query(async ({ ctx }) => {
-    const teams = await getAvailableTeams(ctx.user.id);
-    return teams;
-  }),
+  getAvailable: protectedProcedure
+    .meta({
+      team: false,
+    })
+    .query(async ({ ctx }) => {
+      const teams = await getAvailableTeams(ctx.user.id);
+      return teams;
+    }),
 
   create: protectedProcedure
     .input(createTeamSchema)
@@ -175,6 +180,17 @@ export const teamsRouter = router({
       return getTeamInvites({
         ...input,
         teamId: ctx.user.teamId!,
+      });
+    }),
+
+  getInvitesByEmail: protectedProcedure
+    .meta({
+      team: false,
+    })
+    .input(getInvitesByEmailSchema)
+    .query(async ({ ctx }) => {
+      return getTeamInvitesByEmail({
+        email: ctx.user.email,
       });
     }),
 

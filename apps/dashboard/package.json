@@ -1,5 +1,5 @@
 {
-  "name": "dashboard",
+  "name": "@mimir/dashboard",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -23,6 +23,7 @@
     "@mimir/locale": "workspace:*",
     "@mimir/tsconfig": "workspace:*",
     "@mimir/utils": "workspace:*",
+    "@mimir/ui": "workspace:*",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-collapsible": "^1.1.12",
     "@radix-ui/react-context-menu": "^2.2.16",

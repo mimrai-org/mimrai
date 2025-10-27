@@ -2,6 +2,8 @@
 
 import type { RouterOutputs } from "@api/trpc/routers";
 import { filter } from "@mdxeditor/editor";
+import { Button } from "@mimir/ui/button";
+import { LabelBadge } from "@mimir/ui/label-badge";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { task } from "better-auth/react";
 import { formatRelative } from "date-fns";
@@ -18,8 +20,6 @@ import { KanbanTask } from "@/components/kanban/kanban-task";
 import { Priority } from "@/components/kanban/priority";
 import { TaskContextMenu } from "@/components/kanban/task-context-menu";
 import { TasksFilters } from "@/components/kanban/tasks-filters";
-import { Button } from "@/components/ui/button";
-import { LabelBadge } from "@/components/ui/label-badge";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";
 import { queryClient, trpc } from "@/utils/trpc";

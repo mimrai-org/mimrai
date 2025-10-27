@@ -2,6 +2,33 @@
 import { t } from "@mimir/locale";
 import { DEFAULT_LOCALE, LOCALES } from "@mimir/locale/constants";
 import { getTimezones } from "@mimir/locale/timezones";
+import { Button } from "@mimir/ui/button";
+import {
+	Command,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+} from "@mimir/ui/command";
+import {
+	Form,
+	FormControl,
+	FormDescription,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@mimir/ui/form";
+import { Input } from "@mimir/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@mimir/ui/popover";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@mimir/ui/select";
+import { Textarea } from "@mimir/ui/textarea";
 import { PopoverClose } from "@radix-ui/react-popover";
 import { useMutation } from "@tanstack/react-query";
 import { ChevronDown, Loader2 } from "lucide-react";
@@ -13,33 +40,6 @@ import { useScopes, useUser } from "@/hooks/use-user";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { cn } from "@/lib/utils";
 import { queryClient, trpc } from "@/utils/trpc";
-import { Button } from "../ui/button";
-import {
-	Command,
-	CommandEmpty,
-	CommandGroup,
-	CommandInput,
-	CommandItem,
-} from "../ui/command";
-import {
-	Form,
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
-} from "../ui/form";
-import { Input } from "../ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "../ui/select";
-import { Textarea } from "../ui/textarea";
 
 export const teamFormSchema = z.object({
 	id: z.string().optional(),

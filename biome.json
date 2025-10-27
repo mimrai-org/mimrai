@@ -50,6 +50,9 @@
           }
         }
       },
+      "security": {
+        "noDangerouslySetInnerHtml": "off"
+      },
       "a11y": {
         "useSemanticElements": "off",
         "useKeyWithClickEvents": "off"

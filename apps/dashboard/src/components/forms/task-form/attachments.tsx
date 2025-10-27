@@ -1,8 +1,8 @@
+import { Dialog, DialogContent, DialogTrigger } from "@mimir/ui/dialog";
+import { FormLabel } from "@mimir/ui/form";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { FileTextIcon } from "lucide-react";
 import Image from "next/image";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { FormLabel } from "@/components/ui/form";
 
 export const TaskAttachments = ({
 	attachments = [],

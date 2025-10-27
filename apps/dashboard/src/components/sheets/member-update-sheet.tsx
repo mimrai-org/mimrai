@@ -1,9 +1,9 @@
 "use client";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@mimir/ui/sheet";
 import { useQuery } from "@tanstack/react-query";
 import { useMemberParams } from "@/hooks/use-member-params";
 import { trpc } from "@/utils/trpc";
 import { MemberUpdateForm } from "../forms/member-update-form";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 
 export const MemberUpdateSheet = () => {
 	const { memberId, setParams } = useMemberParams();

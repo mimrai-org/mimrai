@@ -1,7 +1,12 @@
 "use client";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from "@mimir/ui/dialog";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { TaskForm } from "../forms/task-form/task-form";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 
 export const TaskCreateSheet = () => {
 	const { createTask, taskColumnId, setParams } = useTaskParams();

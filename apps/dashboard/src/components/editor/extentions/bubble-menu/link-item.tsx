@@ -1,14 +1,10 @@
 "use client";
 
+import { Button } from "@mimir/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@mimir/ui/popover";
 import type { Editor } from "@tiptap/react";
 import { Link2Icon, Link2OffIcon } from "lucide-react";
 import { useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
 import { formatUrlWithProtocol } from "../../utils";
 import { BubbleMenuButton } from "./bubble-menu-button";
 

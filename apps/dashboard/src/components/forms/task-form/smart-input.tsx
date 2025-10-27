@@ -1,9 +1,9 @@
 import type { RouterOutputs } from "@api/trpc/routers";
+import { Button } from "@mimir/ui/button";
+import { Textarea } from "@mimir/ui/textarea";
 import { useMutation } from "@tanstack/react-query";
 import { ArrowUpIcon, Loader2Icon } from "lucide-react";
 import { useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/utils/trpc";
 import { TaskDuplicated } from "./task-duplicated";

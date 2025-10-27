@@ -1,11 +1,5 @@
 "use client";
-import { useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
-import z from "zod";
-import { useMemberParams } from "@/hooks/use-member-params";
-import { useZodForm } from "@/hooks/use-zod-form";
-import { queryClient, trpc } from "@/utils/trpc";
-import { Button } from "../ui/button";
+import { Button } from "@mimir/ui/button";
 import {
 	Form,
 	FormControl,
@@ -13,8 +7,14 @@ import {
 	FormField,
 	FormItem,
 	FormLabel,
-} from "../ui/form";
-import { Textarea } from "../ui/textarea";
+} from "@mimir/ui/form";
+import { Textarea } from "@mimir/ui/textarea";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import z from "zod";
+import { useMemberParams } from "@/hooks/use-member-params";
+import { useZodForm } from "@/hooks/use-zod-form";
+import { queryClient, trpc } from "@/utils/trpc";
 
 const schema = z.object({
 	userId: z.string(),

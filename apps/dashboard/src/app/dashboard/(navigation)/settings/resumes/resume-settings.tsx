@@ -1,12 +1,7 @@
 "use client";
 import { t } from "@mimir/locale";
+import { Card, CardContent, CardDescription, CardHeader } from "@mimir/ui/card";
 import { useQuery } from "@tanstack/react-query";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-} from "@/components/ui/card";
 import { trpc } from "@/utils/trpc";
 import { ResumeSettingsForm } from "./resume-settings-form";
 

@@ -54,3 +54,7 @@ export const getMemberByIdSchema = z.object({
 export const deleteTeamInviteSchema = z.object({
   inviteId: z.string(),
 });
+
+export const getInvitesByEmailSchema = z.object({
+  email: z.string().email(),
+});

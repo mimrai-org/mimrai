@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@mimir/ui/button";
 import { PanelLeftCloseIcon, PanelLeftOpenIcon } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
@@ -9,7 +10,6 @@ import { useChatContainer } from "./chat/chat-container";
 import { Logo } from "./logo";
 import { ModeToggle } from "./mode-toggle";
 import { TeamSwitcher } from "./team-switcher";
-import { Button } from "./ui/button";
 import UserMenu from "./user-menu";
 
 const links: {

@@ -1,10 +1,10 @@
 "use client";
 
 import { t } from "@mimir/locale";
+import { Button } from "@mimir/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@mimir/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useIntegrationParams } from "@/hooks/use-integration-params";
 import { useScopes } from "@/hooks/use-user";
 import { trpc } from "@/utils/trpc";

@@ -1,8 +1,6 @@
 "use client";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@mimir/ui/alert";
+import { Button } from "@mimir/ui/button";
 import {
 	Card,
 	CardContent,
@@ -10,8 +8,10 @@ import {
 	CardFooter,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+} from "@mimir/ui/card";
+import { Skeleton } from "@mimir/ui/skeleton";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { trpc } from "@/utils/trpc";
 import { PlanList } from "./plan-list";
 

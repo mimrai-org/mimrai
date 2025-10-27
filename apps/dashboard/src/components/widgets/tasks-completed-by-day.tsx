@@ -1,22 +1,22 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
-import { format, sub } from "date-fns";
-import { useState } from "react";
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
-import { trpc } from "@/utils/trpc";
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from "../ui/card";
+} from "@mimir/ui/card";
 import {
 	type ChartConfig,
 	ChartContainer,
 	ChartTooltip,
 	ChartTooltipContent,
-} from "../ui/chart";
+} from "@mimir/ui/chart";
+import { useQuery } from "@tanstack/react-query";
+import { format, sub } from "date-fns";
+import { useState } from "react";
+import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
+import { trpc } from "@/utils/trpc";
 
 const chartConfig = {
 	completedCount: {

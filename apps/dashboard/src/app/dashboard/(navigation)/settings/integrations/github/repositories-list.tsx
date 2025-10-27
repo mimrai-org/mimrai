@@ -1,38 +1,38 @@
 "use client";
 import type { RouterOutputs } from "@api/trpc/routers";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
-import { EllipsisIcon, PlusIcon } from "lucide-react";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@mimir/ui/button";
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
+} from "@mimir/ui/card";
+import { Checkbox } from "@mimir/ui/checkbox";
 import {
 	Command,
 	CommandGroup,
 	CommandInput,
 	CommandItem,
 	CommandList,
-} from "@/components/ui/command";
+} from "@mimir/ui/command";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
+} from "@mimir/ui/dropdown-menu";
+import { Input } from "@mimir/ui/input";
 import {
 	Popover,
 	PopoverAnchor,
 	PopoverContent,
 	PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@mimir/ui/popover";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
+import { EllipsisIcon, PlusIcon } from "lucide-react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { queryClient, trpc } from "@/utils/trpc";
 

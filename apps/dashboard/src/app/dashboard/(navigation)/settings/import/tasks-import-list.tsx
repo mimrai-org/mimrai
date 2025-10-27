@@ -1,10 +1,10 @@
 "use client";
+import { Badge } from "@mimir/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@mimir/ui/card";
 import { getApiUrl } from "@mimir/utils/envs";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { queryClient, trpc } from "@/utils/trpc";
 

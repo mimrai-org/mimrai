@@ -1,15 +1,15 @@
 "use client";
 import type { RouterOutputs } from "@mimir/api/trpc";
-import { useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { useColumnParams } from "@/hooks/use-column-params";
-import { queryClient, trpc } from "@/utils/trpc";
 import {
 	ContextMenu,
 	ContextMenuContent,
 	ContextMenuItem,
 	ContextMenuTrigger,
-} from "../ui/context-menu";
+} from "@mimir/ui/context-menu";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { useColumnParams } from "@/hooks/use-column-params";
+import { queryClient, trpc } from "@/utils/trpc";
 
 export const ColumnContextMenu = ({
 	column,

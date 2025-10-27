@@ -1,4 +1,5 @@
 import type { RouterOutputs } from "@mimir/api/trpc";
+import { LabelBadge } from "@mimir/ui/label-badge";
 import { format } from "date-fns";
 import {
 	CheckSquareIcon,
@@ -11,7 +12,6 @@ import Link from "next/link";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { cn } from "@/lib/utils";
 import { queryClient, trpc } from "@/utils/trpc";
-import { LabelBadge } from "../ui/label-badge";
 import { AssigneeAvatar } from "./asignee";
 import { Priority } from "./priority";
 

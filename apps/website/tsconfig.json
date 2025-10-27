@@ -1,0 +1,20 @@
+{
+	"extends": "@mimir/tsconfig/nextjs.json",
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"@/*": ["./src/*"],
+			"@api/*": ["../api/src/*"]
+		},
+		"strict": true,
+		"verbatimModuleSyntax": true
+	},
+	"include": [
+		"./**/*.ts",
+		"./**/*.tsx",
+		"./.next/types/**/*.ts",
+		"./next-env.d.ts",
+		".next/types/**/*.ts"
+	],
+	"exclude": ["node_modules", ".next"]
+}

@@ -1,13 +1,13 @@
 "use client";
-import { useColumnParams } from "@/hooks/use-column-params";
-import { ColumnForm } from "../forms/column-form";
 import {
 	Sheet,
 	SheetContent,
 	SheetDescription,
 	SheetHeader,
 	SheetTitle,
-} from "../ui/sheet";
+} from "@mimir/ui/sheet";
+import { useColumnParams } from "@/hooks/use-column-params";
+import { ColumnForm } from "../forms/column-form";
 
 export const ColumnCreateSheet = () => {
 	const { createColumn, setParams } = useColumnParams();

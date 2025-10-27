@@ -1,12 +1,12 @@
-import { notFound } from "next/navigation";
-import { IntegrationConfigForm } from "@/components/forms/integration-config-form";
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card";
+} from "@mimir/ui/card";
+import { notFound } from "next/navigation";
+import { IntegrationConfigForm } from "@/components/forms/integration-config-form";
 import { queryClient, trpc } from "@/utils/trpc";
 import { LogsList } from "../logs-list";
 import { LinkedUsersList } from "./linked-users-list";

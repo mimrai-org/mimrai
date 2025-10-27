@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Button } from "@mimir/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -7,10 +6,11 @@ import {
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@mimir/ui/dropdown-menu";
+import { Skeleton } from "@mimir/ui/skeleton";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
-import { Button } from "./ui/button";
-import { Skeleton } from "./ui/skeleton";
 
 export default function UserMenu() {
 	const router = useRouter();

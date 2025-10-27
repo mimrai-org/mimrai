@@ -1,19 +1,14 @@
 "use client";
 import { t } from "@mimir/locale";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { ChevronsUpDownIcon } from "lucide-react";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader } from "@mimir/ui/card";
 import {
 	Collapsible,
 	CollapsibleContent,
 	CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { Switch } from "@/components/ui/switch";
+} from "@mimir/ui/collapsible";
+import { Switch } from "@mimir/ui/switch";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { ChevronsUpDownIcon } from "lucide-react";
 import { queryClient, trpc } from "@/utils/trpc";
 
 export const NotificationSettingsList = () => {

@@ -1,9 +1,9 @@
+import { Button } from "@mimir/ui/button";
+import { Switch } from "@mimir/ui/switch";
 import { PLANS } from "@mimir/utils/plans";
 import { useQuery } from "@tanstack/react-query";
 import { CheckIcon } from "lucide-react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import { trpc } from "@/utils/trpc";
 
 export const PlanList = ({

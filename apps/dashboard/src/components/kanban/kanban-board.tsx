@@ -2,13 +2,13 @@
 
 import { arrayMove } from "@dnd-kit/sortable";
 import type { RouterOutputs } from "@mimir/api/trpc";
+import { Badge } from "@mimir/ui/badge";
+import { Button } from "@mimir/ui/button";
+import * as Kanban from "@mimir/ui/kanban";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FlagIcon, GripVertical, PlusIcon } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import * as React from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import * as Kanban from "@/components/ui/kanban";
 import { useColumnParams } from "@/hooks/use-column-params";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";

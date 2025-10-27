@@ -43,6 +43,12 @@ export const billingRouter = router({
       const result = await stripeClient.invoices.createPreview({
         customer: team!.customerId!,
         subscription: team!.subscriptionId!,
+        subscription_details: {
+          items: subscription.items.data.map((item) => ({
+            id: item.id,
+            quantity: item.quantity,
+          })),
+        },
       });
       return {
         amountDue: result.amount_due,

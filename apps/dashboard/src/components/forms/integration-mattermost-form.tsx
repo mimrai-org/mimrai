@@ -1,8 +1,5 @@
-import { CheckCircle2Icon, Loader2Icon, XCircleIcon } from "lucide-react";
-import z from "zod";
-import { useZodForm } from "@/hooks/use-zod-form";
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
-import { Button } from "../ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@mimir/ui/alert";
+import { Button } from "@mimir/ui/button";
 import {
 	Form,
 	FormControl,
@@ -10,8 +7,11 @@ import {
 	FormItem,
 	FormLabel,
 	FormMessage,
-} from "../ui/form";
-import { Input } from "../ui/input";
+} from "@mimir/ui/form";
+import { Input } from "@mimir/ui/input";
+import { CheckCircle2Icon, Loader2Icon, XCircleIcon } from "lucide-react";
+import z from "zod";
+import { useZodForm } from "@/hooks/use-zod-form";
 
 const schema = z.object({
 	token: z.string().min(1, "Token ID is required"),

@@ -1,7 +1,7 @@
 "use client";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@mimir/ui/sheet";
 import { useLabelParams } from "@/hooks/use-task-label-params";
 import { LabelForm } from "../forms/label-form";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 
 export const LabelCreateSheet = () => {
 	const { createLabel, setParams } = useLabelParams();

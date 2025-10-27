@@ -1,10 +1,5 @@
 "use client";
-import { useMutation } from "@tanstack/react-query";
-import { RocketIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import z from "zod";
-import { Button } from "@/components/ui/button";
+import { Button } from "@mimir/ui/button";
 import {
 	Form,
 	FormControl,
@@ -12,8 +7,13 @@ import {
 	FormItem,
 	FormLabel,
 	FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from "@mimir/ui/form";
+import { Input } from "@mimir/ui/input";
+import { useMutation } from "@tanstack/react-query";
+import { RocketIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import z from "zod";
 import { useUser } from "@/hooks/use-user";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { trpc } from "@/utils/trpc";

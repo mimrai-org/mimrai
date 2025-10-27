@@ -1,5 +1,13 @@
 "use client";
 import { useLocaleStore } from "@mimir/locale";
+import { Avatar, AvatarFallback } from "@mimir/ui/avatar";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@mimir/ui/dropdown-menu";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ChevronsUpDownIcon, PlusIcon } from "lucide-react";
 import { useEffect } from "react";
@@ -9,14 +17,6 @@ import { useChatParams } from "@/hooks/use-chat-params";
 import { useTeamParams } from "@/hooks/use-team-params";
 import { useUser } from "@/hooks/use-user";
 import { trpc } from "@/utils/trpc";
-import { Avatar, AvatarFallback } from "./ui/avatar";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
 
 export const TeamSwitcher = () => {
 	const user = useUser();

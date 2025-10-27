@@ -1,20 +1,16 @@
 "use client";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { EyeIcon, EyeOffIcon, PlusIcon } from "lucide-react";
-import { AssigneeAvatar } from "@/components/kanban/asignee";
-import { Button } from "@/components/ui/button";
+import { Button } from "@mimir/ui/button";
 import {
 	Command,
 	CommandGroup,
 	CommandInput,
 	CommandItem,
 	CommandList,
-} from "@/components/ui/command";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@mimir/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@mimir/ui/popover";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { EyeIcon, EyeOffIcon, PlusIcon } from "lucide-react";
+import { AssigneeAvatar } from "@/components/kanban/asignee";
 import { useUser } from "@/hooks/use-user";
 import { queryClient, trpc } from "@/utils/trpc";
 

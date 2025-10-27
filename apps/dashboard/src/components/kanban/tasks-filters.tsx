@@ -1,13 +1,13 @@
 "use client";
 import { useArtifact } from "@ai-sdk-tools/artifacts/client";
 import { taskFiltersArtifact } from "@mimir/api/ai/artifacts/task-filters";
+import { DataSelectInput } from "@mimir/ui/data-select-input";
+import { Input } from "@mimir/ui/input";
 import { useEffect, useRef, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";
 import { trpc } from "@/utils/trpc";
 import { LabelInput } from "../forms/task-form/label-input";
-import { DataSelectInput } from "../ui/data-select-input";
-import { Input } from "../ui/input";
 import { Assignee, AssigneeAvatar } from "./asignee";
 
 export const TasksFilters = ({

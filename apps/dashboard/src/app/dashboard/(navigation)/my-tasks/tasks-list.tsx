@@ -1,6 +1,8 @@
 "use client";
 
 import type { RouterOutputs } from "@api/trpc/routers";
+import { Button } from "@mimir/ui/button";
+import { LabelBadge } from "@mimir/ui/label-badge";
 import { useQuery } from "@tanstack/react-query";
 import { formatRelative } from "date-fns";
 import { ArrowDownIcon, ArrowRightIcon, CheckIcon } from "lucide-react";
@@ -8,8 +10,6 @@ import { AnimatePresence, motion } from "motion/react";
 import { useMemo } from "react";
 import { Priority } from "@/components/kanban/priority";
 import { TaskContextMenu } from "@/components/kanban/task-context-menu";
-import { Button } from "@/components/ui/button";
-import { LabelBadge } from "@/components/ui/label-badge";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useUser } from "@/hooks/use-user";
 import { queryClient, trpc } from "@/utils/trpc";

@@ -1,23 +1,23 @@
 "use client";
 import { t } from "@mimir/locale";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
-import { EllipsisIcon, PlusIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@mimir/ui/button";
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card";
+} from "@mimir/ui/card";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { LabelBadge } from "@/components/ui/label-badge";
+} from "@mimir/ui/dropdown-menu";
+import { LabelBadge } from "@mimir/ui/label-badge";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
+import { EllipsisIcon, PlusIcon } from "lucide-react";
 import { useLabelParams } from "@/hooks/use-task-label-params";
 import { cn } from "@/lib/utils";
 import { queryClient, trpc } from "@/utils/trpc";

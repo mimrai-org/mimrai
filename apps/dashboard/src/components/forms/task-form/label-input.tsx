@@ -1,18 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@mimir/ui/button";
+import { Checkbox } from "@mimir/ui/checkbox";
 import {
 	Command,
 	CommandGroup,
 	CommandInput,
 	CommandItem,
-} from "@/components/ui/command";
-import { LabelBadge } from "@/components/ui/label-badge";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@mimir/ui/command";
+import { LabelBadge } from "@mimir/ui/label-badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@mimir/ui/popover";
+import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/utils/trpc";
 

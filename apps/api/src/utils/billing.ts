@@ -27,6 +27,10 @@ export const updateSubscriptionUsersUsage = async ({
       subscription
     );
 
+    console.log({
+      usersPrice,
+    });
+
     if (usersPrice) {
       await stripeClient.subscriptionItems.update(usersPrice.id, {
         quantity,

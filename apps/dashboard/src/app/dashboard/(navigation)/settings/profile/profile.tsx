@@ -1,5 +1,5 @@
 "use client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@mimir/ui/card";
 import { useUser } from "@/hooks/use-user";
 import { ProfileForm } from "./profile-form";
 

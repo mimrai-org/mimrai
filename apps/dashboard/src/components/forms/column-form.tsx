@@ -1,9 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import z from "zod";
-import { useColumnParams } from "@/hooks/use-column-params";
-import { useZodForm } from "@/hooks/use-zod-form";
-import { trpc } from "@/utils/trpc";
-import { Button } from "../ui/button";
+import { Button } from "@mimir/ui/button";
 import {
 	Form,
 	FormControl,
@@ -11,16 +6,21 @@ import {
 	FormItem,
 	FormLabel,
 	FormMessage,
-} from "../ui/form";
-import { Input } from "../ui/input";
+} from "@mimir/ui/form";
+import { Input } from "@mimir/ui/input";
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from "../ui/select";
-import { Textarea } from "../ui/textarea";
+} from "@mimir/ui/select";
+import { Textarea } from "@mimir/ui/textarea";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import z from "zod";
+import { useColumnParams } from "@/hooks/use-column-params";
+import { useZodForm } from "@/hooks/use-zod-form";
+import { trpc } from "@/utils/trpc";
 
 const schema = z.object({
 	id: z.string().optional(),

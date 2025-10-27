@@ -1,9 +1,6 @@
 "use client";
 
-import type { ErrorContext } from "better-auth/react";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { z } from "zod";
+import { Button } from "@mimir/ui/button";
 import {
 	Form,
 	FormControl,
@@ -11,13 +8,16 @@ import {
 	FormItem,
 	FormLabel,
 	FormMessage,
-} from "@/components/ui/form";
+} from "@mimir/ui/form";
+import { Input } from "@mimir/ui/input";
+import type { ErrorContext } from "better-auth/react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { z } from "zod";
 import { useAuthParams } from "@/hooks/use-auth-params";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { authClient } from "@/lib/auth-client";
 import Loader from "./loader";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
 
 const signUpSchema = z.object({
 	name: z.string().min(2, "Name must be at least 2 characters"),

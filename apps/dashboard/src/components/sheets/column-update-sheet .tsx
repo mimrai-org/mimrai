@@ -1,9 +1,9 @@
 "use client";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@mimir/ui/sheet";
 import { useQuery } from "@tanstack/react-query";
 import { useColumnParams } from "@/hooks/use-column-params";
 import { trpc } from "@/utils/trpc";
 import { ColumnForm } from "../forms/column-form";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 
 export const ColumnUpdateSheet = () => {
 	const { columnId, setParams } = useColumnParams();

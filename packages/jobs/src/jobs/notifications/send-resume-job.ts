@@ -10,9 +10,22 @@ import {
   usersOnTeams,
 } from "@mimir/db/schema";
 import { getTaskMarkdownLink } from "@mimir/utils/tasks";
-import { logger, schedules, schemaTask } from "@trigger.dev/sdk";
+import { logger, metadata, schedules, schemaTask } from "@trigger.dev/sdk";
 import { generateText } from "ai";
-import { and, desc, eq, gt, gte, inArray, isNotNull } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  gt,
+  gte,
+  inArray,
+  isNotNull,
+  max,
+  sql,
+} from "drizzle-orm";
+import { act } from "react";
 import z from "zod";
 import { sendNotificationJob } from "./send-notification-job";
 
@@ -63,15 +76,33 @@ export const sendResumeJob = schedules.task({
       .where(
         and(
           eq(activities.teamId, team.id),
-          inArray(activities.type, ["task_updated", "task_created"]),
+          inArray(activities.type, ["task_created"]),
           gte(activities.createdAt, lastResumeDate.toISOString()),
-          isNotNull(tasks.id)
+          isNotNull(activities.groupId)
         )
       )
       .leftJoin(users, eq(activities.userId, users.id))
-      .leftJoin(tasks, eq(activities.groupId, tasks.id))
+      .innerJoin(tasks, eq(activities.groupId, tasks.id))
       .orderBy(desc(activities.createdAt))
       .limit(50);
+
+    const columnChangeActivities = await db
+      .selectDistinctOn([activities.groupId])
+      .from(activities)
+      .where(
+        and(
+          eq(activities.teamId, team.id),
+          eq(activities.type, "task_column_changed"),
+          gte(activities.createdAt, lastResumeDate.toISOString()),
+          isNotNull(activities.groupId)
+        )
+      )
+      .leftJoin(users, eq(activities.userId, users.id))
+      .innerJoin(tasks, eq(activities.groupId, tasks.id))
+      .orderBy(asc(activities.groupId), desc(activities.createdAt))
+      .limit(50);
+
+    console.log(columnChangeActivities);
 
     const teamColumns = await db
       .select({
@@ -93,7 +124,7 @@ export const sendResumeJob = schedules.task({
       .innerJoin(users, eq(users.id, usersOnTeams.userId))
       .limit(50);
 
-    const activitiesContext = teamActivities
+    const activitiesContext = [...teamActivities, ...columnChangeActivities]
       .map((activity) => {
         if (!activity.tasks) return null;
         const userName = activity.user ? activity.user.name : "Unknown user";
@@ -107,6 +138,20 @@ export const sendResumeJob = schedules.task({
 
         if (activity.activities.type === "task_created") {
           return `- Task "${getTaskMarkdownLink(taskId, taskTitle)}" was created by ${userName} on ${createdAt}.`;
+        }
+
+        if (activity.activities.type === "task_column_changed") {
+          const newColumn = teamColumns.find(
+            (col) => col.id === activity.activities.metadata?.toColumnId
+          );
+          let newValue = newColumn?.name || "Unknown column (maybe deleted)";
+
+          // Append column type info
+          if (newColumn) {
+            newValue = `${newValue} (type: ${newColumn.type})`;
+          }
+          return `- Task "${getTaskMarkdownLink(taskId, taskTitle)}" moved to "${newValue}" by ${userName} on ${createdAt}.`;
+          // return `- Task "${getTaskMarkdownLink(taskId, taskTitle)}" was moved to ${activity.activities.metadata?.columnName} column by ${userName} on ${createdAt}.`;
         }
 
         if (activity.activities.type === "task_updated") {
@@ -125,22 +170,6 @@ export const sendResumeJob = schedules.task({
                     ?.name || "Unassigned";
               }
 
-              if (key === "columnId") {
-                const oldColumn = teamColumns.find(
-                  (col) => col.id === changes[key].oldValue
-                );
-                const newColumn = teamColumns.find(
-                  (col) => col.id === changes[key].value
-                );
-                oldValue = oldColumn?.name || "Unknown column (maybe deleted)";
-                newValue = newColumn?.name || "Unknown column (maybe deleted)";
-
-                // Append column type info
-                if (newColumn) {
-                  newValue = `${newValue} (type: ${newColumn.type})`;
-                }
-              }
-
               return `- ${key}: "${oldValue}" => "${newValue}"`;
             })
             .join("\n");
@@ -151,9 +180,11 @@ export const sendResumeJob = schedules.task({
       })
       .filter(Boolean);
 
+    console.log(activitiesContext);
+
     const text = await generateText({
       model: "openai/gpt-4o",
-      prompt: `Provide a concise summary of the following activities for the team ${team.name}.
+      prompt: `You are Mimir, a helpful assistant. Provide a concise summary of the following activities for the team ${team.name}.
 
       Activities (one per line):
       ${activitiesContext.length > 0 ? activitiesContext.join("\n") : "No activities found."}
@@ -162,23 +193,24 @@ export const sendResumeJob = schedules.task({
       RESPONSE GUIDELINES:
       - The summary should focus on the progress made in the tasks.
       - Use bullet points for clarity.
-      - Be precise, use the task titles wharever possible.
+      - Be precise, use the task titles wherever possible.
       - Use markdown formatting.
       - Do not ask for more information. Just provide the summary based on the activities provided.
-      - If a column is of type "done" it means the task is completed, do not mention the column, just say the task is finished, and congratulate the user.
-      - Add a motivational note at the end of the summary.
-      - Add a warming salute at the beginning of the summary.
+      - If a column is of type "done" it means the task is completed, do not mention the column, say the task is finished (THIS IS IMPORTANT), and congratulate the user.
       - Group the activities by team members
       - Respect the markdown links provided in the activities.
 
-      RESPONSE EXAMPLE (This is a format example, do not copy the content):
-      Hello Team, you all are doing great! Here is a summary of your work so far:
+      RESPONSE TEMPLATE (This is a format example, do not copy the content):
+      {insert salute here}:
       Alice:
         - Task "Design Homepage" was created on 2024-10-01.
       Bob:
         - Task "Implement Authentication" was finished on 2024-10-02.
         - Task "Set up Database" was moved to "In Progress" on 2024-10-03.
-      You are making great progress! keep it up!
+
+
+      {add a brief summary of the overall progress, you can focus on the completed tasks and their impact}.
+      {insert motivational note here based on the activities}.
 
       IMPORTANT: Always respond in ${team.locale} language.
       `,

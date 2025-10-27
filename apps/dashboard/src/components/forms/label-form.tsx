@@ -1,10 +1,5 @@
 "use client";
-import { useMutation } from "@tanstack/react-query";
-import { z } from "zod";
-import { useLabelParams } from "@/hooks/use-task-label-params";
-import { useZodForm } from "@/hooks/use-zod-form";
-import { queryClient, trpc } from "@/utils/trpc";
-import { Button } from "../ui/button";
+import { Button } from "@mimir/ui/button";
 import {
 	ColorPicker,
 	ColorPickerAlphaSlider,
@@ -15,7 +10,7 @@ import {
 	ColorPickerInput,
 	ColorPickerSwatch,
 	ColorPickerTrigger,
-} from "../ui/color-picker";
+} from "@mimir/ui/color-picker";
 import {
 	Form,
 	FormControl,
@@ -23,9 +18,14 @@ import {
 	FormItem,
 	FormLabel,
 	FormMessage,
-} from "../ui/form";
-import { Input } from "../ui/input";
-import { Textarea } from "../ui/textarea";
+} from "@mimir/ui/form";
+import { Input } from "@mimir/ui/input";
+import { Textarea } from "@mimir/ui/textarea";
+import { useMutation } from "@tanstack/react-query";
+import { z } from "zod";
+import { useLabelParams } from "@/hooks/use-task-label-params";
+import { useZodForm } from "@/hooks/use-zod-form";
+import { queryClient, trpc } from "@/utils/trpc";
 
 const schema = z.object({
 	id: z.string().optional(),

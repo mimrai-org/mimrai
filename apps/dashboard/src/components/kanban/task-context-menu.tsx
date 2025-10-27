@@ -1,13 +1,5 @@
 import type { RouterOutputs } from "@mimir/api/trpc";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import {
-	ArrowUpNarrowWideIcon,
-	FlagIcon,
-	TrashIcon,
-	UserIcon,
-} from "lucide-react";
-import { queryClient, trpc } from "@/utils/trpc";
-import { Checkbox } from "../ui/checkbox";
+import { Checkbox } from "@mimir/ui/checkbox";
 import {
 	ContextMenu,
 	ContextMenuContent,
@@ -17,8 +9,16 @@ import {
 	ContextMenuSubContent,
 	ContextMenuSubTrigger,
 	ContextMenuTrigger,
-} from "../ui/context-menu";
-import { LabelBadge } from "../ui/label-badge";
+} from "@mimir/ui/context-menu";
+import { LabelBadge } from "@mimir/ui/label-badge";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+	ArrowUpNarrowWideIcon,
+	FlagIcon,
+	TrashIcon,
+	UserIcon,
+} from "lucide-react";
+import { queryClient, trpc } from "@/utils/trpc";
 import { Assignee } from "./asignee";
 import { PriorityBadge } from "./priority";
 

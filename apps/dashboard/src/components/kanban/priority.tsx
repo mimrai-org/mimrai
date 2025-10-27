@@ -1,5 +1,5 @@
-import { Badge } from "../ui/badge";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { Badge } from "@mimir/ui/badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@mimir/ui/tooltip";
 
 const PriorityTooltip = ({
 	value,

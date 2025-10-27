@@ -1,10 +1,15 @@
 "use client";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from "@mimir/ui/dialog";
+import { Skeleton } from "@mimir/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { trpc } from "@/utils/trpc";
 import { TaskForm } from "../forms/task-form/task-form";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Skeleton } from "../ui/skeleton";
 
 export const TaskUpdateSheet = () => {
 	const { taskId, setParams } = useTaskParams();

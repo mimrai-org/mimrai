@@ -1,8 +1,8 @@
+import { Avatar, AvatarFallback } from "@mimir/ui/avatar";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@mimir/ui/tooltip";
 import { getContrast } from "@mimir/utils/random";
 import { UserIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback } from "../ui/avatar";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 type Props = {
 	name?: string;

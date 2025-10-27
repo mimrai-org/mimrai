@@ -1,5 +1,2 @@
-const config = {
-  plugins: ["@tailwindcss/postcss"],
-};
-
+import config from "@mimir/ui/postcss";
 export default config;

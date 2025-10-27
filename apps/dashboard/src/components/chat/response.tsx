@@ -1,10 +1,10 @@
 "use client";
 
+import { Table } from "@mimir/ui/table";
 import Link from "next/link";
 import { type ComponentProps, memo } from "react";
 import { Streamdown } from "streamdown";
 import { cn } from "@/lib/utils";
-import { Table } from "../ui/table";
 
 type ResponseProps = ComponentProps<typeof Streamdown>;
 

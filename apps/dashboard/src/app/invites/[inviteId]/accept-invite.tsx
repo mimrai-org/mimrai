@@ -1,12 +1,12 @@
 "use client";
 
 import type { RouterOutputs } from "@mimir/api/trpc";
+import { Button } from "@mimir/ui/button";
+import { Card, CardContent } from "@mimir/ui/card";
 import { useMutation } from "@tanstack/react-query";
 import { CheckCircleIcon, Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { authClient } from "@/lib/auth-client";
 import { trpc } from "@/utils/trpc";
 

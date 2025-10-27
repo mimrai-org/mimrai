@@ -1,6 +1,6 @@
+import { Textarea } from "@mimir/ui/textarea";
 import { useMutation } from "@tanstack/react-query";
 import { useRef, useState } from "react";
-import { Textarea } from "@/components/ui/textarea";
 import { queryClient, trpc } from "@/utils/trpc";
 
 export const CommentInput = ({ taskId }: { taskId: string }) => {

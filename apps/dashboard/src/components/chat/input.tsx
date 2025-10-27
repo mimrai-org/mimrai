@@ -1,15 +1,15 @@
 "use client";
 import { useChatActions, useChatId, useChatStatus } from "@ai-sdk-tools/store";
-import { ArrowUp, Square } from "lucide-react";
-import { useState } from "react";
-import { useChatParams } from "@/hooks/use-chat-params";
-import { Button } from "../ui/button";
+import { Button } from "@mimir/ui/button";
 import {
 	PromptInput,
 	PromptInputAction,
 	PromptInputActions,
 	PromptInputTextarea,
-} from "../ui/prompt-input";
+} from "@mimir/ui/prompt-input";
+import { ArrowUp, Square } from "lucide-react";
+import { useState } from "react";
+import { useChatParams } from "@/hooks/use-chat-params";
 
 export const ChatInput = () => {
 	const { setParams, chatId: chatIdParam } = useChatParams();

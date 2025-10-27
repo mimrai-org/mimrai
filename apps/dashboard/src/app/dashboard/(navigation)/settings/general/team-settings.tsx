@@ -1,9 +1,9 @@
 "use client";
 import { t } from "@mimir/locale";
+import { Card, CardContent, CardHeader, CardTitle } from "@mimir/ui/card";
+import { Skeleton } from "@mimir/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import { TeamForm } from "@/components/forms/team-form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { trpc } from "@/utils/trpc";
 
 export const TeamSettings = () => {

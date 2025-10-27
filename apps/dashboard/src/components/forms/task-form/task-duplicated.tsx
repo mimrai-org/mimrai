@@ -1,13 +1,9 @@
+import { Popover, PopoverContent, PopoverTrigger } from "@mimir/ui/popover";
+import { ScrollArea } from "@mimir/ui/scroll-area";
 import { useQuery } from "@tanstack/react-query";
 import { Layers2Icon, Loader2Icon } from "lucide-react";
 import { useEffect } from "react";
 import { useDebounceValue } from "usehooks-ts";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { queryClient, trpc } from "@/utils/trpc";
 

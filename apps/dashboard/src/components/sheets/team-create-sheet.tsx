@@ -1,7 +1,7 @@
 "use client";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@mimir/ui/sheet";
 import { useTeamParams } from "@/hooks/use-team-params";
 import { TeamForm } from "../forms/team-form";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 
 export const TeamCreateSheet = () => {
 	const { createTeam, setParams } = useTeamParams();

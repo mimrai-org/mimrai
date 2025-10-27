@@ -1,17 +1,17 @@
 "use client";
 import { t } from "@mimir/locale";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
-import { EllipsisIcon } from "lucide-react";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@mimir/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@mimir/ui/card";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@mimir/ui/dropdown-menu";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
+import { EllipsisIcon } from "lucide-react";
+import { toast } from "sonner";
 import { useScopes } from "@/hooks/use-user";
 import { queryClient, trpc } from "@/utils/trpc";
 

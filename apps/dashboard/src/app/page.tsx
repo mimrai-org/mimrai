@@ -1,6 +1,6 @@
 "use client";
+import { Button } from "@mimir/ui/button";
 import { useQuery } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
 import { trpc } from "@/utils/trpc";
 
 export default function Home() {

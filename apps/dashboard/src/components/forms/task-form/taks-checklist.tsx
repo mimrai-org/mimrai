@@ -1,8 +1,29 @@
 "use client";
+import { Button } from "@mimir/ui/button";
+import { Checkbox } from "@mimir/ui/checkbox";
+import {
+	ContextMenu,
+	ContextMenuContent,
+	ContextMenuItem,
+	ContextMenuTrigger,
+} from "@mimir/ui/context-menu";
+import { DataSelectInput } from "@mimir/ui/data-select-input";
+import {
+	Dialog,
+	DialogContent,
+	DialogTitle,
+	DialogTrigger,
+} from "@mimir/ui/dialog";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@mimir/ui/dropdown-menu";
+import { Form, FormControl, FormField, FormItem } from "@mimir/ui/form";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { EllipsisIcon, FileIcon, PlusIcon } from "lucide-react";
 import { motion } from "motion/react";
-
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -10,28 +31,6 @@ import { z } from "zod";
 import { Response } from "@/components/ai-elements/response";
 import { Editor } from "@/components/editor";
 import { Assignee, AssigneeAvatar } from "@/components/kanban/asignee";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-	ContextMenu,
-	ContextMenuContent,
-	ContextMenuItem,
-	ContextMenuTrigger,
-} from "@/components/ui/context-menu";
-import { DataSelectInput } from "@/components/ui/data-select-input";
-import {
-	Dialog,
-	DialogContent,
-	DialogTitle,
-	DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { cn } from "@/lib/utils";
 import { queryClient, trpc } from "@/utils/trpc";

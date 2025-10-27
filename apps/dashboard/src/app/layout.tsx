@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Noto_Sans_Runic } from "next/font/google";
 import Providers from "@/components/providers";
-import "../index.css";
+import "../../index.css";
 import { Provider as OpenPanelProvider } from "@mimir/events/client";
 import { Suspense } from "react";
 

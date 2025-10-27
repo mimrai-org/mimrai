@@ -1,4 +1,4 @@
-@reference "../../index.css";
+@reference "../../../index.css";
 
 .ProseMirror-focused {
 	@apply outline-none;

@@ -1,11 +1,7 @@
 "use client";
 import { t } from "@mimir/locale";
-import { useMutation } from "@tanstack/react-query";
-import { InfoIcon, Loader2Icon } from "lucide-react";
-import { toast } from "sonner";
-import z from "zod";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@mimir/ui/alert";
+import { Button } from "@mimir/ui/button";
 import {
 	Form,
 	FormControl,
@@ -14,10 +10,14 @@ import {
 	FormItem,
 	FormLabel,
 	FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
+} from "@mimir/ui/form";
+import { Input } from "@mimir/ui/input";
+import { Switch } from "@mimir/ui/switch";
+import { Textarea } from "@mimir/ui/textarea";
+import { useMutation } from "@tanstack/react-query";
+import { InfoIcon, Loader2Icon } from "lucide-react";
+import { toast } from "sonner";
+import z from "zod";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { queryClient, trpc } from "@/utils/trpc";
 

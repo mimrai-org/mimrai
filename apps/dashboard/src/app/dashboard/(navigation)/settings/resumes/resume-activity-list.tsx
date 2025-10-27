@@ -1,17 +1,17 @@
 "use client";
 import { t } from "@mimir/locale";
-import { useQuery } from "@tanstack/react-query";
-import { RefreshCwIcon } from "lucide-react";
-import { Response } from "@/components/ai-elements/response";
-import { Button } from "@/components/ui/button";
+import { Button } from "@mimir/ui/button";
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card";
-import { Markdown } from "@/components/ui/markdown";
+} from "@mimir/ui/card";
+import { Markdown } from "@mimir/ui/markdown";
+import { useQuery } from "@tanstack/react-query";
+import { RefreshCwIcon } from "lucide-react";
+import { Response } from "@/components/ai-elements/response";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/utils/trpc";
 
