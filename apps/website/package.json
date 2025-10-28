@@ -12,6 +12,7 @@
     "@hookform/resolvers": "^5.2.2",
     "@mdxeditor/editor": "^3.46.1",
     "@mimir/api": "workspace:*",
+    "@mimir/ui": "workspace:*",
     "@mimir/events": "workspace:*",
     "@mimir/locale": "workspace:*",
     "@mimir/tsconfig": "workspace:*",

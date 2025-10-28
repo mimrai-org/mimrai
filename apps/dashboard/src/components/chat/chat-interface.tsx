@@ -71,17 +71,6 @@ export const ChatInterface = ({ id }: { id?: string }) => {
 				<Messages />
 				<ChatInput />
 			</div>
-			{process.env.NODE_ENV === "development" && (
-				<AIDevtools
-					config={{
-						streamCapture: {
-							enabled: true,
-							endpoint: `${process.env.NEXT_PUBLIC_SERVER_URL}/api/chat`,
-							autoConnect: true,
-						},
-					}}
-				/>
-			)}
 		</div>
 	);
 };

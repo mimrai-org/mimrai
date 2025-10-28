@@ -22,8 +22,8 @@ const notoSansRunic = Noto_Sans_Runic({
 });
 
 export const metadata: Metadata = {
-	title: "Mimir",
-	description: "Mimir - Your AI Task Management Assistant",
+	title: "Mimrai - App",
+	description: "Mimrai - Your AI Task Management Assistant",
 };
 
 export default function RootLayout({
