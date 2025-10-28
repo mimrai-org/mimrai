@@ -21,6 +21,7 @@ import {
   getUserById,
   switchTeam,
 } from "@mimir/db/queries/users";
+import { getApiUrl } from "@mimir/utils/envs";
 import {
   convertToModelMessages,
   generateText,
@@ -48,7 +49,7 @@ export const handleWhatsappMessage = async ({
     externalUserId: fromNumber,
   });
   if (!associetedUser) {
-    const url = `${process.env.API_URL}/api/integrations/associate?externalUserId=${encodeURIComponent(fromNumber)}&externalUserName=${encodeURIComponent(
+    const url = `${getApiUrl()}/api/integrations/associate?externalUserId=${encodeURIComponent(fromNumber)}&externalUserName=${encodeURIComponent(
       fromName
     )}`;
     response.message(
