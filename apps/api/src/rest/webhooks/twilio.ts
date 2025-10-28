@@ -18,8 +18,7 @@ app.post(async (c) => {
   const isValid = twilio.validateRequest(
     process.env.TWILIO_AUTH_TOKEN!,
     c.req.header("x-twilio-signature")!,
-    // `${getApiUrl()}/webhooks/twilio`,
-    "https://9748ee2c7077.ngrok-free.app/webhooks/twilio",
+    `${getApiUrl()}/webhooks/twilio`,
     body
   );
 
