@@ -10,7 +10,7 @@ export const ContentSection = () => {
 			<div className="px-4 py-8 sm:px-0">
 				<div className="text-base sm:text-lg">
 					Hi there! I'm the developer behind MIMRAI. After trying every project
-					management tool out there, I got tired of
+					management tool out there, I got tired of{" "}
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<span className="underline">

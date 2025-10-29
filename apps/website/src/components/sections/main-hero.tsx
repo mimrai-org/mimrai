@@ -1,6 +1,7 @@
 "use client";
 
 import { getAppUrl } from "@mimir/utils/envs";
+import { Badge } from "@ui/components/ui/badge";
 import { Button } from "@ui/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import { useAnimationFrame, useMotionValueEvent, useTime } from "motion/react";
@@ -25,7 +26,7 @@ export const MainHero = () => {
 			</div>
 			<div className="flex justify-between invert">
 				<div className="flex items-center px-4 font-mono">{"10/28/2025"}</div>
-				<div className="flex">
+				<div className="flex divide-x">
 					<Link href={`${getAppUrl()}/sign-in`}>
 						<Button type="button">
 							Sign in
@@ -33,7 +34,12 @@ export const MainHero = () => {
 						</Button>
 					</Link>
 					<Link href={`${getAppUrl()}/sign-up`}>
-						<Button type="button">Sign up</Button>
+						<Button type="button">
+							Sign up
+							<Badge variant={"secondary"} className="rounded-none">
+								Beta
+							</Badge>
+						</Button>
 					</Link>
 				</div>
 			</div>
