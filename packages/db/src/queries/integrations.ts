@@ -316,7 +316,7 @@ export const getLinkedUserByExternalId = async ({
     })
     .from(integrationUserLink)
     .where(and(...whereClause))
-    .innerJoin(
+    .leftJoin(
       integrations,
       eq(integrationUserLink.integrationId, integrations.id)
     )
