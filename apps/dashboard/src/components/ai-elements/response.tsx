@@ -116,7 +116,7 @@ export const Response = memo(
 						);
 					}
 
-					return <a {...props} />;
+					return <a {...props} className="underline" />;
 				},
 			}}
 			{...props}

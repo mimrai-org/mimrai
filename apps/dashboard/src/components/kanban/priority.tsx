@@ -10,7 +10,7 @@ const PriorityTooltip = ({
 }) => {
 	return (
 		<Tooltip delayDuration={500}>
-			<TooltipTrigger>{children}</TooltipTrigger>
+			<TooltipTrigger asChild>{children}</TooltipTrigger>
 			<TooltipContent className="capitalize">{value}</TooltipContent>
 		</Tooltip>
 	);

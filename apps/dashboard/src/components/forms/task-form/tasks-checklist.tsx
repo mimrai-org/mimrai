@@ -90,7 +90,7 @@ export const TaskChecklist = ({ taskId }: { taskId: string }) => {
 					</div>
 				</CollapsibleTrigger>
 				<CollapsibleContent className="w-full">
-					<div className="my-2 w-full">
+					<div className="my-4 w-full">
 						{data?.length ? (
 							<div className="space-y-2">
 								{data.map((item) => (
@@ -109,18 +109,18 @@ export const TaskChecklist = ({ taskId }: { taskId: string }) => {
 												onSuccess={() => setActiveUpdateId(null)}
 											/>
 										) : (
-											<div className="flex items-start justify-between gap-2 bg-secondary px-4 py-3 text-secondary-foreground">
+											<div className="flex items-start justify-between gap-2 bg-secondary px-4 py-2 text-secondary-foreground">
 												<div className="flex gap-2">
 													<Checkbox
 														checked={item.isCompleted}
-														disabled={isPending}
 														onCheckedChange={(value) => {
+															if (isPending) return;
 															updateChecklistItem({
 																id: item.id,
 																isCompleted: value === true,
 															});
 														}}
-														className="size-5"
+														className="mt-0.5 size-4"
 													/>
 													<div>
 														<div
@@ -207,7 +207,7 @@ export const TaskChecklist = ({ taskId }: { taskId: string }) => {
 									variant={"ghost"}
 									size={"sm"}
 									type="button"
-									className="text-sm"
+									className="text-xs"
 									onClick={() => setCreate(true)}
 								>
 									<PlusIcon />

@@ -52,7 +52,7 @@ export const Assignee = (props: Props) => {
 	return (
 		<div className="flex items-center gap-2">
 			<AssigneeAvatar {...props} />
-			<span className="line-clamp-1 text-sm">{name || email}</span>
+			<span className="line-clamp-1 text-xs">{name || email}</span>
 		</div>
 	);
 };

@@ -16,6 +16,7 @@ export const getTasksSchema = z.object({
   search: z.string().optional(),
   labels: z.array(z.string()).optional(),
   view: z.enum(["board", "backlog"]).optional(),
+  recurring: z.boolean().optional(),
 });
 export type GetTasksInput = z.infer<typeof getTasksSchema>;
 
@@ -29,6 +30,14 @@ export const createTaskSchema = z.object({
   labels: z.array(z.string()).optional(),
   dueDate: z.string().nullable().optional(),
   mentions: z.array(z.string()).optional(),
+  recurring: z
+    .object({
+      startDate: z.string().optional(),
+      frequency: z.enum(["daily", "weekly", "monthly", "yearly"]),
+      interval: z.number().min(1).max(365),
+    })
+    .nullable()
+    .optional(),
 });
 export type CreateTaskInput = z.infer<typeof createTaskSchema>;
 
@@ -43,6 +52,14 @@ export const updateTaskSchema = z.object({
   columnId: z.string().optional(),
   labels: z.array(z.string()).optional(),
   mentions: z.array(z.string()).optional(),
+  recurring: z
+    .object({
+      frequency: z.enum(["daily", "weekly", "monthly", "yearly"]),
+      interval: z.number().min(1).max(365),
+      endDate: z.string().nullable().optional(),
+    })
+    .nullable()
+    .optional(),
 });
 export type UpdateTaskInput = z.infer<typeof updateTaskSchema>;
 

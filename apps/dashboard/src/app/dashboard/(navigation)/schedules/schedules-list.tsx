@@ -1,41 +1,26 @@
 "use client";
 
 import type { RouterOutputs } from "@api/trpc/routers";
-import { filter } from "@mdxeditor/editor";
 import { Button } from "@mimir/ui/button";
 import { LabelBadge } from "@mimir/ui/label-badge";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { task } from "better-auth/react";
-import { formatRelative } from "date-fns";
-import {
-	BrushCleaningIcon,
-	Loader2Icon,
-	PlusIcon,
-	SquareDashedIcon,
-} from "lucide-react";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
+import { Loader2Icon, PlusIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo } from "react";
 import { AssigneeAvatar } from "@/components/kanban/asignee";
-import { KanbanTask } from "@/components/kanban/kanban-task";
-import { Priority } from "@/components/kanban/priority";
 import { TaskContextMenu } from "@/components/kanban/task-context-menu";
-import { TasksFilters } from "@/components/kanban/tasks-filters";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";
 import { queryClient, trpc } from "@/utils/trpc";
 
-export const TasksList = () => {
+export const SchedulesList = () => {
 	const { setParams } = useTaskParams();
 	const {
 		setParams: setFilters,
 		hasParams: hasFilters,
 		...filters
 	} = useTasksFilterParams();
-	const { data: backlogColumn } = useQuery(
-		trpc.columns.getBacklogColumn.queryOptions(),
-	);
-	const backlogColumnId = backlogColumn?.id;
-
 	const {
 		data: tasks,
 		fetchNextPage,
@@ -47,8 +32,8 @@ export const TasksList = () => {
 				assigneeId: filters.assigneeId ?? undefined,
 				search: filters.search ?? undefined,
 				labels: filters.labels ?? undefined,
-				columnId: backlogColumnId ? [backlogColumnId] : ["none"],
 				pageSize: 20,
+				recurring: true,
 			},
 			{
 				getNextPageParam: (lastPage) => lastPage.meta.cursor,
@@ -63,21 +48,20 @@ export const TasksList = () => {
 	if (listData.length === 0 && !isLoading && !hasFilters) {
 		return (
 			<div className="mt-12 flex flex-col items-start justify-center gap-2 px-8 text-center">
-				<h3 className="flex items-center gap-2 text-2xl text-muted-foreground">
-					You have no tasks in your backlog
+				<h3 className="flex items-center gap-2 font-runic text-3xl uppercase">
+					no tasks scheduled
 				</h3>
-				<p className="max-w-md text-balance text-muted-foreground text-sm">
-					Backlog is empty. Create tasks to see them listed here.
+				<p className="max-w-lg text-balance text-start text-muted-foreground text-sm">
+					Schedule tasks to repeat at regular intervals to stay on top of your
+					work.
 				</p>
 				<Button
 					variant="default"
 					className="mt-4"
-					onClick={() =>
-						setParams({ createTask: true, taskColumnId: backlogColumnId })
-					}
+					onClick={() => setParams({ createTask: true })}
 				>
 					<PlusIcon />
-					Create your first task
+					Create a task
 				</Button>
 			</div>
 		);
@@ -85,22 +69,6 @@ export const TasksList = () => {
 
 	return (
 		<div className="px-8 py-4">
-			<div className="flex justify-between">
-				<div>
-					<TasksFilters />
-				</div>
-				<Button
-					variant="default"
-					size={"sm"}
-					onClick={() =>
-						setParams({ createTask: true, taskColumnId: backlogColumnId })
-					}
-				>
-					<PlusIcon />
-					Add Task
-				</Button>
-			</div>
-
 			<AnimatePresence>
 				<ul className="flex flex-col py-4">
 					{listData.map((task) => (
@@ -153,18 +121,27 @@ export const TaskItem = ({
 			}}
 		>
 			<div className="flex items-center gap-2 text-start text-sm">
-				{task.sequence && (
-					<span className="text-muted-foreground">{task.sequence}</span>
+				{task.sequence !== null && (
+					<span className="font-mono text-muted-foreground">
+						{task.sequence}
+					</span>
 				)}
 				<h3 className="font-medium">{task.title}</h3>
 			</div>
-			<div className="flex items-center gap-4">
+			<div className="flex items-center gap-2">
 				<div className="flex gap-2">
 					{task.labels?.map((label) => (
 						<LabelBadge key={label.id} {...label} />
 					))}
 				</div>
-				<AssigneeAvatar {...task.assignee} />
+				{task.recurringNextDate && (
+					<div className="flex h-5.5 items-center gap-2 bg-secondary/80 px-2 text-xs">
+						<span className="text-muted-foreground">Next</span>
+						<span>
+							{format(new Date(task.recurringNextDate), "MMM dd, yyyy")}
+						</span>
+					</div>
+				)}
 			</div>
 		</motion.button>
 	);

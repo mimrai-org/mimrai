@@ -58,7 +58,7 @@ export const KanbanTask = ({
 				<div className="flex h-full grow-1 flex-col justify-between gap-2">
 					<div className="flex items-center justify-between gap-2">
 						<span className={"font-medium text-sm"}>
-							{task.sequence && (
+							{task.sequence !== null && (
 								<span className="mr-2 font-mono text-muted-foreground">
 									{task.sequence}
 								</span>

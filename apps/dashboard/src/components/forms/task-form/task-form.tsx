@@ -13,6 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@mimir/ui/popover";
 import {
 	Select,
 	SelectContent,
+	SelectGroup,
 	SelectItem,
 	SelectTrigger,
 } from "@mimir/ui/select";
@@ -25,7 +26,7 @@ import { toast } from "sonner";
 import { useDebounceValue } from "usehooks-ts";
 import z from "zod";
 import { Editor } from "@/components/editor";
-import { PriorityBadge } from "@/components/kanban/priority";
+import { Priority, PriorityBadge } from "@/components/kanban/priority";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { trpc } from "@/utils/trpc";
@@ -35,6 +36,7 @@ import { TaskAttachments } from "./attachments";
 import { ColumnSelect } from "./column-select";
 import { CommentInput } from "./comment-input";
 import { LabelInput } from "./label-input";
+import { Recurring } from "./recurring";
 import { SmartInput } from "./smart-input";
 import { SubscribersList } from "./subscribers-list";
 import { TaskDuplicated } from "./task-duplicated";
@@ -42,7 +44,7 @@ import { TaskChecklist } from "./tasks-checklist";
 
 export const taskFormSchema = z.object({
 	id: z.string().optional(),
-	title: z.string().min(1).max(255),
+	title: z.string().min(1, { message: "Task must have a title" }).max(255),
 	description: z.string().max(50_000).optional(),
 	assigneeId: z.string().nullable().optional(),
 	columnId: z.string().min(1),
@@ -51,6 +53,13 @@ export const taskFormSchema = z.object({
 	priority: z.enum(["low", "medium", "high"]).optional(),
 	attachments: z.array(z.string()).optional(),
 	showSmartInput: z.boolean().optional(),
+	recurring: z
+		.object({
+			frequency: z.enum(["daily", "weekly", "monthly", "yearly"]),
+			interval: z.coerce.number().min(1).max(12),
+			startDate: z.string().optional(),
+		})
+		.optional(),
 });
 export type TaskFormValues = z.infer<typeof taskFormSchema>;
 
@@ -226,7 +235,7 @@ export const TaskForm = ({
 													<FormControl>
 														<Input
 															variant={"ghost"}
-															className="h-10 w-full font-medium focus:border-0 md:text-xl"
+															className="h-10 w-full px-0 font-medium hover:bg-transparent focus:border-0 md:text-xl dark:hover:bg-transparent"
 															placeholder="Task title"
 															autoFocus={false}
 															{...field}
@@ -236,20 +245,6 @@ export const TaskForm = ({
 												</FormItem>
 											)}
 										/>
-
-										<Button
-											type="submit"
-											variant={defaultValues?.id ? "ghost" : "default"}
-											size={"sm"}
-											className="text-sm"
-											disabled={
-												!form.formState.isDirty || form.formState.isSubmitting
-											}
-										>
-											{defaultValues?.id
-												? `${format(lastSavedDate, "PP, p")}`
-												: "Create Task"}
-										</Button>
 									</div>
 									{createMode && (
 										<div className="px-8">
@@ -267,7 +262,7 @@ export const TaskForm = ({
 												<FormItem>
 													<FormControl>
 														<Editor
-															className="px-4 [&_div]:min-h-[160px]"
+															className="[&_div]:min-h-[100px]"
 															placeholder="Add description..."
 															value={field.value ?? ""}
 															onChange={(value) => {
@@ -289,7 +284,7 @@ export const TaskForm = ({
 													<FormItem>
 														<FormControl>
 															<LabelInput
-																className="justify-start"
+																className="w-fit justify-start px-0 text-xs"
 																placeholder="Add labels..."
 																value={field.value ?? []}
 																onChange={(value) => field.onChange(value)}
@@ -316,9 +311,10 @@ export const TaskForm = ({
 																	getLabel={(item) =>
 																		item?.name || item?.email || "Unassigned"
 																	}
-																	variant={"ghost"}
-																	className="w-fit px-4!"
-																	placeholder="Assignee"
+																	variant={"secondary"}
+																	size={"sm"}
+																	className="h-6! w-fit px-2! py-1! text-xs"
+																	placeholder="Unassigned"
 																	clearable
 																	renderClear={() => (
 																		<div className="flex items-center gap-2">
@@ -327,7 +323,16 @@ export const TaskForm = ({
 																		</div>
 																	)}
 																	renderItem={(item) => (
-																		<Assignee {...item} className="size-6" />
+																		<Assignee
+																			{...item}
+																			className="size-5 text-sm"
+																		/>
+																	)}
+																	renderValue={(item) => (
+																		<Assignee
+																			{...item}
+																			className="size-4 text-xs"
+																		/>
 																	)}
 																/>
 															</FormControl>
@@ -343,8 +348,8 @@ export const TaskForm = ({
 																<Popover>
 																	<PopoverTrigger asChild>
 																		<Button
-																			variant="ghost"
-																			className="w-fit justify-between font-normal"
+																			variant="secondary"
+																			className="h-6 w-fit justify-between font-normal text-xs"
 																		>
 																			{field.value ? (
 																				formatRelative(field.value, new Date())
@@ -385,17 +390,22 @@ export const TaskForm = ({
 																	value={field.value}
 																	onValueChange={field.onChange}
 																>
-																	<SelectTrigger className="w-full rounded-xs border-none shadow-none transition-colors hover:bg-muted focus:ring-0 dark:bg-transparent">
+																	<SelectTrigger className="h-6! border-none bg-secondary text-xs hover:bg-secondary/80 dark:bg-secondary/80 hover:dark:bg-secondary/70">
 																		{field.value && (
-																			<PriorityBadge value={field.value} />
+																			<div className="flex gap-2 capitalize">
+																				<Priority value={field.value} />
+																				{field.value}
+																			</div>
 																		)}
 																	</SelectTrigger>
 																	<SelectContent>
-																		<SelectItem value="low">Low</SelectItem>
-																		<SelectItem value="medium">
-																			Medium
-																		</SelectItem>
-																		<SelectItem value="high">High</SelectItem>
+																		<SelectGroup>
+																			<SelectItem value="low">Low</SelectItem>
+																			<SelectItem value="medium">
+																				Medium
+																			</SelectItem>
+																			<SelectItem value="high">High</SelectItem>
+																		</SelectGroup>
 																	</SelectContent>
 																</Select>
 															</FormControl>
@@ -404,17 +414,35 @@ export const TaskForm = ({
 													)}
 												/>
 												<ColumnSelect />
+
+												<Recurring />
 											</div>
 										</div>
 
-										<div className="space-y-4 px-4">
-											<FormField
-												control={form.control}
-												name="attachments"
-												render={({ field }) => (
-													<TaskAttachments attachments={field.value ?? []} />
-												)}
-											/>
+										<hr className="my-6" />
+										<div className="flex justify-between">
+											<div className="space-y-4">
+												<FormField
+													control={form.control}
+													name="attachments"
+													render={({ field }) => (
+														<TaskAttachments attachments={field.value ?? []} />
+													)}
+												/>
+											</div>
+											<Button
+												type="submit"
+												variant={defaultValues?.id ? "ghost" : "default"}
+												size={"sm"}
+												className="text-xs"
+												disabled={
+													!form.formState.isDirty || form.formState.isSubmitting
+												}
+											>
+												{defaultValues?.id
+													? `Last saved at ${format(lastSavedDate, "PP, p")}`
+													: "Create Task"}
+											</Button>
 										</div>
 									</div>
 								</div>
@@ -422,16 +450,16 @@ export const TaskForm = ({
 						</form>
 					</Form>
 
-					<div className="px-8">
+					<div className="px-4">
 						{defaultValues?.id && (
 							<div>
-								<hr className="my-8" />
+								<hr className="my-6" />
 								<TaskChecklist taskId={defaultValues?.id!} />
 							</div>
 						)}
 						{defaultValues?.id && (
 							<div>
-								<hr className="my-8" />
+								<hr className="my-6" />
 								<div>
 									<div className="mb-4 flex items-center justify-between">
 										<span className="font-medium text-sm">Activity</span>

@@ -52,8 +52,8 @@ export const SubscribersList = ({ taskId }: { taskId: string }) => {
 		<div className="flex items-center gap-2">
 			{isSubscribed ? (
 				<Button
-					variant={"secondary"}
-					className="w-fit justify-start text-start"
+					variant={"ghost"}
+					className="w-fit justify-start text-start text-xs"
 					type="button"
 					size={"sm"}
 					onClick={() => {
@@ -65,8 +65,8 @@ export const SubscribersList = ({ taskId }: { taskId: string }) => {
 				</Button>
 			) : (
 				<Button
-					variant={"secondary"}
-					className="w-fit justify-start text-start"
+					variant={"ghost"}
+					className="w-fit justify-start text-start text-xs"
 					type="button"
 					size={"sm"}
 					onClick={() => {

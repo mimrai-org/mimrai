@@ -1,4 +1,3 @@
-import { generateSystemPrompt } from "@api/ai/generate-system-prompt";
 import { getUserContext } from "@api/ai/utils/get-user-context";
 import {
   commentTaskSchema,
@@ -28,6 +27,8 @@ import {
   updateTask,
 } from "@mimir/db/queries/tasks";
 import { getDuplicateTaskEmbedding } from "@mimir/db/queries/tasks-embeddings";
+import { createRecurringTaskJob } from "@mimir/jobs/tasks/create-recurring-task-job";
+import { runs } from "@trigger.dev/sdk";
 import { generateObject } from "ai";
 
 export const tasksRouter = router({
@@ -43,20 +44,45 @@ export const tasksRouter = router({
   create: protectedProcedure
     .input(createTaskSchema)
     .mutation(async ({ ctx, input }) => {
-      return createTask({
+      const task = await createTask({
         ...input,
         userId: ctx.user.id,
         teamId: ctx.user.teamId!,
       });
+
+      // If recurring is set, schedule the first occurrence
+      if (task.recurring) {
+        // Schedule the job to create the next occurrence
+        await createRecurringTaskJob.trigger({
+          originalTaskId: task.id,
+        });
+      }
+
+      return task;
     }),
   update: protectedProcedure
     .input(updateTaskSchema)
     .mutation(async ({ ctx, input }) => {
-      return updateTask({
+      const task = await updateTask({
         ...input,
         userId: ctx.user.id,
         teamId: ctx.user.teamId!,
       });
+
+      // If recurring is set, schedule the first occurrence
+      if (task.recurring) {
+        const existingJob = task.recurringJobId;
+        if (existingJob) {
+          // If there's an existing job, we might want to cancel it first
+          await runs.cancel(existingJob);
+        }
+        // Schedule the job to create the next occurrence
+        await createRecurringTaskJob.trigger({
+          originalTaskId: task.id,
+        });
+      }
+
+      return task;
     }),
   delete: protectedProcedure
     .input(deleteTaskSchema.omit({ teamId: true }))

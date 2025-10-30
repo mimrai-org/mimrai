@@ -31,7 +31,14 @@ export const LabelInput = ({
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
-				<Button type="button" variant={"ghost"} className={cn(className, "")}>
+				<Button
+					type="button"
+					variant={"ghost"}
+					className={cn(
+						className,
+						"group hover:bg-transparent dark:hover:bg-transparent",
+					)}
+				>
 					{selectedLabels.length > 0 && (
 						<div className="flex flex-wrap gap-1">
 							{selectedLabels.map((label) => (
@@ -39,7 +46,7 @@ export const LabelInput = ({
 							))}
 						</div>
 					)}
-					<span className="font-normal text-muted-foreground">
+					<span className="font-normal text-muted-foreground transition-colors group-hover:text-foreground">
 						{placeholder}
 					</span>
 				</Button>

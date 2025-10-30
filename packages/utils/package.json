@@ -24,6 +24,7 @@
     "./random": "./src/random.ts",
     "./plans": "./src/plans.ts",
     "./tax": "./src/tax.ts",
-    "./tasks": "./src/tasks.ts"
+    "./tasks": "./src/tasks.ts",
+    "./recurrence": "./src/recurrence.ts"
   }
 }

@@ -21,6 +21,7 @@ export const DataSelectInput = <
 	getValue,
 	getLabel,
 	renderItem,
+	renderValue,
 	renderClear,
 	clearable,
 	className,
@@ -49,6 +50,7 @@ export const DataSelectInput = <
 	renderClear?: () => React.ReactNode;
 	clearable?: boolean;
 	renderItem?: (item: T[number]) => React.ReactNode;
+	renderValue?: (item: T[number]) => React.ReactNode;
 	renderMultiple?: (items: D[]) => React.ReactNode;
 	showChevron?: boolean;
 	multiple?: boolean;
@@ -86,7 +88,9 @@ export const DataSelectInput = <
 							"Render multiple not implemented"
 						)
 					) : singleValue ? (
-						(renderItem?.(singleValue) ?? getLabel(singleValue))
+						(renderValue?.(singleValue) ??
+						renderItem?.(singleValue) ??
+						getLabel(singleValue))
 					) : (
 						<span className="font-normal text-muted-foreground">
 							{placeholder ?? "Select..."}

@@ -36,7 +36,6 @@ export const TaskUpdateSheet = () => {
 			<DialogContent showCloseButton={false} className="pt-0 sm:min-w-[1000px]">
 				{task ? (
 					<TaskForm
-						pullRequestPlan={task.pullRequestPlan}
 						defaultValues={{
 							id: task.id,
 							title: task.title,
@@ -47,6 +46,7 @@ export const TaskUpdateSheet = () => {
 							dueDate: task.dueDate ? new Date(task.dueDate) : undefined,
 							labels: task.labels?.map((label) => label.id) || [],
 							attachments: task.attachments || [],
+							recurring: task.recurring || undefined,
 						}}
 					/>
 				) : (

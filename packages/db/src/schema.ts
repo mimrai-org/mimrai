@@ -220,6 +220,17 @@ export const tasks = pgTable(
     subscribers: text("subscribers").array().default([]).notNull(),
     mentions: text("mentions").array().default([]).notNull(),
 
+    recurring: jsonb("recurring").$type<{
+      frequency: "daily" | "weekly" | "monthly" | "yearly";
+      interval: number;
+      startDate?: string;
+    }>(),
+    recurringJobId: text("recurring_job_id"),
+    recurringNextDate: timestamp("recurring_next_date", {
+      withTimezone: true,
+      mode: "string",
+    }),
+
     createdAt: timestamp("created_at", {
       withTimezone: true,
       mode: "string",

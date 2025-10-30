@@ -1,10 +1,10 @@
 import { Provider as ChatProvider } from "@ai-sdk-tools/store";
-import { TasksList } from "./tasks-list";
+import { BacklogList } from "./backlog-list";
 
 export default function Page() {
 	return (
 		<ChatProvider>
-			<TasksList />
+			<BacklogList />
 		</ChatProvider>
 	);
 }

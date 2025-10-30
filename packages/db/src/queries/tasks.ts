@@ -1,6 +1,16 @@
 import type { DeleteTaskInput } from "@api/schemas/tasks";
 import { subDays } from "date-fns";
-import { and, desc, eq, gte, inArray, or, type SQL, sql } from "drizzle-orm";
+import {
+  and,
+  desc,
+  eq,
+  gte,
+  inArray,
+  isNotNull,
+  or,
+  type SQL,
+  sql,
+} from "drizzle-orm";
 import { buildSearchQuery } from "src/utils/search-query";
 import { db } from "..";
 import {
@@ -44,6 +54,7 @@ export const getTasks = async ({
   labels?: string[];
   teamId?: string;
   search?: string;
+  recurring?: boolean;
   view?: "board" | "backlog";
 }) => {
   const whereClause: (SQL | undefined)[] = [];
@@ -56,6 +67,7 @@ export const getTasks = async ({
   input.labels &&
     input.labels.length > 0 &&
     whereClause.push(inArray(labelsOnTasks.labelId, input.labels));
+  input.recurring && whereClause.push(isNotNull(tasks.recurringJobId));
 
   if (input.search) {
     if (!Number.isNaN(Number.parseInt(input.search, 10))) {
@@ -126,6 +138,9 @@ export const getTasks = async ({
         prTitle: pullRequestPlan.prTitle,
         status: pullRequestPlan.status,
       },
+      recurring: tasks.recurring,
+      recurringJobId: tasks.recurringJobId,
+      recurringNextDate: tasks.recurringNextDate,
       column: {
         id: columns.id,
         name: columns.name,
@@ -215,6 +230,11 @@ export const createTask = async ({
   attachments?: string[];
   mentions?: string[];
   userId?: string;
+  recurring?: {
+    startDate?: string;
+    frequency: "daily" | "weekly" | "monthly" | "yearly";
+    interval: number;
+  };
 }) => {
   const { sequence, order } = await getNextTaskSequence(input.teamId);
   const [task] = await db
@@ -296,6 +316,11 @@ export const updateTask = async ({
   attachments?: string[];
   mentions?: string[];
   userId?: string;
+  recurring?: {
+    startDate?: string;
+    frequency: "daily" | "weekly" | "monthly" | "yearly";
+    interval: number;
+  };
 }) => {
   const whereClause: SQL[] = [eq(tasks.id, input.id)];
 
@@ -394,6 +419,9 @@ export const getTaskById = async (id: string, teamId?: string) => {
         prTitle: pullRequestPlan.prTitle,
         status: pullRequestPlan.status,
       },
+      recurring: tasks.recurring,
+      recurringJobId: tasks.recurringJobId,
+      recurringNextDate: tasks.recurringNextDate,
       column: {
         id: columns.id,
         name: columns.name,
@@ -636,4 +664,27 @@ export const getTaskSubscribers = async ({
     .innerJoin(tasks, and(...whereClause));
 
   return subscribers;
+};
+
+export const updateTaskRecurringJob = async ({
+  taskId,
+  jobId,
+  nextOccurrenceDate,
+}: {
+  taskId: string;
+  jobId: string;
+  nextOccurrenceDate?: string;
+}) => {
+  const [task] = await db
+    .update(tasks)
+    .set({
+      recurringJobId: jobId,
+      recurringNextDate: nextOccurrenceDate,
+    })
+    .where(eq(tasks.id, taskId))
+    .returning();
+  if (!task) {
+    throw new Error("Failed to link recurring job to task");
+  }
+  return task;
 };

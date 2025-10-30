@@ -5,6 +5,7 @@
 	"compilerOptions": {
 		"baseUrl": ".",
 		"esModuleInterop": true,
+		"strictNullChecks": false,
 		"paths": {
 			"@jobs/*": ["src/*"]
 		},

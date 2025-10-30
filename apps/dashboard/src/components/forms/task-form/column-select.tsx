@@ -17,7 +17,7 @@ export const ColumnSelect = () => {
 					<FormControl>
 						<DataSelectInput
 							size="sm"
-							className="w-full"
+							className="h-6! w-full text-xs"
 							// @ts-expect-error
 							queryOptions={trpc.columns.get.queryOptions(
 								{},
@@ -29,13 +29,19 @@ export const ColumnSelect = () => {
 							onChange={(value) => field.onChange(value || undefined)}
 							getLabel={(item) => item?.name ?? ""}
 							getValue={(item) => item?.id ?? ""}
+							renderValue={(item) => (
+								<span className="flex items-center gap-2">
+									<ColumnIcon className="size-3.5" type={item.type} />
+									{item.name}
+								</span>
+							)}
 							renderItem={(item) => (
 								<span className="flex items-center gap-2">
 									<ColumnIcon type={item.type} />
 									{item.name}
 								</span>
 							)}
-							variant={"ghost"}
+							variant={"secondary"}
 						/>
 					</FormControl>
 				</FormItem>
