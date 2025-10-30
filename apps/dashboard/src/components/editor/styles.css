@@ -56,10 +56,7 @@
 
 .tiptap {
 	pre {
-		@apply bg-accent;
-		@apply p-2;
-		@apply my-2;
-		@apply rounded;
+		@apply border p-2 my-2;
 
 		code {
 			background: none;
@@ -67,6 +64,10 @@
 			font-size: 0.8rem;
 			padding: 0;
 		}
+	}
+
+	blockquote {
+		@apply border-l-2 border-primary pl-4 italic ml-2;
 	}
 
 	img {

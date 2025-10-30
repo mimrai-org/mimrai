@@ -191,7 +191,7 @@ export const TaskForm = ({
 	const showSmartInput = createMode && formValues.showSmartInput;
 
 	return (
-		<div className="max-h-[80vh] overflow-y-auto">
+		<div className="max-h-[95vh] overflow-y-auto">
 			{showSmartInput ? (
 				<SmartInput
 					onFinish={(data) => {

@@ -39,6 +39,7 @@ export const CommentInput = ({ taskId }: { taskId: string }) => {
 			<Editor
 				value={comment}
 				ref={editorRef}
+				autoFocus={false}
 				onChange={(e) => setComment(e)}
 				placeholder="Leave a comment..."
 				className="min-h-16 border border-input bg-accent px-4 py-2"

@@ -105,6 +105,24 @@ export const Response = memo(
 						{children}
 					</h4>
 				),
+				code: ({ children, node, ...props }) => (
+					<div className="border px-2 py-0.5 font-mono">
+						<code {...props}>{children}</code>
+					</div>
+				),
+				pre: ({ children, node, ...props }) => (
+					<pre className="overflow-x-auto font-mono" {...props}>
+						{children}
+					</pre>
+				),
+				blockquote: ({ children, node, ...props }) => (
+					<blockquote
+						className="border-primary border-l-2 pl-4 italic"
+						{...props}
+					>
+						{children}
+					</blockquote>
+				),
 				table: (props) => <Table {...props} className="border" />,
 				a: (props) => {
 					// if the href starts with the app url, open in the same window

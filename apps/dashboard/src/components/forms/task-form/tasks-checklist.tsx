@@ -27,8 +27,10 @@ import {
 	CollapsibleContent,
 	CollapsibleTrigger,
 } from "@ui/components/ui/collapsible";
+import { Switch } from "@ui/components/ui/switch";
 import { EllipsisIcon, FileIcon, PlusIcon, SaveIcon } from "lucide-react";
 import { motion } from "motion/react";
+import ms from "ms";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -43,11 +45,36 @@ import { queryClient, trpc } from "@/utils/trpc";
 export const TaskChecklist = ({ taskId }: { taskId: string }) => {
 	const [create, setCreate] = useState(false);
 	const [activeUpdateId, setActiveUpdateId] = useState<string | null>(null);
+	const [showAll, setShowAll] = useState(false);
 
 	const { data } = useQuery(
-		trpc.checklists.get.queryOptions({
-			taskId,
-		}),
+		trpc.checklists.get.queryOptions(
+			{
+				taskId,
+			},
+			{
+				select: (data) => {
+					if (!data || data.length === 0)
+						return { data: [], hiddenCount: null };
+					const newData = data.filter(
+						(item) =>
+							!item.isCompleted ||
+							new Date(item.updatedAt!).valueOf() >= Date.now() - ms("1 day"),
+					);
+					const hiddenCount = data.length - newData.length;
+					if (showAll)
+						return {
+							data,
+							hiddenCount,
+						};
+
+					return {
+						data: newData,
+						hiddenCount,
+					};
+				},
+			},
+		),
 	);
 
 	const { mutate: updateChecklistItem, isPending } = useMutation(
@@ -84,16 +111,25 @@ export const TaskChecklist = ({ taskId }: { taskId: string }) => {
 	return (
 		<div className="w-full">
 			<Collapsible defaultOpen>
-				<CollapsibleTrigger className="collapsible-chevron flex items-center gap-2">
-					<div className="flex items-center justify-between">
-						<span className="font-medium text-sm">Checklist</span>
-					</div>
-				</CollapsibleTrigger>
+				<div className="flex w-full items-center justify-between">
+					<CollapsibleTrigger className="collapsible-chevron flex items-center gap-2">
+						<div className="flex items-center justify-between">
+							<div className="font-medium text-sm">Checklist</div>
+						</div>
+					</CollapsibleTrigger>
+					{data?.hiddenCount !== null && (
+						<div className="flex items-center gap-2 text-muted-foreground text-xs">
+							Show {data?.hiddenCount} completed item
+							{data?.hiddenCount! > 1 ? "s" : ""}{" "}
+							<Switch checked={showAll} onCheckedChange={setShowAll} />
+						</div>
+					)}
+				</div>
 				<CollapsibleContent className="w-full">
 					<div className="my-4 w-full">
-						{data?.length ? (
+						{data?.data.length ? (
 							<div className="space-y-2">
-								{data.map((item) => (
+								{data.data.map((item) => (
 									<div key={item.id}>
 										{activeUpdateId === item.id ? (
 											<TaskChecklistItemForm

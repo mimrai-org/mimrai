@@ -33,7 +33,10 @@ export const TaskUpdateSheet = () => {
 			<DialogHeader>
 				<DialogTitle />
 			</DialogHeader>
-			<DialogContent showCloseButton={false} className="pt-0 sm:min-w-[1000px]">
+			<DialogContent
+				showCloseButton={true}
+				className="min-h-[95vh] pt-0 sm:min-w-[60vw]"
+			>
 				{task ? (
 					<TaskForm
 						defaultValues={{
@@ -50,7 +53,7 @@ export const TaskUpdateSheet = () => {
 						}}
 					/>
 				) : (
-					<Skeleton className="h-[800px] w-full" />
+					<Skeleton className="h-[200px] w-full" />
 				)}
 			</DialogContent>
 		</Dialog>

@@ -1,4 +1,4 @@
-import { and, asc, eq, is, type SQL, sql } from "drizzle-orm";
+import { and, asc, eq, is, or, type SQL, sql } from "drizzle-orm";
 import { db } from "../index";
 import { checklistItems, users } from "../schema";
 
