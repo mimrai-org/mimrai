@@ -1,8 +1,9 @@
-import { init } from "@sentry/node";
+import * as Sentry from "@sentry/node";
 
-export const sentry = init({
+export const sentry = Sentry.init({
   dsn: process.env.SENTRY_DSN!,
   sendDefaultPii: true,
   environment: process.env.NODE_ENV,
-  // enabled: process.env.NODE_ENV === "production",
+  tracesSampleRate: 0.2,
+  enabled: process.env.NODE_ENV === "production",
 });
