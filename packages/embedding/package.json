@@ -14,11 +14,12 @@
   },
   "dependencies": {
     "@date-fns/utc": "^2.1.1",
-    "date-fns": "^4.1.0",
-    "ai": "^5.0.56",
+    "@mimir/cache": "workspace:*",
     "@mimir/logger": "workspace:*",
     "@mimir/utils": "workspace:*",
-    "@mimir/cache": "workspace:*"
+    "ai": "^5.0.56",
+    "date-fns": "^4.1.0",
+    "string-strip-html": "^13.5.0"
   },
   "devDependencies": {
     "@mimir/tsconfig": "workspace:*",
