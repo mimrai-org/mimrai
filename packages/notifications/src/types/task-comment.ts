@@ -7,7 +7,10 @@ export const taskComment: NotificationHandler = {
   createNotification: (data, user) => {
     return {
       title: "Task Commented",
-      message: `> **${user.name}** commented on task **${getTaskMarkdownLink(data.groupId!, data.metadata?.title)}**:\n\n>${data.metadata?.comment}`,
+      message: `> **${user.name}** commented on task **${getTaskMarkdownLink(
+        data.groupId!,
+        data.metadata?.title
+      )}**:\n\n>${data.metadata?.comment}`,
       type: "customer",
       additionalRecipients: data.metadata?.subscribers ?? [],
     };
@@ -24,6 +27,13 @@ export const taskComment: NotificationHandler = {
       emailType: "customer",
       additionalRecipients: data.metadata?.subscribers ?? [],
       data,
+    };
+  },
+  createWhatsappNotification: (data, user) => {
+    return {
+      message: `*${user.name}* commented on task *${data.metadata?.title}*:\n\n${data.metadata?.comment}`,
+      type: "customer",
+      additionalRecipients: data.metadata?.subscribers ?? [],
     };
   },
 };

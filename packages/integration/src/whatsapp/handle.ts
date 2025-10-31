@@ -49,9 +49,11 @@ export const handleWhatsappMessage = async ({
     externalUserId: fromNumber,
   });
   if (!associetedUser) {
-    const url = `${getApiUrl()}/api/integrations/associate?externalUserId=${encodeURIComponent(fromNumber)}&externalUserName=${encodeURIComponent(
+    const url = `${getApiUrl()}/api/integrations/associate?externalUserId=${encodeURIComponent(
+      fromNumber
+    )}&externalUserName=${encodeURIComponent(
       fromName
-    )}`;
+    )}&integrationType=whatsapp`;
     response.message(
       `Please associate your WhatsApp number with your account by clicking the following ${url}`
     );
@@ -110,7 +112,9 @@ export const handleWhatsappMessage = async ({
     process.env.TWILIO_AUTH_TOKEN!
   );
 
-  const systemPrompt = `You are responding to a chat ON WHATSAPP, DO NOT RESPOND WITH MARKDOWNS AND DO NOT SEND LINKS. Always inlcude **${userContext.teamName}** on the top of your responses to identify the team.
+  const systemPrompt = `You are responding to a chat ON WHATSAPP, DO NOT RESPOND WITH MARKDOWNS AND DO NOT SEND LINKS. Always inlcude **${
+    userContext.teamName
+  }** on the top of your responses to identify the team.
   If the user want to change team, use the tool "getOrSetIntegrationTeam" to do so.
   ${generateSystemPrompt(userContext)}`;
 

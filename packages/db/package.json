@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@date-fns/utc": "^2.1.1",
-    "date-fns": "^4.1.0",
+    "date-fns": "4.1.0",
     "@mimir/logger": "workspace:*",
     "@mimir/utils": "workspace:*",
     "@mimir/cache": "workspace:*",
@@ -24,7 +24,7 @@
     "@mimir/events": "workspace:*",
     "@types/pg": "^8.15.5",
     "camelcase-keys": "^10.0.0",
-    "drizzle-orm": "0.44.5",
+    "drizzle-orm": "0.44.6",
     "pg": "^8.16.3",
     "snakecase-keys": "^9.0.2"
   },

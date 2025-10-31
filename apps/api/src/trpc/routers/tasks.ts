@@ -25,6 +25,7 @@ import {
   subscribeUserToTask,
   unsubscribeUserFromTask,
   updateTask,
+  updateTaskRecurringJob,
 } from "@mimir/db/queries/tasks";
 import { getDuplicateTaskEmbedding } from "@mimir/db/queries/tasks-embeddings";
 import { createRecurringTaskJob } from "@mimir/jobs/tasks/create-recurring-task-job";
@@ -75,6 +76,10 @@ export const tasksRouter = router({
         if (existingJob) {
           // If there's an existing job, we might want to cancel it first
           await runs.cancel(existingJob);
+          await updateTaskRecurringJob({
+            jobId: null,
+            taskId: task.id,
+          });
         }
         // Schedule the job to create the next occurrence
         await createRecurringTaskJob.trigger({
@@ -164,7 +169,9 @@ export const tasksRouter = router({
 				- If no suitable member is found, leave the task unassigned
 				
 				Current date: ${new Date().toISOString()}
-				User locale: ${userContext.locale} (IMPORTANT:ALWAYS respond in this language no matter what)
+				User locale: ${
+          userContext.locale
+        } (IMPORTANT:ALWAYS respond in this language no matter what)
 				`,
         model: "openai/gpt-4o",
         schema: smartCompleteResponseSchema,

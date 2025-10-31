@@ -1,10 +1,7 @@
-import {
-  getIntegrationByType,
-  getLinkedUsers,
-} from "@mimir/db/queries/integrations";
 import type { NotificationChannel } from "@mimir/db/queries/notification-settings";
 import { getMembers, getTeamById } from "@mimir/db/queries/teams";
 import { sendMattermostNotification } from "@mimir/integration/mattermost";
+import { sendWhatsappNotification } from "@mimir/integration/whatsapp";
 import { getEmailFrom } from "@mimir/utils/envs";
 import snakecaseKeys from "snakecase-keys";
 import type { UserData } from "./base";
@@ -120,6 +117,53 @@ export const sendNotification = async (
         scheduledAt: emailPayload.scheduledAt,
         to: [...recipients],
         from: getEmailFrom(),
+      });
+      break;
+    }
+    case "whatsapp": {
+      if (!handler.createWhatsappNotification) {
+        throw new Error(
+          `No WhatsApp sender found for notification type: ${type}`
+        );
+      }
+
+      const team = await getTeamById(user.teamId);
+      if (!team) {
+        throw new Error(`Team not found: ${user.teamId}`);
+      }
+
+      const recipients = new Set<string>();
+      if (notification.type === "customer") {
+        recipients.add(user.id);
+      }
+
+      if (notification.type === "team") {
+        // Send to team channel
+        const members = await getMembers({ teamId: team.id });
+        for (const member of members) {
+          recipients.add(member.id);
+        }
+      }
+
+      if (notification.type === "owners") {
+        const members = await getMembers({ teamId: team.id, role: "owner" });
+        for (const member of members) {
+          recipients.add(member.id);
+        }
+      }
+
+      if (notification.additionalRecipients) {
+        for (const recipient of notification.additionalRecipients) {
+          recipients.add(recipient);
+        }
+      }
+
+      const whatsappPayload = handler.createWhatsappNotification(data, user);
+      await sendWhatsappNotification({
+        teamId: user.teamId,
+        teamName: team.name,
+        userId: Array.from(recipients),
+        message: whatsappPayload.message,
       });
     }
   }

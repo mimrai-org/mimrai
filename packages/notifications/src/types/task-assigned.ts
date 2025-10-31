@@ -7,7 +7,10 @@ export const taskAssigned: NotificationHandler = {
   createNotification: (data, user) => {
     return {
       title: "Task Assigned",
-      message: `> Task **${getTaskMarkdownLink(data.groupId!, data.metadata?.title)}** has been assigned to **${data.metadata?.assigneeName}**.`,
+      message: `> Task **${getTaskMarkdownLink(
+        data.groupId!,
+        data.metadata?.title
+      )}** has been assigned to **${data.metadata?.assigneeName}**.`,
       type: "customer",
       additionalRecipients: data.metadata?.subscribers ?? [],
     };
@@ -24,6 +27,13 @@ export const taskAssigned: NotificationHandler = {
       emailType: "customer",
       additionalRecipients: data.metadata?.subscribers ?? [],
       data,
+    };
+  },
+  createWhatsappNotification: (data, user) => {
+    return {
+      message: `Task *${data.metadata?.title}* has been assigned to *${data.metadata?.assigneeName}*.`,
+      type: "customer",
+      additionalRecipients: data.metadata?.subscribers ?? [],
     };
   },
 };

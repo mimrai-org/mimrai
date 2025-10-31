@@ -9,4 +9,11 @@ export const checklistItemCompleted: NotificationHandler = {
       additionalRecipients: data.metadata?.subscribers ?? [],
     };
   },
+  createWhatsappNotification: (data, user) => {
+    return {
+      message: `A checklist item on task *${data.metadata?.title}* has been completed by ${user.name}.`,
+      type: "customer",
+      additionalRecipients: data.metadata?.subscribers ?? [],
+    };
+  },
 };

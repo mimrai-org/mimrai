@@ -47,6 +47,7 @@ export const en = {
       in_app: "In-App",
       email: "Email",
       mattermost: "Mattermost",
+      whatsapp: "WhatsApp",
     },
   },
   activities: {

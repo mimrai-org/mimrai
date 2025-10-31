@@ -11,6 +11,7 @@ export const notificationChannels = [
   "email",
   "push",
   "mattermost",
+  "whatsapp",
 ] as const;
 export type NotificationChannel = (typeof notificationChannels)[number];
 

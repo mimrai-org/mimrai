@@ -26,7 +26,7 @@
     "codepage": "^1.15.0",
     "heic-convert": "1.2.4",
     "node-xlsx": "^0.24.0",
-    "drizzle-orm": "0.44.5",
+    "drizzle-orm": "0.44.6",
     "sharp": "0.34.4",
     "trigger.dev": "^4.0.4",
     "xlsx": "^0.18.5",

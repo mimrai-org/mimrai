@@ -9,4 +9,11 @@ export const checklistItemCreated: NotificationHandler = {
       additionalRecipients: data.metadata?.subscribers ?? [],
     };
   },
+  createWhatsappNotification: (data, user) => {
+    return {
+      message: `A new checklist item on task *${data.metadata?.title}* has been created by ${user.name}.`,
+      type: "customer",
+      additionalRecipients: data.metadata?.subscribers ?? [],
+    };
+  },
 };

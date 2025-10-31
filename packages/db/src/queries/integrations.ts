@@ -294,9 +294,11 @@ export const getLinkedUsers = async ({
 export const getLinkedUserByExternalId = async ({
   integrationId,
   externalUserId,
+  integrationType,
   teamId,
 }: {
   integrationId?: string;
+  integrationType?: IntegrationName;
   externalUserId: string;
   teamId?: string;
 }) => {
@@ -305,6 +307,8 @@ export const getLinkedUserByExternalId = async ({
   ];
   if (integrationId)
     whereClause.push(eq(integrationUserLink.integrationId, integrationId));
+  if (integrationType)
+    whereClause.push(eq(integrationUserLink.integrationType, integrationType));
 
   if (teamId) whereClause.push(eq(integrations.teamId, teamId));
 
@@ -327,19 +331,22 @@ export const getLinkedUserByExternalId = async ({
 
 export const getLinkedUserByUserId = async ({
   integrationId,
+  integrationType,
   userId,
   teamId,
 }: {
-  integrationId: string;
+  integrationId?: string;
+  integrationType?: IntegrationName;
   userId: string;
   teamId?: string;
 }) => {
-  const whereClause: SQL[] = [
-    eq(integrationUserLink.integrationId, integrationId),
-    eq(integrationUserLink.userId, userId),
-  ];
+  const whereClause: SQL[] = [eq(integrationUserLink.userId, userId)];
 
+  if (integrationId)
+    whereClause.push(eq(integrationUserLink.integrationId, integrationId));
   if (teamId) whereClause.push(eq(integrations.teamId, teamId));
+  if (integrationType)
+    whereClause.push(eq(integrationUserLink.integrationType, integrationType));
 
   const [link] = await db
     .select({

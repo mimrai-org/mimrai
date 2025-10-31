@@ -22,7 +22,7 @@
     "@mimir/db": "workspace:*",
     "@mimir/utils": "workspace:*",
     "ai": "^5.0.56",
-    "drizzle-orm": "0.44.5",
+    "drizzle-orm": "0.44.6",
     "redis": "^5.8.2",
     "twilio": "^5.10.4",
     "ws": "^8.18.3",

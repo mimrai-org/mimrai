@@ -26,6 +26,14 @@ export interface NotificationHandler {
     data: InferSelectModel<typeof activities>,
     user: UserData
   ) => CreateNotificationInput;
+  createWhatsappNotification?: (
+    data: InferSelectModel<typeof activities>,
+    user: UserData
+  ) => {
+    message: string;
+    type: "customer" | "team" | "owners";
+    additionalRecipients?: string[];
+  };
   createEmail?: (
     data: InferSelectModel<typeof activities>,
     user: UserData,

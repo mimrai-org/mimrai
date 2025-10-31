@@ -48,6 +48,7 @@ export const associateMattermostUserSchema = z.object({
 
 export const associeteIntegrationUserSchema = z.object({
   integrationId: z.string().optional(),
+  integrationType: z.string().optional(),
   externalUserId: z.string(),
   externalUserName: z.string(),
 });

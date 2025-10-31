@@ -8,4 +8,10 @@ export const resumeGenerated: NotificationHandler = {
       type: "team",
     };
   },
+  createWhatsappNotification: (data, user) => {
+    return {
+      message: `${data.metadata?.summary}`,
+      type: "team",
+    };
+  },
 };

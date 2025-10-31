@@ -7,7 +7,12 @@ export const taskColumnChanged: NotificationHandler = {
   createNotification: (data, user) => {
     return {
       title: "Task Moved",
-      message: `> Task **${getTaskMarkdownLink(data.groupId!, data.metadata?.title)}** has been moved to **${data.metadata?.toColumnName}** by ${user.name}.`,
+      message: `> Task **${getTaskMarkdownLink(
+        data.groupId!,
+        data.metadata?.title
+      )}** has been moved to **${data.metadata?.toColumnName}** by ${
+        user.name
+      }.`,
       type: "customer",
       additionalRecipients: data.metadata?.subscribers ?? [],
     };
@@ -24,6 +29,13 @@ export const taskColumnChanged: NotificationHandler = {
       emailType: "customer",
       additionalRecipients: data.metadata?.subscribers ?? [],
       data,
+    };
+  },
+  createWhatsappNotification: (data, user) => {
+    return {
+      message: `Task *${data.metadata?.title}* has been moved to *${data.metadata?.toColumnName}* by ${user.name}.`,
+      type: "customer",
+      additionalRecipients: data.metadata?.subscribers ?? [],
     };
   },
 };

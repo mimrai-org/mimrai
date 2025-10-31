@@ -672,7 +672,7 @@ export const updateTaskRecurringJob = async ({
   nextOccurrenceDate,
 }: {
   taskId: string;
-  jobId: string;
+  jobId: string | null;
   nextOccurrenceDate?: string;
 }) => {
   const [task] = await db

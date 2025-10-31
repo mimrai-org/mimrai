@@ -85,6 +85,12 @@ app.get("/associate", async (c) => {
     );
   }
 
+  if (safeQuery.data.integrationType) {
+    whereClause.push(
+      eq(integrationUserLink.integrationType, safeQuery.data.integrationType)
+    );
+  }
+
   const [existingLink] = await db
     .select()
     .from(integrationUserLink)
@@ -97,6 +103,7 @@ app.get("/associate", async (c) => {
 
   await db.insert(integrationUserLink).values({
     integrationId: safeQuery.data.integrationId,
+    integrationType: safeQuery.data.integrationType,
     userId: userId,
     externalUserId: safeQuery.data.externalUserId,
     externalUserName: safeQuery.data.externalUserName,
