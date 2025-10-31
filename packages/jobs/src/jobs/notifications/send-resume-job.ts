@@ -10,23 +10,9 @@ import {
   usersOnTeams,
 } from "@mimir/db/schema";
 import { getTaskMarkdownLink } from "@mimir/utils/tasks";
-import { logger, metadata, schedules, schemaTask } from "@trigger.dev/sdk";
+import { logger, schedules } from "@trigger.dev/sdk";
 import { generateText } from "ai";
-import {
-  and,
-  asc,
-  count,
-  desc,
-  eq,
-  gt,
-  gte,
-  inArray,
-  isNotNull,
-  max,
-  sql,
-} from "drizzle-orm";
-import { act } from "react";
-import z from "zod";
+import { and, asc, desc, eq, gte, inArray, isNotNull } from "drizzle-orm";
 import { sendNotificationJob } from "./send-notification-job";
 
 export const sendResumeJob = schedules.task({
@@ -137,7 +123,10 @@ export const sendResumeJob = schedules.task({
         ).toLocaleDateString();
 
         if (activity.activities.type === "task_created") {
-          return `- Task "${getTaskMarkdownLink(taskId, taskTitle)}" was created by ${userName} on ${createdAt}.`;
+          return `- Task "${getTaskMarkdownLink(
+            taskId,
+            taskTitle
+          )}" was created by ${userName} on ${createdAt}.`;
         }
 
         if (activity.activities.type === "task_column_changed") {
@@ -150,7 +139,10 @@ export const sendResumeJob = schedules.task({
           if (newColumn) {
             newValue = `${newValue} (type: ${newColumn.type})`;
           }
-          return `- Task "${getTaskMarkdownLink(taskId, taskTitle)}" moved to "${newValue}" by ${userName} on ${createdAt}.`;
+          return `- Task "${getTaskMarkdownLink(
+            taskId,
+            taskTitle
+          )}" moved to "${newValue}" by ${userName} on ${createdAt}.`;
           // return `- Task "${getTaskMarkdownLink(taskId, taskTitle)}" was moved to ${activity.activities.metadata?.columnName} column by ${userName} on ${createdAt}.`;
         }
 
@@ -173,7 +165,10 @@ export const sendResumeJob = schedules.task({
               return `- ${key}: "${oldValue}" => "${newValue}"`;
             })
             .join("\n");
-          return `- Task "${getTaskMarkdownLink(taskId, taskTitle)}" was updated by ${userName} on ${createdAt}.\n\tChanges:\n${changesText}`;
+          return `- Task "${getTaskMarkdownLink(
+            taskId,
+            taskTitle
+          )}" was updated by ${userName} on ${createdAt}.\n\tChanges:\n${changesText}`;
         }
 
         return null;
@@ -184,10 +179,16 @@ export const sendResumeJob = schedules.task({
 
     const text = await generateText({
       model: "openai/gpt-4o",
-      prompt: `You are Mimir, a helpful assistant. Provide a concise summary of the following activities for the team ${team.name}.
+      prompt: `You are Mimir, a helpful assistant. Provide a concise summary of the following activities for the team ${
+        team.name
+      }.
 
       Activities (one per line):
-      ${activitiesContext.length > 0 ? activitiesContext.join("\n") : "No activities found."}
+      ${
+        activitiesContext.length > 0
+          ? activitiesContext.join("\n")
+          : "No activities found."
+      }
         
 
       RESPONSE GUIDELINES:
