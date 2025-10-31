@@ -20,6 +20,7 @@
     "@mimir/utils": "workspace:*",
     "ai": "^5.0.56",
     "drizzle-orm": "^0.44.5",
+    "resend": "^6.1.2",
     "redis": "^5.8.2",
     "snakecase-keys": "^9.0.2",
     "ws": "^8.18.3",

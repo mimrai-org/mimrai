@@ -211,7 +211,11 @@ export const initMattermostSingle = async (
                 // associate the user
 
                 // send the association linking message
-                const url = `${process.env.API_URL}/api/integrations/mattermost/associate?integrationId=${integration.id}&mattermostUserId=${senderId}&mattermostUserName=${encodeURIComponent(
+                const url = `${
+                  process.env.API_URL
+                }/api/integrations/mattermost/associate?integrationId=${
+                  integration.id
+                }&mattermostUserId=${senderId}&mattermostUserName=${encodeURIComponent(
                   senderName
                 )}`;
                 await client.createPost({
@@ -266,7 +270,9 @@ export const initMattermostSingle = async (
                   const systemPrompt = `${generateSystemPrompt(userContext)}
                    
                   If you create a task add the next link to the task description to allow easy access to the context, append at the end of the description and use markdown format:
-                  CONTEXT LINK: [Context Link](${integration.config.url}/${teamName}/pl/${threadId})
+                  CONTEXT LINK: [Context Link](${
+                    integration.config.url
+                  }/${teamName}/pl/${threadId})
                   `;
 
                   if (threadId) {

@@ -20,6 +20,7 @@
     "@mattermost/client": "^10.12.0",
     "@mimir/cache": "workspace:*",
     "@mimir/db": "workspace:*",
+    "@mimir/utils": "workspace:*",
     "ai": "^5.0.56",
     "drizzle-orm": "^0.44.5",
     "redis": "^5.8.2",
