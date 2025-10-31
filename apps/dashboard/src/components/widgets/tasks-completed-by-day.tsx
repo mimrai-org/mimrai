@@ -49,7 +49,10 @@ export const TasksCompletedByDay = () => {
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
-				<ChartContainer config={chartConfig} className="h-48 w-full">
+				<ChartContainer
+					config={chartConfig}
+					className="aspect-auto h-48 w-full"
+				>
 					<LineChart
 						accessibilityLayer
 						data={data || []}
@@ -71,9 +74,17 @@ export const TasksCompletedByDay = () => {
 							content={<ChartTooltipContent hideLabel />}
 						/>
 						<Line
-							dataKey={"completedCount"}
-							type={"linear"}
-							stroke="var(--primary)"
+							dataKey={"taskCompletedCount"}
+							type={"monotone"}
+							stroke="var(--chart-2)"
+							strokeWidth={2}
+							dot={false}
+						/>
+						<Line
+							dataKey={"checklistItemsCompletedCount"}
+							type={"monotone"}
+							stroke="var(--chart-1)"
+							strokeDasharray={5}
 							strokeWidth={2}
 							dot={false}
 						/>

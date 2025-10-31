@@ -28,6 +28,7 @@ export const checklistsRouter = router({
       return await createChecklistItem({
         ...input,
         teamId: ctx.user.teamId!,
+        userId: ctx.user.id,
       });
     }),
 
@@ -37,6 +38,7 @@ export const checklistsRouter = router({
       return updateChecklistItem({
         ...input,
         teamId: ctx.user.teamId!,
+        userId: ctx.user.id,
       });
     }),
 

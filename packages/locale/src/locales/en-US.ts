@@ -38,6 +38,10 @@ export const en = {
         title: "Mentioned",
         description: "Notify me when I am mentioned in a task or comment.",
       },
+      checklist_item_completed: {
+        title: "Checklist Item Completed",
+        description: "Notify me when a checklist item is completed on a task.",
+      },
     },
     channels: {
       in_app: "In-App",

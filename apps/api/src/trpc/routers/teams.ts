@@ -22,6 +22,7 @@ import {
 import {
   changeOwner,
   createTeam,
+  deleteTeam,
   getMemberById,
   getMembers,
   getTeamById,
@@ -282,5 +283,18 @@ export const teamsRouter = router({
         inviteId: input.inviteId,
         teamId: ctx.user.teamId!,
       });
+    }),
+
+  deleteTeam: protectedProcedure
+    .meta({ scopes: ["team:write"] })
+    .mutation(async ({ ctx }) => {
+      const team = await deleteTeam(ctx.user.teamId!);
+
+      // Cancel the subscription in Stripe if it exists
+      if (team.subscriptionId) {
+        await stripeClient.subscriptions.cancel(team.subscriptionId!);
+      }
+
+      return team;
     }),
 });

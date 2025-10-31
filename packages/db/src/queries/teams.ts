@@ -379,3 +379,8 @@ export const getMemberByEmail = async ({
     .limit(1);
   return member;
 };
+
+export const deleteTeam = async (teamId: string) => {
+  const [team] = await db.delete(teams).where(eq(teams.id, teamId)).returning();
+  return team;
+};

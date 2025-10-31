@@ -42,10 +42,10 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Slot } from "@radix-ui/react-slot";
+import { useComposedRefs } from "@ui/lib/compose-refs";
 import { cn } from "@ui/lib/utils";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { useComposedRefs } from "@/lib/compose-refs";
 
 const directions: string[] = [
 	KeyboardCode.Down,

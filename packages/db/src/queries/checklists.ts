@@ -1,6 +1,7 @@
 import { and, asc, eq, is, or, type SQL, sql } from "drizzle-orm";
 import { db } from "../index";
 import { checklistItems, users } from "../schema";
+import { createChecklistItemActivity } from "./activities";
 
 export const createChecklistItem = async ({
   taskId,
@@ -8,11 +9,13 @@ export const createChecklistItem = async ({
   assigneeId,
   attachments,
   teamId,
+  userId,
 }: {
   taskId?: string;
   teamId: string;
   description: string;
   assigneeId?: string;
+  userId?: string;
   attachments?: string[];
 }) => {
   const [nextOrder] = await db
@@ -34,6 +37,15 @@ export const createChecklistItem = async ({
       order: nextOrder?.maxOrder ?? 1,
     })
     .returning();
+
+  if (!item) {
+    throw new Error("Failed to create checklist item");
+  }
+
+  createChecklistItemActivity({
+    checklistItem: item,
+    userId,
+  });
 
   return item;
 };
@@ -93,6 +105,7 @@ export const updateChecklistItem = async ({
   assigneeId,
   isCompleted,
   attachments,
+  userId,
   teamId,
 }: {
   id: string;
@@ -100,12 +113,23 @@ export const updateChecklistItem = async ({
   assigneeId?: string;
   isCompleted?: boolean;
   attachments?: string[];
+  userId?: string;
   teamId?: string;
 }) => {
   const whereClause: SQL[] = [eq(checklistItems.id, id)];
   if (teamId) {
     whereClause.push(eq(checklistItems.teamId, teamId));
   }
+
+  const [oldItem] = await db
+    .select()
+    .from(checklistItems)
+    .where(and(...whereClause));
+
+  if (!oldItem) {
+    throw new Error("Checklist item not found");
+  }
+
   const [item] = await db
     .update(checklistItems)
     .set({
@@ -116,6 +140,16 @@ export const updateChecklistItem = async ({
     })
     .where(and(...whereClause))
     .returning();
+
+  if (!item) {
+    throw new Error("Checklist item not found");
+  }
+
+  createChecklistItemActivity({
+    checklistItem: item,
+    oldChecklistItem: oldItem,
+    userId,
+  });
 
   return item;
 };

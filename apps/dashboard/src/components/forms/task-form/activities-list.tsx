@@ -142,6 +142,17 @@ const ActivityItem = ({
 				</div>
 			);
 		}
+		case "checklist_item_created": {
+			return (
+				<div className="flex items-center px-4 text-muted-foreground text-xs">
+					<AssigneeAvatar {...activity.user} className="mr-2 size-4 text-xs" />
+					<span className="mr-1 font-medium">{activity.user!.name}</span>
+					created a checklist item
+					<DotIcon />
+					{formatRelative(new Date(activity.createdAt!), new Date())}
+				</div>
+			);
+		}
 		default:
 			return null;
 	}

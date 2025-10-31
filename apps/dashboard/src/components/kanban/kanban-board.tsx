@@ -91,10 +91,15 @@ export function KanbanBoard() {
 				<TasksFilters />
 				<Button
 					size={"sm"}
-					onClick={() => setColumnParams({ createColumn: true })}
+					onClick={() =>
+						setParams({
+							createTask: true,
+							taskColumnId: columns?.data[0]?.id || null,
+						})
+					}
 				>
 					<PlusIcon />
-					Add Column
+					Add Task
 				</Button>
 			</div>
 			<Kanban.Root

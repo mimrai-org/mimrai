@@ -1,3 +1,4 @@
+export * from "./checklist-item-completed";
 export * from "./checklist-item-created";
 export * from "./mention";
 export * from "./resume-generated";

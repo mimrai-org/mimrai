@@ -50,6 +50,13 @@ export const allNotificationTypes: NotificationType[] = [
     category: "tasks",
     order: 5,
   },
+  {
+    type: "checklist_item_completed",
+    channels: ["mattermost"],
+    showInSettings: true,
+    category: "tasks",
+    order: 6,
+  },
 ];
 
 // Get all notification types (including hidden ones)

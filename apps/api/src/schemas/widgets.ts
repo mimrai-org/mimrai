@@ -1,6 +1,6 @@
 import z from "zod";
 
-export const getTasksCompletedByDaySchema = z.object({
+export const getWidgetSchema = z.object({
   startDate: z.coerce.date(),
   endDate: z.coerce.date(),
 });

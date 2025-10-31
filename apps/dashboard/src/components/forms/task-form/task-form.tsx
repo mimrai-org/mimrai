@@ -20,7 +20,7 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Editor as EditorInstance } from "@tiptap/react";
 import { format, formatRelative } from "date-fns";
-import { ChevronDownIcon } from "lucide-react";
+import { ChevronDownIcon, Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useDebounceValue } from "usehooks-ts";
@@ -104,7 +104,7 @@ export const TaskForm = ({
 		}),
 	);
 
-	const { mutate: createTask } = useMutation(
+	const { mutate: createTask, isPending: isPendingCreate } = useMutation(
 		trpc.tasks.create.mutationOptions({
 			onSuccess: (task) => {
 				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
@@ -117,7 +117,7 @@ export const TaskForm = ({
 		}),
 	);
 
-	const { mutate: updateTask } = useMutation(
+	const { mutate: updateTask, isPending: isPendingUpdate } = useMutation(
 		trpc.tasks.update.mutationOptions({
 			onSuccess: (task) => {
 				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
@@ -436,9 +436,14 @@ export const TaskForm = ({
 												size={"sm"}
 												className="text-xs"
 												disabled={
-													!form.formState.isDirty || form.formState.isSubmitting
+													!form.formState.isDirty ||
+													isPendingCreate ||
+													isPendingUpdate
 												}
 											>
+												{(isPendingCreate || isPendingUpdate) && (
+													<Loader2 className="animate-spin" />
+												)}
 												{defaultValues?.id
 													? `Last saved at ${format(lastSavedDate, "PP, p")}`
 													: "Create Task"}

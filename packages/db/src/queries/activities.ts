@@ -14,7 +14,8 @@ import {
   activities,
   type activitySourceEnum,
   type activityTypeEnum,
-  type tasks,
+  type checklistItems,
+  tasks,
   users,
 } from "../schema";
 import { getColumnById } from "./columns";
@@ -53,7 +54,7 @@ export const createActivity = async (input: CreateActivityInput) => {
           eq(activities.groupId, input.groupId),
           eq(activities.userId, userId),
           eq(activities.type, input.type),
-          gte(activities.createdAt, sql`now() - interval '5 minutes'`)
+          gte(activities.createdAt, sql`now() - interval '30 minutes'`)
         )
       )
       .orderBy(desc(activities.createdAt))
@@ -357,4 +358,89 @@ export const getActivityById = async (id: string) => {
     .limit(1);
 
   return activity;
+};
+
+export const createChecklistItemActivity = async ({
+  checklistItem,
+  oldChecklistItem,
+  userId,
+}: {
+  checklistItem: InferSelectModel<typeof checklistItems>;
+  oldChecklistItem?: InferSelectModel<typeof checklistItems>;
+  userId?: string;
+}) => {
+  let definedUserId = userId;
+
+  // If userId is not set, get system user id
+  if (!definedUserId) definedUserId = (await getSystemUser())!.id;
+
+  if (checklistItem.taskId) {
+    const [task] = await db
+      .select()
+      .from(tasks)
+      .where(
+        and(
+          eq(tasks.id, checklistItem.taskId),
+          eq(tasks.teamId, checklistItem.teamId)
+        )
+      )
+      .limit(1);
+
+    if (!task) return;
+
+    if (oldChecklistItem) {
+      const changes: Partial<
+        Record<"title" | "isCompleted", Record<string, any>>
+      > = {};
+      if (oldChecklistItem.isCompleted !== checklistItem.isCompleted) {
+        changes.isCompleted = {
+          value: checklistItem.isCompleted,
+          oldValue: oldChecklistItem.isCompleted,
+        };
+      }
+
+      if (changes.isCompleted?.value && !changes.isCompleted?.oldValue) {
+        await createActivity({
+          userId: definedUserId,
+          teamId: checklistItem.teamId,
+          groupId: checklistItem.taskId,
+          type: "checklist_item_completed",
+          metadata: {
+            checklistItemId: checklistItem.id,
+            title: task.title,
+            subscribers: task.subscribers,
+          },
+          source: "checklist_item",
+        });
+
+        delete changes.isCompleted;
+      } else if (changes.isCompleted?.oldValue && !changes.isCompleted?.value) {
+        // Delete checklist item completed activity for the same checklist item since only one can exist
+        await db
+          .delete(activities)
+          .where(
+            and(
+              eq(activities.groupId, checklistItem.taskId),
+              sql`${activities.metadata}->>'checklistItemId' = ${checklistItem.id}`,
+              eq(activities.type, "checklist_item_completed")
+            )
+          );
+
+        delete changes.isCompleted;
+      }
+    } else {
+      await createActivity({
+        userId: definedUserId,
+        teamId: checklistItem.teamId,
+        groupId: checklistItem.taskId,
+        type: "checklist_item_created",
+        metadata: {
+          checklistItemId: checklistItem.id,
+          title: task.title,
+          subscribers: task.subscribers,
+        },
+        source: "checklist_item",
+      });
+    }
+  }
 };

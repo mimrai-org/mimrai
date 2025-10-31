@@ -109,7 +109,7 @@ export const users = pgTable(
       name: "user_team_id_fkey",
       columns: [table.teamId],
       foreignColumns: [teams.id],
-    }),
+    }).onDelete("set null"),
   ]
 );
 
