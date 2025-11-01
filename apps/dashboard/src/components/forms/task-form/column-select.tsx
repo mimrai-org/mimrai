@@ -3,7 +3,7 @@ import { FormControl, FormField, FormItem, FormLabel } from "@mimir/ui/form";
 import { useFormContext } from "react-hook-form";
 import { ColumnIcon } from "@/components/column-icon";
 import { trpc } from "@/utils/trpc";
-import type { TaskFormValues } from "./task-form";
+import type { TaskFormValues } from "./form";
 
 export const ColumnSelect = () => {
 	const form = useFormContext<TaskFormValues>();

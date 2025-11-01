@@ -22,7 +22,7 @@ import {
 import { formatRelative } from "date-fns";
 import { CalendarSyncIcon, ChevronDownIcon } from "lucide-react";
 import { useFormContext } from "react-hook-form";
-import type { TaskFormValues } from "./task-form";
+import type { TaskFormValues } from "./form";
 
 const formatFrequency = (frequency: string) => {
 	if (frequency === "daily") {

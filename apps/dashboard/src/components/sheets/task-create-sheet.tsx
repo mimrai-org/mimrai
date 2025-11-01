@@ -6,7 +6,7 @@ import {
 	DialogTitle,
 } from "@mimir/ui/dialog";
 import { useTaskParams } from "@/hooks/use-task-params";
-import { TaskForm } from "../forms/task-form/task-form";
+import { TaskForm } from "../forms/task-form/form";
 
 export const TaskCreateSheet = () => {
 	const { createTask, taskColumnId, setParams } = useTaskParams();

@@ -7,6 +7,7 @@ export const Logo = ({ className }: { className?: string }) => {
 			alt="Mimir Logo"
 			width={32}
 			height={32}
+			loading="lazy"
 			className={className}
 		/>
 	);

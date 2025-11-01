@@ -33,14 +33,14 @@ import { trpc } from "@/utils/trpc";
 import { Assignee, AssigneeAvatar } from "../../kanban/asignee";
 import { TaskActivitiesList } from "./activities-list";
 import { TaskAttachments } from "./attachments";
+import { TaskChecklist } from "./checklist";
 import { ColumnSelect } from "./column-select";
 import { CommentInput } from "./comment-input";
+import { TaskDuplicated } from "./duplicated";
 import { LabelInput } from "./label-input";
 import { Recurring } from "./recurring";
 import { SmartInput } from "./smart-input";
 import { SubscribersList } from "./subscribers-list";
-import { TaskDuplicated } from "./task-duplicated";
-import { TaskChecklist } from "./tasks-checklist";
 
 export const taskFormSchema = z.object({
 	id: z.string().optional(),

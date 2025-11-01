@@ -6,7 +6,7 @@ import { ArrowUpIcon, Loader2Icon } from "lucide-react";
 import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/utils/trpc";
-import { TaskDuplicated } from "./task-duplicated";
+import { TaskDuplicated } from "./duplicated";
 
 export const SmartInput = ({
 	onFinish,

@@ -29,7 +29,6 @@ import {
 } from "@ui/components/ui/collapsible";
 import { Switch } from "@ui/components/ui/switch";
 import { EllipsisIcon, FileIcon, PlusIcon, SaveIcon } from "lucide-react";
-import { motion } from "motion/react";
 import ms from "ms";
 import Image from "next/image";
 import { useEffect, useState } from "react";
