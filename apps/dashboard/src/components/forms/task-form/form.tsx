@@ -266,8 +266,20 @@ export const TaskForm = ({
 															placeholder="Add description..."
 															value={field.value ?? ""}
 															onChange={(value) => {
-																console.log("ref", editorRef.current);
 																field.onChange(value);
+															}}
+															shouldInsertImage={true}
+															onUpload={async (url) => {
+																const currentValue =
+																	form.getValues("attachments") ?? [];
+																form.setValue(
+																	"attachments",
+																	[...currentValue, url],
+																	{
+																		shouldDirty: true,
+																		shouldValidate: true,
+																	},
+																);
 															}}
 															ref={editorRef}
 														/>

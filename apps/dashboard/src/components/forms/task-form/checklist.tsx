@@ -385,11 +385,14 @@ export const TaskChecklistItemForm = ({
 										className="py-2"
 										autoFocus
 										// className="border border-input p-2 text-accent-foreground placeholder:text-accent-foreground dark:bg-input/30"
-										placeholder="Enter a description"
+										placeholder="Enter a description..."
 										onUpload={async (url) => {
 											const currentValue = form.getValues("attachments") ?? [];
 											console.log("currentValue", currentValue);
-											form.setValue("attachments", [...currentValue, url]);
+											form.setValue("attachments", [...currentValue, url], {
+												shouldDirty: true,
+												shouldValidate: true,
+											});
 										}}
 									/>
 								</FormControl>
@@ -434,6 +437,7 @@ export const TaskChecklistItemForm = ({
 														Unassigned
 													</div>
 												)}
+												size="sm"
 												variant={"ghost"}
 												renderItem={(item) => <Assignee {...item} />}
 											/>
@@ -470,7 +474,7 @@ export const ChecklistItemAttachments = ({
 							<ContextMenu>
 								<ContextMenuTrigger>
 									<div className="group relative">
-										{url.includes("image") ? (
+										{url.match(/\.(jpg|jpeg|png|gif|webp|svg)/i) ? (
 											<Image
 												src={url}
 												alt="File"

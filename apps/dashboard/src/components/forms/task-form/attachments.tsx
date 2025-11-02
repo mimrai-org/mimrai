@@ -13,7 +13,7 @@ export const TaskAttachments = ({
 	return (
 		<div className="">
 			<FormLabel className="mb-4">Attachments</FormLabel>
-			<ul className="flex min-h-[32px] items-center gap-2 p-1">
+			<ul className="flex items-center gap-2 p-1">
 				{attachments?.map((attachment) => (
 					<li key={attachment} className="flex items-center">
 						<TaskAttachmentPreview attachment={attachment} />
@@ -30,17 +30,17 @@ export const TaskAttachmentPreview = ({
 	attachment: string;
 }) => {
 	const url = new URL(attachment);
-	const isImage = url.pathname.match(/\.(jpeg|jpg|gif|png)$/) != null;
+	const isImage = url.pathname.match(/\.(jpeg|jpg|gif|png)/) != null;
 
 	return (
 		<Dialog>
 			<DialogTrigger>
-				<div className="size-[64px] items-center justify-center overflow-hidden rounded-md bg-muted">
+				<div className="size-8 items-center justify-center overflow-hidden rounded-md bg-muted">
 					{isImage ? (
 						<Image
 							src={attachment}
 							alt=""
-							className="size-[64px] object-cover"
+							className="size-8 object-cover"
 							width={64}
 							height={64}
 						/>
