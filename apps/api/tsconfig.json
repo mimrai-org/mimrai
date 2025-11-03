@@ -27,7 +27,7 @@
 			"@api/*": ["src/*"],
 			"@db/*": ["../../packages/db/src/*"]
 		},
-		"types": ["bun-types"]
+		"types": ["@types/bun"]
 	},
 	"exclude": ["node_modules"],
 	"include": ["src/**/*.ts"]

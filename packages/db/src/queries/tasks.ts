@@ -225,7 +225,7 @@ export const createTask = async ({
 	columnId: string;
 	teamId: string;
 	order?: number;
-	priority?: "low" | "medium" | "high";
+	priority?: "low" | "medium" | "high" | "urgent";
 	dueDate?: string;
 	attachments?: string[];
 	mentions?: string[];
@@ -311,7 +311,7 @@ export const updateTask = async ({
 	columnId?: string;
 	teamId?: string;
 	order?: number;
-	priority?: "low" | "medium" | "high";
+	priority?: "low" | "medium" | "high" | "urgent";
 	dueDate?: string;
 	attachments?: string[];
 	mentions?: string[];

@@ -15,7 +15,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient, trpc } from "@/utils/trpc";
 import { ColumnIcon } from "../column-icon";
 import { Assignee, AssigneeAvatar } from "./asignee";
-import { PriorityBadge } from "./priority";
+import { PriorityItem } from "./priority";
 
 export const TaskContextMenu = ({
 	task,
@@ -141,14 +141,14 @@ export const TaskContextMenu = ({
 						Priority
 					</ContextMenuSubTrigger>
 					<ContextMenuSubContent className="w-32">
-						{["low", "medium", "high"].map((level) => (
+						{["low", "medium", "high", "urgent"].map((level) => (
 							<ContextMenuItem
 								key={level}
 								onClick={handleUpdateTask.bind(null, {
 									priority: level as any,
 								})}
 							>
-								<PriorityBadge value={level as any} />
+								<PriorityItem value={level as any} />
 							</ContextMenuItem>
 						))}
 					</ContextMenuSubContent>

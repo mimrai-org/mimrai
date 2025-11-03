@@ -26,7 +26,7 @@ import { toast } from "sonner";
 import { useDebounceValue } from "usehooks-ts";
 import z from "zod";
 import { Editor } from "@/components/editor";
-import { Priority, PriorityBadge } from "@/components/kanban/priority";
+import { Priority, PriorityItem } from "@/components/kanban/priority";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { trpc } from "@/utils/trpc";
@@ -50,7 +50,7 @@ export const taskFormSchema = z.object({
 	columnId: z.string().min(1),
 	dueDate: z.date().nullable().optional(),
 	labels: z.array(z.string()).optional(),
-	priority: z.enum(["low", "medium", "high"]).optional(),
+	priority: z.enum(["low", "medium", "high", "urgent"]).optional(),
 	attachments: z.array(z.string()).optional(),
 	showSmartInput: z.boolean().optional(),
 	recurring: z
@@ -417,6 +417,9 @@ export const TaskForm = ({
 																				Medium
 																			</SelectItem>
 																			<SelectItem value="high">High</SelectItem>
+																			<SelectItem value="urgent">
+																				Urgent
+																			</SelectItem>
 																		</SelectGroup>
 																	</SelectContent>
 																</Select>

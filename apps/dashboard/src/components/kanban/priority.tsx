@@ -5,13 +5,14 @@ import {
 	SignalLow,
 	SignalLowIcon,
 	SignalMediumIcon,
+	TriangleAlertIcon,
 } from "lucide-react";
 
 const PriorityTooltip = ({
 	value,
 	children,
 }: {
-	value: "low" | "medium" | "high";
+	value: "low" | "medium" | "high" | "urgent";
 	children: React.ReactNode;
 }) => {
 	return (
@@ -23,38 +24,34 @@ const PriorityTooltip = ({
 };
 
 const PriorityIcon = {
-	low: SignalLowIcon,
-	medium: SignalMediumIcon,
-	high: SignalHighIcon,
+	low: <SignalLowIcon className="size-4 text-muted-foreground" />,
+	medium: <SignalMediumIcon className="size-4" />,
+	high: <SignalHighIcon className="size-4 text-yellow-600" />,
+	urgent: <TriangleAlertIcon className="size-4 text-red-600" />,
 };
 
-export const Priority = ({ value }: { value: "low" | "medium" | "high" }) => {
+export const Priority = ({
+	value,
+}: {
+	value: "low" | "medium" | "high" | "urgent";
+}) => {
 	const Icon = PriorityIcon[value];
 	return (
 		<PriorityTooltip value={value}>
-			<div className="mb-1">
-				<Icon />
-			</div>
+			<div className="mb-1">{Icon}</div>
 		</PriorityTooltip>
 	);
 };
 
-export const PriorityBadge = ({
+export const PriorityItem = ({
 	value,
 }: {
-	value: "low" | "medium" | "high";
+	value: "low" | "medium" | "high" | "urgent";
 }) => {
-	if (value === "low") {
-		return <Badge variant="secondary">Low</Badge>;
-	}
-
-	if (value === "medium") {
-		return <Badge variant="default">Medium</Badge>;
-	}
-
-	if (value === "high") {
-		return <Badge variant="destructive">High</Badge>;
-	}
-
-	return null;
+	return (
+		<div className="flex gap-1">
+			{PriorityIcon[value]}
+			<span className="capitalize">{value}</span>
+		</div>
+	);
 };

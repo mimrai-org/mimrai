@@ -5,83 +5,83 @@ import z from "zod";
 import { getContext } from "../context";
 
 export const updateTaskToolSchema = z.object({
-  id: z
-    .string()
-    .describe("ID (uuid) of the task to update, get it from getTasks tool"),
-  title: z
-    .string()
-    .min(1)
-    .optional()
-    .describe(
-      "New title for the task, only provide if you want to update the title"
-    ),
-  description: z
-    .string()
-    .optional()
-    .describe(
-      "New description of the task, only provide if you want to update the description"
-    ),
-  dueDate: z
-    .string()
-    .optional()
-    .describe(
-      "New ISO date string, only provide if you want to update the due date"
-    ),
-  assigneeId: z
-    .string()
-    .optional()
-    .describe(
-      "New ID of the user to assign the task to, only provide if you want to update the assignee, use the getUsers tool to get the ID"
-    ),
-  columnId: z
-    .string()
-    .optional()
-    .describe(
-      "New ID of the column to move the task to, the column is like the status of the task, use getColumns to retrieve the available columns, only provide if you want to update the column"
-    ),
+	id: z
+		.string()
+		.describe("ID (uuid) of the task to update, get it from getTasks tool"),
+	title: z
+		.string()
+		.min(1)
+		.optional()
+		.describe(
+			"New title for the task, only provide if you want to update the title",
+		),
+	description: z
+		.string()
+		.optional()
+		.describe(
+			"New description of the task, only provide if you want to update the description",
+		),
+	dueDate: z
+		.string()
+		.optional()
+		.describe(
+			"New ISO date string, only provide if you want to update the due date",
+		),
+	assigneeId: z
+		.string()
+		.optional()
+		.describe(
+			"New ID of the user to assign the task to, only provide if you want to update the assignee, use the getUsers tool to get the ID",
+		),
+	columnId: z
+		.string()
+		.optional()
+		.describe(
+			"New ID of the column to move the task to, the column is like the status of the task, use getColumns to retrieve the available columns, only provide if you want to update the column",
+		),
 
-  attachments: z
-    .array(z.url())
-    .optional()
-    .describe(
-      "New list of attachment URLs for the task, only provide if you want to update the attachments"
-    ),
+	attachments: z
+		.array(z.url())
+		.optional()
+		.describe(
+			"New list of attachment URLs for the task, only provide if you want to update the attachments",
+		),
 
-  priority: z
-    .enum(["low", "medium", "high"])
-    .optional()
-    .describe(
-      "New priority level for the task, only provide if you want to update the priority"
-    ),
+	priority: z
+		.enum(["low", "medium", "high", "urgent"])
+		.optional()
+		.describe(
+			"New priority level for the task, only provide if you want to update the priority",
+		),
 });
 
 export const updateTaskTool = tool({
-  description: "Update an existing task in your task manager",
-  inputSchema: updateTaskToolSchema,
-  execute: async function* (input) {
-    try {
-      const { db, user } = getContext();
+	description: "Update an existing task in your task manager",
+	inputSchema: updateTaskToolSchema,
+	execute: async function* (input) {
+		try {
+			const { db, user } = getContext();
 
-      yield { type: "text", text: `Updating task: ${input.title}` };
-      const [updatedTask] = await db
-        .update(tasks)
-        .set({
-          title: input.title,
-          description: input.description,
-          dueDate: input.dueDate
-            ? new Date(input.dueDate).toISOString()
-            : undefined,
-          columnId: input.columnId,
-          assigneeId: input.assigneeId,
-          teamId: user.teamId,
-          priority: input.priority,
-        })
-        .where(and(eq(tasks.id, input.id), eq(tasks.teamId, user.teamId)))
-        .returning();
+			yield { type: "text", text: `Updating task: ${input.title}` };
+			const [updatedTask] = await db
+				.update(tasks)
+				.set({
+					title: input.title,
+					description: input.description,
+					dueDate: input.dueDate
+						? new Date(input.dueDate).toISOString()
+						: undefined,
+					columnId: input.columnId,
+					assigneeId: input.assigneeId,
+					teamId: user.teamId,
+					priority: input.priority,
+				})
+				.where(and(eq(tasks.id, input.id), eq(tasks.teamId, user.teamId)))
+				.returning();
 
-      yield { type: "text", text: `Task updated: ${updatedTask.title}` };
-    } catch (error) {
-      console.error("Error updating task:", error);
-    }
-  },
+			yield { type: "text", text: `Task updated: ${updatedTask.title}` };
+		} catch (error) {
+			console.error("Error updating task:", error);
+		}
+	},
 });
