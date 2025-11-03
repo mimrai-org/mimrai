@@ -25,7 +25,6 @@ export const SmartInput = ({
 
 	const handleSubmit = () => {
 		const prompt = inputRef.current?.value;
-		console.log("Prompt:", prompt);
 		if (prompt && prompt.trim().length > 0) {
 			mutate({ prompt });
 		}

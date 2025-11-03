@@ -66,8 +66,6 @@ export const TasksCompletedByMember = () => {
 		),
 	);
 
-	console.log({ completedData, assignedData });
-
 	return (
 		<Card>
 			<CardHeader>

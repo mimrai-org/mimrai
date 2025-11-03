@@ -36,7 +36,6 @@ export const Messages = () => {
 
 								default: {
 									if (part.type.startsWith("tool-")) {
-										console.log("Rendering tool part:", part);
 										return (
 											<Fragment key={`${message.id}-${index}`}>
 												<Message from={message.role}>

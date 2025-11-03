@@ -388,7 +388,6 @@ export const TaskChecklistItemForm = ({
 										placeholder="Enter a description..."
 										onUpload={async (url) => {
 											const currentValue = form.getValues("attachments") ?? [];
-											console.log("currentValue", currentValue);
 											form.setValue("attachments", [...currentValue, url], {
 												shouldDirty: true,
 												shouldValidate: true,

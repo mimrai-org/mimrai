@@ -1,129 +1,125 @@
 import { stripeClient } from "@api/lib/payments";
 import { getMembers, getTeamById, updateTeamPlan } from "@db/queries/teams";
 import {
-  getPlanBySlug,
-  getSubscriptionItemByType,
-  type PlanSlug,
-  type PriceType,
+	getPlanBySlug,
+	getSubscriptionItemByType,
+	type PlanSlug,
+	type PriceType,
 } from "@mimir/utils/plans";
 
 export const updateSubscriptionUsersUsage = async ({
-  teamId,
+	teamId,
 }: {
-  teamId: string;
+	teamId: string;
 }) => {
-  const team = await getTeamById(teamId);
-  if (team.subscriptionId) {
-    const quantity = await getPriceQuantity({
-      teamId,
-      type: "users",
-    });
-    const subscription = await stripeClient.subscriptions.retrieve(
-      team.subscriptionId
-    );
-    const usersPrice = getSubscriptionItemByType(
-      "users",
-      team.plan!,
-      subscription
-    );
+	const team = await getTeamById(teamId);
+	if (team.subscriptionId) {
+		const quantity = await getPriceQuantity({
+			teamId,
+			type: "users",
+		});
+		const subscription = await stripeClient.subscriptions.retrieve(
+			team.subscriptionId,
+		);
+		const usersPrice = getSubscriptionItemByType(
+			"users",
+			team.plan!,
+			subscription,
+		);
 
-    console.log({
-      usersPrice,
-    });
-
-    if (usersPrice) {
-      await stripeClient.subscriptionItems.update(usersPrice.id, {
-        quantity,
-      });
-    }
-  }
+		if (usersPrice) {
+			await stripeClient.subscriptionItems.update(usersPrice.id, {
+				quantity,
+			});
+		}
+	}
 };
 
 export const getPriceQuantity = async ({
-  type,
-  teamId,
+	type,
+	teamId,
 }: {
-  type: PriceType;
-  teamId: string;
+	type: PriceType;
+	teamId: string;
 }) => {
-  switch (type) {
-    case "users": {
-      const members = await getMembers({ teamId });
-      return members.length;
-    }
-    default:
-      return 0;
-  }
+	switch (type) {
+		case "users": {
+			const members = await getMembers({ teamId });
+			return members.length;
+		}
+		default:
+			return 0;
+	}
 };
 
 export const buildSubscriptionItems = async ({
-  planSlug,
-  teamId,
-  recurringInterval,
+	planSlug,
+	teamId,
+	recurringInterval,
 }: {
-  planSlug: PlanSlug;
-  teamId: string;
-  recurringInterval: "monthly" | "yearly";
+	planSlug: PlanSlug;
+	teamId: string;
+	recurringInterval: "monthly" | "yearly";
 }) => {
-  const plan = getPlanBySlug(planSlug);
-  if (!plan) {
-    throw new Error("Plan not found");
-  }
-  const prices = plan.pricesIds[recurringInterval];
-  const pricesWithQuantities = await Promise.all(
-    Object.keys(prices).map(async (priceType) => ({
-      price: prices[priceType as PriceType],
-      quantity: await getPriceQuantity({
-        type: priceType as PriceType,
-        teamId,
-      }),
-    }))
-  );
-  return pricesWithQuantities;
+	const plan = getPlanBySlug(planSlug);
+	if (!plan) {
+		throw new Error("Plan not found");
+	}
+	const prices = plan.pricesIds[recurringInterval];
+	const pricesWithQuantities = await Promise.all(
+		Object.keys(prices).map(async (priceType) => ({
+			price: prices[priceType as PriceType],
+			quantity: await getPriceQuantity({
+				type: priceType as PriceType,
+				teamId,
+			}),
+		})),
+	);
+	return pricesWithQuantities;
 };
 
 export const createTrialSubscription = async ({
-  teamId,
-  recurringInterval,
+	teamId,
+	recurringInterval,
 }: {
-  teamId: string;
-  recurringInterval: "monthly" | "yearly";
+	teamId: string;
+	recurringInterval: "monthly" | "yearly";
 }) => {
-  const team = await getTeamById(teamId);
-  if (!team) {
-    throw new Error("Team not found");
-  }
-  const plan = getPlanBySlug("starter"); // Default to starter plan
+	const team = await getTeamById(teamId);
+	if (!team) {
+		throw new Error("Team not found");
+	}
+	const plan = getPlanBySlug("starter"); // Default to starter plan
 
-  if (!plan) {
-    throw new Error("Plan not found");
-  }
+	if (!plan) {
+		throw new Error("Plan not found");
+	}
 
-  const items = await buildSubscriptionItems({
-    planSlug: plan.slug,
-    teamId: team.id,
-    recurringInterval,
-  });
+	const items = await buildSubscriptionItems({
+		planSlug: plan.slug,
+		teamId: team.id,
+		recurringInterval,
+	});
 
-  const subscription = await stripeClient.subscriptions.create({
-    customer: team.customerId!,
-    items,
-    trial_period_days: 14,
-    trial_settings: {
-      end_behavior: {
-        missing_payment_method: "cancel",
-      },
-    },
-    metadata: {
-      planName: plan.name,
-      teamId: team.id,
-    },
-  });
+	const subscription = await stripeClient.subscriptions.create({
+		customer: team.customerId!,
+		items,
+		trial_period_days: 14,
+		trial_settings: {
+			end_behavior: {
+				missing_payment_method: "cancel",
+			},
+		},
+		metadata: {
+			planName: plan.name,
+			teamId: team.id,
+		},
+	});
 
-  await updateTeamPlan({
-    subscriptionId: subscription.id,
-    plan: plan.slug,
-    customerId: team.customerId!,
-    canceledAt: null,
-  });
+	await updateTeamPlan({
+		subscriptionId: subscription.id,
+		plan: plan.slug,
+		customerId: team.customerId!,
+		canceledAt: null,
+	});
 };

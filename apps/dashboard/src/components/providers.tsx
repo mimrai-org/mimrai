@@ -5,7 +5,6 @@ import { queryClient } from "@/utils/trpc";
 import { ThemeProvider } from "./theme-provider";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
-	console.log("providers");
 	return (
 		<QueryClientProvider client={queryClient}>
 			<ThemeProvider
