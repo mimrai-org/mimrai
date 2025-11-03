@@ -41,7 +41,6 @@ export function NavUser({
 	const router = useRouter();
 	const { isMobile } = useSidebar();
 	if (!user) return null;
-	console.log(user);
 
 	return (
 		<SidebarMenu>

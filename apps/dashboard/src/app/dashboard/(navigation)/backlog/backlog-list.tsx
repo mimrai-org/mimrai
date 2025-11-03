@@ -52,8 +52,8 @@ export const BacklogList = () => {
 
 	if (listData.length === 0 && !isLoading && !hasFilters) {
 		return (
-			<div className="mt-12 flex flex-col items-start justify-center gap-2 px-8 text-center">
-				<h3 className="flex items-center gap-2 font-runic text-3xl uppercase">
+			<div className="flex flex-col items-start justify-center gap-2 text-center">
+				<h3 className="flex items-center gap-2 text-3xl uppercase">
 					no tasks in your backlog
 				</h3>
 				<p className="max-w-md text-balance text-muted-foreground text-sm">

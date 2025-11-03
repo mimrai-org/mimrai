@@ -41,6 +41,21 @@ export const KanbanAssignee = ({ task }: { task: KanbanTask }) => {
 					<Command>
 						<CommandInput placeholder="Search..." />
 						<CommandGroup>
+							<PopoverClose className="w-full">
+								<CommandItem
+									onSelect={() => {
+										updateTask({
+											id: task.id,
+											assigneeId: null,
+										});
+									}}
+								>
+									<div className="flex items-center gap-2">
+										<AssigneeAvatar />
+										Unassigned
+									</div>
+								</CommandItem>
+							</PopoverClose>
 							{data?.map((member) => (
 								<PopoverClose key={member.id} className="w-full">
 									<CommandItem

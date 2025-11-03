@@ -10,11 +10,11 @@ type Props = {
 
 export default function DashboardPage({ searchParams }: Props) {
 	return (
-		<div className="mx-6">
+		<div className="">
 			<ChatProvider>
 				<div className="flex flex-row gap-6">
 					{/*<ChatContainer chatId={chatId} />*/}
-					<div className="h-full w-full overflow-hidden py-4">
+					<div className="h-full w-full overflow-hidden">
 						<Suspense>
 							<KanbanBoard />
 						</Suspense>

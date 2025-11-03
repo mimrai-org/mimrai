@@ -17,7 +17,7 @@ export default function DashboardLayout({
 					<AppSidebar collapsible="icon" />
 					<SidebarInset>
 						<Header />
-						<main className="flex flex-1 flex-col">{children}</main>
+						<main className="flex flex-1 flex-col px-6 pt-6">{children}</main>
 					</SidebarInset>
 				</SidebarProvider>
 			</Suspense>

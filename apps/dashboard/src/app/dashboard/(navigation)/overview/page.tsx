@@ -3,7 +3,7 @@ import { TasksCompletedByMember } from "@/components/widgets/tasks-completed-by-
 
 export default function Page() {
 	return (
-		<div className="flex flex-col gap-8 p-6">
+		<div className="flex flex-col gap-8">
 			<div className="w-full">
 				<TasksCompletedByDay />
 			</div>

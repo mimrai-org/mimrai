@@ -12,12 +12,6 @@ import {
 } from "@mimir/ui/context-menu";
 import { LabelBadge } from "@mimir/ui/label-badge";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import {
-	ArrowUpNarrowWideIcon,
-	FlagIcon,
-	TrashIcon,
-	UserIcon,
-} from "lucide-react";
 import { queryClient, trpc } from "@/utils/trpc";
 import { ColumnIcon } from "../column-icon";
 import { Assignee, AssigneeAvatar } from "./asignee";

@@ -23,6 +23,7 @@ import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
 import { useUser } from "@/hooks/use-user";
+import { SidebarSubscriptionStatus } from "./sidebar-subscription-status";
 import { TeamSwitcher } from "./team-switcher";
 
 type Item = {
@@ -83,21 +84,18 @@ const data: {
 					title: "Columns",
 					url: "/dashboard/settings/columns",
 				},
+				{
+					title: "Notifications",
+					url: "/dashboard/settings/notifications",
+				},
+				{
+					title: "Integrations",
+					url: "/dashboard/settings/integrations",
+				},
 			],
 		},
 	],
-	navSecondary: [
-		{
-			title: "Support",
-			url: "#",
-			icon: LifeBuoy,
-		},
-		{
-			title: "Feedback",
-			url: "#",
-			icon: Send,
-		},
-	],
+	navSecondary: [],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -109,30 +107,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				<SidebarMenu>
 					<SidebarMenuItem>
 						<SidebarMenuButton size="lg" asChild className="">
-							<div className="">
+							<div>
 								<TeamSwitcher />
 							</div>
-							{/*<a
-								href="/#"
-								className="flex items-center border border-transparent py-2 opacity-90 hover:bg-transparent hover:opacity-100"
-							>
-								<div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-									<Command className="size-4" />
-								</div>
-								<div className="grid flex-1 text-left text-sm leading-tight">
-									<span className="truncate font-medium">
-										{user?.team?.name}
-									</span>
-									<span className="truncate text-xs">{user?.team?.role}</span>
-								</div>
-							</a>*/}
 						</SidebarMenuButton>
 					</SidebarMenuItem>
 				</SidebarMenu>
 			</SidebarHeader>
 			<SidebarContent>
 				<NavMain items={data.navMain} />
-				<NavSecondary items={data.navSecondary} className="mt-auto" />
+				<div className="mt-auto mb-2 flex flex-col space-y-2">
+					<NavSecondary items={data.navSecondary} />
+					<SidebarSubscriptionStatus />
+				</div>
 			</SidebarContent>
 			<SidebarFooter className="border-t">
 				<NavUser user={user!} />

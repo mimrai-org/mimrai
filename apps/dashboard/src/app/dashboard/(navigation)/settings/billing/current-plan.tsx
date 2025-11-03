@@ -91,8 +91,10 @@ export const CurrentPlan = () => {
 			</CardHeader>
 			<CardContent>
 				{trialDaysLeft > 0 && (
-					<Alert variant={"destructive"}>
-						<AlertTitle>Free Trial</AlertTitle>
+					<Alert>
+						<AlertTitle className="text-yellow-600">
+							You're on a free trial
+						</AlertTitle>
 						<AlertDescription>
 							You are currently in a free trial with {trialDaysLeft} days left.
 						</AlertDescription>
