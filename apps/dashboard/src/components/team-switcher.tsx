@@ -53,9 +53,9 @@ export const TeamSwitcher = () => {
 					type="button"
 					className="flex w-full items-center gap-2 py-2 opacity-90 hover:bg-transparent hover:opacity-100 focus:outline-none"
 				>
-					<div className="flex aspect-square size-8 items-center justify-center rounded-sm bg-sidebar-primary text-sidebar-primary-foreground">
-						<Avatar className="size-6 text-base">
-							<AvatarFallback className="bg-primary text-primary-foreground">
+					<div className="flex aspect-square size-8 items-center justify-center rounded-nonde border border-primary bg-primary/80 text-sidebar-primary-foreground">
+						<Avatar className="size-6 bg-transparent text-base">
+							<AvatarFallback className="bg-transparent text-primary-foreground">
 								{user?.team?.name?.charAt(0).toUpperCase()}
 							</AvatarFallback>
 						</Avatar>

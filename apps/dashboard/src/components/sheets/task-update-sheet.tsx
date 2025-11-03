@@ -35,7 +35,7 @@ export const TaskUpdateSheet = () => {
 			</DialogHeader>
 			<DialogContent
 				showCloseButton={true}
-				className="min-h-[95vh] pt-0 sm:min-w-[60vw]"
+				className="min-h-[80vh] pt-0 sm:min-w-[60vw]"
 			>
 				{task ? (
 					<TaskForm
