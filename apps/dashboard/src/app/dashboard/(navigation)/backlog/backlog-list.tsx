@@ -74,7 +74,7 @@ export const BacklogList = () => {
 	}
 
 	return (
-		<div className="px-8 py-4">
+		<div className="">
 			<div className="flex justify-between">
 				<div>
 					<TasksFilters />
