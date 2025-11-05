@@ -20,6 +20,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUser } from "@/hooks/use-user";
 import { cn } from "@/lib/utils";
+import { CreateButton } from "./create-button";
 
 export function NavMain({
 	items,
@@ -40,8 +41,11 @@ export function NavMain({
 	const pathname = usePathname();
 
 	return (
-		<SidebarGroup>
+		<SidebarGroup className="pt-6">
 			<SidebarMenu>
+				<SidebarMenuItem className="mb-2">
+					<CreateButton />
+				</SidebarMenuItem>
 				{items.map((item) => {
 					const isActive =
 						pathname.startsWith(item.url) ||

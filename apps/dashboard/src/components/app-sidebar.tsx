@@ -4,6 +4,8 @@ import {
 	Sidebar,
 	SidebarContent,
 	SidebarFooter,
+	SidebarGroup,
+	SidebarGroupContent,
 	SidebarHeader,
 	SidebarMenu,
 	SidebarMenuButton,
@@ -20,6 +22,7 @@ import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
 import { useUser } from "@/hooks/use-user";
+import { CreateButton } from "./create-button";
 import { SidebarSubscriptionStatus } from "./sidebar-subscription-status";
 import { TeamSwitcher } from "./team-switcher";
 
