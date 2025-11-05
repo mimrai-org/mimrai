@@ -20,7 +20,7 @@ export const TeamDelete = () => {
 	const [teamName, setTeamName] = useState("");
 
 	const { mutate, isPending } = useMutation(
-		trpc.teams.deleteTeam.mutationOptions({
+		trpc.teams.delete.mutationOptions({
 			onSuccess: () => {
 				window.location.reload();
 			},
@@ -35,6 +35,10 @@ export const TeamDelete = () => {
 		if (!isValid) return;
 		mutate();
 	};
+
+	const canDelete = user?.team?.scopes?.includes("team:write");
+
+	if (!canDelete) return null;
 
 	return (
 		<Card className="border-destructive/50">

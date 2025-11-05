@@ -11,12 +11,33 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@ui/components/ui/popover";
+import { useMemo } from "react";
+import { cn } from "@/lib/utils";
 import { queryClient, trpc } from "@/utils/trpc";
 import { Assignee, AssigneeAvatar } from "../asignee";
 import type { KanbanTask } from "./kanban-task";
 
 export const KanbanAssignee = ({ task }: { task: KanbanTask }) => {
 	const { data, isLoading } = useQuery(trpc.teams.getMembers.queryOptions());
+
+	const coworkers = useMemo(() => {
+		const coworksersIds: string[] = [task.assigneeId].filter(
+			Boolean,
+		) as string[];
+		const checklistAssigneeIds =
+			task.checklistSummary?.checklist?.map((item) => item.assigneeId) ?? [];
+
+		return Array.from(
+			new Set(
+				[...coworksersIds, ...checklistAssigneeIds]
+					.flatMap(
+						(item) =>
+							(item ? data?.find((member) => member.id === item) : null)!,
+					)
+					.filter(Boolean),
+			),
+		).reverse();
+	}, [task.checklistSummary, data, task.assigneeId]);
 
 	const { mutate: updateTask, isPending } = useMutation(
 		trpc.tasks.update.mutationOptions({
@@ -35,7 +56,22 @@ export const KanbanAssignee = ({ task }: { task: KanbanTask }) => {
 		>
 			<Popover>
 				<PopoverTrigger>
-					<AssigneeAvatar {...task.assignee} />
+					<div className="flex items-center">
+						{coworkers.length > 0 && (
+							<div className="flex flex-row-reverse items-center">
+								{coworkers.map((coworker, index) => (
+									<div
+										key={coworker.id}
+										className={cn("-ml-4.5", {
+											"brightness-80": index !== coworkers.length - 1,
+										})}
+									>
+										<AssigneeAvatar {...coworker} />
+									</div>
+								))}
+							</div>
+						)}
+					</div>
 				</PopoverTrigger>
 				<PopoverContent>
 					<Command>

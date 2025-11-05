@@ -12,7 +12,13 @@ import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
 export const queryClient = new QueryClient({
 	queryCache: new QueryCache({
 		onError: (error) => {
-			console.error("Query Error:", error);
+			const safeError = error as { data?: { httpStatus?: number } };
+			const httpStatus = safeError.data?.httpStatus;
+			switch (httpStatus) {
+				case 401:
+					location.href = "/sign-in";
+					break;
+			}
 		},
 	}),
 });

@@ -66,7 +66,7 @@ export const TeamForm = ({
 	const { setParams } = useTeamParams();
 	const [openTimezone, setOpenTimezone] = useState(false);
 	const user = useUser();
-	const canWriteTeam = useScopes(["team:write"]);
+	const canWriteTeam = useScopes(["team:write"]) && !!defaultValues?.id;
 	const form = useZodForm(teamFormSchema, {
 		defaultValues: {
 			name: "",
@@ -75,7 +75,7 @@ export const TeamForm = ({
 			locale: DEFAULT_LOCALE,
 			...defaultValues,
 		},
-		disabled: !canWriteTeam,
+		disabled: !canWriteTeam && !!defaultValues?.id,
 	});
 
 	useEffect(() => {
@@ -86,7 +86,7 @@ export const TeamForm = ({
 		trpc.users.switchTeam.mutationOptions(),
 	);
 
-	const { mutateAsync: createTeam } = useMutation(
+	const { mutateAsync: createTeam, isPending: isCreating } = useMutation(
 		trpc.teams.create.mutationOptions({
 			onSuccess: async (team) => {
 				setParams(null);
@@ -253,10 +253,12 @@ export const TeamForm = ({
 					/>
 				</div>
 				{/* </ScrollArea> */}
-				{canWriteTeam && (
+				{(canWriteTeam || !defaultValues?.id) && (
 					<div className="flex items-center justify-end px-4">
-						<Button type="submit" disabled={isUpdating}>
-							{isUpdating && <Loader2 className="animate-spin" />}
+						<Button type="submit" disabled={isUpdating || isCreating}>
+							{(isUpdating || isCreating) && (
+								<Loader2 className="animate-spin" />
+							)}
 							Save
 						</Button>
 					</div>

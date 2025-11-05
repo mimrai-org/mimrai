@@ -11,8 +11,7 @@ import {
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ChevronsUpDownIcon, PlusIcon } from "lucide-react";
 import { useEffect } from "react";
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
+import { toast } from "sonner";
 import { useChatParams } from "@/hooks/use-chat-params";
 import { useTeamParams } from "@/hooks/use-team-params";
 import { useUser } from "@/hooks/use-user";
@@ -20,13 +19,22 @@ import { trpc } from "@/utils/trpc";
 
 export const TeamSwitcher = () => {
 	const user = useUser();
-	const { setParams } = useTeamParams();
+	const { setParams, teamId } = useTeamParams();
 	const { setParams: setChatParams } = useChatParams();
 	const { data: teams } = useQuery(trpc.teams.getAvailable.queryOptions());
 	const { setLocale } = useLocaleStore();
 
-	const { mutateAsync: switchTeamAsync } = useMutation(
-		trpc.users.switchTeam.mutationOptions(),
+	const { mutate: switchTeam } = useMutation(
+		trpc.users.switchTeam.mutationOptions({
+			onSuccess: () => {
+				setChatParams(null);
+				setParams(null);
+				window.location.reload();
+			},
+			onError: () => {
+				toast.error("Failed to switch team");
+			},
+		}),
 	);
 
 	useEffect(() => {
@@ -38,13 +46,12 @@ export const TeamSwitcher = () => {
 		}
 	}, [user?.team]);
 
-	const switchTeam = async (teamId: string) => {
-		const newUser = await switchTeamAsync({ teamId });
-		setChatParams(null);
-		window.location.reload();
-		// queryClient.setQueryData(trpc.users.getCurrent.queryKey(), newUser);
-		// queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
-	};
+	useEffect(() => {
+		if (!teamId) return;
+		switchTeam({
+			teamId,
+		});
+	}, [teamId]);
 
 	return (
 		<DropdownMenu>
@@ -81,7 +88,14 @@ export const TeamSwitcher = () => {
 				sideOffset={10}
 			>
 				{teams?.map((team) => (
-					<DropdownMenuItem key={team.id} onClick={() => switchTeam(team.id)}>
+					<DropdownMenuItem
+						key={team.id}
+						onClick={() =>
+							switchTeam({
+								teamId: team.id,
+							})
+						}
+					>
 						<Avatar className="size-6">
 							<AvatarFallback className="bg-primary text-primary-foreground">
 								{team.name.charAt(0).toUpperCase()}

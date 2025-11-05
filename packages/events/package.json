@@ -15,7 +15,12 @@
   "dependencies": {
     "@mimir/tsconfig": "workspace:*",
     "@openpanel/nextjs": "^1.0.8",
-    "@openpanel/sdk": "^1.0.0"
+    "@openpanel/sdk": "^1.0.0",
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "19.1.1"
+  }
 }

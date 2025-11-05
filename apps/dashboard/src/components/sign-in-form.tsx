@@ -10,6 +10,7 @@ import {
 } from "@mimir/ui/form";
 import { Input } from "@mimir/ui/input";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import z from "zod";
 import { useAuthParams } from "@/hooks/use-auth-params";
@@ -25,7 +26,8 @@ const schema = z.object({
 export default function SignInForm() {
 	useAuthParams();
 	const router = useRouter();
-	const { isPending } = authClient.useSession();
+	const [loading, setLoading] = useState(false);
+	const { isPending, data } = authClient.useSession();
 
 	const form = useZodForm(schema, {
 		defaultValues: {
@@ -34,7 +36,16 @@ export default function SignInForm() {
 		},
 	});
 
+	const handleSuccess = () => {
+		const callbackUrl = localStorage.getItem("callbackUrl") ?? "/redirect";
+
+		localStorage.removeItem("callbackUrl");
+		toast.success("Sign in successful");
+		window.location.href = callbackUrl;
+	};
+
 	const handleSubmit = async (data: z.infer<typeof schema>) => {
+		setLoading(true);
 		await authClient.signIn.email(
 			{
 				email: data.email,
@@ -44,12 +55,7 @@ export default function SignInForm() {
 				credentials: "include",
 				mode: "cors",
 				onSuccess: () => {
-					const callbackUrl =
-						localStorage.getItem("callbackUrl") ?? "/redirect";
-
-					localStorage.removeItem("callbackUrl");
-					toast.success("Sign in successful");
-					window.location.href = callbackUrl;
+					handleSuccess();
 				},
 				onError: (ctx) => {
 					if (ctx.error.status === 403) {
@@ -57,14 +63,17 @@ export default function SignInForm() {
 						return;
 					}
 					toast.error(ctx.error.message || ctx.error.statusText);
+					setLoading(false);
 				},
 			},
 		);
 	};
 
-	if (isPending) {
-		return <Loader />;
-	}
+	useEffect(() => {
+		if (data?.user) {
+			handleSuccess();
+		}
+	}, [data?.user]);
 
 	return (
 		<div className="mx-auto my-auto w-full max-w-lg p-6">
@@ -106,7 +115,12 @@ export default function SignInForm() {
 							</FormItem>
 						)}
 					/>
-					<Button type="submit" className="w-full" disabled={isPending}>
+					<Button
+						type="submit"
+						className="w-full"
+						disabled={isPending || loading}
+					>
+						{(isPending || loading) && <Loader />}
 						Sign In
 					</Button>
 				</form>

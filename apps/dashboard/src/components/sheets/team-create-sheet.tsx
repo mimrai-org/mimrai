@@ -15,7 +15,9 @@ export const TeamCreateSheet = () => {
 					<SheetTitle>Create a new team</SheetTitle>
 				</SheetHeader>
 
-				<TeamForm />
+				<div className="max-h-[95vh] overflow-y-auto">
+					<TeamForm />
+				</div>
 			</SheetContent>
 		</Sheet>
 	);

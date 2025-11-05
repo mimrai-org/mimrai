@@ -37,6 +37,7 @@ type TaskChecklistItem = {
 	id: string;
 	description: string;
 	isCompleted: boolean;
+	assigneeId: string | null;
 };
 
 export const getNextTaskSequence = async (teamId: string) => {
@@ -116,7 +117,7 @@ export const getTasks = async ({
 			total: sql<number>`COUNT(${checklistItems.id})`.as("total"),
 			checklist: sql<
 				TaskChecklistItem[]
-			>`COALESCE(json_agg(jsonb_build_object('id', ${checklistItems.id}, 'description', ${checklistItems.description}, 'isCompleted', ${checklistItems.isCompleted}) ) FILTER (WHERE ${checklistItems.id} IS NOT NULL), '[]'::json)`.as(
+			>`COALESCE(json_agg(jsonb_build_object('id', ${checklistItems.id}, 'description', ${checklistItems.description}, 'isCompleted', ${checklistItems.isCompleted}, 'assigneeId', ${checklistItems.assigneeId}) ) FILTER (WHERE ${checklistItems.id} IS NOT NULL), '[]'::json)`.as(
 				"checklist",
 			),
 		})

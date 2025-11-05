@@ -76,7 +76,15 @@ export const tasksRouter = router({
 				const existingJob = task.recurringJobId;
 				if (existingJob) {
 					// If there's an existing job, we might want to cancel it first
-					await runs.cancel(existingJob);
+					try {
+						await runs.cancel(existingJob);
+					} catch (error) {
+						// Failed to cancel existing job, log and continue
+						console.warn(
+							`Failed to cancel existing recurring job with ID ${existingJob} for task ID ${task.id}:`,
+							error,
+						);
+					}
 					await updateTaskRecurringJob({
 						jobId: null,
 						taskId: task.id,
