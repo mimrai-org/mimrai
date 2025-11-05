@@ -62,8 +62,8 @@ export const KanbanAssignee = ({ task }: { task: KanbanTask }) => {
 								{coworkers.map((coworker, index) => (
 									<div
 										key={coworker.id}
-										className={cn("-ml-4.5", {
-											"brightness-80": index !== coworkers.length - 1,
+										className={cn("", {
+											"-ml-4 brightness-80": index !== coworkers.length - 1,
 										})}
 									>
 										<AssigneeAvatar {...coworker} />
