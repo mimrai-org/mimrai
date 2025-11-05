@@ -42,6 +42,7 @@ export const tasksRouter = router({
 				teamId: ctx.user.teamId!,
 			});
 		}),
+
 	create: protectedProcedure
 		.input(createTaskSchema)
 		.mutation(async ({ ctx, input }) => {
@@ -157,6 +158,19 @@ export const tasksRouter = router({
 				- Focus on usability and clarity
 				- Do not include unnecessary details
 				- Ensure tasks are specific and achievable
+        - Title should be concise, 1-3 words if possible
+        <example>
+          <prompt>Implement new customers module for the app</prompt>
+          <title>Customers Module</title>
+        </example>
+        <example>
+          <prompt>Fix the login bug that prevents users from accessing their accounts</prompt>
+          <title>Fix Login Bug</title>
+        </example>
+        <example>
+          <prompt>Design a new landing page for the marketing website</prompt>
+          <title>Landing Page Design</title>
+        </example>
 
 				TASK DESCRIPTION STANDARDS:
 				- Provide a concise summary of the task's purpose

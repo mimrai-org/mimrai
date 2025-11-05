@@ -1,10 +1,10 @@
 import { Suspense } from "react";
-import { TasksList } from "./tasks-list";
+import { WorkstationList } from "./workstation-list";
 
 export default function Page() {
 	return (
 		<Suspense>
-			<TasksList />
+			<WorkstationList />
 		</Suspense>
 	);
 }

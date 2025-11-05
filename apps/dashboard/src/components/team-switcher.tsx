@@ -51,20 +51,26 @@ export const TeamSwitcher = () => {
 			<DropdownMenuTrigger asChild>
 				<button
 					type="button"
-					className="flex w-full items-center gap-2 py-2 opacity-90 hover:bg-transparent hover:opacity-100 focus:outline-none"
+					className="flex w-full items-center justify-between gap-2 py-2 opacity-90 hover:bg-transparent hover:opacity-100 focus:outline-none dark:hover:bg-transparent"
 				>
-					<div className="flex aspect-square size-8 items-center justify-center rounded-nonde border border-primary bg-primary text-sidebar-primary-foreground">
-						<Avatar className="size-6 bg-transparent text-base">
-							<AvatarFallback className="bg-transparent text-primary-foreground">
-								{user?.team?.name?.charAt(0).toUpperCase()}
-							</AvatarFallback>
-						</Avatar>
+					<div className="flex gap-2">
+						<div className="flex aspect-square size-8 items-center justify-center rounded-lg border border-primary bg-primary text-sidebar-primary-foreground">
+							<Avatar className="size-6 bg-transparent text-base">
+								<AvatarFallback className="bg-transparent text-primary-foreground">
+									{user?.team?.name?.charAt(0).toUpperCase()}
+								</AvatarFallback>
+							</Avatar>
+						</div>
+						<div className="grid flex-1 text-left text-sm leading-tight">
+							<span className="truncate font-medium">{user?.team?.name}</span>
+							<span className="truncate text-muted-foreground text-xs capitalize">
+								{user?.team?.role}
+							</span>
+						</div>
 					</div>
-					<div className="grid flex-1 text-left text-sm leading-tight">
-						<span className="truncate font-medium">{user?.team?.name}</span>
-						<span className="truncate text-muted-foreground text-xs capitalize">
-							{user?.team?.role}
-						</span>
+
+					<div>
+						<ChevronsUpDownIcon className="size-4" />
 					</div>
 				</button>
 			</DropdownMenuTrigger>

@@ -35,21 +35,13 @@ export const TaskUpdateSheet = () => {
 			</DialogHeader>
 			<DialogContent
 				showCloseButton={true}
-				className="min-h-[80vh] pt-0 sm:min-w-[60vw]"
+				className="max-h-[85vh] overflow-y-auto pt-0 sm:min-w-[60vw]"
 			>
 				{task ? (
 					<TaskForm
 						defaultValues={{
-							id: task.id,
-							title: task.title,
-							description: task.description || "",
-							assigneeId: task.assigneeId || undefined,
-							columnId: task.columnId,
-							priority: task.priority || "medium",
-							dueDate: task.dueDate ? new Date(task.dueDate) : undefined,
+							...task,
 							labels: task.labels?.map((label) => label.id) || [],
-							attachments: task.attachments || [],
-							recurring: task.recurring || undefined,
 						}}
 					/>
 				) : (

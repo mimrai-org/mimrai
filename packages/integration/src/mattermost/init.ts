@@ -466,7 +466,7 @@ export const initMattermostSingle = async (
                   const systemMessage: UIChatMessage = await new Promise(
                     (resolve, reject) => {
                       const result = streamText({
-                        model: "openai/gpt-4o",
+                        model: "openai/gpt-5",
                         system: systemPrompt,
                         messages: convertToModelMessages(allMessages),
                         tools: {
@@ -481,6 +481,9 @@ export const initMattermostSingle = async (
 
                           // Force stop if any tool has completed its full streaming response
                           return shouldForceStop(step);
+                        },
+                        onError: (error) => {
+                          console.error(error);
                         },
                       });
 

@@ -27,7 +27,7 @@ const schema = z.object({
 	id: z.string().optional(),
 	name: z.string().min(1).max(255),
 	description: z.string().max(5000).optional(),
-	type: z.enum(["done", "backlog", "normal"]).optional(),
+	type: z.enum(["done", "backlog", "in_progress", "review"]).optional(),
 });
 
 export const ColumnForm = ({
@@ -41,7 +41,7 @@ export const ColumnForm = ({
 		defaultValues: {
 			name: "",
 			description: "",
-			type: "normal",
+			type: "in_progress",
 			...defaultValues,
 		},
 	});
@@ -131,7 +131,7 @@ export const ColumnForm = ({
 											<SelectValue placeholder="Select column type" />
 										</SelectTrigger>
 										<SelectContent>
-											{["normal", "done"].map((type) => (
+											{["in_progress", "review", "done"].map((type) => (
 												<SelectItem
 													key={type}
 													value={type}

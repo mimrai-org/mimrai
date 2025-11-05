@@ -26,7 +26,7 @@ export function KanbanBoard() {
 	const { ...filters } = useTasksFilterParams();
 	const { data: columns } = useQuery(
 		trpc.columns.get.queryOptions({
-			type: ["normal", "done"],
+			type: ["in_progress", "review", "done"],
 		}),
 	);
 

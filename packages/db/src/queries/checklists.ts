@@ -137,6 +137,7 @@ export const updateChecklistItem = async ({
       assigneeId,
       isCompleted,
       attachments,
+      updatedAt: new Date().toISOString(),
     })
     .where(and(...whereClause))
     .returning();

@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogTrigger } from "@mimir/ui/dialog";
-import { FormLabel } from "@mimir/ui/form";
+import { FormField, FormLabel } from "@mimir/ui/form";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import {
 	ContextMenu,
@@ -9,30 +9,35 @@ import {
 } from "@ui/components/ui/context-menu";
 import { FileTextIcon } from "lucide-react";
 import Image from "next/image";
+import { useFormContext } from "react-hook-form";
+import type { TaskFormValues } from "./form-type";
 
-export const TaskAttachments = ({
-	attachments = [],
-	onRemove,
-}: {
-	attachments?: Array<string>;
-	onRemove: (index: number) => void;
-}) => {
-	if (attachments?.length === 0) return null;
+export const Attachments = () => {
+	const form = useFormContext<TaskFormValues>();
+
 	return (
-		<div className="">
-			<FormLabel className="mb-4">Attachments</FormLabel>
-			<ul className="flex items-center gap-2 p-1">
-				{attachments?.map((attachment, index) => (
-					<li key={attachment} className="flex items-center">
-						<TaskAttachmentPreview
-							attachment={attachment}
-							onRemove={onRemove}
-							index={index}
-						/>
-					</li>
-				))}
-			</ul>
-		</div>
+		<FormField
+			control={form.control}
+			name="attachments"
+			render={({ field }) => (
+				<div className="">
+					<FormLabel className="mb-4">Attachments</FormLabel>
+					<ul className="flex items-center gap-2 p-1">
+						{field.value?.map((attachment, index) => (
+							<li key={attachment} className="flex items-center">
+								<TaskAttachmentPreview
+									attachment={attachment}
+									onRemove={() => {
+										field.onChange(field.value?.filter((_, i) => i !== index));
+									}}
+									index={index}
+								/>
+							</li>
+						))}
+					</ul>
+				</div>
+			)}
+		/>
 	);
 };
 

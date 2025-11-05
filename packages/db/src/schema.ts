@@ -310,7 +310,8 @@ export const teamsWithTasksRelations = relations(teams, ({ many }) => ({
 export const columnTypeEnum = pgEnum("column_type", [
 	"done",
 	"backlog",
-	"normal",
+	"in_progress",
+	"review",
 ]);
 
 export const columns = pgTable(
@@ -324,7 +325,7 @@ export const columns = pgTable(
 		teamId: text("team_id").notNull(),
 		order: integer("order").default(0).notNull(),
 		description: text("description"),
-		type: columnTypeEnum("type").default("normal").notNull(),
+		type: columnTypeEnum("type").default("in_progress").notNull(),
 		isFinalState: boolean("is_final_state").default(false).notNull(),
 		createdAt: timestamp("created_at", {
 			withTimezone: true,

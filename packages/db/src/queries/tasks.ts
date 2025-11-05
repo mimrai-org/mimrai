@@ -2,6 +2,7 @@ import type { DeleteTaskInput } from "@api/schemas/tasks";
 import { subDays } from "date-fns";
 import {
 	and,
+	asc,
 	desc,
 	eq,
 	gte,
@@ -25,6 +26,18 @@ import {
 import { unionArray } from "../utils/array";
 import { createActivity, createTaskUpdateActivity } from "./activities";
 import { upsertTaskEmbedding } from "./tasks-embeddings";
+
+type TaskLabel = {
+	id: string;
+	name: string;
+	color: string;
+};
+
+type TaskChecklistItem = {
+	id: string;
+	description: string;
+	isCompleted: boolean;
+};
 
 export const getNextTaskSequence = async (teamId: string) => {
 	const [result] = await db
@@ -55,7 +68,7 @@ export const getTasks = async ({
 	teamId?: string;
 	search?: string;
 	recurring?: boolean;
-	view?: "board" | "backlog";
+	view?: "board" | "backlog" | "workstation";
 }) => {
 	const whereClause: (SQL | undefined)[] = [];
 
@@ -81,10 +94,10 @@ export const getTasks = async ({
 	}
 
 	// exlude done tasks with more than 3 days
-	if (input.view === "board") {
+	if (input.view === "board" || input.view === "workstation") {
 		whereClause.push(
 			or(
-				eq(columns.type, "normal"),
+				eq(columns.type, "in_progress"),
 				and(
 					eq(columns.type, "done"),
 					gte(tasks.updatedAt, subDays(new Date(), 3).toISOString()),
@@ -93,7 +106,7 @@ export const getTasks = async ({
 		);
 	}
 
-	const checklistSummarySubquery = db
+	const checklistSubquery = db
 		.select({
 			taskId: checklistItems.taskId,
 			completed:
@@ -101,10 +114,29 @@ export const getTasks = async ({
 					"completed",
 				),
 			total: sql<number>`COUNT(${checklistItems.id})`.as("total"),
+			checklist: sql<
+				TaskChecklistItem[]
+			>`COALESCE(json_agg(jsonb_build_object('id', ${checklistItems.id}, 'description', ${checklistItems.description}, 'isCompleted', ${checklistItems.isCompleted}) ) FILTER (WHERE ${checklistItems.id} IS NOT NULL), '[]'::json)`.as(
+				"checklist",
+			),
 		})
 		.from(checklistItems)
 		.groupBy(checklistItems.taskId)
-		.as("checklist_summary");
+		.as("checklist_subquery");
+
+	const labelsSubquery = db
+		.select({
+			taskId: labelsOnTasks.taskId,
+			labels: sql<
+				TaskLabel[]
+			>`COALESCE(json_agg(jsonb_build_object('id', ${labels.id}, 'name', ${labels.name}, 'color', ${labels.color}) ) FILTER (WHERE ${labels.id} IS NOT NULL), '[]'::json)`.as(
+				"labels",
+			),
+		})
+		.from(labelsOnTasks)
+		.leftJoin(labels, eq(labels.id, labelsOnTasks.labelId))
+		.groupBy(labelsOnTasks.taskId)
+		.as("labels_subquery");
 
 	const query = db
 		.select({
@@ -129,8 +161,9 @@ export const getTasks = async ({
 			teamId: tasks.teamId,
 			attachments: tasks.attachments,
 			checklistSummary: {
-				completed: checklistSummarySubquery.completed,
-				total: checklistSummarySubquery.total,
+				completed: checklistSubquery.completed,
+				total: checklistSubquery.total,
+				checklist: checklistSubquery.checklist,
 			},
 			pullRequestPlan: {
 				id: pullRequestPlan.id,
@@ -148,44 +181,32 @@ export const getTasks = async ({
 				order: columns.order,
 				type: columns.type,
 			},
-			labels: sql<
-				{
-					id: string;
-					name: string;
-					color: string;
-				}[]
-			>`COALESCE(json_agg(DISTINCT jsonb_build_object('id', ${labels.id}, 'name', ${labels.name}, 'color', ${labels.color}) ) FILTER (WHERE ${labels.id} IS NOT NULL), '[]'::json)`.as(
-				"labels",
-			),
+			labels: labelsSubquery.labels,
 		})
 		.from(tasks)
 		.where(and(...whereClause))
 		.innerJoin(columns, eq(tasks.columnId, columns.id))
-		.leftJoin(labelsOnTasks, eq(labelsOnTasks.taskId, tasks.id))
-		.leftJoin(labels, eq(labels.id, labelsOnTasks.labelId))
+		.leftJoin(labelsSubquery, eq(labelsSubquery.taskId, tasks.id))
 		.leftJoin(users, eq(tasks.assigneeId, users.id))
-		.leftJoin(
-			checklistSummarySubquery,
-			eq(checklistSummarySubquery.taskId, tasks.id),
-		)
+		.leftJoin(checklistSubquery, eq(checklistSubquery.taskId, tasks.id))
 		.leftJoin(
 			pullRequestPlan,
 			and(
 				eq(tasks.id, pullRequestPlan.taskId),
 				inArray(pullRequestPlan.status, ["pending", "completed", "error"]),
 			),
-		)
-		.groupBy(
-			tasks.id,
-			users.id,
-			columns.id,
-			pullRequestPlan.id,
-			checklistSummarySubquery.completed,
-			checklistSummarySubquery.total,
 		);
 
 	if (input.view === "board") {
 		query.orderBy(tasks.order);
+	} else if (input.view === "workstation") {
+		query.orderBy(
+			asc(
+				sql`CASE ${tasks.priority} WHEN 'urgent' THEN 1 WHEN 'high' THEN 2 WHEN 'medium' THEN 3 WHEN 'low' THEN 4 END`,
+			),
+			desc(tasks.dueDate),
+			desc(tasks.createdAt),
+		);
 	} else {
 		query.orderBy(desc(tasks.createdAt));
 	}
@@ -391,6 +412,21 @@ export const getTaskById = async (id: string, teamId?: string) => {
 		whereClause.push(eq(tasks.teamId, teamId));
 	}
 
+	const labelsSubquery = db
+		.select({
+			taskId: labelsOnTasks.taskId,
+			labels: sql<
+				TaskLabel[]
+			>`COALESCE(json_agg(jsonb_build_object('id', ${labels.id}, 'name', ${labels.name}, 'color', ${labels.color}) ) FILTER (WHERE ${labels.id} IS NOT NULL), '[]'::json)`.as(
+				"labels",
+			),
+		})
+		.from(labelsOnTasks)
+		.where(eq(labelsOnTasks.taskId, id))
+		.leftJoin(labels, eq(labels.id, labelsOnTasks.labelId))
+		.groupBy(labelsOnTasks.taskId)
+		.as("labels_subquery");
+
 	const [task] = await db
 		.select({
 			id: tasks.id,
@@ -429,21 +465,12 @@ export const getTaskById = async (id: string, teamId?: string) => {
 				order: columns.order,
 				type: columns.type,
 			},
-			labels: sql<
-				{
-					id: string;
-					name: string;
-					color: string;
-				}[]
-			>`COALESCE(json_agg(DISTINCT jsonb_build_object('id', ${labels.id}, 'name', ${labels.name}, 'color', ${labels.color}) ) FILTER (WHERE ${labels.id} IS NOT NULL), '[]'::json)`.as(
-				"labels",
-			),
+			labels: labelsSubquery.labels,
 		})
 		.from(tasks)
 		.where(and(...whereClause))
 		.innerJoin(columns, eq(tasks.columnId, columns.id))
-		.leftJoin(labelsOnTasks, eq(labelsOnTasks.taskId, tasks.id))
-		.leftJoin(labels, eq(labels.id, labelsOnTasks.labelId))
+		.leftJoin(labelsSubquery, eq(labelsSubquery.taskId, tasks.id))
 		.leftJoin(users, eq(tasks.assigneeId, users.id))
 		.leftJoin(
 			pullRequestPlan,
@@ -452,7 +479,6 @@ export const getTaskById = async (id: string, teamId?: string) => {
 				inArray(pullRequestPlan.status, ["pending", "completed", "error"]),
 			),
 		)
-		.groupBy(tasks.id, users.id, columns.id, pullRequestPlan.id)
 		.limit(1);
 
 	return task;

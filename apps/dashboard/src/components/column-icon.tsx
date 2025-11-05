@@ -11,7 +11,9 @@ export const ColumnIcon = ({
 	switch (type) {
 		case "backlog":
 			return <CircleDotIcon className={className} />;
-		case "normal":
+		case "in_progress":
+			return <CircleDashedIcon className={className} />;
+		case "review":
 			return <CircleDashedIcon className={className} />;
 		case "done":
 			return <CircleCheckIcon className={className} />;

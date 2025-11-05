@@ -45,7 +45,7 @@ export function NavMain({
 				{items.map((item) => {
 					const isActive =
 						pathname.startsWith(item.url) ||
-						item.items?.some((subItem) => pathname === subItem.url);
+						item.items?.some((subItem) => pathname.startsWith(subItem.url));
 
 					if (
 						item.scopes &&
@@ -82,7 +82,7 @@ export function NavMain({
 										<CollapsibleContent>
 											<SidebarMenuSub>
 												{item.items?.map((subItem) => {
-													const isSubActive = pathname === subItem.url;
+													const isSubActive = pathname.startsWith(subItem.url);
 
 													if (
 														subItem.scopes &&

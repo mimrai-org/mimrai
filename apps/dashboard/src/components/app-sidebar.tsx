@@ -10,12 +10,9 @@ import {
 	SidebarMenuItem,
 } from "@ui/components/ui/sidebar";
 import {
-	Command,
 	LayersIcon,
 	LayoutDashboardIcon,
-	LifeBuoy,
 	type LucideIcon,
-	Send,
 	Settings2,
 } from "lucide-react";
 import type * as React from "react";
@@ -50,6 +47,10 @@ const data: {
 			url: "/dashboard/board",
 			icon: LayersIcon,
 			items: [
+				{
+					title: "Workstation",
+					url: "/dashboard/workstation",
+				},
 				{
 					title: "Board",
 					url: "/dashboard/board",
@@ -105,7 +106,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
 	return (
 		<Sidebar variant="sidebar" {...props}>
-			<SidebarHeader className="h-[65px] border-b">
+			<SidebarHeader className="flex h-[65px] flex-col items-center justify-center border-b">
 				<SidebarMenu>
 					<SidebarMenuItem>
 						<SidebarMenuButton size="lg" asChild className="">
