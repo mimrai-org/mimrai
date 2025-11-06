@@ -735,7 +735,7 @@ export const cloneTask = async ({
 		columnId: task.columnId,
 		order: task.order,
 		priority: task.priority,
-		labels: task.labels.map((label) => label.id),
+		labels: task.labels?.map((label) => label.id),
 		teamId,
 		userId,
 		dueDate: task.dueDate!,
