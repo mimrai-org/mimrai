@@ -30,7 +30,25 @@ export const TaskContextMenu = ({
 	const { setParams } = useTaskParams();
 
 	const { mutateAsync: deleteTask } = useMutation(
-		trpc.tasks.delete.mutationOptions(),
+		trpc.tasks.delete.mutationOptions({
+			onMutate: () => {
+				toast.loading("Deleting task...", {
+					id: "delete-task",
+				});
+			},
+			onSuccess: () => {
+				toast.success("Task deleted", {
+					id: "delete-task",
+				});
+				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
+				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
+			},
+			onError: () => {
+				toast.error("Failed to delete task", {
+					id: "delete-task",
+				});
+			},
+		}),
 	);
 	const { mutate: updateTask } = useMutation(
 		trpc.tasks.update.mutationOptions({

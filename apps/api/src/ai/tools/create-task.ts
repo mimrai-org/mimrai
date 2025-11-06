@@ -88,7 +88,7 @@ export const createTaskTool = tool({
 						suggestion:
 							"Think about creating a subtask or updating the existing one.",
 						taskId: taskExist.id,
-						taskLink: getTaskUrl(taskExist.id),
+						taskLink: getTaskUrl(taskExist.id, user.teamId),
 					};
 					return;
 				}
@@ -112,7 +112,7 @@ export const createTaskTool = tool({
 			yield {
 				type: "text",
 				text: `Task created: ${newTask.title}`,
-				taskLink: getTaskUrl(newTask.id),
+				taskLink: getTaskUrl(newTask.id, newTask.teamId),
 			};
 		} catch (error) {
 			console.error("Error creating task:", error);

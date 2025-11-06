@@ -16,8 +16,6 @@ export const TaskUpdateSheet = () => {
 
 	const isOpen = Boolean(taskId);
 
-	console.log("taskId", taskId, isOpen);
-
 	const { data: task } = useQuery(
 		trpc.tasks.getById.queryOptions(
 			{

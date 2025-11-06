@@ -200,7 +200,7 @@ const extensions = ({
 				if (htmlContent) {
 					// if there is htmlContent, stop manual insertion & let other extensions handle insertion via inputRule
 					// you could extract the pasted file from this url string and upload it to a server for example
-					console.log(htmlContent); // eslint-disable-line no-console
+					// console.log(htmlContent); // eslint-disable-line no-console
 					return false;
 				}
 
@@ -215,8 +215,6 @@ const extensions = ({
 
 				const data = await response.json();
 				const url = data.url as string;
-
-				console.log("Uploaded file data:", data);
 
 				if (shouldInsertImage) {
 					currentEditor

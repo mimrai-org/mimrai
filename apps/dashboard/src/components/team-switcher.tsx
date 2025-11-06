@@ -48,10 +48,13 @@ export const TeamSwitcher = () => {
 
 	useEffect(() => {
 		if (!teamId) return;
+		if (!user?.team?.id) return;
+		if (teamId === user?.team?.id) return;
 		switchTeam({
 			teamId,
 		});
-	}, [teamId]);
+		setParams(null);
+	}, [teamId, user?.team?.id]);
 
 	return (
 		<DropdownMenu>

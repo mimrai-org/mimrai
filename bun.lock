@@ -354,6 +354,7 @@
         "@mimir/utils": "workspace:*",
         "ai": "^5.0.56",
         "drizzle-orm": "0.44.6",
+        "mime-types": "^3.0.1",
         "redis": "^5.8.2",
         "twilio": "^5.10.4",
         "ws": "^8.18.3",
@@ -363,6 +364,7 @@
         "@mattermost/types": "^10.12.0",
         "@mimir/tsconfig": "workspace:*",
         "@types/bun": "latest",
+        "@types/mime-types": "^3.0.1",
         "@types/redis": "^4.0.11",
         "@types/ws": "^8.18.1",
       },
@@ -1897,6 +1899,8 @@
     "@types/mdast": ["@types/mdast@4.0.4", "", { "dependencies": { "@types/unist": "*" } }, "sha512-kGaNbPh1k7AFzgpud/gMdvIm5xuECykRR+JnWKQno9TAXVa6WIVCGTPvYGekIDL4uwCZQSYbUxNBSb1aUo79oA=="],
 
     "@types/mdurl": ["@types/mdurl@1.0.5", "", {}, "sha512-6L6VymKTzYSrEf4Nev4Xa1LCHKrlTlYCBMTlQKFuddo1CvQcE52I0mwfOJayueUC7MJuXOeHTcIU683lzd0cUA=="],
+
+    "@types/mime-types": ["@types/mime-types@3.0.1", "", {}, "sha512-xRMsfuQbnRq1Ef+C+RKaENOxXX87Ygl38W1vDfPHRku02TgQr+Qd8iivLtAMcR0KF5/29xlnFihkTlbqFrGOVQ=="],
 
     "@types/ms": ["@types/ms@2.1.0", "", {}, "sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA=="],
 
