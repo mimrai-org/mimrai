@@ -12,6 +12,7 @@ const Provider = () => (
 		trackAttributes={true}
 		trackScreenViews={isProd}
 		trackOutgoingLinks={isProd}
+		waitForProfile
 	/>
 );
 
