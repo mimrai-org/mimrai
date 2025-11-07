@@ -8,6 +8,6 @@
 			"@integration/*": ["src/*"],
 			"@api/*": ["../../apps/api/src/*"]
 		},
-		"types": ["bun-types"]
+		"types": ["@types/bun"]
 	}
 }

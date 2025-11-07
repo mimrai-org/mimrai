@@ -1,29 +1,22 @@
 import { OpenPanel } from "@openpanel/sdk";
 
 export const op = new OpenPanel({
-  clientId: process.env.OPENPANEL_CLIENT_ID!,
-  clientSecret: process.env.OPENPANEL_CLIENT_SECRET!,
+	clientId: process.env.OPENPANEL_CLIENT_ID!,
+	clientSecret: process.env.OPENPANEL_CLIENT_SECRET!,
 });
 
-export const trackTaskCompleted = async ({
-  taskId,
-  userId,
-  teamId,
-  userName,
-  score = 1,
+export const trackMessage = ({
+	userId,
+	teamName,
+	source,
 }: {
-  taskId: string;
-  userId: string;
-  teamId: string;
-  userName: string;
-  score?: number;
+	userId: string;
+	teamName?: string;
+	source: string;
 }) => {
-  await op.identify({
-    profileId: `${teamId}-${userId}`,
-    firstName: userName.split(" ")[0],
-  });
-  await op.track("task_completed", {
-    taskId,
-    score,
-  });
+	op.track("message", {
+		profileId: userId,
+		source,
+		teamName,
+	});
 };

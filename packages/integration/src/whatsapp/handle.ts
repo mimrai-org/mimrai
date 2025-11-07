@@ -18,6 +18,7 @@ import {
 	getUserById,
 	switchTeam,
 } from "@mimir/db/queries/users";
+import { trackMessage } from "@mimir/events/server";
 import { getApiUrl } from "@mimir/utils/envs";
 import {
 	convertToModelMessages,
@@ -150,6 +151,12 @@ export const handleWhatsappMessage = async ({
 	//   to: `whatsapp:${fromNumber}`,
 	//   body: "Thinking...",
 	// });
+
+	trackMessage({
+		userId: userContext.userId,
+		source: "whatsapp",
+		teamName: userContext.teamName ?? undefined,
+	});
 
 	const text: UIChatMessage = await new Promise((resolve, reject) => {
 		const result = streamText({

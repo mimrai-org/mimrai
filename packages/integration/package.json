@@ -21,6 +21,7 @@
     "@mimir/cache": "workspace:*",
     "@mimir/db": "workspace:*",
     "@mimir/utils": "workspace:*",
+    "@mimir/events": "workspace:*",
     "ai": "^5.0.56",
     "drizzle-orm": "0.44.6",
     "mime-types": "^3.0.1",
