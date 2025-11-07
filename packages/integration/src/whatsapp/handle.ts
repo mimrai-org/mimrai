@@ -152,7 +152,7 @@ export const handleWhatsappMessage = async ({
 	//   body: "Thinking...",
 	// });
 
-	trackMessage({
+	await trackMessage({
 		userId: userContext.userId,
 		source: "whatsapp",
 		teamName: userContext.teamName ?? undefined,

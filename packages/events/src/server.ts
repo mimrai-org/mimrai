@@ -5,7 +5,7 @@ export const op = new OpenPanel({
 	clientSecret: process.env.OPENPANEL_CLIENT_SECRET!,
 });
 
-export const trackMessage = ({
+export const trackMessage = async ({
 	userId,
 	teamName,
 	source,
@@ -14,7 +14,7 @@ export const trackMessage = ({
 	teamName?: string;
 	source: string;
 }) => {
-	op.track("message", {
+	await op.track("message", {
 		profileId: userId,
 		source,
 		teamName,

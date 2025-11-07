@@ -457,7 +457,7 @@ export const initMattermostSingle = async (
 									});
 
 									console.log(`genering response for thread ${threadId}`);
-									trackMessage({
+									await trackMessage({
 										userId: userContext.userId,
 										source: "mattermost",
 										teamName: userContext.teamName ?? undefined,
