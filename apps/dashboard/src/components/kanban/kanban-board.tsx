@@ -83,18 +83,6 @@ export function KanbanBoard() {
 		<div className="h-full grow-1">
 			<div className="flex justify-between pb-4">
 				<TasksFilters />
-				<Button
-					size={"sm"}
-					onClick={() =>
-						setParams({
-							createTask: true,
-							taskColumnId: columns?.data[0]?.id || null,
-						})
-					}
-				>
-					<PlusIcon />
-					Add Task
-				</Button>
 			</div>
 			<Kanban.Root
 				value={columnsData}

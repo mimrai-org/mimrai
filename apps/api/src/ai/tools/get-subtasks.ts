@@ -1,4 +1,4 @@
-import { checklistItems, labels } from "@db/schema";
+import { checklistItems } from "@db/schema";
 import { getTaskUrl } from "@mimir/utils/tasks";
 import { tool } from "ai";
 import { and, eq } from "drizzle-orm";
