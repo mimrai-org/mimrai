@@ -2,6 +2,7 @@ import { installIntegration } from "@db/queries/integrations";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { getSlackClient } from "@mimir/integration/slack";
 import { getAppUrl } from "@mimir/utils/envs";
+import { App } from "@slack/bolt";
 import type { Context } from "../types";
 
 const app = new OpenAPIHono<Context>();
@@ -11,8 +12,8 @@ app.get("/oauth/callback", async (c) => {
 
 	const code = c.req.query("code");
 
-	const client = getSlackClient().client;
-	const result = await client.oauth.v2.access({
+	const app = new App();
+	const result = await app.client.oauth.v2.access({
 		client_id: process.env.SLACK_CLIENT_ID!,
 		client_secret: process.env.SLACK_CLIENT_SECRET!,
 		code: code,
