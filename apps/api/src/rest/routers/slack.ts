@@ -16,6 +16,7 @@ app.get("/oauth/callback", async (c) => {
 		client_id: process.env.SLACK_CLIENT_ID!,
 		client_secret: process.env.SLACK_CLIENT_SECRET!,
 		code: code,
+		redirect_uri: `${getAppUrl()}/api/slack/oauth/callback`,
 	});
 
 	if (!result.ok) {
