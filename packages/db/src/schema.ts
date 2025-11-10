@@ -469,7 +469,7 @@ export const integrationUserLink = pgTable(
 			.notNull(),
 		userId: text("user_id").notNull(),
 		externalUserId: text("external_user_id").notNull(),
-		externalUserName: text("external_user_name").notNull(),
+		externalUserName: text("external_user_name"),
 		integrationId: text("integration_id"),
 		integrationType: text("integration_type").$type<IntegrationName>(),
 		createdAt: timestamp("created_at", {
