@@ -1,3 +1,4 @@
+import { access } from "node:fs";
 import z from "zod/v3";
 
 export const integrationsRegistry = {
@@ -30,7 +31,9 @@ export const integrationsRegistry = {
 		name: "Slack",
 		type: "slack" as const,
 		description: "Manage MIMRAI from Slack",
-		configSchema: z.object({}),
+		configSchema: z.object({
+			accessToken: z.string(),
+		}),
 	},
 } as const;
 
