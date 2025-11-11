@@ -80,6 +80,7 @@ export const handleSlackMessage = async ({
 			url.searchParams.append("externalUserName", externalUserName);
 		url.searchParams.append("externalTeamId", externalTeamId);
 		url.searchParams.append("integrationType", "slack");
+		url.searchParams.append("integrationId", integration.id);
 
 		await client.chat.postMessage({
 			thread_ts: threadTs,
