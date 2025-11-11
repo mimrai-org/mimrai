@@ -8,6 +8,8 @@ import {
 	gte,
 	inArray,
 	isNotNull,
+	isNull,
+	notInArray,
 	or,
 	type SQL,
 	sql,
@@ -19,6 +21,7 @@ import {
 	columns,
 	labels,
 	labelsOnTasks,
+	projects,
 	pullRequestPlan,
 	tasks,
 	users,
@@ -67,6 +70,8 @@ export const getTasks = async ({
 	columnId?: string[];
 	labels?: string[];
 	teamId?: string;
+	projectId?: string[];
+	nProjectId?: string[];
 	search?: string;
 	recurring?: boolean;
 	view?: "board" | "backlog" | "workstation";
@@ -82,6 +87,17 @@ export const getTasks = async ({
 		input.labels.length > 0 &&
 		whereClause.push(inArray(labelsOnTasks.labelId, input.labels));
 	input.recurring && whereClause.push(isNotNull(tasks.recurringJobId));
+	input.projectId &&
+		input.projectId.length > 0 &&
+		whereClause.push(inArray(tasks.projectId, input.projectId));
+	input.nProjectId &&
+		input.nProjectId.length > 0 &&
+		whereClause.push(
+			or(
+				notInArray(tasks.projectId, input.nProjectId),
+				isNull(tasks.projectId),
+			),
+		);
 
 	if (input.search) {
 		if (!Number.isNaN(Number.parseInt(input.search, 10))) {
@@ -146,6 +162,12 @@ export const getTasks = async ({
 			description: tasks.description,
 			assigneeId: tasks.assigneeId,
 			sequence: tasks.sequence,
+			projectId: tasks.projectId,
+			project: {
+				id: projects.id,
+				name: projects.name,
+				color: projects.color,
+			},
 			assignee: {
 				id: users.id,
 				name: users.name,
@@ -190,6 +212,7 @@ export const getTasks = async ({
 		.leftJoin(labelsSubquery, eq(labelsSubquery.taskId, tasks.id))
 		.leftJoin(users, eq(tasks.assigneeId, users.id))
 		.leftJoin(checklistSubquery, eq(checklistSubquery.taskId, tasks.id))
+		.leftJoin(projects, eq(tasks.projectId, projects.id))
 		.leftJoin(
 			pullRequestPlan,
 			and(
@@ -251,6 +274,7 @@ export const createTask = async ({
 	dueDate?: string;
 	attachments?: string[];
 	mentions?: string[];
+	projectId?: string;
 	userId?: string;
 	recurring?: {
 		startDate?: string;
@@ -338,6 +362,7 @@ export const updateTask = async ({
 	attachments?: string[];
 	mentions?: string[];
 	userId?: string;
+	projectId?: string;
 	recurring?: {
 		startDate?: string;
 		frequency: "daily" | "weekly" | "monthly" | "yearly";
@@ -435,6 +460,7 @@ export const getTaskById = async (id: string, teamId?: string) => {
 			description: tasks.description,
 			assigneeId: tasks.assigneeId,
 			sequence: tasks.sequence,
+			projectId: tasks.projectId,
 			assignee: {
 				id: users.id,
 				name: users.name,

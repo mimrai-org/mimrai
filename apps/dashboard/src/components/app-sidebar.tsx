@@ -12,6 +12,7 @@ import {
 	SidebarMenuItem,
 } from "@ui/components/ui/sidebar";
 import {
+	BoxIcon,
 	LayersIcon,
 	LayoutDashboardIcon,
 	type LucideIcon,
@@ -71,6 +72,11 @@ const data: {
 					url: "/dashboard/done",
 				},
 			],
+		},
+		{
+			title: "Projects",
+			url: "/dashboard/projects",
+			icon: BoxIcon,
 		},
 		{
 			title: "Settings",

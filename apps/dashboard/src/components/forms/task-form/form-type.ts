@@ -10,6 +10,7 @@ export const taskFormSchema = z.object({
 	labels: z.array(z.string()).nullable().optional(),
 	priority: z.enum(["low", "medium", "high", "urgent"]).nullable().optional(),
 	attachments: z.array(z.string()).nullable().optional(),
+	projectId: z.string().optional().nullable(),
 	showSmartInput: z.boolean().nullable().optional(),
 	recurring: z
 		.object({

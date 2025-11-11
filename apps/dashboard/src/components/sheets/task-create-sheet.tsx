@@ -9,7 +9,8 @@ import { useTaskParams } from "@/hooks/use-task-params";
 import { TaskForm } from "../forms/task-form/form";
 
 export const TaskCreateSheet = () => {
-	const { createTask, taskColumnId, setParams } = useTaskParams();
+	const { createTask, taskColumnId, taskProjectId, setParams } =
+		useTaskParams();
 
 	const isOpen = Boolean(createTask);
 
@@ -22,6 +23,7 @@ export const TaskCreateSheet = () => {
 				<TaskForm
 					defaultValues={{
 						columnId: taskColumnId || "backlog",
+						projectId: taskProjectId || undefined,
 					}}
 				/>
 			</DialogContent>

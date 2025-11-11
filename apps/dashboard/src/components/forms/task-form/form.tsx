@@ -25,6 +25,7 @@ import { TaskDuplicated } from "./duplicated";
 import { taskFormSchema } from "./form-type";
 import { Labels } from "./labels";
 import { Priority } from "./priority";
+import { ProjectSelect } from "./project-select";
 import { Recurring } from "./recurring";
 import { SmartInput } from "./smart-input";
 import { SubscribersList } from "./subscribers-list";
@@ -75,20 +76,31 @@ export const TaskForm = ({
 
 	const { mutate: createTask, isPending: isPendingCreate } = useMutation(
 		trpc.tasks.create.mutationOptions({
+			onMutate: () => {
+				toast.loading("Creating task...", { id: "create-task" });
+			},
 			onSuccess: (task) => {
+				toast.success("Task created successfully", { id: "create-task" });
 				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
 				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
 				setParams(null);
 			},
 			onError: (error) => {
-				toast.error("Failed to create task");
+				toast.error("Failed to create task", { id: "create-task" });
 			},
 		}),
 	);
 
 	const { mutate: updateTask, isPending: isPendingUpdate } = useMutation(
 		trpc.tasks.update.mutationOptions({
+			onMutate: () => {
+				toast.loading("Updating task...", { id: "update-task" });
+			},
+			onError: (error) => {
+				toast.error("Failed to update task", { id: "update-task" });
+			},
 			onSuccess: (task) => {
+				toast.success("Task updated successfully", { id: "update-task" });
 				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
 				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
 				queryClient.invalidateQueries(
@@ -213,6 +225,7 @@ export const TaskForm = ({
 												<DueDate />
 												<Priority />
 												<ColumnSelect />
+												<ProjectSelect />
 												<Recurring />
 											</div>
 										</div>

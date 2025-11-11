@@ -8,17 +8,20 @@ import {
 } from "@ui/components/ui/dropdown-menu";
 import { RotatingText } from "@ui/components/ui/rotating-text";
 import {
+	BoxIcon,
 	ChevronDownIcon,
 	CirclePlusIcon,
 	Layers3Icon,
 	PlusIcon,
 } from "lucide-react";
 import { useColumnParams } from "@/hooks/use-column-params";
+import { useProjectParams } from "@/hooks/use-project-params";
 import { useTaskParams } from "@/hooks/use-task-params";
 
 export const CreateButton = () => {
 	const { setParams: setTaskParams } = useTaskParams();
 	const { setParams: setColumnParams } = useColumnParams();
+	const { setParams: setProjectParams } = useProjectParams();
 
 	return (
 		<div>
@@ -50,6 +53,12 @@ export const CreateButton = () => {
 					>
 						<CirclePlusIcon />
 						Column
+					</DropdownMenuItem>
+					<DropdownMenuItem
+						onClick={() => setProjectParams({ createProject: true })}
+					>
+						<BoxIcon />
+						Project
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>

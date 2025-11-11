@@ -1,8 +1,9 @@
 import type { RouterOutputs } from "@mimir/api/trpc";
 import { LabelBadge } from "@mimir/ui/label-badge";
 import { format } from "date-fns";
-import { CheckSquareIcon } from "lucide-react";
+import { BoxIcon, CheckSquareIcon } from "lucide-react";
 import { motion } from "motion/react";
+import { ProjectIcon } from "@/components/project-icon";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { cn } from "@/lib/utils";
 import { queryClient, trpc } from "@/utils/trpc";
@@ -65,6 +66,12 @@ export const KanbanTask = ({
 
 					<div className="mt-2 flex flex-wrap items-center gap-2">
 						{task.priority ? <Priority value={task.priority} /> : <div />}
+						{task.project && (
+							<div className="flex h-5.5 items-center gap-1 bg-secondary px-2 text-xs">
+								<ProjectIcon className="size-3.5" {...task.project} />
+								{task.project.name}
+							</div>
+						)}
 						{task.labels?.length > 0 && (
 							<div className="flex flex-wrap gap-1">
 								{task.labels?.slice(0, 3).map((label) => (

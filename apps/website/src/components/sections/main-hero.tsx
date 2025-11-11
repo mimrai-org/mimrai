@@ -74,11 +74,12 @@ export const MainHero = () => {
 							body="The task [Implement OAuth] has been created."
 						/>
 					</div> */}
-					<h1 className="-z-8 relative font-runic text-6xl text-primary sm:text-8xl">
-						MIMR
-						<span className="text-muted-foreground">AI</span>
+					<h1 className="-z-8 relative flex flex-col font-runic text-2xl text-primary sm:text-4xl">
+						<span>Task management made simple.</span>
+						<span>Just chat it out and let MIMRAI</span>
+						<span>handle the rest.</span>
 					</h1>
-					<p className="max-w-md text-base text-muted-foreground sm:text-lg">
+					<p className="max-w-md text-muted-foreground text-sm sm:text-base">
 						Stop over-configuring. Just write what needs to be done — MIMRAI
 						turns messages into organized tasks automatically.
 					</p>

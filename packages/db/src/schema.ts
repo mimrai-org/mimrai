@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { arch } from "node:os";
 import type { UIChatMessage } from "@api/ai/types";
 import type { IntegrationConfig, IntegrationName } from "@integration/registry";
 import { randomColor } from "@mimir/utils/random";
@@ -224,6 +225,7 @@ export const tasks = pgTable(
 		}),
 		subscribers: text("subscribers").array().default([]).notNull(),
 		mentions: text("mentions").array().default([]).notNull(),
+		projectId: text("project_id"),
 
 		recurring: jsonb("recurring").$type<{
 			frequency: "daily" | "weekly" | "monthly" | "yearly";
@@ -266,6 +268,11 @@ export const tasks = pgTable(
 			columns: [table.columnId],
 			foreignColumns: [columns.id],
 			name: "tasks_column_id_fkey",
+		}),
+		foreignKey({
+			columns: [table.projectId],
+			foreignColumns: [projects.id],
+			name: "tasks_project_id_fkey",
 		}),
 	],
 );
@@ -835,6 +842,38 @@ export const checklistItems = pgTable(
 			columns: [table.teamId],
 			foreignColumns: [teams.id],
 			name: "checklist_items_team_id_fkey",
+		}).onDelete("cascade"),
+	],
+);
+
+export const projects = pgTable(
+	"projects",
+	{
+		id: text("id")
+			.$defaultFn(() => randomUUID())
+			.primaryKey()
+			.notNull(),
+		name: text("name").notNull(),
+		description: text("description"),
+		color: text("color"),
+		archived: boolean("archived").default(false).notNull(),
+		teamId: text("team_id").notNull(),
+		userId: text("user_id").notNull(),
+		createdAt: timestamp("created_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
+		updatedAt: timestamp("updated_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
+	},
+	(table) => [
+		unique("unique_project_name_per_team").on(table.name, table.teamId),
+		foreignKey({
+			columns: [table.teamId],
+			foreignColumns: [teams.id],
+			name: "projects_team_id_fkey",
 		}).onDelete("cascade"),
 	],
 );

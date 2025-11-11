@@ -13,6 +13,8 @@ export const getTasksSchema = z.object({
 	assigneeId: z.array(z.string()).optional(),
 	columnId: z.array(z.string()).optional(),
 	teamId: z.string().optional(),
+	projectId: z.array(z.string()).optional(),
+	nProjectId: z.array(z.string()).optional(),
 	search: z.string().optional(),
 	labels: z.array(z.string()).optional(),
 	view: z.enum(["board", "backlog", "workstation"]).optional(),
@@ -29,6 +31,7 @@ export const createTaskSchema = z.object({
 	priority: z.enum(priorityEnum.enumValues).nullable().optional(),
 	labels: z.array(z.string()).nullable().optional(),
 	dueDate: z.string().nullable().optional(),
+	projectId: z.string().optional().nullable(),
 	mentions: z.array(z.string()).nullable().optional(),
 	recurring: z
 		.object({
@@ -56,6 +59,7 @@ export const updateTaskSchema = z.object({
 	columnId: z.string().optional(),
 	labels: z.array(z.string()).nullable().optional(),
 	mentions: z.array(z.string()).nullable().optional(),
+	projectId: z.string().optional().nullable(),
 	recurring: z
 		.object({
 			frequency: z.enum(["daily", "weekly", "monthly", "yearly"]),

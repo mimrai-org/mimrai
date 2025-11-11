@@ -48,6 +48,7 @@ export const DoneList = () => {
 				assigneeId: filters.assigneeId ?? undefined,
 				search: filters.search ?? undefined,
 				labels: filters.labels ?? undefined,
+				projectId: filters.taskProjectId ?? undefined,
 				columnId: doneColumnsIds,
 				pageSize: 20,
 			},

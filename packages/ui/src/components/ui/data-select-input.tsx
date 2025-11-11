@@ -9,6 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 
 export const DataSelectInput = <
 	D,
+	TFn,
 	T extends Array<D>,
 	TError,
 	TQueryKey extends readonly unknown[],
@@ -32,7 +33,7 @@ export const DataSelectInput = <
 			{items.map((item) => (
 				<span
 					key={getValue(item)}
-					className="inline-flex items-center rounded-full bg-primary px-2 py-1 font-medium text-primary text-primary-foreground text-xs"
+					className="inline-flex items-center rounded-xs bg-primary px-2 py-1 font-medium text-primary text-primary-foreground text-xs"
 				>
 					{getLabel(item)}
 				</span>
@@ -42,7 +43,7 @@ export const DataSelectInput = <
 	...buttonProps
 }: {
 	placeholder?: string;
-	queryOptions: UseQueryOptions<T, TError, T, TQueryKey>;
+	queryOptions: UseQueryOptions<TFn, TError, T, TQueryKey>;
 	value: V;
 	onChange: (value: V) => void;
 	getValue: (item: T[number]) => string;

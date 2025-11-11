@@ -1,16 +1,17 @@
 import { DataSelectInput } from "@mimir/ui/data-select-input";
-import { FormControl, FormField, FormItem, FormLabel } from "@mimir/ui/form";
+import { FormControl, FormField, FormItem } from "@mimir/ui/form";
+import { BoxIcon } from "lucide-react";
 import { useFormContext } from "react-hook-form";
-import { ColumnIcon } from "@/components/column-icon";
+import { ProjectIcon } from "@/components/project-icon";
 import { trpc } from "@/utils/trpc";
 import type { TaskFormValues } from "./form-type";
 
-export const ColumnSelect = () => {
+export const ProjectSelect = () => {
 	const form = useFormContext<TaskFormValues>();
 
 	return (
 		<FormField
-			name="columnId"
+			name="projectId"
 			control={form.control}
 			render={({ field }) => (
 				<FormItem>
@@ -18,7 +19,7 @@ export const ColumnSelect = () => {
 						<DataSelectInput
 							size="sm"
 							className="h-6! text-xs"
-							queryOptions={trpc.columns.get.queryOptions(
+							queryOptions={trpc.projects.get.queryOptions(
 								{},
 								{
 									select: (data) => data.data,
@@ -28,15 +29,16 @@ export const ColumnSelect = () => {
 							onChange={(value) => field.onChange(value || undefined)}
 							getLabel={(item) => item?.name ?? ""}
 							getValue={(item) => item?.id ?? ""}
+							placeholder="No project"
 							renderValue={(item) => (
 								<span className="flex items-center gap-2">
-									<ColumnIcon className="size-3.5" type={item.type} />
+									<ProjectIcon className="size-3.5" {...item} />
 									{item.name}
 								</span>
 							)}
 							renderItem={(item) => (
 								<span className="flex items-center gap-2">
-									<ColumnIcon type={item.type} />
+									<ProjectIcon className="size-3.5" {...item} />
 									{item.name}
 								</span>
 							)}

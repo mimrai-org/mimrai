@@ -23,9 +23,13 @@ import { PriorityItem } from "./priority";
 export const TaskContextMenu = ({
 	task,
 	children,
+	showDelete = true,
+	additionalItems,
 }: {
 	task: RouterOutputs["tasks"]["get"]["data"][number];
 	children: React.ReactNode;
+	showDelete?: boolean;
+	additionalItems?: React.ReactNode;
 }) => {
 	const { setParams } = useTaskParams();
 
@@ -243,13 +247,15 @@ export const TaskContextMenu = ({
 						))}
 					</ContextMenuSubContent>
 				</ContextMenuSub>
-
-				<ContextMenuItem
-					variant="destructive"
-					onClick={handleDeleteTask.bind(null, task.id)}
-				>
-					Delete
-				</ContextMenuItem>
+				{additionalItems}
+				{showDelete && (
+					<ContextMenuItem
+						variant="destructive"
+						onClick={handleDeleteTask.bind(null, task.id)}
+					>
+						Delete
+					</ContextMenuItem>
+				)}
 			</ContextMenuContent>
 		</ContextMenu>
 	);

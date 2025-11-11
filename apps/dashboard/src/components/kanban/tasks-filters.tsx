@@ -3,6 +3,7 @@ import { useArtifact } from "@ai-sdk-tools/artifacts/client";
 import { taskFiltersArtifact } from "@mimir/api/ai/artifacts/task-filters";
 import { DataSelectInput } from "@mimir/ui/data-select-input";
 import { Input } from "@mimir/ui/input";
+import { BoxIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";
@@ -79,6 +80,43 @@ export const TasksFilters = ({
 					renderItem={(item) => <Assignee {...item} />}
 				/>
 			)}
+
+			<DataSelectInput
+				queryOptions={trpc.projects.get.queryOptions(
+					{},
+					{
+						select: (data) => data.data,
+					},
+				)}
+				multiple
+				value={filter.taskProjectId || null}
+				onChange={(value) => setFilter({ ...filter, taskProjectId: value })}
+				getLabel={(item) => item?.name ?? ""}
+				getValue={(item) => item?.id ?? ""}
+				placeholder="Filter by project"
+				className="w-52"
+				showChevron={false}
+				renderMultiple={(items) => (
+					<div className="flex gap-2">
+						{items.map((item) => (
+							<span
+								key={item.id}
+								className="flex items-center gap-2 rounded-xs bg-secondary px-2 py-1 text-xs"
+							>
+								<BoxIcon className="size-3.5" />
+								{item.name}
+							</span>
+						))}
+					</div>
+				)}
+				renderItem={(item) => (
+					<span className="flex items-center gap-2">
+						<BoxIcon className="size-3.5" />
+						{item.name}
+					</span>
+				)}
+				variant={"ghost"}
+			/>
 
 			<LabelInput
 				value={filter.labels || []}
