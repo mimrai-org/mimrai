@@ -1,7 +1,10 @@
+import { db } from "@db/index";
+import { updateTask } from "@db/queries/tasks";
 import { tasks } from "@db/schema";
 import { tool } from "ai";
 import { and, eq } from "drizzle-orm";
 import z from "zod";
+import type { AppContext } from "../agents/config/shared";
 import { getContext } from "../context";
 
 export const updateTaskToolSchema = z.object({
@@ -31,13 +34,13 @@ export const updateTaskToolSchema = z.object({
 		.string()
 		.optional()
 		.describe(
-			"New ID of the user to assign the task to, only provide if you want to update the assignee, use the getUsers tool to get the ID",
+			"New ID of the user to assign the task to, only provide if you want to update the assignee, refer to the users agent to get user IDs",
 		),
 	columnId: z
 		.string()
 		.optional()
 		.describe(
-			"New ID of the column to move the task to, the column is like the status of the task, use getColumns to retrieve the available columns, only provide if you want to update the column",
+			"New ID of the column to move the task to, the column is like the status of the task, refer to the columns agent to get column IDs, only provide if you want to update the column",
 		),
 
 	attachments: z
@@ -58,26 +61,18 @@ export const updateTaskToolSchema = z.object({
 export const updateTaskTool = tool({
 	description: "Update an existing task in your task manager",
 	inputSchema: updateTaskToolSchema,
-	execute: async function* (input) {
+	execute: async function* (input, executionOptions) {
 		try {
-			const { db, user } = getContext();
+			const { userId, teamId } =
+				executionOptions.experimental_context as AppContext;
 
 			yield { type: "text", text: `Updating task: ${input.title}` };
-			const [updatedTask] = await db
-				.update(tasks)
-				.set({
-					title: input.title,
-					description: input.description,
-					dueDate: input.dueDate
-						? new Date(input.dueDate).toISOString()
-						: undefined,
-					columnId: input.columnId,
-					assigneeId: input.assigneeId,
-					teamId: user.teamId,
-					priority: input.priority,
-				})
-				.where(and(eq(tasks.id, input.id), eq(tasks.teamId, user.teamId)))
-				.returning();
+			const updatedTask = await updateTask({
+				...input,
+				id: input.id,
+				teamId,
+				userId,
+			});
 
 			yield { type: "text", text: `Task updated: ${updatedTask.title}` };
 		} catch (error) {

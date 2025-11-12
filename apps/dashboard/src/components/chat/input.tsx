@@ -31,7 +31,7 @@ export const ChatInput = () => {
 
 	return (
 		<PromptInput value={value} onValueChange={setValue} onSubmit={handleSubmit}>
-			<PromptInputTextarea placeholder="Type your message here..." />
+			<PromptInputTextarea placeholder="Chat with mimir..." />
 			<PromptInputActions className="flex items-center justify-between gap-2 pt-2">
 				<div />
 				<PromptInputAction

@@ -19,7 +19,7 @@ export default function DashboardLayout({
 					<SidebarInset>
 						<Header />
 						<main className="flex flex-1 flex-col px-6 py-6">{children}</main>
-						{/* <ChatWidget /> */}
+						<ChatWidget />
 					</SidebarInset>
 				</SidebarProvider>
 			</Suspense>

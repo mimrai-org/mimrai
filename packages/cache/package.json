@@ -10,6 +10,7 @@
   },
   "exports": {
     "./redis-client": "./src/redis-client.ts",
+    "./shared-redis": "./src/shared-redis.ts",
     "./integrations-cache": "./src/integrations-cache.ts",
     "./users-cache": "./src/users-cache.ts"
   },

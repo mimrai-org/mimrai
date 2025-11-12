@@ -1,7 +1,8 @@
 import { randomUUID } from "node:crypto";
+import { buildAppContext } from "@api/ai/agents/config/shared";
+import { mainAgent } from "@api/ai/agents/main";
 import { setContext } from "@api/ai/context";
 import { generateSystemPrompt } from "@api/ai/generate-system-prompt";
-import { createToolRegistry } from "@api/ai/tool-types";
 import type { UIChatMessage } from "@api/ai/types";
 import { getUserContext } from "@api/ai/utils/get-user-context";
 import { createAdminClient } from "@api/lib/supabase";
@@ -453,14 +454,6 @@ export const initMattermostSingle = async (
 									// Add user message to all messages
 									allMessages.push(userMessage);
 
-									setContext({
-										db,
-										user: userContext,
-										//@ts-expect-error
-										writer: undefined,
-										artifactSupport: false,
-									});
-
 									console.log(`genering response for thread ${threadId}`);
 									await trackMessage({
 										userId: userContext.userId,
@@ -474,31 +467,16 @@ export const initMattermostSingle = async (
 										root_id: threadId ?? typedData.post.id,
 									});
 
+									const appContext = buildAppContext(userContext, threadId);
+
 									const systemMessage: UIChatMessage = await new Promise(
 										(resolve, reject) => {
-											const result = streamText({
-												model: "openai/gpt-5",
-												system: systemPrompt,
-												messages: convertToModelMessages(allMessages),
-												tools: {
-													...createToolRegistry(),
-												},
-												onStepFinish: async (step) => {},
-												stopWhen: (step) => {
-													// Stop if we've reached 10 steps (original condition)
-													if (stepCountIs(10)(step)) {
-														return true;
-													}
-
-													// Force stop if any tool has completed its full streaming response
-													return shouldForceStop(step);
-												},
-												onError: (error) => {
-													console.error(error);
-												},
-											});
-
-											const messageStream = result.toUIMessageStream({
+											const messageStream = mainAgent.toUIMessageStream({
+												message: userMessage,
+												strategy: "auto",
+												maxRounds: 5,
+												maxSteps: 20,
+												context: appContext,
 												sendFinish: true,
 												onFinish: ({ responseMessage }) => {
 													resolve(responseMessage as UIChatMessage);
@@ -508,11 +486,9 @@ export const initMattermostSingle = async (
 											// read the stream to completion to avoid memory leaks
 											(async () => {
 												try {
-													for await (const _part of messageStream) {
-														// no-op
-													}
-												} catch (error) {
-													reject(error);
+													await messageStream.json();
+												} catch (e) {
+													reject(e);
 												}
 											})();
 										},

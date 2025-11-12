@@ -10,6 +10,14 @@ export const chatRequestSchema = z.object({
 	city: z.string().optional(),
 	region: z.string().optional(),
 	timezone: z.string().optional(),
+	agentChoice: z.string().optional().openapi({
+		description: "Agent choice",
+		example: "general",
+	}),
+	toolChoice: z.string().optional().openapi({
+		description: "Tool choice",
+		example: "createTask",
+	}),
 });
 
 export const chatMessageSchema = messageSchema;
