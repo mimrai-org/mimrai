@@ -9,6 +9,7 @@ import { useDebounceCallback } from "usehooks-ts";
 import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";
 import { trpc } from "@/utils/trpc";
 import { LabelInput } from "../forms/task-form/label-input";
+import { ProjectIcon } from "../project-icon";
 import { Assignee, AssigneeAvatar } from "./asignee";
 
 export const TasksFilters = ({
@@ -103,7 +104,7 @@ export const TasksFilters = ({
 								key={item.id}
 								className="flex items-center gap-2 rounded-xs bg-secondary px-2 py-1 text-xs"
 							>
-								<BoxIcon className="size-3.5" />
+								<ProjectIcon className="size-3.5" {...item} />
 								{item.name}
 							</span>
 						))}
@@ -111,7 +112,7 @@ export const TasksFilters = ({
 				)}
 				renderItem={(item) => (
 					<span className="flex items-center gap-2">
-						<BoxIcon className="size-3.5" />
+						<ProjectIcon className="size-3.5" {...item} />
 						{item.name}
 					</span>
 				)}

@@ -21,6 +21,7 @@ import {
 } from "@mimir/db/queries/integrations";
 import type { integrations } from "@mimir/db/schema";
 import { op, trackMessage } from "@mimir/events/server";
+import { getApiUrl } from "@mimir/utils/envs";
 import {
 	convertToModelMessages,
 	generateText,
@@ -212,16 +213,20 @@ export const initMattermostSingle = async (
 								// associate the user
 
 								// send the association linking message
-								const url = `${
-									process.env.API_URL
-								}/api/integrations/mattermost/associate?integrationId=${
-									integration.id
-								}&mattermostUserId=${senderId}&mattermostUserName=${encodeURIComponent(
-									senderName,
-								)}`;
+								const url = new URL(
+									`${getApiUrl()}/api/integrations/associate`,
+								);
+								url.searchParams.append("integrationId", integration.id);
+								url.searchParams.append("integrationType", "mattermost");
+								url.searchParams.append("externalUserId", senderId);
+								url.searchParams.append(
+									"externalUserName",
+									senderName || "unknown",
+								);
+
 								await client.createPost({
 									channel_id: typedData.post.channel_id,
-									message: `To link your Mattermost account with Mimir, please click the following link: ${url}`,
+									message: `To link your Mattermost account with Mimir, please click the following link: ${url.toString()}`,
 								});
 							} else {
 								// handle the message

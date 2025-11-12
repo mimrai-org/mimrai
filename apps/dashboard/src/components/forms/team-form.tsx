@@ -126,7 +126,7 @@ export const TeamForm = ({
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
 				{/* <ScrollArea className={scrollarea ? "h-[calc(100vh-140px)]" : ""}> */}
-				<div className={cn("space-y-4 px-4")}>
+				<div className={cn("space-y-4")}>
 					<FormField
 						control={form.control}
 						name="name"
