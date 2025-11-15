@@ -2,7 +2,6 @@ import { getMembers } from "@db/queries/teams";
 import { tool } from "ai";
 import z from "zod";
 import type { AppContext } from "../agents/config/shared";
-import { getContext } from "../context";
 
 export const getTasksToolSchema = z.object({
 	search: z

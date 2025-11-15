@@ -1,36 +1,18 @@
-import { setContext } from "@api/ai/context";
-import { generateSystemPrompt } from "@api/ai/generate-system-prompt";
-import { createToolRegistry } from "@api/ai/tool-types";
+import { buildAppContext } from "@api/ai/agents/config/shared";
+import { mainAgent } from "@api/ai/agents/main";
 import type { UIChatMessage } from "@api/ai/types";
 import { getUserContext } from "@api/ai/utils/get-user-context";
 import { createAdminClient } from "@api/lib/supabase";
-import { shouldForceStop } from "@api/utils/streaming-utils";
-import { db } from "@mimir/db/client";
-import {
-	getChatById,
-	saveChat,
-	saveChatMessage,
-} from "@mimir/db/queries/chats";
 import {
 	getIntegrationByType,
 	getLinkedUserByExternalId,
 } from "@mimir/db/queries/integrations";
-import {
-	getAvailableTeams,
-	getUserById,
-	switchTeam,
-} from "@mimir/db/queries/users";
+import { getUserById } from "@mimir/db/queries/users";
 import { trackMessage } from "@mimir/events/server";
 import { getApiUrl } from "@mimir/utils/envs";
-import { type SlackEventMiddlewareArgs, webApi } from "@slack/bolt";
-import {
-	convertToModelMessages,
-	stepCountIs,
-	streamText,
-	type UIMessage,
-} from "ai";
+import { webApi } from "@slack/bolt";
+import type { UIMessage } from "ai";
 import mime from "mime-types";
-import { getSlackClient } from "./client";
 
 export const handleSlackMessage = async ({
 	message,
@@ -109,16 +91,12 @@ export const handleSlackMessage = async ({
 		});
 
 		const chatId = `slack-${channel}-${threadTs || "main"}`;
-		const chat = await getChatById(chatId);
-		if (!chat) {
-			await saveChat({
-				chatId,
-				userId: associatedUser.userId,
-			});
-		}
 
-		const relevantMessages: UIChatMessage[] = [...(chat?.messages || [])];
-		const newMessage: UIChatMessage = {
+		const unsavedMessages: {
+			message: UIChatMessage;
+			createdAt: string;
+		}[] = [];
+		const userMessage: UIChatMessage = {
 			id: messageId,
 			role: "user",
 			parts: [{ type: "text", text: message }],
@@ -147,29 +125,16 @@ export const handleSlackMessage = async ({
 					},
 				);
 			const fullPath = `${process.env.SUPABASE_URL}/storage/v1/object/public/${storageFile.data?.fullPath}`;
-			newMessage.parts.push({
+			userMessage.parts.push({
 				type: "text",
 				text: `Attachment: ${fullPath}`,
 			});
 		}
 
-		relevantMessages.push(newMessage);
-
-		await saveChatMessage({
+		const appContext = buildAppContext(
+			{ ...userContext, integrationType: "slack" },
 			chatId,
-			userId: associatedUser.userId,
-			message: newMessage,
-		});
-
-		setContext({
-			db: db,
-			user: userContext,
-			// @ts-expect-error
-			writer: null,
-			artifactSupport: false,
-		});
-
-		const systemPrompt = `${generateSystemPrompt(userContext)}`;
+		);
 
 		await trackMessage({
 			userId: userContext.userId,
@@ -178,26 +143,12 @@ export const handleSlackMessage = async ({
 		});
 
 		const text: UIChatMessage = await new Promise((resolve, reject) => {
-			const result = streamText({
-				model: "openai/gpt-4o",
-				system: systemPrompt,
-				messages: convertToModelMessages(relevantMessages),
-				tools: {
-					...createToolRegistry(),
-				},
-				onStepFinish: async (step) => {},
-				stopWhen: (step) => {
-					// Stop if we've reached 10 steps (original condition)
-					if (stepCountIs(10)(step)) {
-						return true;
-					}
-
-					// Force stop if any tool has completed its full streaming response
-					return shouldForceStop(step);
-				},
-			});
-
-			const messageStream = result.toUIMessageStream({
+			const messageStream = mainAgent.toUIMessageStream({
+				message: userMessage,
+				strategy: "auto",
+				maxRounds: 5,
+				maxSteps: 20,
+				context: appContext,
 				sendFinish: true,
 				onFinish: ({ responseMessage }) => {
 					resolve(responseMessage as UIChatMessage);
@@ -207,19 +158,11 @@ export const handleSlackMessage = async ({
 			// read the stream to completion to avoid memory leaks
 			(async () => {
 				try {
-					for await (const _part of messageStream) {
-						// no-op
-					}
-				} catch (error) {
-					reject(error);
+					await messageStream.json();
+				} catch (e) {
+					reject(e);
 				}
 			})();
-		});
-
-		await saveChatMessage({
-			chatId,
-			userId: associatedUser.userId,
-			message: text,
 		});
 
 		const body =

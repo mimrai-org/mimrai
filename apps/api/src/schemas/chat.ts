@@ -29,3 +29,7 @@ export const chatResponseSchema = z.object({
 export const getChatSchema = z.object({
 	chatId: z.string(),
 });
+
+export const getChatHistorySchema = z.object({
+	search: z.string().optional(),
+});

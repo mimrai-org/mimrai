@@ -38,6 +38,7 @@ app.post("/", async (c) => {
 		{
 			...userContext,
 			artifactSupport: true,
+			integrationType: "web",
 		},
 		id,
 	);
@@ -49,6 +50,11 @@ app.post("/", async (c) => {
 		maxSteps: 20,
 		context: appContext,
 		agentChoice,
+
+		onError: (error) => {
+			console.error("Error in chat agent:", error);
+			return "I'm sorry, something went wrong while processing your request.";
+		},
 		// toolChoice,
 		experimental_transform: smoothStream({
 			chunking: "word",

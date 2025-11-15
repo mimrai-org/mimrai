@@ -3,78 +3,78 @@ import { and, eq, type SQL } from "drizzle-orm";
 import { db } from "..";
 import { chatMessages, chats } from "../schema";
 
-export const getChatById = async (chatId: string, teamId?: string) => {
-  const whereClause: SQL[] = [eq(chats.id, chatId)];
-  if (teamId) whereClause.push(eq(chats.teamId, teamId));
-  const [chat] = await db
-    .select()
-    .from(chats)
-    .where(and(...whereClause))
-    .limit(1);
+export const getChatById = async (chatId: string, userId?: string) => {
+	const whereClause: SQL[] = [eq(chats.chatId, chatId)];
+	if (userId) whereClause.push(eq(chats.userId, userId));
+	const [chat] = await db
+		.select()
+		.from(chats)
+		.where(and(...whereClause))
+		.limit(1);
 
-  if (!chat) {
-    return null;
-  }
+	if (!chat) {
+		return null;
+	}
 
-  const messages = await db
-    .select()
-    .from(chatMessages)
-    .where(and(eq(chatMessages.chatId, chatId)))
-    .orderBy(chatMessages.createdAt);
+	const messages = await db
+		.select()
+		.from(chatMessages)
+		.where(and(eq(chatMessages.chatId, chatId)))
+		.orderBy(chatMessages.timestamp);
 
-  return { ...chat, messages: messages.map((m) => m.content) };
+	return { ...chat, messages: messages.map((m) => m.content) };
 };
 
 export const saveChat = async (data: {
-  chatId: string;
-  teamId?: string;
-  userId: string;
-  title?: string | null;
+	chatId: string;
+	userId: string;
+	title?: string | null;
 }) => {
-  const [chat] = await db
-    .insert(chats)
-    .values({
-      id: data.chatId,
-      teamId: data.teamId,
-      userId: data.userId,
-      title: data.title,
-      updatedAt: new Date().toISOString(),
-    })
-    .onConflictDoUpdate({
-      target: chats.id,
-      set: {
-        ...(data.title && { title: data.title }),
-        updatedAt: new Date().toISOString(),
-      },
-    })
-    .returning();
+	const [chat] = await db
+		.insert(chats)
+		.values({
+			chatId: data.chatId,
+			userId: data.userId,
+			title: data.title,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		})
+		.onConflictDoUpdate({
+			target: chats.chatId,
+			set: {
+				...(data.title && { title: data.title }),
+				updatedAt: new Date(),
+			},
+		})
+		.returning();
 
-  return chat;
+	return chat;
 };
 
 export const saveChatMessage = async (data: {
-  chatId: string;
-  teamId?: string;
-  userId: string;
-  message: UIChatMessage;
-  createdAt?: string;
+	id?: string;
+	chatId: string;
+	userId: string;
+	message: UIChatMessage;
+	createdAt?: Date;
 }) => {
-  const [message] = await db
-    .insert(chatMessages)
-    .values({
-      chatId: data.chatId,
-      teamId: data.teamId,
-      userId: data.userId,
-      content: data.message,
-      createdAt: data.createdAt || new Date().toISOString(),
-    })
-    .returning();
+	const [message] = await db
+		.insert(chatMessages)
+		.values({
+			id: data.id,
+			chatId: data.chatId,
+			userId: data.userId,
+			role: data.message.role,
+			content: JSON.stringify(data.message),
+			timestamp: data.createdAt || new Date(),
+		})
+		.returning();
 
-  return message;
+	return message;
 };
 
-export const deleteChat = async (chatId: string, teamId: string) => {
-  await db
-    .delete(chats)
-    .where(and(eq(chats.id, chatId), eq(chats.teamId, teamId)));
+export const deleteChat = async (chatId: string, userId: string) => {
+	await db
+		.delete(chats)
+		.where(and(eq(chats.chatId, chatId), eq(chats.userId, userId)));
 };

@@ -367,25 +367,34 @@ export const tasksOnColumnsRelations = relations(columns, ({ many }) => ({
 export const chats = pgTable(
 	"chats",
 	{
-		id: text("id")
-			.$defaultFn(() => randomUUID())
-			.primaryKey()
-			.notNull(),
-		teamId: text("team_id"),
+		chatId: text("chat_id").primaryKey(),
 		userId: text("user_id").notNull(),
 		title: text("title"),
 		createdAt: timestamp("created_at", {
 			withTimezone: true,
-			mode: "string",
 		}).defaultNow(),
 		updatedAt: timestamp("updated_at", {
 			withTimezone: true,
-			mode: "string",
 		}).defaultNow(),
+		messageCount: integer("message_count").default(0).notNull(),
+	},
+	(table) => [index("chats_user_id_index").on(table.userId)],
+);
+
+export const chatWorkingMemory = pgTable(
+	"working_memory",
+	{
+		id: text("id").primaryKey(),
+		scope: text("scope").notNull(),
+		chatId: text("chat_id"),
+		userId: text("user_id"),
+		content: text("content").notNull(),
+		updatedAt: timestamp("updated_at").notNull(),
 	},
 	(table) => [
-		index("chats_team_id_index").on(table.teamId),
-		index("chats_user_id_index").on(table.userId),
+		index("working_memory_scope_index").on(table.scope),
+		index("working_memory_chat_id_index").on(table.chatId),
+		index("working_memory_user_id_index").on(table.userId),
 	],
 );
 
@@ -397,17 +406,17 @@ export const chatMessages = pgTable(
 			.primaryKey()
 			.notNull(),
 		chatId: text("chat_id").notNull(),
-		teamId: text("team_id"),
 		userId: text("user_id").notNull(),
-		content: jsonb("content").$type<UIChatMessage>().notNull(),
-		createdAt: timestamp("created_at", {
-			withTimezone: true,
-			mode: "string",
-		}).defaultNow(),
+		content: text("content").notNull(),
+		role: text("role").notNull(),
+		timestamp: timestamp("timestamp", {
+			precision: 6,
+		})
+			.notNull()
+			.defaultNow(),
 	},
 	(table) => [
 		index("chat_messages_chat_id_index").on(table.chatId),
-		index("chat_messages_team_id_index").on(table.teamId),
 		index("chat_messages_user_id_index").on(table.userId),
 	],
 );

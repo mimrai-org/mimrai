@@ -1,11 +1,11 @@
-import { type BaseContext, createTypedContext } from "@ai-sdk-tools/artifacts";
-import type { db } from "@db/index";
-import type { ChatUserContext } from "./chat-cache";
+// import { type BaseContext, createTypedContext } from "@ai-sdk-tools/artifacts";
+// import type { db } from "@db/index";
+// import type { ChatUserContext } from "./chat-cache";
 
-interface ChatContext extends BaseContext {
-	db: typeof db;
-	user: ChatUserContext;
-	artifactSupport?: boolean;
-}
+// interface ChatContext extends BaseContext {
+// 	db: typeof db;
+// 	user: ChatUserContext;
+// 	artifactSupport?: boolean;
+// }
 
-export const { setContext, getContext } = createTypedContext<ChatContext>();
+// export const { setContext, getContext } = createTypedContext<ChatContext>();

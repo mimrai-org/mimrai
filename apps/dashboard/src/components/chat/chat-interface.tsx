@@ -3,7 +3,8 @@ import { useChat } from "@ai-sdk-tools/store";
 import type { UIChatMessage } from "@mimir/api/ai/types";
 import { DefaultChatTransport, generateId } from "ai";
 import { useMemo } from "react";
-import { queryClient, trpc } from "@/utils/trpc";
+import { ChatSuggestions } from "./chat-suggestions";
+import { ChatTitle } from "./chat-title";
 import { useChatWidget } from "./chat-widget";
 import { ChatInput } from "./input";
 import { Messages } from "./messages";
@@ -48,39 +49,36 @@ export const ChatInterface = ({
 
 	useChat<UIChatMessage>({
 		id: chatId,
-		enableBatching: true,
-		experimental_throttle: 50,
 		transport: new DefaultChatTransport({
 			api: `${process.env.NEXT_PUBLIC_SERVER_URL}/api/chat`,
 			fetch: authenticatedFetch,
-			prepareSendMessagesRequest({ messages }) {
+			prepareSendMessagesRequest({ messages, id }) {
 				return {
 					body: {
-						id: chatId,
+						id,
 						message: messages[messages.length - 1],
 						timezone: new Intl.DateTimeFormat().resolvedOptions().timeZone,
 					},
 				};
 			},
 		}),
-		onFinish: async (data) => {
-			// Check if was a tool call
-			const hasToolCall = data.message.parts.some((part) =>
-				part.type.includes("tool"),
-			);
-
-			if (hasToolCall) {
-				// Refetch the chat to get the updated message with tool results
-				await queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
-			}
-		},
 	});
 
 	return (
 		<div className="h-full">
 			<div className="flex h-full w-full flex-col overflow-hidden">
-				{showMessages && <Messages />}
-				<ChatInput />
+				{showMessages ? (
+					<Messages />
+				) : (
+					<div className="pointer-events-none h-full" />
+				)}
+				<div className="">
+					<div className="flex items-end justify-between space-x-4 py-2">
+						<ChatTitle />
+						<ChatSuggestions />
+					</div>
+					<ChatInput />
+				</div>
 			</div>
 		</div>
 	);

@@ -4,7 +4,6 @@ import { tool } from "ai";
 import { eq } from "drizzle-orm";
 import z from "zod";
 import type { AppContext } from "../agents/config/shared";
-import { getContext } from "../context";
 
 export const getColumnsToolSchema = z.object({});
 

@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/ui/button";
 import { generateId } from "ai";
 import { XIcon } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { create } from "zustand";
 import { cn } from "@/lib/utils";
@@ -25,20 +26,65 @@ export const useChatWidget = create<ChatContainerState>()((set, get) => ({
 }));
 
 export const ChatWidget = () => {
+	const pathname = usePathname();
+	const lastPathname = useRef<string>(pathname);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [hover, setHover] = useState(false);
 	const { show, toggle, chatId, setChatId } = useChatWidget();
 
-	const { data: initialMessages, isFetched } = useQuery(
+	useEffect(() => {
+		if (pathname !== lastPathname.current) {
+			// Close chat on route change
+			toggle(false);
+			setHover(false);
+			lastPathname.current = pathname;
+		}
+	}, [pathname]);
+
+	const {
+		data: initialMessages,
+		isFetched,
+		isFetching,
+	} = useQuery(
 		trpc.chats.get.queryOptions(
 			{
 				chatId: chatId!,
 			},
 			{
 				enabled: !!chatId,
+				refetchOnWindowFocus: false,
+				// select: (chat) => chat.sort((a, b) => a.timestamp - b.timestamp),
 			},
 		),
 	);
+
+	useEffect(() => {
+		if (!isFetched) return;
+		if (!containerRef.current) return;
+
+		const handleMouseEnter = () => {
+			setHover(true);
+		};
+		const handleMouseLeave = () => {
+			setHover(false);
+		};
+		const handleClick = () => {
+			toggle(true);
+		};
+
+		const textarea = containerRef.current?.querySelector("textarea");
+		textarea?.addEventListener("mouseenter", handleMouseEnter);
+		textarea?.addEventListener("mouseleave", handleMouseLeave);
+		textarea?.addEventListener("click", handleClick);
+		textarea?.addEventListener("focus", handleClick);
+
+		return () => {
+			textarea?.removeEventListener("mouseenter", handleMouseEnter);
+			textarea?.removeEventListener("mouseleave", handleMouseLeave);
+			textarea?.removeEventListener("click", handleClick);
+			textarea?.removeEventListener("focus", handleClick);
+		};
+	}, [isFetched]);
 
 	useEffect(() => {
 		if (typeof window === "undefined") return;
@@ -52,8 +98,20 @@ export const ChatWidget = () => {
 					document.activeElement.blur();
 			}
 		};
-
 		window.addEventListener("keydown", closeHandler);
+
+		return () => {
+			window.removeEventListener("keydown", closeHandler);
+		};
+	}, []);
+
+	useEffect(() => {
+		if (typeof window === "undefined") return;
+		if (chatId) {
+			console.log("Storing chat ID:", chatId);
+			window.localStorage.setItem("chat-id", chatId);
+			return;
+		}
 
 		const storedChatId = window.localStorage.getItem("chat-id");
 		if (storedChatId) {
@@ -63,73 +121,57 @@ export const ChatWidget = () => {
 			setChatId(newChatId);
 			window.localStorage.setItem("chat-id", newChatId);
 		}
-		return () => {
-			window.removeEventListener("keydown", closeHandler);
-		};
-	}, []);
+	}, [chatId]);
 
 	return (
-		<Provider initialMessages={initialMessages?.messages as UIMessage[]}>
-			<div className="pointer-events-none fixed inset-0 z-10">
-				<div
-					className={cn("absolute inset-0 transition-all", {
-						"pointer-events-auto bg-background opacity-100": show,
-						"pointer-events-none opacity-0": !show,
-					})}
-				>
-					<div className="absolute top-8 right-8">
-						<Button
-							type="button"
-							variant={"ghost"}
-							size="sm"
-							onClick={() => toggle(false)}
-						>
-							<XIcon />
-						</Button>
-					</div>
-				</div>
-				<div
-					ref={containerRef}
-					className={cn(
-						"-translate-x-1/2 pointer-events-auto absolute bottom-0 left-1/2 pb-2 transition-all",
-						{
-							"translate-y-[calc(100%-50px)]": !show && !hover,
-							"translate-y-[calc(100%-90px)]": hover && !show,
-							"h-screen": show,
-						},
-					)}
-					onMouseEnter={() => {
-						setHover(true);
-						// containerRef.current?.querySelector("textarea")?.focus();
-					}}
-					onMouseLeave={() => {
-						setHover(false);
-						// toggle(false);
-						// containerRef.current?.querySelector("textarea")?.blur();
-					}}
-				>
-					<div
-						className="h-full w-[50vw] bg-transparent"
-						onClick={(e) => {
-							e.stopPropagation();
-							toggle(true);
-						}}
+		<div className="pointer-events-none fixed inset-0 z-10">
+			<div
+				className={cn("absolute inset-0 transition-all duration-300", {
+					"pointer-events-auto bg-background opacity-100": show,
+					"pointer-events-none opacity-0": !show,
+				})}
+			>
+				<div className="absolute top-8 right-8">
+					<Button
+						type="button"
+						variant={"ghost"}
+						size="sm"
+						onClick={() => toggle(false)}
 					>
-						{isFetched && <ChatInterface showMessages={show} id={chatId} />}
-					</div>
+						<XIcon />
+					</Button>
 				</div>
 			</div>
-			{process.env.NODE_ENV === "development" && (
-				<AIDevtools
-					config={{
-						streamCapture: {
-							enabled: true,
-							endpoint: `${process.env.NEXT_PUBLIC_SERVER_URL}/api/chat`,
-							autoConnect: true,
-						},
-					}}
-				/>
+			{!isFetching && (
+				<Provider initialMessages={initialMessages ?? []}>
+					<div
+						ref={containerRef}
+						className={cn(
+							"-translate-x-1/2 pointer-events-none absolute bottom-0 left-1/2 h-screen pb-2 transition-[translate,min-height] duration-200",
+							{
+								"translate-y-[calc(65px)]": !show && !hover,
+								"translate-y-[calc(40px)]": hover && !show,
+								"pointer-events-auto h-screen": show,
+							},
+						)}
+					>
+						<div className="h-full w-[50vw] bg-transparent">
+							{isFetched && <ChatInterface showMessages={show} id={chatId} />}
+						</div>
+					</div>
+					{process.env.NODE_ENV === "development" && (
+						<AIDevtools
+							config={{
+								streamCapture: {
+									enabled: true,
+									endpoint: `${process.env.NEXT_PUBLIC_SERVER_URL}/api/chat`,
+									autoConnect: true,
+								},
+							}}
+						/>
+					)}
+				</Provider>
 			)}
-		</Provider>
+		</div>
 	);
 };

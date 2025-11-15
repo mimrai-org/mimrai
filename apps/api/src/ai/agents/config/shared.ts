@@ -1,8 +1,11 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { Agent, type AgentConfig } from "@ai-sdk-tools/agents";
+import { DrizzleProvider } from "@ai-sdk-tools/memory/drizzle";
 import { RedisProvider } from "@ai-sdk-tools/memory/redis";
 import type { ChatUserContext } from "@api/ai/chat-cache";
+import { db } from "@db/index";
+import { chatMessages, chats, chatWorkingMemory } from "@db/schema";
 import { getSharedRedisClient } from "@mimir/cache/shared-redis";
 
 const memoryTemplate = readFileSync(
@@ -21,26 +24,27 @@ const titleInstructions = readFileSync(
 );
 
 export function formatContextForLLM(context: AppContext): string {
-	return `<company_info>
-<current_date>${context.currentDateTime}</current_date>
+	return `<company-info>
+<current-date>${context.currentDateTime}</current-date>
 <timezone>${context.timezone}</timezone>
-<company_name>${context.companyName}</company_name>
-<base_currency>${context.baseCurrency}</base_currency>
+<company-name>${context.companyName}</company-name>
+<base-currency>${context.baseCurrency}</base-currency>
 <locale>${context.locale}</locale>
-</company_info>
+</company-info>
 
 Important: Use the current date/time above for time-sensitive operations. User-specific information is maintained in your working memory.`;
 }
 
-export const COMMON_AGENT_RULES = `<behavior_rules>
+export const COMMON_AGENT_RULES = `<behavior-rules>
 - Call tools immediately without explanatory text
+- Always write in the team's preferred language as indicated by the locale
 - Use parallel tool calls when possible
 - Provide specific numbers and actionable insights
 - Explain your reasoning
 - Lead with the most important information first
 - When presenting repeated structured data (lists of items, multiple entries, time series), always use markdown tables
 - Tables make data scannable and easier to compare - use them for any data with 2+ rows
-</behavior_rules>`;
+</behavior-rules>`;
 
 export interface AppContext {
 	userId: string;
@@ -62,6 +66,7 @@ export interface AppContext {
 export function buildAppContext(
 	context: ChatUserContext & {
 		artifactSupport?: boolean;
+		integrationType: "web" | "slack" | "whatsapp" | "mattermost";
 	},
 	chatId: string,
 ): AppContext {
@@ -82,6 +87,12 @@ export function buildAppContext(
 	};
 }
 
+// export const memoryProvider = new DrizzleProvider(db, {
+// 	messagesTable: chatMessages,
+// 	workingMemoryTable: chatWorkingMemory,
+// 	chatsTable: chats,
+// });
+// @ts-expect-error RedisClient type mismatch
 export const memoryProvider = new RedisProvider(getSharedRedisClient());
 
 export const createAgent = (config: AgentConfig<AppContext>) => {
@@ -107,7 +118,7 @@ export const createAgent = (config: AgentConfig<AppContext>) => {
 				generateSuggestions: {
 					enabled: true,
 					model: "gpt-4.1-nano",
-					limit: 5,
+					limit: 4,
 					instructions: suggestionsInstructions,
 				},
 			},

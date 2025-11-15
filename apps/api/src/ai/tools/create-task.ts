@@ -1,4 +1,5 @@
 import { getColumns } from "@db/queries/columns";
+import { getLabels } from "@db/queries/labels";
 import { createTask } from "@db/queries/tasks";
 import { getDuplicateTaskEmbedding } from "@db/queries/tasks-embeddings";
 import { getMembers } from "@db/queries/teams";
@@ -38,12 +39,6 @@ export const createTaskToolSchema = z.object({
 		.string()
 		.describe(
 			"Name of the column where the task should be created, do not ask if not provided.",
-		),
-	labels: z
-		.array(z.string())
-		.optional()
-		.describe(
-			"List of label IDs to assign to the task. Do not ask, get it from the getLabels tool always (it is used to categorize and filter tasks)",
 		),
 
 	attachments: z
@@ -104,6 +99,10 @@ export const createTaskTool = tool({
 				teamId: teamId,
 			});
 
+			const labels = await getLabels({
+				teamId: teamId,
+			});
+
 			const result = await generateObject({
 				model: "gpt-4o-mini",
 				schema: z.object({
@@ -116,10 +115,18 @@ export const createTaskTool = tool({
 					columnId: z
 						.string()
 						.describe("ID of the column where the task should be created"),
+					labelsIds: z
+						.array(z.string())
+						.optional()
+						.describe(
+							"List of label IDs to assign to the task, leave empty if no labels are suitable",
+						),
 				}),
 				prompt: `Based on the following options, provide the assignee ID and column ID for the new task.
 
 				<input-variables>
+				title: ${input.title}
+				description: ${input.description || "not provided"}
 				column: ${input.column || "not provided"}
 				assignee: ${input.assignee || "not provided"}
 				</input-variables>
@@ -141,7 +148,7 @@ export const createTaskTool = tool({
 				
 				<assignee-rules>
 					- If no assignee is specified, try to assign the task to the team member who best fits the task based on their name, email, and description.
-					- If no suitable assignee is found, leave the assigneeId empty.
+					- If no suitable assignee is found, use the current user as the assignee.
 					- If the specified assignee does not exist, leave the assigneeId empty.
 				</assignee-rules>
 				<possible-assignees>
@@ -154,7 +161,22 @@ export const createTaskTool = tool({
 						})),
 					)}
 				</possible-assignees>
+
+				<labels-rules>
+					- Use the task title and description to determine the most relevant labels.
+					- If no labels are relevant, leave the labelsIds array empty.
+				</labels-rules>
+				<possible-labels>
+					${JSON.stringify(
+						labels.map((label) => ({
+							name: label.name,
+							id: label.id,
+							description: label.description,
+						})),
+					)}
+				</possible-labels>
 				`,
+				temperature: 0.4,
 			});
 
 			const newTask = await createTask({
@@ -168,7 +190,7 @@ export const createTaskTool = tool({
 				priority: input.priority || "medium",
 				teamId: teamId,
 				attachments: input.attachments || [],
-				labels: input.labels || [],
+				labels: result.object.labelsIds || [],
 				userId: userId,
 			});
 

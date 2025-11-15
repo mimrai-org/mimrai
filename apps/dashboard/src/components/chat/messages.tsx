@@ -11,7 +11,6 @@ import { Response } from "../ai-elements/response";
 export const Messages = () => {
 	const user = useUser();
 	const messages = useChatMessages<UIChatMessage>();
-
 	return (
 		<Conversation className="h-full w-full">
 			<ConversationContent>
@@ -44,7 +43,6 @@ export const Messages = () => {
 												)}
 											</Message>
 										);
-
 									default: {
 										if (part.type.startsWith("tool-")) {
 											return (

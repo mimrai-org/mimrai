@@ -8,6 +8,7 @@ import {
 	TooltipTrigger,
 } from "@ui/components/ui/tooltip";
 import { cn } from "@ui/lib/utils";
+import { StarsIcon } from "lucide-react";
 import React, {
 	createContext,
 	useContext,
@@ -99,12 +100,14 @@ function PromptInput({
 
 export type PromptInputTextareaProps = {
 	disableAutosize?: boolean;
-} & React.ComponentProps<typeof Textarea>;
+	placeholder?: React.ReactNode;
+} & Omit<React.ComponentProps<typeof Textarea>, "placeholder">;
 
 function PromptInputTextarea({
 	className,
 	onKeyDown,
 	disableAutosize = false,
+	placeholder,
 	...props
 }: PromptInputTextareaProps) {
 	const { value, setValue, maxHeight, onSubmit, disabled, textareaRef } =
@@ -130,19 +133,26 @@ function PromptInputTextarea({
 	};
 
 	return (
-		<Textarea
-			ref={textareaRef}
-			value={value}
-			onChange={(e) => setValue(e.target.value)}
-			onKeyDown={handleKeyDown}
-			className={cn(
-				"min-h-[44px] w-full resize-none border-none bg-transparent text-primary shadow-none outline-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent",
-				className,
+		<div className="relative">
+			<Textarea
+				ref={textareaRef}
+				value={value}
+				onChange={(e) => setValue(e.target.value)}
+				onKeyDown={handleKeyDown}
+				className={cn(
+					"min-h-[44px] w-full resize-none border-none bg-transparent text-primary shadow-none outline-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent",
+					className,
+				)}
+				rows={1}
+				disabled={disabled}
+				{...props}
+			/>
+			{placeholder && value.length === 0 && (
+				<div className="pointer-events-none absolute top-2 left-3 text-muted-foreground text-sm">
+					{placeholder}
+				</div>
 			)}
-			rows={1}
-			disabled={disabled}
-			{...props}
-		/>
+		</div>
 	);
 }
 

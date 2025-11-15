@@ -75,9 +75,7 @@ export const getTasksTool = tool({
 			}));
 
 			yield {
-				text: "I've applied the task filters you provided. You can view the filtered tasks in your board.",
 				boardUrl: `${getAppUrl()}/dashboard`,
-				status: "success",
 				data: mappedData,
 			};
 		} catch (error) {

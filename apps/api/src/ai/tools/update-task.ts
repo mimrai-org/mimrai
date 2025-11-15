@@ -1,11 +1,7 @@
-import { db } from "@db/index";
 import { updateTask } from "@db/queries/tasks";
-import { tasks } from "@db/schema";
 import { tool } from "ai";
-import { and, eq } from "drizzle-orm";
 import z from "zod";
 import type { AppContext } from "../agents/config/shared";
-import { getContext } from "../context";
 
 export const updateTaskToolSchema = z.object({
 	id: z
