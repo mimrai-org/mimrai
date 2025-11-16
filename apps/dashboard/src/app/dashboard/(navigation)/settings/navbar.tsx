@@ -53,7 +53,7 @@ export const SettingsNavbar = () => {
 
 	return (
 		<div className="h-fit w-full">
-			<ul className="flex space-x-1 text-sm">
+			<ul className="flex space-x-1 overflow-x-auto text-sm">
 				{settingsLinks.map(({ to, label, scopes }) => {
 					if (
 						scopes &&

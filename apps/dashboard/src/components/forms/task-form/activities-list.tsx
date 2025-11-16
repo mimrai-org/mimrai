@@ -274,8 +274,23 @@ export const CommentActivityItem = ({
 				</ContextMenuContent>
 			</ContextMenu>
 
+			<AnimatePresence>
+				{replying && (
+					<motion.div
+						animate={{ opacity: 1, height: "auto" }}
+						initial={{ opacity: 0, height: 0 }}
+						exit={{ opacity: 0, height: 0 }}
+						transition={{ duration: 0.2 }}
+						className="mt-4"
+						ref={replyContainerRef}
+					>
+						<CommentInput taskId={taskId} replyTo={activity.id} autoFocus />
+					</motion.div>
+				)}
+			</AnimatePresence>
+
 			{replyCommentsArray && replyCommentsArray.length > 0 && (
-				<div className="ml-6 space-y-4 border-l pt-4 pl-4">
+				<div className="space-y-4 pt-4 sm:ml-6 sm:border-l sm:pl-4">
 					{hasNextPage && (
 						<Button
 							variant={"ghost"}
@@ -295,20 +310,6 @@ export const CommentActivityItem = ({
 					))}
 				</div>
 			)}
-			<AnimatePresence>
-				{replying && (
-					<motion.div
-						animate={{ opacity: 1, height: "auto" }}
-						initial={{ opacity: 0, height: 0 }}
-						exit={{ opacity: 0, height: 0 }}
-						transition={{ duration: 0.2 }}
-						className="mt-4"
-						ref={replyContainerRef}
-					>
-						<CommentInput taskId={taskId} replyTo={activity.id} autoFocus />
-					</motion.div>
-				)}
-			</AnimatePresence>
 		</div>
 	);
 };

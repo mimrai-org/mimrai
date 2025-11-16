@@ -14,6 +14,7 @@ export default async function Page({ params }: Props) {
 
 	return (
 		<div>
+			{/* <WorkSession task={task} /> */}
 			<TaskForm
 				defaultValues={{ ...task, labels: task?.labels?.map((l) => l.id) }}
 			/>

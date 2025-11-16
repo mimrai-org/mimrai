@@ -249,7 +249,7 @@ export const TaskForm = ({
 										</div>
 
 										<hr className="my-6" />
-										<div className="flex justify-between">
+										<div className="flex flex-col justify-between sm:flex-row">
 											<div className="space-y-4">
 												<Attachments />
 											</div>

@@ -1,4 +1,5 @@
-import { and, eq, inArray, type SQL } from "drizzle-orm";
+import { columnsLimits } from "@mimir/utils/columns";
+import { and, count, eq, inArray, type SQL } from "drizzle-orm";
 import { db } from "..";
 import { columns, type columnTypeEnum } from "../schema";
 
@@ -58,9 +59,26 @@ export const createColumn = async (input: {
 	name: string;
 	description?: string;
 	order?: number;
-	type?: (typeof columnTypeEnum.enumValues)[number];
+	type: (typeof columnTypeEnum.enumValues)[number];
 	teamId: string;
 }) => {
+	// Check column limits
+	const [columnsCount] = await db
+		.select({
+			count: count(columns.id),
+		})
+		.from(columns)
+		.where(and(eq(columns.teamId, input.teamId), eq(columns.type, input.type)));
+
+	const currentCount = Number(columnsCount?.count ?? 0) + 1;
+	const limit = columnsLimits[input.type as keyof typeof columnsLimits];
+
+	if (limit && currentCount > limit) {
+		throw new Error(
+			`Cannot create more than ${limit} columns of type ${input.type}`,
+		);
+	}
+
 	const [column] = await db
 		.insert(columns)
 		.values({

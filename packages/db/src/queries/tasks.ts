@@ -118,7 +118,7 @@ export const getTasks = async ({
 	if (input.view === "board" || input.view === "workstation") {
 		whereClause.push(
 			or(
-				eq(columns.type, "in_progress"),
+				inArray(columns.type, ["in_progress", "to_do"]),
 				and(
 					eq(columns.type, "done"),
 					gte(tasks.updatedAt, subDays(new Date(), 3).toISOString()),

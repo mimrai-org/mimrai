@@ -1,5 +1,12 @@
 import type { RouterOutputs } from "@mimir/api/trpc";
-import { CircleCheckIcon, CircleDashedIcon, CircleDotIcon } from "lucide-react";
+import { cn } from "@ui/lib/utils";
+import {
+	CircleCheckIcon,
+	CircleDashedIcon,
+	CircleDotIcon,
+	CircleGaugeIcon,
+	CircleStarIcon,
+} from "lucide-react";
 
 export const ColumnIcon = ({
 	type,
@@ -12,11 +19,13 @@ export const ColumnIcon = ({
 		case "backlog":
 			return <CircleDotIcon className={className} />;
 		case "in_progress":
-			return <CircleDashedIcon className={className} />;
+			return <CircleGaugeIcon className={className} />;
 		case "review":
+			return <CircleStarIcon className={cn(className)} />;
+		case "to_do":
 			return <CircleDashedIcon className={className} />;
 		case "done":
-			return <CircleCheckIcon className={className} />;
+			return <CircleCheckIcon className={cn(className)} />;
 		default:
 			return null;
 	}

@@ -3,6 +3,7 @@
 import type { RouterOutputs } from "@api/trpc/routers";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/ui/button";
+import { DialogTrigger } from "@ui/components/ui/dialog";
 import { Table, TableBody, TableCell, TableRow } from "@ui/components/ui/table";
 import { cn } from "@ui/lib/utils";
 import { format } from "date-fns";
@@ -29,6 +30,7 @@ import { TaskItem } from "@/components/task-item";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useUser } from "@/hooks/use-user";
 import { queryClient, trpc } from "@/utils/trpc";
+import { WorkConfirmDialogTrigger } from "./work-confirm-dialog";
 
 export const WorkstationList = () => {
 	const user = useUser();
@@ -83,7 +85,9 @@ export const WorkstationList = () => {
 					<TaskContextMenu task={task} key={task.id}>
 						<li className="group flex items-center gap-2 transition-all">
 							<div className="w-full transition-all duration-300">
-								<TaskItem task={task} />
+								{/* <WorkConfirmDialogTrigger asChild taskId={task.id}> */}
+								<TaskItem task={task} dialog={false} />
+								{/* </WorkConfirmDialogTrigger> */}
 							</div>
 						</li>
 					</TaskContextMenu>

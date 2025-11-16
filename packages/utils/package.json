@@ -23,6 +23,7 @@
     "./format": "./src/format.ts",
     "./random": "./src/random.ts",
     "./plans": "./src/plans.ts",
+    "./columns": "./src/columns.ts",
     "./tax": "./src/tax.ts",
     "./tasks": "./src/tasks.ts",
     "./recurrence": "./src/recurrence.ts"

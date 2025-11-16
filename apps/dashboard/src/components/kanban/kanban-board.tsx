@@ -26,7 +26,7 @@ export function KanbanBoard() {
 	const { ...filters } = useTasksFilterParams();
 	const { data: columns } = useQuery(
 		trpc.columns.get.queryOptions({
-			type: ["in_progress", "review", "done"],
+			type: ["in_progress", "review", "done", "to_do"],
 		}),
 	);
 
@@ -229,7 +229,7 @@ export function KanbanBoard() {
 				getItemValue={(item) => item.id}
 			>
 				<AnimatePresence>
-					<Kanban.Board className="flex w-full items-stretch gap-4 overflow-x-auto">
+					<Kanban.Board className="flex w-screen items-stretch gap-4 overflow-x-auto">
 						{Object.entries(columnsData).map(([columnValue, tasks]) => {
 							const column = columns?.data.find(
 								(col) => col.name === columnValue,

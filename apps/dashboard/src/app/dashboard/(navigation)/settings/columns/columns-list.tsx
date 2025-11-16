@@ -33,7 +33,7 @@ export const ColumnsList = () => {
 		}),
 	);
 
-	const gridClass = "grid grid-cols-3 gap-4";
+	const gridClass = "grid grid-cols-4 gap-4";
 
 	return (
 		<Card>
@@ -56,11 +56,15 @@ export const ColumnsList = () => {
 					>
 						<span>Name</span>
 						<span>Description</span>
+						<span>Type</span>
 					</li>
 					{data?.data.map((column) => (
 						<li
 							key={column.id}
-							className={cn(gridClass, "border-b py-2 text-sm last:border-0")}
+							className={cn(
+								gridClass,
+								"items-center border-b py-2 text-sm last:border-0",
+							)}
 						>
 							<span className="flex items-center gap-2">
 								<ColumnIcon className="inline size-4!" type={column.type} />
@@ -68,6 +72,9 @@ export const ColumnsList = () => {
 							</span>
 							<span className="text-muted-foreground">
 								{column.description}
+							</span>
+							<span className="text-muted-foreground">
+								{column.type.replaceAll("_", " ").toUpperCase()}
 							</span>
 							<div className="flex justify-end">
 								<DropdownMenu>

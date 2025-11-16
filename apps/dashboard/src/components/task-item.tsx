@@ -3,6 +3,7 @@ import { LabelBadge } from "@ui/components/ui/label-badge";
 import { format } from "date-fns";
 import { CheckSquareIcon } from "lucide-react";
 import { motion } from "motion/react";
+import { useRouter } from "next/navigation";
 import { Fragment } from "react";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { cn } from "@/lib/utils";
@@ -62,6 +63,9 @@ type Property = keyof typeof propertiesComponents;
 export const TaskItem = ({
 	task,
 	className,
+	dialog = true,
+	disableEvent = false,
+	onClick,
 	properties = [
 		"priority",
 		"dueDate",
@@ -74,8 +78,12 @@ export const TaskItem = ({
 }: {
 	task: RouterOutputs["tasks"]["get"]["data"][number];
 	className?: string;
+	onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+	dialog?: boolean;
+	disableEvent?: boolean;
 	properties?: Property[];
 }) => {
+	const router = useRouter();
 	const { setParams } = useTaskParams();
 
 	return (
@@ -87,15 +95,29 @@ export const TaskItem = ({
 			layout
 			layoutId={`task-${task.id}`}
 			className={cn(
-				"flex w-full flex-row justify-between gap-2 border-b p-4 transition-colors hover:bg-accent/50",
+				"flex w-full flex-col justify-between gap-2 border-b p-4 transition-colors hover:bg-accent/50 sm:flex-row",
 				className,
 			)}
-			onClick={() => {
+			onClick={(e) => {
 				queryClient.setQueryData(
 					trpc.tasks.getById.queryKey({ id: task.id }),
 					task,
 				);
-				setParams({ taskId: task.id });
+
+				if (onClick) {
+					onClick(e);
+					return;
+				}
+
+				if (disableEvent) {
+					return;
+				}
+
+				if (dialog) {
+					setParams({ taskId: task.id });
+				} else {
+					router.push(`/dashboard/workstation/${task.id}`);
+				}
 			}}
 		>
 			<div className="flex items-center gap-2 text-start text-sm">
@@ -104,7 +126,7 @@ export const TaskItem = ({
 				)}
 				<h3 className="font-medium">{task.title}</h3>
 			</div>
-			<div className="flex items-center gap-2">
+			<div className="flex flex-wrap items-center justify-end gap-2">
 				{properties.map((property) => (
 					<Fragment key={property}>
 						{propertiesComponents[property](task)}

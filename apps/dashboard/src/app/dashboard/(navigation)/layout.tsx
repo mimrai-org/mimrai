@@ -18,7 +18,7 @@ export default function DashboardLayout({
 					<AppSidebar collapsible="icon" />
 					<SidebarInset>
 						<Header />
-						<main className="flex flex-1 flex-col px-6 py-6">{children}</main>
+						<div className="flex flex-1 flex-col px-6 py-6">{children}</div>
 						{/* <ChatWidget /> */}
 					</SidebarInset>
 				</SidebarProvider>
