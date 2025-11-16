@@ -880,3 +880,8 @@ export const projects = pgTable(
 		}).onDelete("cascade"),
 	],
 );
+
+export const waitlist = pgTable("waitlist", {
+	email: text("email").primaryKey().notNull(),
+	createdAt: timestamp("created_at").notNull().defaultNow(),
+});

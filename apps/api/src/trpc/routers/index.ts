@@ -16,6 +16,7 @@ import { resumeSettingsRouter } from "./resume-settings";
 import { tasksRouter } from "./tasks";
 import { teamsRouter } from "./teams";
 import { usersRouter } from "./users";
+import { waitlistRouter } from "./waitlist";
 import { widgetsRouter } from "./widgets";
 
 export const appRouter = router({
@@ -44,6 +45,7 @@ export const appRouter = router({
 	widgets: widgetsRouter,
 	checklists: checklistsRouter,
 	projects: projectsRouter,
+	waitlist: waitlistRouter,
 });
 export type AppRouter = typeof appRouter;
 export type RouterOutputs = inferRouterOutputs<AppRouter>;

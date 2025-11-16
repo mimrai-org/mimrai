@@ -11,6 +11,7 @@ import { createRef, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { FakeMessage } from "../fakes/fake-message";
 import { FakeTask } from "../fakes/fake-tasks";
+import { WaitlistForm } from "../forms/waitlist-form";
 import { Logo } from "../logo";
 
 export const MainHero = () => {
@@ -21,7 +22,7 @@ export const MainHero = () => {
 			className="relative flex h-screen flex-col border"
 			ref={constraintsRef}
 		>
-			<header className="flex h-full flex-col overflow-hidden px-8 pt-8 pb-8">
+			<header className="flex flex-col overflow-hidden px-8 pt-8 pb-8">
 				<div className="flex flex-col items-start gap-2 space-y-4">
 					<Link href={"/"}>
 						<Logo
@@ -36,11 +37,11 @@ export const MainHero = () => {
 			<div className="-translate-y-1/2 pointer-events-none absolute inset-x-0 top-1/2" />
 			{/* <div className="-translate-y-1/2 absolute top-1/2 right-0 h-[80%] w-[50%] overflow-hidden rounded-l-none"> */}
 
-			<div className="-z-10 absolute h-[75%] invert md:inset-0 md:h-full">
+			<div className="-z-10 absolute inset-x-0 h-[50%] p-4 invert sm:inset-0 sm:h-full sm:p-0">
 				<Image
 					src={"/images/cover4.png"}
 					alt="Cover Image"
-					className="size-full scale-80 object-cover object-bottom md:scale-100"
+					className="size-full scale-100 object-cover object-bottom"
 					width={1400}
 					height={800}
 				/>
@@ -57,8 +58,8 @@ export const MainHero = () => {
 				/>
 			</div>
 			<div className="-z-5 pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(0,0,0,0),rgba(0,0,0,0.0)),url(https://grainy-gradients.vercel.app/noise.svg)] brightness-[10%] contrast-[170%]" />
-			<div className="mt-auto flex flex-col items-end justify-between md:flex-row">
-				<div className="space-y-4 p-8">
+			<div className="mt-auto flex flex-col sm:items-end sm:justify-between md:flex-row">
+				<div className="space-y-4 p-4 sm:p-8">
 					{/* <div className="w-fit space-y-4">
 						<FakeMessage
 							variant="user"
@@ -74,32 +75,38 @@ export const MainHero = () => {
 							body="The task [Implement OAuth] has been created."
 						/>
 					</div> */}
-					<h1 className="-z-8 relative flex flex-col font-runic text-2xl text-primary sm:text-4xl">
-						<span>Task management made simple.</span>
-						<span>Just chat it out and let MIMRAI</span>
-						<span>handle the rest.</span>
+					<h1 className="-z-8 relative flex flex-col font-runic text-4xl text-primary sm:text-6xl">
+						Task management <br /> made simple.
 					</h1>
-					<p className="max-w-md text-muted-foreground text-sm sm:text-base">
-						Stop over-configuring. Just write what needs to be done — MIMRAI
-						turns messages into organized tasks automatically.
+					<p className="max-w-md text-sm sm:text-base">
+						Just write what needs to be done — MIMRAI organizes everything
+						automatically in the background.
 					</p>
 				</div>
 				{/* <div className="flex items-center px-8 font-mono">{"10/28/2025"}</div> */}
-				<div className="flex divide-x">
-					<Link href={`${getAppUrl()}/sign-in`}>
-						<Button type="button">
-							Sign in
-							<ChevronRight />
-						</Button>
-					</Link>
-					<Link href={`${getAppUrl()}/sign-up`}>
-						<Button type="button">
-							Join
-							<Badge variant={"secondary"} className="rounded-none">
-								Beta
-							</Badge>
-						</Button>
-					</Link>
+
+				<div>
+					<div className="p-4 sm:p-8">
+						<div className="max-w-sm text-left sm:text-right">
+							<WaitlistForm />
+						</div>
+					</div>
+					{/* <div className="flex justify-end divide-x">
+						<Link href={`${getAppUrl()}/sign-in`}>
+							<Button type="button">
+								Sign in
+								<ChevronRight />
+							</Button>
+						</Link>
+						<Link href={`${getAppUrl()}/sign-up`}>
+							<Button type="button">
+								Join
+								<Badge variant={"secondary"} className="rounded-none">
+									Waitlist
+								</Badge>
+							</Button>
+						</Link>
+					</div> */}
 				</div>
 			</div>
 		</motion.div>
