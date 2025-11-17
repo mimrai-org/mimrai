@@ -47,6 +47,11 @@ export const en = {
 				description:
 					"Receive a daily summary of my pending tasks and activities.",
 			},
+			daily_eod: {
+				title: "Daily End of Day Summary",
+				description:
+					"Receive a daily summary of my completed tasks and activities.",
+			},
 		},
 		channels: {
 			in_app: "In-App",

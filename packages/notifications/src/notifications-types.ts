@@ -45,6 +45,13 @@ export const allNotificationTypes: NotificationType[] = [
 		order: 2,
 	},
 	{
+		type: "daily_eod",
+		channels: ["mattermost", "whatsapp"],
+		showInSettings: true,
+		category: "resumes",
+		order: 3,
+	},
+	{
 		type: "mention",
 		channels: ["mattermost"],
 		showInSettings: true,

@@ -83,7 +83,7 @@ export const createEODActivityJob = schemaTask({
 		await createActivity({
 			teamId,
 			userId,
-			type: "daily_digest",
+			type: "daily_end_of_day",
 			metadata: {
 				content: `Wrapping up the day, ${payload.userName}!
 
