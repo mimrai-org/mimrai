@@ -18,6 +18,7 @@ export const waitlistRouter = router({
 					email,
 				});
 			} catch (e) {
+				console.error("Error adding to waitlist:", e);
 				return { success: true };
 			}
 
