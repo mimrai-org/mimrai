@@ -11,7 +11,6 @@ import { Response } from "../ai-elements/response";
 export const Messages = () => {
 	const user = useUser();
 	const messages = useChatMessages<UIChatMessage>();
-
 	return (
 		<Conversation className="h-full w-full">
 			<ConversationContent>
@@ -19,7 +18,7 @@ export const Messages = () => {
 					{messages.map((message) => (
 						<motion.div
 							key={message.id}
-							className="mb-4 flex flex-col"
+							className="mb-4 flex flex-col px-1"
 							initial={{ opacity: 0, y: 10 }}
 							animate={{ opacity: 1 }}
 							exit={{ opacity: 0, y: 10 }}
@@ -39,12 +38,11 @@ export const Messages = () => {
 													<MessageAvatar
 														src={""}
 														name={user?.name ?? "User"}
-														className="size-9"
+														className="size-8"
 													/>
 												)}
 											</Message>
 										);
-
 									default: {
 										if (part.type.startsWith("tool-")) {
 											return (

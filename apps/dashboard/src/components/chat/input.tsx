@@ -7,9 +7,10 @@ import {
 	PromptInputActions,
 	PromptInputTextarea,
 } from "@mimir/ui/prompt-input";
-import { ArrowUp, Square } from "lucide-react";
+import { ArrowUp, Square, StarsIcon } from "lucide-react";
 import { useState } from "react";
 import { useChatParams } from "@/hooks/use-chat-params";
+import type { ChatTitleData } from "./chat-title";
 
 export const ChatInput = () => {
 	const { setParams, chatId: chatIdParam } = useChatParams();
@@ -30,8 +31,22 @@ export const ChatInput = () => {
 	};
 
 	return (
-		<PromptInput value={value} onValueChange={setValue} onSubmit={handleSubmit}>
-			<PromptInputTextarea placeholder="Type your message here..." />
+		<PromptInput
+			value={value}
+			onValueChange={setValue}
+			onSubmit={handleSubmit}
+			className="pointer-events-auto"
+		>
+			<PromptInputTextarea
+			// placeholder={
+			// 	<div className="flex items-center gap-1">
+			// 		<StarsIcon className="size-3.5" />
+			// 		{chatTitle?.title
+			// 			? `Continue "${chatTitle.title}"`
+			// 			: "Send a message to start the conversation"}
+			// 	</div>
+			// }
+			/>
 			<PromptInputActions className="flex items-center justify-between gap-2 pt-2">
 				<div />
 				<PromptInputAction
