@@ -1,6 +1,6 @@
 import { createTask } from "@db/queries/tasks";
 import { getDuplicateTaskEmbedding } from "@db/queries/tasks-embeddings";
-import { getTaskUrl } from "@mimir/utils/tasks";
+import { getTaskPermalink } from "@mimir/utils/tasks";
 import { tool } from "ai";
 import z from "zod";
 import { getContext } from "../context";
@@ -88,7 +88,7 @@ export const createTaskTool = tool({
 						suggestion:
 							"Think about creating a subtask or updating the existing one.",
 						taskId: taskExist.id,
-						taskLink: getTaskUrl(taskExist.id, user.teamId),
+						taskLink: getTaskPermalink(taskExist.permalinkId),
 					};
 					return;
 				}
@@ -112,7 +112,7 @@ export const createTaskTool = tool({
 			yield {
 				type: "text",
 				text: `Task created: ${newTask.title}`,
-				taskLink: getTaskUrl(newTask.id, newTask.teamId),
+				taskLink: getTaskPermalink(newTask.permalinkId),
 			};
 		} catch (error) {
 			console.error("Error creating task:", error);

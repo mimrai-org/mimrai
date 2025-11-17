@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@mimir/ui/button";
 import { Form } from "@mimir/ui/form";
+import { getTaskPermalink } from "@mimir/utils/tasks";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Editor as EditorInstance } from "@tiptap/react";
 import { format } from "date-fns";
@@ -61,7 +62,7 @@ export const TaskForm = ({
 		},
 	});
 
-	const id = form.watch("id");
+	const [id, permalinkId] = form.watch(["id", "permalinkId"]);
 
 	const { data: isGithubConnected } = useQuery(
 		trpc.integrations.getByType.queryOptions(
@@ -268,7 +269,7 @@ export const TaskForm = ({
 														aria-label="Copy task link"
 														onClick={() => {
 															navigator.clipboard.writeText(
-																window.location.href,
+																getTaskPermalink(permalinkId ?? id!),
 															);
 															toast.success("Task link copied to clipboard");
 														}}

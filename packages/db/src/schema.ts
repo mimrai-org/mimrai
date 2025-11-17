@@ -202,6 +202,7 @@ export const tasks = pgTable(
 			.$defaultFn(() => randomUUID())
 			.primaryKey()
 			.notNull(),
+		permalinkId: text("permalink_id"),
 		title: text("title").notNull(),
 		sequence: integer("sequence"),
 		description: text("description"),

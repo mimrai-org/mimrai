@@ -1,5 +1,5 @@
-import { checklistItems } from "@db/schema";
-import { getTaskUrl } from "@mimir/utils/tasks";
+import { checklistItems, tasks } from "@db/schema";
+import { getTaskPermalink } from "@mimir/utils/tasks";
 import { tool } from "ai";
 import { and, eq } from "drizzle-orm";
 import z from "zod";
@@ -16,6 +16,19 @@ export const getSubtasksTool = tool({
 		const { db, user } = getContext();
 
 		yield { text: "Retrieving subtasks..." };
+
+		const [task] = await db
+			.select()
+			.from(tasks)
+			.where(eq(tasks.id, input.taskId))
+			.limit(1);
+
+		if (!task) {
+			yield {
+				text: `No task found with ID ${input.taskId}.`,
+			};
+			return;
+		}
 
 		const data = await db
 			.select({
@@ -34,7 +47,7 @@ export const getSubtasksTool = tool({
 
 		yield {
 			text: `Found ${data.length} subtasks.`,
-			taskUrl: getTaskUrl(input.taskId, user.teamId),
+			taskUrl: getTaskPermalink(task.permalinkId),
 			data,
 		};
 	},

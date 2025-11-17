@@ -14,6 +14,7 @@ import {
 	type SQL,
 	sql,
 } from "drizzle-orm";
+import { nanoid } from "nanoid";
 import { buildSearchQuery } from "src/utils/search-query";
 import { db } from "..";
 import {
@@ -25,6 +26,7 @@ import {
 	pullRequestPlan,
 	tasks,
 	users,
+	usersOnTeams,
 } from "../schema";
 import { unionArray } from "../utils/array";
 import {
@@ -61,6 +63,18 @@ export const getNextTaskSequence = async (teamId: string) => {
 		sequence: result?.maxSequence ?? 0,
 		order: result?.maxOrder ?? 6000,
 	};
+};
+
+export const generateTaskPermalinkId = async (size = 12): Promise<string> => {
+	const value = nanoid(size);
+	const [existingTask] = await db
+		.select({ exists: sql<boolean>`COUNT(*) > 0` })
+		.from(tasks)
+		.where(eq(tasks.permalinkId, value));
+	if (existingTask?.exists) {
+		return generateTaskPermalinkId(size + 1);
+	}
+	return value;
 };
 
 export const getTasks = async ({
@@ -167,6 +181,7 @@ export const getTasks = async ({
 			assigneeId: tasks.assigneeId,
 			sequence: tasks.sequence,
 			projectId: tasks.projectId,
+			permalinkId: tasks.permalinkId,
 			project: {
 				id: projects.id,
 				name: projects.name,
@@ -291,11 +306,13 @@ export const createTask = async ({
 	};
 }) => {
 	const { sequence, order } = await getNextTaskSequence(input.teamId);
+	const permalinkId = await generateTaskPermalinkId();
 	const [task] = await db
 		.insert(tasks)
 		.values({
 			...input,
 			sequence,
+			permalinkId,
 			order,
 			subscribers: unionArray([
 				userId,
@@ -441,11 +458,40 @@ export const updateTask = async ({
 	return task;
 };
 
-export const getTaskById = async (id: string, teamId?: string) => {
+export const getTaskByPermalinkId = async (
+	permalinkId: string,
+	userId?: string,
+) => {
+	console.log({
+		permalinkId,
+		userId,
+	});
+	const whereClause: SQL[] = [
+		or(eq(tasks.permalinkId, permalinkId), eq(tasks.id, permalinkId))!,
+	];
+
+	if (userId) {
+		whereClause.push(eq(usersOnTeams.userId, userId));
+	}
+
+	const [task] = await db
+		.select({
+			id: tasks.id,
+			teamId: tasks.teamId,
+		})
+		.from(tasks)
+		.where(and(...whereClause))
+		.innerJoin(usersOnTeams, eq(usersOnTeams.teamId, tasks.teamId))
+		.limit(1);
+
+	return task;
+};
+
+export const getTaskById = async (id: string, userId?: string) => {
 	const whereClause: SQL[] = [eq(tasks.id, id)];
 
-	if (teamId) {
-		whereClause.push(eq(tasks.teamId, teamId));
+	if (userId) {
+		whereClause.push(eq(usersOnTeams.userId, userId));
 	}
 
 	const labelsSubquery = db
@@ -488,6 +534,7 @@ export const getTaskById = async (id: string, teamId?: string) => {
 			updatedAt: tasks.updatedAt,
 			teamId: tasks.teamId,
 			attachments: tasks.attachments,
+			permalinkId: tasks.permalinkId,
 			pullRequestPlan: {
 				id: pullRequestPlan.id,
 				prUrl: pullRequestPlan.prUrl,
@@ -509,6 +556,7 @@ export const getTaskById = async (id: string, teamId?: string) => {
 		.from(tasks)
 		.where(and(...whereClause))
 		.innerJoin(columns, eq(tasks.columnId, columns.id))
+		.innerJoin(usersOnTeams, eq(usersOnTeams.teamId, tasks.teamId))
 		.leftJoin(labelsSubquery, eq(labelsSubquery.taskId, tasks.id))
 		.leftJoin(users, eq(tasks.assigneeId, users.id))
 		.leftJoin(

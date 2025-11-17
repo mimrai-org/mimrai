@@ -1,16 +1,15 @@
 import { getAppUrl } from "./envs";
 
-export const getTaskUrl = (taskId: string, teamId?: string) => {
-	const url = new URL(`${getAppUrl()}/dashboard/workstation/${taskId}`);
-	if (teamId) url.searchParams.set("teamId", teamId);
+export const getTaskPermalink = (permalinkId: string) => {
+	const url = new URL(`${getAppUrl()}/t/${permalinkId}`);
 	return url.toString();
 };
 
 export const getTaskMarkdownLink = (
-	taskId: string,
+	permalinkId: string,
 	title: string,
 	teamId?: string,
 ) => {
-	const url = getTaskUrl(taskId, teamId);
+	const url = getTaskPermalink(permalinkId);
 	return `[${title}](${url})`;
 };

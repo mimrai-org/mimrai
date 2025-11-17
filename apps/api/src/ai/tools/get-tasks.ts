@@ -1,6 +1,6 @@
 import { getTasks } from "@mimir/db/queries/tasks";
 import { getAppUrl } from "@mimir/utils/envs";
-import { getTaskUrl } from "@mimir/utils/tasks";
+import { getTaskPermalink } from "@mimir/utils/tasks";
 import { tool } from "ai";
 import z from "zod";
 import { taskFiltersArtifact } from "../artifacts/task-filters";
@@ -75,7 +75,7 @@ export const getTasksTool = tool({
 				createdAt: task.createdAt,
 				updatedAt: task.updatedAt,
 				sequence: task.sequence,
-				taskUrl: getTaskUrl(task.id, task.teamId),
+				taskUrl: getTaskPermalink(task.permalinkId),
 			}));
 
 			yield {

@@ -25,6 +25,7 @@ import {
 	deleteTask,
 	deleteTaskComment,
 	getTaskById,
+	getTaskByPermalinkId,
 	getTaskSubscribers,
 	getTasks,
 	subscribeUserToTask,
@@ -37,6 +38,7 @@ import { handleTaskComment } from "@mimir/integration/task-comments";
 import { createRecurringTaskJob } from "@mimir/jobs/tasks/create-recurring-task-job";
 import { runs } from "@trigger.dev/sdk";
 import { generateObject } from "ai";
+import z from "zod";
 
 export const tasksRouter = router({
 	get: protectedProcedure
@@ -126,7 +128,12 @@ export const tasksRouter = router({
 	getById: protectedProcedure
 		.input(updateTaskSchema.pick({ id: true }))
 		.query(async ({ ctx, input }) => {
-			return getTaskById(input.id, ctx.user.teamId!);
+			return getTaskById(input.id, ctx.user.id);
+		}),
+	getByPermalinkId: protectedProcedure
+		.input(z.object({ permalinkId: z.string() }))
+		.query(async ({ ctx, input }) => {
+			return getTaskByPermalinkId(input.permalinkId, ctx.user.id);
 		}),
 
 	comment: protectedProcedure
