@@ -2,6 +2,7 @@ import type { DeleteTaskInput } from "@api/schemas/tasks";
 import { subDays } from "date-fns";
 import {
 	and,
+	arrayContains,
 	asc,
 	desc,
 	eq,
@@ -96,9 +97,39 @@ export const getTasks = async ({
 }) => {
 	const whereClause: (SQL | undefined)[] = [];
 
+	const checklistSubquery = db
+		.select({
+			taskId: checklistItems.taskId,
+			completed:
+				sql<number>`COUNT(CASE WHEN ${checklistItems.isCompleted} = true THEN 1 END)`.as(
+					"completed",
+				),
+			total: sql<number>`COUNT(${checklistItems.id})`.as("total"),
+			// assigneess array for filtering
+			assigneess: sql<
+				string[]
+			>`COALESCE(array_agg(DISTINCT CASE WHEN ${checklistItems.assigneeId} IS NOT NULL THEN ${checklistItems.assigneeId} END), ARRAY[]::TEXT[])`.as(
+				"assigneess",
+			),
+			checklist: sql<
+				TaskChecklistItem[]
+			>`COALESCE(json_agg(jsonb_build_object('id', ${checklistItems.id}, 'description', ${checklistItems.description}, 'isCompleted', ${checklistItems.isCompleted}, 'assigneeId', ${checklistItems.assigneeId}) ) FILTER (WHERE ${checklistItems.id} IS NOT NULL), '[]'::json)`.as(
+				"checklist",
+			),
+		})
+		.from(checklistItems)
+		.groupBy(checklistItems.taskId)
+		.as("checklist_subquery");
+
+	const assigneesConcat = `${input.assigneeId?.join(",")}`;
 	input.assigneeId &&
 		input.assigneeId.length > 0 &&
-		whereClause.push(inArray(tasks.assigneeId, input.assigneeId));
+		whereClause.push(
+			or(
+				inArray(tasks.assigneeId, input.assigneeId),
+				sql`${checklistSubquery.assigneess} && string_to_array(${assigneesConcat}, ',')::text[]`,
+			),
+		);
 	input.columnId && whereClause.push(inArray(tasks.columnId, input.columnId));
 	input.teamId && whereClause.push(eq(tasks.teamId, input.teamId));
 	input.labels &&
@@ -140,24 +171,6 @@ export const getTasks = async ({
 			),
 		);
 	}
-
-	const checklistSubquery = db
-		.select({
-			taskId: checklistItems.taskId,
-			completed:
-				sql<number>`COUNT(CASE WHEN ${checklistItems.isCompleted} = true THEN 1 END)`.as(
-					"completed",
-				),
-			total: sql<number>`COUNT(${checklistItems.id})`.as("total"),
-			checklist: sql<
-				TaskChecklistItem[]
-			>`COALESCE(json_agg(jsonb_build_object('id', ${checklistItems.id}, 'description', ${checklistItems.description}, 'isCompleted', ${checklistItems.isCompleted}, 'assigneeId', ${checklistItems.assigneeId}) ) FILTER (WHERE ${checklistItems.id} IS NOT NULL), '[]'::json)`.as(
-				"checklist",
-			),
-		})
-		.from(checklistItems)
-		.groupBy(checklistItems.taskId)
-		.as("checklist_subquery");
 
 	const labelsSubquery = db
 		.select({
