@@ -1,5 +1,7 @@
 "use client";
+import { useArtifact } from "@ai-sdk-tools/artifacts/client";
 import { useChatActions, useChatId, useChatStatus } from "@ai-sdk-tools/store";
+import { chatTitleArtifact } from "@api/ai/artifacts/chat-title";
 import { Button } from "@mimir/ui/button";
 import {
 	PromptInput,
@@ -18,6 +20,8 @@ export const ChatInput = () => {
 	const status = useChatStatus();
 	const chatId = useChatId();
 	const { sendMessage } = useChatActions();
+	const { data } = useArtifact(chatTitleArtifact);
+	const chatTitle = data as ChatTitleData;
 
 	const handleSubmit = () => {
 		if (value.trim() === "") return;
@@ -38,14 +42,14 @@ export const ChatInput = () => {
 			className="pointer-events-auto"
 		>
 			<PromptInputTextarea
-			// placeholder={
-			// 	<div className="flex items-center gap-1">
-			// 		<StarsIcon className="size-3.5" />
-			// 		{chatTitle?.title
-			// 			? `Continue "${chatTitle.title}"`
-			// 			: "Send a message to start the conversation"}
-			// 	</div>
-			// }
+				placeholder={
+					<div className="flex items-center gap-1">
+						<StarsIcon className="size-3.5" />
+						{chatTitle?.title
+							? `Continue "${chatTitle.title}"`
+							: "Send a message to start the conversation"}
+					</div>
+				}
 			/>
 			<PromptInputActions className="flex items-center justify-between gap-2 pt-2">
 				<div />
