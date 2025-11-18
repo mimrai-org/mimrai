@@ -37,11 +37,17 @@ export const MainHero = () => {
 			<div className="-translate-y-1/2 pointer-events-none absolute inset-x-0 top-1/2" />
 			{/* <div className="-translate-y-1/2 absolute top-1/2 right-0 h-[80%] w-[50%] overflow-hidden rounded-l-none"> */}
 
-			<div className="-z-10 absolute inset-x-0 h-[50%] p-4 invert sm:inset-0 sm:h-full sm:p-0">
+			<div
+				className="-z-10 absolute inset-x-0 h-[50%] p-4 invert sm:inset-0 sm:h-full sm:p-0"
+				style={{
+					maskImage:
+						"radial-gradient(ellipse 80% 60% at 50% 50%, black 40%, transparent 100%)",
+				}}
+			>
 				<Image
 					src={"/images/cover4.png"}
 					alt="Cover Image"
-					className="size-full scale-100 object-cover object-bottom"
+					className="size-full scale-100 object-cover object-center"
 					width={1400}
 					height={800}
 				/>
