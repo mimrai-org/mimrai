@@ -8,6 +8,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { GripVertical, PlusIcon } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import * as React from "react";
+import { create } from "zustand";
 import { useColumnParams } from "@/hooks/use-column-params";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";
@@ -19,10 +20,31 @@ import { KanbanTask } from "./kanban-task/kanban-task";
 import { TaskContextMenu } from "./task-context-menu";
 import { TasksFilters } from "./tasks-filters";
 
+export interface KanbanStore {
+	draggingTaskId: string | null;
+	overColumnId: string | null;
+	setDraggingTaskId: (id: string | null) => void;
+	setOverColumnId: (id: string | null) => void;
+}
+
+export const useKanbanStore = create<KanbanStore>((set) => ({
+	draggingTaskId: null,
+	overColumnId: null,
+	setDraggingTaskId: (id: string | null) =>
+		set(() => ({
+			draggingTaskId: id,
+		})),
+	setOverColumnId: (id: string | null) =>
+		set(() => ({
+			overColumnId: id,
+		})),
+}));
+
 export function KanbanBoard() {
 	const queryClient = useQueryClient();
+	const { draggingTaskId, setDraggingTaskId, setOverColumnId, overColumnId } =
+		useKanbanStore();
 	const { setParams } = useTaskParams();
-	const { setParams: setColumnParams } = useColumnParams();
 	const { ...filters } = useTasksFilterParams();
 	const { data: columns } = useQuery(
 		trpc.columns.get.queryOptions({
@@ -56,11 +78,11 @@ export function KanbanBoard() {
 	const columnsData = React.useMemo(() => {
 		if (!tasks?.data || !columns?.data) return {};
 		const sortedColumns = [...columns.data].sort((a, b) => a.order - b.order);
-		const sortedTasks = [...tasks.data].sort((a, b) => a.order - b.order);
+		// const sortedTasks = [...tasks.data].sort((a, b) => a.order - b.order);
 
 		return sortedColumns.reduce(
 			(acc, column) => {
-				acc[column.name] = sortedTasks.filter(
+				acc[column.name] = tasks.data.filter(
 					(task) => task.columnId === column.id,
 				);
 				return acc;
@@ -89,12 +111,25 @@ export function KanbanBoard() {
 				value={columnsData}
 				// onValueChange={setKanbanState}
 				onDragCancel={async ({ active, over }) => {
+					setDraggingTaskId(null);
+					setOverColumnId(null);
 					return;
 				}}
 				onDragOver={async ({ active, over }) => {
+					const overColumn = columns?.data.find((col) => col.name === over?.id);
+					if (overColumn) {
+						setOverColumnId(overColumn.id);
+					} else {
+						setOverColumnId(null);
+					}
 					return;
 				}}
+				onDragStart={async ({ active }) => {
+					setDraggingTaskId(active.id.toString());
+				}}
 				onDragEnd={async ({ active, over }) => {
+					setDraggingTaskId(null);
+					setOverColumnId(null);
 					if (!tasks) return;
 
 					const activeColumn = columns?.data.find(
@@ -170,13 +205,11 @@ export function KanbanBoard() {
 									if (!old) return old;
 									const newData = {
 										...old,
-										data: [...old.data]
-											.map((task) => {
-												if (task.id === activeItem.id) return newActiveItem;
-												if (task.id === overItem.id) return newOverItem;
-												return task;
-											})
-											.sort((a, b) => a.order - b.order),
+										data: [...old.data].map((task) => {
+											if (task.id === activeItem.id) return newActiveItem;
+											if (task.id === overItem.id) return newOverItem;
+											return task;
+										}),
 									};
 									return newData;
 								},
@@ -206,12 +239,10 @@ export function KanbanBoard() {
 									if (!old) return undefined;
 									const newData = {
 										...old,
-										data: [...old.data]
-											.map((task) => {
-												if (task.id === activeItem.id) return newActiveItem;
-												return task;
-											})
-											.sort((a, b) => a.order - b.order),
+										data: [...old.data].map((task) => {
+											if (task.id === activeItem.id) return newActiveItem;
+											return task;
+										}),
 									};
 									return newData;
 								},
@@ -238,7 +269,10 @@ export function KanbanBoard() {
 
 							return (
 								<Kanban.Column
-									className="h-auto min-h-[200px] min-w-86 max-w-86 grow-1"
+									className={cn(
+										"h-auto min-h-[200px] min-w-86 max-w-86 grow-1",
+										{},
+									)}
 									key={columnValue}
 									value={columnValue}
 								>
@@ -285,7 +319,9 @@ export function KanbanBoard() {
 											</div>
 										</div>
 									</ColumnContextMenu>
-									<div className="flex flex-col gap-2 p-0.5">
+									<div
+										className={cn("relative flex grow-1 flex-col gap-2 p-2")}
+									>
 										{tasks.map((task) => (
 											<TaskContextMenu task={task} key={task.id}>
 												<Kanban.Item
@@ -306,6 +342,16 @@ export function KanbanBoard() {
 												</Kanban.Item>
 											</TaskContextMenu>
 										))}
+										<div
+											className={cn(
+												"pointer-events-none absolute inset-0 border bg-black/50 opacity-0 transition-opacity",
+												{
+													"opacity-100":
+														Boolean(draggingTaskId) &&
+														overColumnId === column.id,
+												},
+											)}
+										/>
 									</div>
 								</Kanban.Column>
 							);

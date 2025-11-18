@@ -10,9 +10,9 @@ type Props = {
 
 export default function DashboardPage({ searchParams }: Props) {
 	return (
-		<div className="">
+		<div className="h-full">
 			<ChatProvider>
-				<div className="flex flex-row gap-6">
+				<div className="flex h-full flex-row gap-6">
 					{/*<ChatContainer chatId={chatId} />*/}
 					<div className="h-full w-full overflow-hidden">
 						<Suspense>
