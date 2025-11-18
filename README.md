@@ -1,6 +1,6 @@
 <h1 align="center"><b>Mimrai</b></h1>
 
-Open source minimalist project management tool to track your tasks and projects with ease.
+Open source minimalist task management tool to track your tasks and projects with ease.
 
 > Mimrai is an evolving project, currently in its early stages of development. Your feedback and contributions are highly valued to help shape its future.
 
