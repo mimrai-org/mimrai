@@ -14,6 +14,7 @@
     "check-types": "turbo check-types",
     "dev:dashboard": "turbo -F @mimir/dashboard dev",
     "dev:api": "turbo -F @mimir/api dev",
+    "dev:website": "turbo -F @mimir/website dev",
     "db:push": "turbo -F @mimir/db db:push"
   },
   "devDependencies": {
