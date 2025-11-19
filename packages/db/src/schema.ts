@@ -700,6 +700,71 @@ export const importStatusEnum = pgEnum("task_import_status", [
 
 export const importTypeEnum = pgEnum("import_type", ["tasks_csv"]);
 
+export const intakeStatusEnum = pgEnum("intake_status", [
+	"pending",
+	"accepted",
+	"rejected",
+]);
+
+export const intakeSourceEnum = pgEnum("intake_source", [
+	"gmail",
+	"voice",
+	"manual",
+]);
+
+export const intake = pgTable(
+	"intake",
+	{
+		id: text("id")
+			.$defaultFn(() => randomUUID())
+			.primaryKey()
+			.notNull(),
+		teamId: text("team_id").notNull(),
+		userId: text("user_id"),
+		source: intakeSourceEnum("source").notNull(),
+		content: text("content").notNull(),
+		status: intakeStatusEnum("status").default("pending").notNull(),
+		aiAnalysis: jsonb("ai_analysis").$type<{
+			suggestedTitle?: string;
+			suggestedDescription?: string;
+			suggestedSubtasks?: string[];
+		}>(),
+		metadata: jsonb("metadata").$type<{
+			emailId?: string;
+			sender?: string;
+			subject?: string;
+			date?: string;
+		}>(),
+		createdAt: timestamp("created_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
+		updatedAt: timestamp("updated_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
+	},
+	(table) => [
+		index("intake_team_id_index").on(table.teamId),
+		index("intake_user_id_index").on(table.userId),
+		foreignKey({
+			columns: [table.teamId],
+			foreignColumns: [teams.id],
+			name: "intake_team_id_fkey",
+		}).onDelete("cascade"),
+		foreignKey({
+			columns: [table.userId],
+			foreignColumns: [users.id],
+			name: "intake_user_id_fkey",
+		}).onDelete("set null"),
+	],
+);
+
+export const intakeRelations = relations(intake, ({ one }) => ({
+	team: one(teams, { fields: [intake.teamId], references: [teams.id] }),
+	user: one(users, { fields: [intake.userId], references: [users.id] }),
+}));
+
 export const imports = pgTable("imports", {
 	id: text("id")
 		.$defaultFn(() => randomUUID())
