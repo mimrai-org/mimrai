@@ -14,7 +14,7 @@ import { ColumnIcon } from "../../column-icon";
 import { ColumnContextMenu } from "./../column-context-menu";
 import { KanbanTask } from "../kanban-task/kanban-task";
 import { TaskContextMenu } from "./../task-context-menu";
-import type { Column, Task } from "./use-kanban-board"; // The hook we created above
+import { type Column, type Task, useKanbanStore } from "./use-kanban-board"; // The hook we created above
 
 interface BoardColumnProps {
 	column: Column;
@@ -23,9 +23,8 @@ interface BoardColumnProps {
 }
 
 export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
+	const { overColumnName, activeTaskId } = useKanbanStore();
 	const { setParams: setTaskParams } = useTaskParams();
-
-	console.log("rerender column:", columnName);
 
 	return (
 		<Kanban.Column
@@ -70,7 +69,7 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 				</div>
 			</ColumnContextMenu>
 
-			<div className="flex flex-col gap-2 p-0.5">
+			<div className="relative flex grow-1 flex-col gap-2 p-2">
 				{tasks.map((task) => (
 					<TaskContextMenu task={task} key={task.id}>
 						<Kanban.Item
@@ -93,6 +92,20 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 						</Kanban.Item>
 					</TaskContextMenu>
 				))}
+				<div
+					className={cn(
+						"pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0",
+						{
+							"opacity-100":
+								overColumnName === columnName && Boolean(activeTaskId),
+						},
+					)}
+				>
+					<div className="text-xs">
+						Drag here to move task to{" "}
+						<strong className="border px-1 py-0.5">{columnName}</strong>
+					</div>
+				</div>
 			</div>
 		</Kanban.Column>
 	);

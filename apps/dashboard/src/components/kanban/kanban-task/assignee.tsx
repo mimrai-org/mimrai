@@ -14,7 +14,7 @@ import {
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { queryClient, trpc } from "@/utils/trpc";
-import { Assignee, AssigneeAvatar } from "../asignee";
+import { Assignee, AssigneeAvatar } from "../asignee-avatar";
 import type { KanbanTask } from "./kanban-task";
 
 export const KanbanAssignee = ({ task }: { task: KanbanTask }) => {

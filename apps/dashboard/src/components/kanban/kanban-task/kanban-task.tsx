@@ -34,9 +34,6 @@ export const KanbanTask = ({
 				className,
 			)}
 			ref={ref}
-			animate={{ opacity: 1, y: 0 }}
-			initial={{ opacity: 0, y: 20 }}
-			exit={{ opacity: 0, y: 20 }}
 			transition={{ duration: 0.2 }}
 			layout
 			layoutId={`task-${task.id}`}

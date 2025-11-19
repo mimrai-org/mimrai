@@ -3,12 +3,27 @@
 import type { RouterOutputs } from "@mimir/api/trpc";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as React from "react";
+import { create } from "zustand";
 import { trpc } from "@/utils/trpc";
 
 // Types
 export type Task = RouterOutputs["tasks"]["get"]["data"][number];
 export type Column = RouterOutputs["columns"]["get"]["data"][number];
 export type KanbanData = Record<string, Task[]>;
+export type KanbanStore = {
+	overColumnName?: string;
+	activeTaskId?: string;
+	setOverColumnName: (name?: string) => void;
+	setActiveTaskId: (id?: string) => void;
+};
+
+// Zustand store for kanban drag state
+export const useKanbanStore = create<KanbanStore>((set) => ({
+	overColumnName: undefined,
+	activeTaskId: undefined,
+	setOverColumnName: (name) => set({ overColumnName: name }),
+	setActiveTaskId: (id) => set({ activeTaskId: id }),
+}));
 
 const MIN_ORDER = 0;
 const MAX_ORDER = 74000;
@@ -50,7 +65,32 @@ export function useKanbanBoard(filters: any) {
 		if (!tasks?.data || !columns?.data) return {};
 
 		const sortedColumns = [...columns.data].sort((a, b) => a.order - b.order);
-		const sortedTasks = [...tasks.data].sort((a, b) => a.order - b.order);
+		const sortedTasks = [...tasks.data].sort((a, b) => {
+			// First by priority (urgent > high > medium > low)
+			const priorityOrder = {
+				urgent: 1,
+				high: 2,
+				medium: 3,
+				low: 4,
+				undefined: 5,
+			};
+			const priorityDiff =
+				(priorityOrder[a.priority as keyof typeof priorityOrder] || 5) -
+				(priorityOrder[b.priority as keyof typeof priorityOrder] || 5);
+			if (priorityDiff !== 0) return priorityDiff;
+
+			// Then by due date (earliest first)
+			const aDue = a.dueDate
+				? new Date(a.dueDate).getTime()
+				: Number.POSITIVE_INFINITY;
+			const bDue = b.dueDate
+				? new Date(b.dueDate).getTime()
+				: Number.POSITIVE_INFINITY;
+			if (aDue !== bDue) return aDue - bDue;
+
+			// Finally by order
+			return a.order - b.order;
+		});
 
 		return sortedColumns.reduce((acc, column) => {
 			acc[column.name] = sortedTasks.filter(

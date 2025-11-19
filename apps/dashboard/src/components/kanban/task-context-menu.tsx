@@ -18,7 +18,7 @@ import { queryClient, trpc } from "@/utils/trpc";
 import { ColumnIcon } from "../column-icon";
 import Loader from "../loader";
 import { ProjectIcon } from "../project-icon";
-import { Assignee, AssigneeAvatar } from "./asignee";
+import { Assignee, AssigneeAvatar } from "./asignee-avatar";
 import { PriorityItem } from "./priority";
 
 export const TaskContextMenu = ({

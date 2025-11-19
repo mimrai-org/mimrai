@@ -19,7 +19,7 @@ import { format } from "date-fns";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { trpc } from "@/utils/trpc";
 import { ColumnIcon } from "../column-icon";
-import { AssigneeAvatar } from "../kanban/asignee";
+import { AssigneeAvatar } from "../kanban/asignee-avatar";
 import { Priority } from "../kanban/priority";
 
 export const TasksTodoWidget = () => {

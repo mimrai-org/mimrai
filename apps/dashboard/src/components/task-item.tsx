@@ -9,7 +9,7 @@ import { useTaskParams } from "@/hooks/use-task-params";
 import { cn } from "@/lib/utils";
 import { queryClient, trpc } from "@/utils/trpc";
 import { ColumnIcon } from "./column-icon";
-import { AssigneeAvatar } from "./kanban/asignee";
+import { AssigneeAvatar } from "./kanban/asignee-avatar";
 import { Priority } from "./kanban/priority";
 import { ProjectIcon } from "./project-icon";
 
