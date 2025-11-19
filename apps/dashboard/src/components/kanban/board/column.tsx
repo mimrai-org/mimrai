@@ -28,7 +28,7 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 
 	return (
 		<Kanban.Column
-			className="h-auto min-h-[200px] min-w-86 max-w-86 grow-1"
+			className="h-auto min-h-[200px] min-w-86 max-w-86 grow-1 bg-muted/50"
 			value={columnName}
 		>
 			<ColumnContextMenu column={column}>
@@ -69,7 +69,7 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 				</div>
 			</ColumnContextMenu>
 
-			<div className="relative flex grow-1 flex-col gap-2 p-2">
+			<div className="relative flex grow-1 flex-col gap-2">
 				{tasks.map((task) => (
 					<TaskContextMenu task={task} key={task.id}>
 						<Kanban.Item
@@ -94,7 +94,7 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 				))}
 				<div
 					className={cn(
-						"pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0",
+						"pointer-events-none absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity duration-200",
 						{
 							"opacity-100":
 								overColumnName === columnName && Boolean(activeTaskId),

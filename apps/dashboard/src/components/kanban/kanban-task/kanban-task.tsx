@@ -27,7 +27,7 @@ export const KanbanTask = ({
 	return (
 		<motion.div
 			className={cn(
-				"flex min-h-14 cursor-pointer flex-col rounded-none bg-secondary transition-background hover:bg-secondary/80",
+				"flex min-h-14 cursor-pointer flex-col rounded-none bg-card transition-background hover:bg-card/50",
 				{
 					"opacity-50!": task.column?.type === "done",
 				},
@@ -63,7 +63,7 @@ export const KanbanTask = ({
 					<div className="mt-2 flex flex-wrap items-center gap-2">
 						{task.priority ? <Priority value={task.priority} /> : <div />}
 						{task.project && (
-							<div className="flex h-5.5 items-center gap-1 border bg-secondary px-2 font-medium text-xs">
+							<div className="flex h-5.5 items-center gap-1 bg-secondary px-2 font-medium text-xs">
 								<ProjectIcon className="size-3.5" {...task.project} />
 								{task.project.name}
 							</div>
@@ -71,19 +71,19 @@ export const KanbanTask = ({
 						{task.labels?.length > 0 && (
 							<div className="flex flex-wrap gap-1">
 								{task.labels?.slice(0, 3).map((label) => (
-									<LabelBadge key={label.id} {...label} variant="outline" />
+									<LabelBadge key={label.id} {...label} variant="secondary" />
 								))}
 							</div>
 						)}
 						{task.dueDate && (
-							<time className="flex h-5.5 items-center border bg-secondary px-2 font-medium text-xs tabular-nums">
+							<time className="flex h-5.5 items-center bg-secondary px-2 font-medium text-xs tabular-nums">
 								{format(new Date(task.dueDate), "PP")}
 							</time>
 						)}
 						{task.checklistSummary?.total > 0 && (
 							<div
 								className={cn(
-									"flex h-5.5 items-center border px-2 font-medium text-muted-foreground text-xs",
+									"flex h-5.5 items-center px-2 font-medium text-muted-foreground text-xs",
 									{
 										"bg-primary px-2 text-primary-foreground":
 											task.checklistSummary.completed ===
