@@ -35,6 +35,24 @@ export const integrationsRegistry = {
 			accessToken: z.string(),
 		}),
 	},
+	gmail: {
+		name: "Gmail",
+		type: "gmail" as const,
+		description: "Smart Inbox Integration for Gmail",
+		configSchema: z.object({
+			refreshToken: z.string().min(1, "Refresh token is required"),
+			accessToken: z.string().optional(),
+			expiresAt: z.number().optional(),
+			lastSyncedAt: z.string().optional(),
+
+			// Smart Filtering Config
+			mode: z.enum(["auto", "strict_allow", "strict_deny"]).default("auto"),
+			allowDomains: z.array(z.string()).default([]),
+			allowSenders: z.array(z.string()).default([]),
+			denyDomains: z.array(z.string()).default([]),
+			denySenders: z.array(z.string()).default([]),
+		}),
+	},
 } as const;
 
 export type IntegrationName = keyof typeof integrationsRegistry;

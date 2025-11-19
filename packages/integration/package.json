@@ -27,6 +27,7 @@
     "@slack/bolt": "^4.6.0",
     "ai": "^5.0.56",
     "drizzle-orm": "0.44.6",
+    "googleapis": "^166.0.0",
     "mime-types": "^3.0.1",
     "redis": "^5.8.2",
     "twilio": "^5.10.4",
