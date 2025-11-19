@@ -3,7 +3,6 @@ import { getUserById } from "@mimir/db/queries/users";
 import type { Session } from "better-auth";
 import type { MiddlewareHandler } from "hono";
 import { HTTPException } from "hono/http-exception";
-import type { Context } from "../types";
 
 export const withAuth: MiddlewareHandler = async (c, next) => {
 	const authSession = await auth.api.getSession({
@@ -24,6 +23,7 @@ export const withAuth: MiddlewareHandler = async (c, next) => {
 		};
 
 		c.set("session", session);
+		c.set("user", user);
 		c.set("teamId", user.teamId);
 		// Grant all scopes for authenticated users via Supabase
 		// c.set("scopes", expandScopes(["apis.all"]));

@@ -64,7 +64,7 @@ export const IntegrationsList = () => {
 													setParams({ installType: integration.type })
 												}
 											>
-												Install
+												{integration.type === "gmail" ? "Connect" : "Install"}
 											</Button>
 										)}
 									</div>

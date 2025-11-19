@@ -426,6 +426,7 @@ export const integrations = pgTable(
 			.primaryKey()
 			.notNull(),
 		teamId: text("team_id").notNull(),
+		userId: text("user_id"),
 		externalTeamId: text("external_team_id"),
 		name: text("name").notNull(),
 		type: text("type").$type<IntegrationName>().notNull(),
@@ -445,6 +446,11 @@ export const integrations = pgTable(
 			foreignColumns: [teams.id],
 			name: "integrations_team_id_fkey",
 		}),
+		foreignKey({
+			columns: [table.userId],
+			foreignColumns: [users.id],
+			name: "integrations_user_id_fkey",
+		}).onDelete("set null"),
 	],
 );
 
@@ -729,16 +735,20 @@ export const intake = pgTable(
 			suggestedDescription?: string;
 			suggestedSubtasks?: string[];
 		}>(),
-		metadata: jsonb("metadata").$type<{
-			emailId?: string;
-			sender?: string;
-			subject?: string;
-			date?: string;
-		}>(),
-		createdAt: timestamp("created_at", {
-			withTimezone: true,
-			mode: "string",
-		}).defaultNow(),
+	metadata: jsonb("metadata").$type<{
+		emailId?: string;
+		sender?: string;
+		subject?: string;
+		date?: string;
+		snippet?: string;
+		originalHtml?: string;
+	}>(),
+	sourceMessageId: text("source_message_id"),
+	taskId: text("task_id"),
+	createdAt: timestamp("created_at", {
+		withTimezone: true,
+		mode: "string",
+	}).defaultNow(),
 		updatedAt: timestamp("updated_at", {
 			withTimezone: true,
 			mode: "string",
@@ -747,6 +757,11 @@ export const intake = pgTable(
 	(table) => [
 		index("intake_team_id_index").on(table.teamId),
 		index("intake_user_id_index").on(table.userId),
+		index("intake_source_message_id_index").on(table.sourceMessageId),
+		unique("unique_intake_source_per_team").on(
+			table.teamId,
+			table.sourceMessageId,
+		),
 		foreignKey({
 			columns: [table.teamId],
 			foreignColumns: [teams.id],
@@ -756,6 +771,11 @@ export const intake = pgTable(
 			columns: [table.userId],
 			foreignColumns: [users.id],
 			name: "intake_user_id_fkey",
+		}).onDelete("set null"),
+		foreignKey({
+			columns: [table.taskId],
+			foreignColumns: [tasks.id],
+			name: "intake_task_id_fkey",
 		}).onDelete("set null"),
 	],
 );

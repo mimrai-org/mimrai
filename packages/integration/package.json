@@ -16,9 +16,12 @@
     "./mattermost": "./src/mattermost/index.ts",
     "./task-comments": "./src/task-comments/index.ts",
     "./slack": "./src/slack/index.ts",
-    "./whatsapp": "./src/whatsapp/index.ts"
+    "./whatsapp": "./src/whatsapp/index.ts",
+    "./gmail/manager": "./src/gmail/manager.ts",
+    "./gmail/intake-manager": "./src/gmail/intake-manager.ts"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^1.1.9",
     "@mattermost/client": "^10.12.0",
     "@mimir/cache": "workspace:*",
     "@mimir/db": "workspace:*",
@@ -26,7 +29,9 @@
     "@mimir/utils": "workspace:*",
     "@slack/bolt": "^4.6.0",
     "ai": "^5.0.56",
+    "cheerio": "^1.0.0",
     "drizzle-orm": "0.44.6",
+    "google-auth-library": "^9.15.1",
     "googleapis": "^166.0.0",
     "mime-types": "^3.0.1",
     "redis": "^5.8.2",
