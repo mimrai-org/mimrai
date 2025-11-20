@@ -23,7 +23,6 @@ export const withAuth: MiddlewareHandler = async (c, next) => {
 		};
 
 		c.set("session", session);
-		c.set("user", user);
 		c.set("teamId", user.teamId);
 		// Grant all scopes for authenticated users via Supabase
 		// c.set("scopes", expandScopes(["apis.all"]));

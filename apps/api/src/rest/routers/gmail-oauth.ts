@@ -4,7 +4,7 @@ import type { Context } from "@api/rest/types";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { db } from "@mimir/db/client";
 import { integrations } from "@mimir/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { google } from "googleapis";
 
 const gmailOAuthRouter = new OpenAPIHono<Context>();
@@ -34,7 +34,7 @@ gmailOAuthRouter.get("/authorize", async (c) => {
 	}
 
 	const session = c.get("session");
-	const user = c.get("user");
+	const teamId = c.get("teamId");
 
 	if (!session) {
 		return c.json({ error: "Unauthorized" }, 401);
@@ -42,8 +42,8 @@ gmailOAuthRouter.get("/authorize", async (c) => {
 
 	const state = randomUUID();
 	stateStore.set(state, {
-		userId: user.id,
-		teamId: user.teamId,
+		userId: session.userId,
+		teamId,
 		expiresAt: Date.now() + 10 * 60 * 1000, // 10 minutes
 	});
 
@@ -107,8 +107,12 @@ gmailOAuthRouter.get("/callback", async (c) => {
 		const [existingIntegration] = await db
 			.select()
 			.from(integrations)
-			.where(eq(integrations.type, "gmail"))
-			.where(eq(integrations.teamId, stateData.teamId))
+			.where(
+				and(
+					eq(integrations.type, "gmail"),
+					eq(integrations.teamId, stateData.teamId),
+				),
+			)
 			.limit(1);
 
 		if (existingIntegration) {
