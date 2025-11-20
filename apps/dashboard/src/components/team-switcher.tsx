@@ -64,7 +64,7 @@ export const TeamSwitcher = () => {
 					className="flex w-full items-center justify-between gap-2 py-2 opacity-90 hover:bg-transparent hover:opacity-100 focus:outline-none dark:hover:bg-transparent"
 				>
 					<div className="flex gap-2">
-						<div className="flex aspect-square size-8 items-center justify-center rounded-lg border border-primary bg-primary text-sidebar-primary-foreground">
+						<div className="flex aspect-square size-8 items-center justify-center rounded-sm border border-primary bg-primary text-sidebar-primary-foreground">
 							<Avatar className="size-6 bg-transparent text-base">
 								<AvatarFallback className="bg-transparent text-primary-foreground">
 									{user?.team?.name?.charAt(0).toUpperCase()}

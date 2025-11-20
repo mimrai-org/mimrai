@@ -1,16 +1,16 @@
 import { getWidgetSchema } from "@api/schemas/widgets";
 import { protectedProcedure, router } from "@api/trpc/init";
 import {
-	getTasksCompletedByDay,
+	getTasksBurnup,
 	getTasksSummaryByMember,
 	getTasksTodo,
 } from "@mimir/db/queries/tasks-analytics";
 
 export const widgetsRouter = router({
-	tasksCompletedByDay: protectedProcedure
+	tasksBurnup: protectedProcedure
 		.input(getWidgetSchema)
 		.query(async ({ ctx, input }) => {
-			return getTasksCompletedByDay({
+			return getTasksBurnup({
 				teamId: ctx.user.teamId!,
 				startDate: input.startDate,
 				endDate: input.endDate,
