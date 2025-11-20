@@ -17,8 +17,7 @@
     "./task-comments": "./src/task-comments/index.ts",
     "./slack": "./src/slack/index.ts",
     "./whatsapp": "./src/whatsapp/index.ts",
-    "./gmail/manager": "./src/gmail/manager.ts",
-    "./gmail/intake-manager": "./src/gmail/intake-manager.ts"
+    "./gmail/handle": "./src/gmail/handle.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.1.9",
@@ -31,7 +30,7 @@
     "ai": "^5.0.56",
     "cheerio": "^1.0.0",
     "drizzle-orm": "0.44.6",
-    "google-auth-library": "^9.15.1",
+    "google-auth-library": "^10.5.0",
     "googleapis": "^166.0.0",
     "mime-types": "^3.0.1",
     "redis": "^5.8.2",

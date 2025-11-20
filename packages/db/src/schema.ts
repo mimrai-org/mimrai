@@ -1,5 +1,4 @@
 import { randomUUID } from "node:crypto";
-import { arch } from "node:os";
 import type { UIChatMessage } from "@api/ai/types";
 import type { IntegrationConfig, IntegrationName } from "@integration/registry";
 import { randomColor } from "@mimir/utils/random";
@@ -734,21 +733,28 @@ export const intake = pgTable(
 			suggestedTitle?: string;
 			suggestedDescription?: string;
 			suggestedSubtasks?: string[];
+			suggestedDueDate?: string;
+			suggestedPriority?: "low" | "medium" | "high" | "urgent";
+			suggestedAssignee?: string;
+			confidence?: number;
+			summary?: string;
+			actionItems?: string[];
+			category?: string;
 		}>(),
-	metadata: jsonb("metadata").$type<{
-		emailId?: string;
-		sender?: string;
-		subject?: string;
-		date?: string;
-		snippet?: string;
-		originalHtml?: string;
-	}>(),
-	sourceMessageId: text("source_message_id"),
-	taskId: text("task_id"),
-	createdAt: timestamp("created_at", {
-		withTimezone: true,
-		mode: "string",
-	}).defaultNow(),
+		metadata: jsonb("metadata").$type<{
+			emailId?: string;
+			sender?: string;
+			subject?: string;
+			date?: string;
+			snippet?: string;
+			originalHtml?: string;
+		}>(),
+		sourceMessageId: text("source_message_id"),
+		taskId: text("task_id"),
+		createdAt: timestamp("created_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
 		updatedAt: timestamp("updated_at", {
 			withTimezone: true,
 			mode: "string",

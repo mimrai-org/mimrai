@@ -70,7 +70,7 @@ export default function IntakePage() {
 	const { data: membersData } = useQuery(trpc.teams.getMembers.queryOptions());
 
 	const columns = columnsData?.data;
-	const members = membersData?.data;
+	const members = membersData;
 
 	const selectedItem = intakeItems?.find((item) => item.id === selectedItemId);
 
@@ -96,7 +96,7 @@ export default function IntakePage() {
 					selectedItem.aiAnalysis?.suggestedDescription ||
 					selectedItem.content.substring(0, 500),
 				columnId: defaultColumn?.id,
-				priority: "medium",
+				priority: selectedItem.aiAnalysis?.suggestedPriority || "medium",
 			});
 		}
 	}, [selectedItem?.id, columns, form]);
@@ -112,7 +112,7 @@ export default function IntakePage() {
 				const index =
 					intakeItems?.findIndex((i) => i.id === selectedItemId) ?? -1;
 				if (index !== -1 && intakeItems && index < intakeItems.length - 1) {
-					setSelectedItemId(intakeItems[index + 1].id);
+					setSelectedItemId(intakeItems[index + 1]!.id);
 				} else {
 					setSelectedItemId(null);
 				}
@@ -134,7 +134,7 @@ export default function IntakePage() {
 				const index =
 					intakeItems?.findIndex((i) => i.id === selectedItemId) ?? -1;
 				if (index !== -1 && intakeItems && index < intakeItems.length - 1) {
-					setSelectedItemId(intakeItems[index + 1].id);
+					setSelectedItemId(intakeItems[index + 1]!.id);
 				} else {
 					setSelectedItemId(null);
 				}
@@ -433,11 +433,16 @@ export default function IntakePage() {
 																</SelectTrigger>
 															</FormControl>
 															<SelectContent>
-																{members?.map((member) => (
-																	<SelectItem key={member.id} value={member.id}>
-																		{member.name}
-																	</SelectItem>
-																))}
+																{members?.map(
+																	(member: { id: string; name: string }) => (
+																		<SelectItem
+																			key={member.id}
+																			value={member.id}
+																		>
+																			{member.name}
+																		</SelectItem>
+																	),
+																)}
 															</SelectContent>
 														</Select>
 														<FormMessage />
