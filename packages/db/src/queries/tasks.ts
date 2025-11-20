@@ -846,7 +846,7 @@ export const cloneTask = async ({
 	teamId: string;
 	userId: string;
 }) => {
-	const task = await getTaskById(taskId, teamId);
+	const task = await getTaskById(taskId, userId);
 	if (!task) throw new Error("Task not found");
 
 	const newTask = await createTask({
