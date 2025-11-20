@@ -153,7 +153,7 @@ export const TaskForm = ({
 				});
 			}
 		};
-	}, []);
+	}, [form]);
 
 	const parseMentions = (data: any) => {
 		const mentions: string[] = (data.content || []).flatMap(parseMentions);
