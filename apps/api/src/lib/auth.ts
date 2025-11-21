@@ -32,6 +32,11 @@ export const auth = betterAuth<BetterAuthOptions>({
 				return;
 			}
 
+			// Bypass waitlist check in development
+			if (process.env.NODE_ENV === "development") {
+				return;
+			}
+
 			const [waitlistEntry] = await db
 				.select()
 				.from(waitlist)

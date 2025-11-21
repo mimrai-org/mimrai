@@ -1,23 +1,23 @@
 import { defineConfig } from "@trigger.dev/sdk";
 
 export default defineConfig({
-  project: "proj_nknxpfoejznlapsfqzqq",
-  runtime: "node",
-  logLevel: "log",
-  maxDuration: 60,
-  experimental_processKeepAlive: true,
-  retries: {
-    enabledInDev: false,
-    default: {
-      maxAttempts: 3,
-      minTimeoutInMs: 1000,
-      maxTimeoutInMs: 10000,
-      factor: 2,
-      randomize: true,
-    },
-  },
-  build: {
-    external: ["sharp", "canvas", "pino"],
-  },
-  dirs: ["./src/jobs"],
+	project: "proj_pkmzpcrpsttmqpikzyyv",
+	runtime: "node",
+	logLevel: "log",
+	maxDuration: 60,
+	experimental_processKeepAlive: true,
+	retries: {
+		enabledInDev: false,
+		default: {
+			maxAttempts: 3,
+			minTimeoutInMs: 1000,
+			maxTimeoutInMs: 10000,
+			factor: 2,
+			randomize: true,
+		},
+	},
+	build: {
+		external: ["sharp", "canvas", "pino"],
+	},
+	dirs: ["./src/jobs"],
 });

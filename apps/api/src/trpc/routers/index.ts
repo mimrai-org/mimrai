@@ -8,6 +8,7 @@ import { checklistsRouter } from "./checklists";
 import { columnsRouter } from "./columns";
 import { githubRouter } from "./github";
 import { importsRouter } from "./imports";
+import { intakeRouter } from "./intake";
 import { integrationsRouter } from "./integrations";
 import { labelsRouter } from "./labels";
 import { notificationSettingsRouter } from "./notification-settings";
@@ -40,6 +41,7 @@ export const appRouter = router({
 	activities: activitiesRouter,
 	github: githubRouter,
 	imports: importsRouter,
+	intake: intakeRouter,
 	notificationSettings: notificationSettingsRouter,
 	resumeSettings: resumeSettingsRouter,
 	widgets: widgetsRouter,

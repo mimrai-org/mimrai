@@ -4,8 +4,6 @@ import {
 	Sidebar,
 	SidebarContent,
 	SidebarFooter,
-	SidebarGroup,
-	SidebarGroupContent,
 	SidebarHeader,
 	SidebarMenu,
 	SidebarMenuButton,
@@ -13,6 +11,7 @@ import {
 } from "@ui/components/ui/sidebar";
 import {
 	BoxIcon,
+	InboxIcon,
 	LayersIcon,
 	LayoutDashboardIcon,
 	type LucideIcon,
@@ -23,7 +22,6 @@ import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
 import { useUser } from "@/hooks/use-user";
-import { CreateButton } from "./create-button";
 import { SidebarSubscriptionStatus } from "./sidebar-subscription-status";
 import { TeamSwitcher } from "./team-switcher";
 
@@ -72,6 +70,11 @@ const data: {
 					url: "/dashboard/done",
 				},
 			],
+		},
+		{
+			title: "Intake",
+			url: "/dashboard/intake",
+			icon: InboxIcon,
 		},
 		{
 			title: "Projects",

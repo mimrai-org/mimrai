@@ -3,7 +3,6 @@ import { getUserById } from "@mimir/db/queries/users";
 import type { Session } from "better-auth";
 import type { MiddlewareHandler } from "hono";
 import { HTTPException } from "hono/http-exception";
-import type { Context } from "../types";
 
 export const withAuth: MiddlewareHandler = async (c, next) => {
 	const authSession = await auth.api.getSession({
