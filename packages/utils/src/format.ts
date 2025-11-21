@@ -52,3 +52,36 @@ export function getInitials(value: string) {
 
   return formatted.charAt(0);
 }
+
+/**
+ * Get the first alphabetic character from a string as an initial
+ * @param name - The name to extract the initial from
+ * @returns The first alphabetic character in uppercase, or "?" if none found
+ */
+export function getFirstInitial(name: string): string {
+  const match = name.match(/[a-zA-Z]/);
+  return match ? match[0].toUpperCase() : "?";
+}
+
+/**
+ * Generate a consistent Tailwind color class based on an ID
+ * @param id - The ID to generate a color from
+ * @returns A Tailwind background color class
+ */
+export function getAvatarColorClass(id: string): string {
+  const colors = [
+    "bg-red-500",
+    "bg-blue-500",
+    "bg-green-500",
+    "bg-yellow-500",
+    "bg-purple-500",
+    "bg-pink-500",
+    "bg-indigo-500",
+  ];
+  
+  const colorIndex = id
+    .split("")
+    .reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
+  
+  return colors[colorIndex];
+}

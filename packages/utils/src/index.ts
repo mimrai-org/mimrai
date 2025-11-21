@@ -7,6 +7,13 @@ export function stripSpecialCharacters(inputString: string) {
 }
 
 export {
+	formatAmount,
+	formatDate,
+	getAvatarColorClass,
+	getFirstInitial,
+	getInitials,
+} from "./format";
+export {
 	ensureFileExtension,
 	getExtensionFromMimeType,
 } from "./mime-to-extension";
