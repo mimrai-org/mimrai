@@ -3,7 +3,7 @@ import { getAvatarColorClass, getFirstInitial } from "@mimir/utils";
 import type React from "react";
 
 interface IntakeInboxListProps {
-	intakeItems: RouterOutputs["intake"]["getPending"] | undefined;
+	intakeItems: RouterOutputs["intake"]["getIntakes"]["data"] | undefined;
 	selectedId: string | null;
 	onSelect: (id: string) => void;
 }

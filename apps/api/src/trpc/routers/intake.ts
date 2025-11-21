@@ -2,7 +2,7 @@ import { protectedProcedure, router } from "@api/trpc/init";
 import { db } from "@mimir/db/client";
 import {
 	getIntakeItemById,
-	getIntakeItems,
+	getIntakes,
 	updateIntakeItemStatus,
 } from "@mimir/db/queries/intake";
 import { createTask } from "@mimir/db/queries/tasks";
@@ -11,19 +11,20 @@ import { and, eq } from "drizzle-orm";
 import z from "zod";
 
 export const intakeRouter = router({
-	getPending: protectedProcedure
+	getIntakes: protectedProcedure
 		.input(
 			z.object({
-				limit: z.number().min(1).max(100).optional(),
-				offset: z.number().min(0).optional(),
+				pageSize: z.number().min(1).max(100).optional(),
+				cursor: z.string().optional(),
+				status: z.enum(intakeStatusEnum.enumValues).optional(),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
-			return await getIntakeItems({
+			return await getIntakes({
 				teamId: ctx.user.teamId!,
-				status: "pending",
-				limit: input.limit,
-				offset: input.offset,
+				status: input.status,
+				pageSize: input.pageSize,
+				cursor: input.cursor,
 			});
 		}),
 

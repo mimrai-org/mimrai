@@ -14,11 +14,14 @@ export default function IntakePage() {
 	const queryClient = useQueryClient();
 	const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
-	const { data: intakeItems } = useQuery(
-		trpc.intake.getPending.queryOptions({
-			limit: 50,
+	const { data: intakeData } = useQuery(
+		trpc.intake.getIntakes.queryOptions({
+			pageSize: 50,
+			status: "pending",
 		}),
 	);
+
+	const intakeItems = intakeData?.data;
 
 	const { data: columnsData } = useQuery(
 		trpc.columns.get.queryOptions({
@@ -38,7 +41,7 @@ export default function IntakePage() {
 			onSuccess: () => {
 				toast.success("Task created successfully!");
 				queryClient.invalidateQueries({
-					queryKey: [["intake", "getPending"]],
+					queryKey: [["intake", "getIntakes"]],
 				});
 				// Move to next item
 				const index =
@@ -60,7 +63,7 @@ export default function IntakePage() {
 			onSuccess: () => {
 				toast.success("Item rejected");
 				queryClient.invalidateQueries({
-					queryKey: [["intake", "getPending"]],
+					queryKey: [["intake", "getIntakes"]],
 				});
 				// Move to next item
 				const index =

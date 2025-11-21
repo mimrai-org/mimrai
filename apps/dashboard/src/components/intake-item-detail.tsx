@@ -5,7 +5,9 @@ import { Mail } from "lucide-react";
 import type React from "react";
 
 interface IntakeItemDetailProps {
-	selectedItem: RouterOutputs["intake"]["getPending"][number] | undefined;
+	selectedItem:
+		| RouterOutputs["intake"]["getIntakes"]["data"][number]
+		| undefined;
 }
 
 const IntakeItemDetail: React.FC<IntakeItemDetailProps> = ({
@@ -36,7 +38,7 @@ const IntakeItemDetail: React.FC<IntakeItemDetailProps> = ({
 				<h1 className="mb-2 font-semibold text-lg">{subject}</h1>
 				<div className="flex items-center gap-3">
 					<div
-						className={`flex h-8 w-10 items-center justify-center rounded-full font-bold ${avatarColor}`}
+						className={`flex h-8 w-8 items-center justify-center rounded-full font-bold ${avatarColor}`}
 					>
 						{initials}
 					</div>

@@ -3,18 +3,18 @@ import { db } from "..";
 import { intake, type intakeStatusEnum } from "../schema";
 
 /**
- * Get intake items for a team with pagination and filtering
+ * Get intakes for a team with cursor-based pagination and filtering
  */
-export const getIntakeItems = async ({
+export const getIntakes = async ({
 	teamId,
 	status,
-	limit = 50,
-	offset = 0,
+	pageSize = 50,
+	cursor,
 }: {
 	teamId: string;
 	status?: (typeof intakeStatusEnum.enumValues)[number];
-	limit?: number;
-	offset?: number;
+	pageSize?: number;
+	cursor?: string;
 }) => {
 	const filters = [eq(intake.teamId, teamId)];
 
@@ -22,20 +22,86 @@ export const getIntakeItems = async ({
 		filters.push(eq(intake.status, status));
 	}
 
-	return await db
+	// Apply pagination
+	const offset = cursor ? Number.parseInt(cursor, 10) : 0;
+
+	const data = await db
 		.select()
 		.from(intake)
 		.where(and(...filters))
 		.orderBy(desc(intake.createdAt))
-		.limit(limit)
+		.limit(pageSize)
 		.offset(offset);
+
+	// Calculate next cursor
+	const nextCursor =
+		data && data.length === pageSize
+			? (offset + pageSize).toString()
+			: undefined;
+
+	return {
+		meta: {
+			cursor: nextCursor ?? null,
+			hasPreviousPage: offset > 0,
+			hasNextPage: data && data.length === pageSize,
+		},
+		data,
+	};
 };
 
 /**
  * Create a new intake item
  */
-export const createIntakeItem = async (item: typeof intake.$inferInsert) => {
-	const [created] = await db.insert(intake).values(item).returning();
+export const createIntakeItem = async ({
+	teamId,
+	userId,
+	source,
+	content,
+	status,
+	aiAnalysis,
+	metadata,
+	sourceMessageId,
+}: {
+	teamId: string;
+	userId?: string | null;
+	source: "gmail" | "voice" | "manual";
+	content: string;
+	status?: "pending" | "accepted" | "rejected";
+	aiAnalysis?: {
+		suggestedTitle?: string;
+		suggestedDescription?: string;
+		suggestedSubtasks?: string[];
+		suggestedDueDate?: string;
+		suggestedPriority?: "low" | "medium" | "high" | "urgent";
+		suggestedAssignee?: string;
+		confidence?: number;
+		summary?: string;
+		actionItems?: string[];
+		category?: string;
+	};
+	metadata?: {
+		emailId?: string;
+		sender?: string;
+		subject?: string;
+		date?: string;
+		snippet?: string;
+		originalHtml?: string;
+	};
+	sourceMessageId?: string | null;
+}) => {
+	const [created] = await db
+		.insert(intake)
+		.values({
+			teamId,
+			userId,
+			source,
+			content,
+			status,
+			aiAnalysis,
+			metadata,
+			sourceMessageId,
+		})
+		.returning();
 	return created;
 };
 

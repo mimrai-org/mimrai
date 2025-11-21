@@ -17,7 +17,9 @@ const taskFormSchema = z.object({
 export type TaskFormValues = z.infer<typeof taskFormSchema>;
 
 interface IntakeActionFormProps {
-	selectedItem: RouterOutputs["intake"]["getPending"][number] | undefined;
+	selectedItem:
+		| RouterOutputs["intake"]["getIntakes"]["data"][number]
+		| undefined;
 	columns:
 		| {
 				id: string;
