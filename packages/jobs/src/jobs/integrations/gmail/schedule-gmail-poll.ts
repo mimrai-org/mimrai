@@ -1,5 +1,5 @@
 import { getDb } from "@jobs/init";
-import { integrations } from "@mimir/db/schema";
+import { integrations, integrationUserLink } from "@mimir/db/schema";
 import { logger, schedules } from "@trigger.dev/sdk";
 import { eq } from "drizzle-orm";
 import { processUserGmailPoll } from "./process-user-gmail-poll";
@@ -13,42 +13,63 @@ export const scheduleGmailPoll = schedules.task({
 	run: async () => {
 		const db = getDb();
 
-		const gmailIntegrations = await db
-			.select()
-			.from(integrations)
-			.where(eq(integrations.type, "gmail"));
+		const gmailLinkedUsers = await db
+			.select({
+				userId: integrationUserLink.userId,
+				externalUserId: integrationUserLink.externalUserId,
+				integrationId: integrationUserLink.integrationId,
+				teamId: integrations.teamId,
+			})
+			.from(integrationUserLink)
+			.innerJoin(
+				integrations,
+				eq(integrationUserLink.integrationId, integrations.id),
+			)
+			.where(eq(integrationUserLink.integrationType, "gmail"));
 
-		logger.info(`Found ${gmailIntegrations.length} Gmail integrations to poll`);
+		logger.info(`Found ${gmailLinkedUsers.length} Gmail linked users to poll`);
+
+		if (gmailLinkedUsers.length === 0) {
+			logger.info("No Gmail linked users found, skipping");
+			return;
+		}
 
 		const timestamp = Date.now();
+		let triggeredCount = 0;
 
-		for (const integration of gmailIntegrations) {
+		for (const linkedUser of gmailLinkedUsers) {
+			if (!linkedUser.integrationId) {
+				logger.warn(`User ${linkedUser.userId} has no integrationId, skipping`);
+				continue;
+			}
+
 			try {
 				await processUserGmailPoll.trigger(
 					{
-						integrationId: integration.id,
-						teamId: integration.teamId,
-						userId: integration.userId || undefined,
+						integrationId: linkedUser.integrationId,
+						teamId: linkedUser.teamId,
+						userId: linkedUser.userId,
+						externalUserId: linkedUser.externalUserId,
 					},
 					{
-						idempotencyKey: `gmail-poll-${integration.id}-${timestamp}`,
+						idempotencyKey: `gmail-poll-${linkedUser.userId}-${timestamp}`,
 						tags: [
-							`teamId:${integration.teamId}`,
-							`integrationId:${integration.id}`,
+							`userId:${linkedUser.userId}`,
+							`integrationId:${linkedUser.integrationId}`,
 						],
 					},
 				);
 
-				logger.info(`Triggered worker for integration ${integration.id}`);
+				triggeredCount++;
 			} catch (error) {
 				logger.error(
-					`Failed to trigger worker for integration ${integration.id}: ${error}`,
+					`Failed to trigger worker for user ${linkedUser.userId}: ${error}`,
 				);
 			}
 		}
 
 		logger.info(
-			`Gmail polling coordinator completed - triggered ${gmailIntegrations.length} workers`,
+			`Gmail polling coordinator completed - triggered ${triggeredCount} workers`,
 		);
 	},
 });

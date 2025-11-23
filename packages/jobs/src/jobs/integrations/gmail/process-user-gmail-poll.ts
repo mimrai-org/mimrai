@@ -11,12 +11,15 @@ export const processUserGmailPoll = schemaTask({
 	schema: z.object({
 		integrationId: z.string(),
 		teamId: z.string(),
-		userId: z.string().optional(),
+		userId: z.string(),
+		externalUserId: z.string(),
 	}),
 	run: async (payload) => {
-		const { integrationId, teamId, userId } = payload;
+		const { integrationId, teamId, userId, externalUserId } = payload;
 
-		logger.info(`Processing integration ${integrationId}...`);
+		logger.info(
+			`Processing Gmail for user ${userId} (external: ${externalUserId})`,
+		);
 
 		const [integration] = await db
 			.select()
@@ -28,17 +31,14 @@ export const processUserGmailPoll = schemaTask({
 		}
 
 		const config = integration.config as IntegrationConfig<"gmail">;
-
 		const gmailHandle = new GmailHandle(config, logger);
 
 		const processedCount = await gmailHandle.processIntegration({
-			userId: userId || undefined,
+			userId,
 			teamId,
 		});
 
-		logger.info(
-			`Integration ${integrationId}: Processed ${processedCount} actionable items`,
-		);
+		logger.info(`User ${userId}: Processed ${processedCount} actionable items`);
 
 		await db
 			.update(integrations)
@@ -51,7 +51,9 @@ export const processUserGmailPoll = schemaTask({
 			})
 			.where(eq(integrations.id, integrationId));
 
-		logger.info(`Integration ${integrationId}: Updated lastSyncedAt timestamp`);
+		logger.info(
+			`Updated lastSyncedAt timestamp for integration ${integrationId}`,
+		);
 
 		return { processedCount };
 	},

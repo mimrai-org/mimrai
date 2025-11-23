@@ -436,7 +436,6 @@ export const integrations = pgTable(
 			.primaryKey()
 			.notNull(),
 		teamId: text("team_id").notNull(),
-		userId: text("user_id"),
 		externalTeamId: text("external_team_id"),
 		name: text("name").notNull(),
 		type: text("type").$type<IntegrationName>().notNull(),
@@ -456,11 +455,6 @@ export const integrations = pgTable(
 			foreignColumns: [teams.id],
 			name: "integrations_team_id_fkey",
 		}),
-		foreignKey({
-			columns: [table.userId],
-			foreignColumns: [users.id],
-			name: "integrations_user_id_fkey",
-		}).onDelete("set null"),
 	],
 );
 
@@ -517,6 +511,11 @@ export const integrationUserLink = pgTable(
 			foreignColumns: [users.id],
 			name: "integration_user_link_user_id_fkey",
 		}),
+		foreignKey({
+			columns: [table.integrationId],
+			foreignColumns: [integrations.id],
+			name: "integration_user_link_integration_id_fkey",
+		}).onDelete("cascade"),
 	],
 );
 

@@ -3,6 +3,7 @@ import { withAuth } from "@api/rest/middleware/auth";
 import type { Context } from "@api/rest/types";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { db } from "@mimir/db/client";
+import { createIntegrationUserLink } from "@mimir/db/queries/integrations";
 import { integrations } from "@mimir/db/schema";
 import { and, eq } from "drizzle-orm";
 import { google } from "googleapis";
@@ -104,6 +105,32 @@ gmailOAuthRouter.get("/callback", async (c) => {
 			);
 		}
 
+		if (!tokens.access_token) {
+			return c.json(
+				{
+					error: "No access token received from Google",
+				},
+				400,
+			);
+		}
+
+		oauth2Client.setCredentials(tokens);
+
+		const gmail = google.gmail({ version: "v1", auth: oauth2Client });
+		const profile = await gmail.users.getProfile({ userId: "me" });
+
+		if (!profile.data.emailAddress) {
+			return c.json(
+				{
+					error: "Failed to fetch email address from Gmail",
+				},
+				400,
+			);
+		}
+
+		const googleEmail = profile.data.emailAddress;
+		const googleUserId = googleEmail;
+
 		const [existingIntegration] = await db
 			.select()
 			.from(integrations)
@@ -115,11 +142,12 @@ gmailOAuthRouter.get("/callback", async (c) => {
 			)
 			.limit(1);
 
+		let integrationId: string;
+
 		if (existingIntegration) {
 			await db
 				.update(integrations)
 				.set({
-					userId: stateData.userId,
 					config: {
 						refreshToken: tokens.refresh_token,
 						accessToken: tokens.access_token,
@@ -133,24 +161,36 @@ gmailOAuthRouter.get("/callback", async (c) => {
 					updatedAt: new Date().toISOString(),
 				})
 				.where(eq(integrations.id, existingIntegration.id));
+			integrationId = existingIntegration.id;
 		} else {
-			await db.insert(integrations).values({
-				teamId: stateData.teamId,
-				userId: stateData.userId,
-				name: "Gmail",
-				type: "gmail",
-				config: {
-					refreshToken: tokens.refresh_token,
-					accessToken: tokens.access_token,
-					expiresAt: tokens.expiry_date,
-					mode: "auto",
-					allowDomains: [],
-					allowSenders: [],
-					denyDomains: [],
-					denySenders: [],
-				},
-			});
+			const [newIntegration] = await db
+				.insert(integrations)
+				.values({
+					teamId: stateData.teamId,
+					name: "Gmail",
+					type: "gmail",
+					config: {
+						refreshToken: tokens.refresh_token,
+						accessToken: tokens.access_token,
+						expiresAt: tokens.expiry_date,
+						mode: "auto",
+						allowDomains: [],
+						allowSenders: [],
+						denyDomains: [],
+						denySenders: [],
+					},
+				})
+				.returning();
+			integrationId = newIntegration.id;
 		}
+
+		await createIntegrationUserLink({
+			userId: stateData.userId,
+			externalUserId: googleUserId,
+			externalUserName: googleEmail,
+			integrationId,
+			integrationType: "gmail",
+		});
 
 		return c.redirect(
 			`${process.env.APP_URL || "http://localhost:3000"}/dashboard/settings/integrations?success=gmail`,
