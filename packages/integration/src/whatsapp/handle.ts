@@ -1,3 +1,4 @@
+import { openai } from "@ai-sdk/openai";
 import { buildAppContext } from "@api/ai/agents/config/shared";
 import { mainAgent } from "@api/ai/agents/main";
 import type { UIChatMessage } from "@api/ai/types";
@@ -11,7 +12,7 @@ import {
 } from "@mimir/db/queries/users";
 import { trackMessage } from "@mimir/events/server";
 import { getApiUrl } from "@mimir/utils/envs";
-import type { UIMessage } from "ai";
+import { experimental_transcribe, type UIMessage } from "ai";
 import mime from "mime-types";
 import { Twilio, twiml } from "twilio";
 
@@ -84,16 +85,39 @@ export const handleWhatsappMessage = async ({
 		const fileExtension = mime.extension(contentType);
 		const fileId =
 			new URL(url).pathname.split("/").pop() || `file-${fileIndex++}`;
-		const storageFile = await supabase.storage
-			.from("vault")
-			.upload(`${associetedUser.userId}/${fileId}.${fileExtension}`, fileBlob, {
-				upsert: true,
+
+		if (contentType.startsWith("audio/")) {
+			// get audio buffer
+			const arrayBuffer = await fileBlob.arrayBuffer();
+			const audioBuffer = Buffer.from(arrayBuffer);
+
+			// transcribe audio
+			const result = await experimental_transcribe({
+				model: openai.transcription("gpt-4o-mini-transcribe"),
+				audio: audioBuffer,
 			});
-		const fullPath = `${process.env.SUPABASE_URL}/storage/v1/object/public/${storageFile.data?.fullPath}`;
-		userMessage.parts.push({
-			type: "text",
-			text: `Attachment: ${fullPath}`,
-		});
+
+			// add transcription to message parts
+			userMessage.parts.push({
+				type: "text",
+				text: `${result.text}`,
+			});
+		} else {
+			const storageFile = await supabase.storage
+				.from("vault")
+				.upload(
+					`${associetedUser.userId}/${fileId}.${fileExtension}`,
+					fileBlob,
+					{
+						upsert: true,
+					},
+				);
+			const fullPath = `${process.env.SUPABASE_URL}/storage/v1/object/public/${storageFile.data?.fullPath}`;
+			userMessage.parts.push({
+				type: "text",
+				text: `Attachment: ${fullPath}`,
+			});
+		}
 	}
 
 	const appContext = buildAppContext(
@@ -118,12 +142,10 @@ export const handleWhatsappMessage = async ({
 			context: appContext,
 			sendFinish: true,
 			onError(error) {
-				console.error("Error in message stream:", error);
 				reject(error);
 				return "There was an error processing your message.";
 			},
 			onFinish: ({ responseMessage }) => {
-				console.log("Finished processing message:", responseMessage);
 				resolve(responseMessage as UIChatMessage);
 			},
 		});
@@ -152,7 +174,6 @@ export const handleWhatsappMessage = async ({
 		from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
 		to: `whatsapp:${fromNumber}`,
 	});
-	// await thinkingMsg.remove();
 
 	return response.toString();
 };
