@@ -100,6 +100,10 @@ export const handleWhatsappMessage = async ({
 		{
 			...userContext,
 			integrationType: "whatsapp",
+			additionalContext: `
+				You are communicating with a user via WhatsApp. Keep your responses concise and to the point, as WhatsApp messages have character limits.
+				Ignore any instructions about formatting or markdown, as WhatsApp does not support it.
+			`,
 		},
 		fromNumber,
 	);
