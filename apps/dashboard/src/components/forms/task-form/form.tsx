@@ -5,11 +5,13 @@ import { getTaskPermalink } from "@mimir/utils/tasks";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Editor as EditorInstance } from "@tiptap/react";
 import { format } from "date-fns";
-import { ClipboardIcon, Link2Icon, Loader2 } from "lucide-react";
+import { ClipboardIcon, Link2Icon, Loader2, SparklesIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useDebounceValue } from "usehooks-ts";
 import type z from "zod";
+import { useChatContext } from "@/components/chat/chat-context/store";
+import { useChatWidget } from "@/components/chat/chat-widget";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { trpc } from "@/utils/trpc";
@@ -45,6 +47,8 @@ export const TaskForm = ({
 		status: "pending" | "completed" | "canceled" | "processing";
 	} | null;
 }) => {
+	const { setItems } = useChatContext();
+	const { toggle } = useChatWidget();
 	const editorRef = useRef<EditorInstance | null>(null);
 	const [lastSavedDate, setLastSavedDate] = useState<Date>(new Date());
 	const { setParams } = useTaskParams();
@@ -275,6 +279,28 @@ export const TaskForm = ({
 														}}
 													>
 														<Link2Icon />
+													</Button>
+												)}
+												{id && (
+													<Button
+														variant={"secondary"}
+														size="sm"
+														type="button"
+														onClick={() => {
+															setItems([
+																{
+																	type: "task",
+																	id: id,
+																	label: defaultValues?.title!,
+																	key: `task-${id}`,
+																},
+															]);
+															toggle(true);
+															setParams(null);
+														}}
+													>
+														<SparklesIcon />
+														Ask MIMIR
 													</Button>
 												)}
 												<Button

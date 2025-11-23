@@ -3,6 +3,15 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+.scrollbar-hide::-webkit-scrollbar {
+	display: none;
+}
+
+.scrollbar-hide {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
 @theme {
 	--font-sans:
 		"Geist", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",

@@ -1,79 +1,39 @@
 import { updateTask } from "@db/queries/tasks";
-import { tasks } from "@db/schema";
 import { tool } from "ai";
-import { and, eq } from "drizzle-orm";
 import z from "zod";
-import { getContext } from "../context";
+import type { AppContext } from "../agents/config/shared";
 
 export const updateTaskToolSchema = z.object({
-	id: z
-		.string()
-		.describe("ID (uuid) of the task to update, get it from getTasks tool"),
-	title: z
-		.string()
-		.min(1)
-		.optional()
-		.describe(
-			"New title for the task, only provide if you want to update the title",
-		),
-	description: z
-		.string()
-		.optional()
-		.describe(
-			"New description of the task, only provide if you want to update the description",
-		),
-	dueDate: z
-		.string()
-		.optional()
-		.describe(
-			"New ISO date string, only provide if you want to update the due date",
-		),
-	assigneeId: z
-		.string()
-		.optional()
-		.describe(
-			"New ID of the user to assign the task to, only provide if you want to update the assignee, use the getUsers tool to get the ID",
-		),
-	columnId: z
-		.string()
-		.optional()
-		.describe(
-			"New ID of the column to move the task to, the column is like the status of the task, use getColumns to retrieve the available columns, only provide if you want to update the column",
-		),
+	id: z.string().describe("Task ID to update"),
+	title: z.string().min(1).optional().describe("Title"),
+	description: z.string().optional().describe("Description"),
+	dueDate: z.string().optional().describe("Due Date in ISO 8601 format"),
+	assigneeId: z.string().optional().describe("User assignee ID"),
+	columnId: z.string().optional().describe("Column ID"),
 
-	attachments: z
-		.array(z.url())
-		.optional()
-		.describe(
-			"New list of attachment URLs for the task, only provide if you want to update the attachments",
-		),
+	attachments: z.array(z.url()).optional().describe("List of attachment URLs"),
 
 	priority: z
 		.enum(["low", "medium", "high", "urgent"])
 		.optional()
-		.describe(
-			"New priority level for the task, only provide if you want to update the priority",
-		),
+		.describe("Priority level"),
 });
 
 export const updateTaskTool = tool({
-	description: "Update an existing task in your task manager",
+	description:
+		"Update a task, including title, description, due date, assignee, column, attachments, and priority",
 	inputSchema: updateTaskToolSchema,
-	execute: async function* (input) {
+	execute: async function* (input, executionOptions) {
 		try {
-			const { db, user } = getContext();
+			const { userId, teamId } =
+				executionOptions.experimental_context as AppContext;
 
 			yield { type: "text", text: `Updating task: ${input.title}` };
-
 			const updatedTask = await updateTask({
-				title: input.title,
-				description: input.description,
-				dueDate: input.dueDate,
-				columnId: input.columnId,
-				assigneeId: input.assigneeId,
-				teamId: user.teamId,
-				priority: input.priority,
+				...input,
 				id: input.id,
+				teamId,
+				userId,
 			});
 
 			yield { type: "text", text: `Task updated: ${updatedTask.title}` };

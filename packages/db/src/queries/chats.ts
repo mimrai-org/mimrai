@@ -1,5 +1,5 @@
 import type { UIChatMessage } from "@api/ai/types";
-import { and, desc, eq, ilike, or, type SQL } from "drizzle-orm";
+import { and, desc, eq, ilike, or, type SQL, sql } from "drizzle-orm";
 import { db } from "..";
 import { chatMessages, chats } from "../schema";
 
@@ -20,9 +20,12 @@ export const getChatById = async (chatId: string, teamId?: string) => {
 		.select()
 		.from(chatMessages)
 		.where(and(eq(chatMessages.chatId, chatId)))
-		.orderBy(chatMessages.createdAt);
+		.orderBy(
+			desc(chatMessages.createdAt),
+			desc(sql`CASE WHEN ${chatMessages.role} = 'assistant' THEN 1 ELSE 0 END`),
+		);
 
-	return { ...chat, messages: messages.map((m) => m.content) };
+	return { ...chat, messages: messages.map((m) => m.content).reverse() };
 };
 
 export const saveChat = async (data: {
@@ -56,6 +59,7 @@ export const saveChatMessage = async (data: {
 	chatId: string;
 	teamId?: string;
 	userId: string;
+	role: "user" | "assistant" | "system";
 	message: UIChatMessage;
 	createdAt?: string;
 }) => {
@@ -63,10 +67,10 @@ export const saveChatMessage = async (data: {
 		.insert(chatMessages)
 		.values({
 			chatId: data.chatId,
-			teamId: data.teamId,
 			userId: data.userId,
 			content: data.message,
 			createdAt: data.createdAt || new Date().toISOString(),
+			role: data.role,
 		})
 		.returning();
 

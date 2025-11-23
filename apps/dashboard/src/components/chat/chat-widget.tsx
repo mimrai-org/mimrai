@@ -7,6 +7,7 @@ import { generateId } from "ai";
 import { XIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { create } from "zustand";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/utils/trpc";
@@ -16,13 +17,17 @@ export type ChatContainerState = {
 	chatId?: string;
 	title?: string;
 	show: boolean;
+	hover?: boolean;
 	toggle: (value?: boolean) => void;
+	setHover: (hover: boolean) => void;
 	setTitle: (title: string) => void;
 	setChatId: (chatId: string) => void;
 };
 
 export const useChatWidget = create<ChatContainerState>()((set, get) => ({
 	show: false,
+	hover: false,
+	setHover: (hover) => set({ hover }),
 	toggle: (value) => {
 		if (typeof window !== "undefined") {
 			if (value === false) {
@@ -41,8 +46,8 @@ export const ChatWidget = () => {
 	const pathname = usePathname();
 	const lastPathname = useRef<string>(pathname);
 	const containerRef = useRef<HTMLDivElement>(null);
-	const [hover, setHover] = useState(false);
-	const { show, toggle, chatId, setChatId, setTitle } = useChatWidget();
+	const { show, toggle, chatId, setChatId, setTitle, setHover, hover } =
+		useChatWidget();
 
 	useEffect(() => {
 		if (pathname !== lastPathname.current) {
@@ -65,7 +70,6 @@ export const ChatWidget = () => {
 			{
 				enabled: !!chatId,
 				refetchOnWindowFocus: false,
-				// select: (chat) => chat.sort((a, b) => a.timestamp - b.timestamp),
 			},
 		),
 	);
@@ -74,57 +78,27 @@ export const ChatWidget = () => {
 		setTitle(initialMessages?.title || "");
 	}, [initialMessages]);
 
-	useEffect(() => {
-		if (!isFetched) return;
-		if (!containerRef.current) return;
+	useHotkeys("ctrl+Enter", () => {
+		toggle();
+	});
 
-		const handleMouseEnter = () => {
-			setHover(true);
-		};
-		const handleMouseLeave = () => {
+	useHotkeys(
+		"esc",
+		() => {
+			toggle(false);
 			setHover(false);
-		};
-		const handleClick = () => {
-			toggle(true);
-		};
-
-		const textarea = containerRef.current?.querySelector("#prompt-input");
-		textarea?.addEventListener("mouseenter", handleMouseEnter);
-		textarea?.addEventListener("mouseleave", handleMouseLeave);
-		textarea?.addEventListener("click", handleClick);
-		textarea?.addEventListener("focus", handleClick);
-
-		return () => {
-			textarea?.removeEventListener("mouseenter", handleMouseEnter);
-			textarea?.removeEventListener("mouseleave", handleMouseLeave);
-			textarea?.removeEventListener("click", handleClick);
-			textarea?.removeEventListener("focus", handleClick);
-		};
-	}, [isFetched, chatId]);
-
-	useEffect(() => {
-		if (typeof window === "undefined") return;
-		if (chatId) return;
-
-		const closeHandler = (e: KeyboardEvent) => {
-			if (e.key === "Escape") {
-				toggle(false);
-				setHover(false);
-				document.activeElement instanceof HTMLElement &&
-					document.activeElement.blur();
-			}
-		};
-		window.addEventListener("keydown", closeHandler);
-
-		return () => {
-			window.removeEventListener("keydown", closeHandler);
-		};
-	}, []);
+			document.activeElement instanceof HTMLElement &&
+				document.activeElement.blur();
+		},
+		{
+			enableOnContentEditable: true,
+			enableOnFormTags: true,
+		},
+	);
 
 	useEffect(() => {
 		if (typeof window === "undefined") return;
 		if (chatId) {
-			console.log("Storing chat ID:", chatId);
 			window.localStorage.setItem("chat-id", chatId);
 			return;
 		}
@@ -140,7 +114,12 @@ export const ChatWidget = () => {
 	}, [chatId]);
 
 	return (
-		<div className="pointer-events-none fixed inset-0 z-10">
+		<div
+			className={cn("pointer-events-none fixed inset-0", {
+				"z-50": show,
+				"z-10": !show,
+			})}
+		>
 			<div
 				className={cn("absolute inset-0 transition-all duration-300", {
 					"pointer-events-auto bg-background opacity-100": show,

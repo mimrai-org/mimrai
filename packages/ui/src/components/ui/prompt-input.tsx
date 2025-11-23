@@ -8,6 +8,7 @@ import {
 	TooltipTrigger,
 } from "@ui/components/ui/tooltip";
 import { cn } from "@ui/lib/utils";
+import type { FileUIPart } from "ai";
 import { StarsIcon } from "lucide-react";
 import React, {
 	createContext,
@@ -16,6 +17,11 @@ import React, {
 	useRef,
 	useState,
 } from "react";
+
+export type PromptInputMessage = {
+	text?: string;
+	files?: FileUIPart[];
+};
 
 type PromptInputContextType = {
 	isLoading: boolean;
@@ -86,11 +92,13 @@ function PromptInput({
 			>
 				<div
 					className={cn(
-						"cursor-text border border-input bg-background p-2 shadow-xl",
+						"cursor-text border bg-background p-2 shadow-xl",
 						className,
 					)}
 					id="prompt-input"
-					onClick={() => textareaRef.current?.focus()}
+					onClick={() => {
+						textareaRef.current?.focus();
+					}}
 				>
 					{children}
 				</div>

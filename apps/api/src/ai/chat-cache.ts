@@ -7,41 +7,37 @@ const userContextCache = new RedisCache("chat:user", 30 * 60); // 30 minutes TTL
 const isDevelopment = process.env.NODE_ENV === "development";
 
 export interface ChatUserContext {
-  userId: string;
-  teamId: string;
-  teamName?: string | null;
-  teamDescription?: string | null;
-  fullName?: string | null;
-  avatarUrl?: string | null;
-  countryCode?: string | null;
-  dateFormat?: string | null;
-  locale?: string | null;
-  country?: string | null;
-  city?: string | null;
-  region?: string | null;
-  timezone?: string | null;
-  columns?: {
-    id: string;
-    name: string;
-    description?: string | null;
-  }[];
+	userId: string;
+	teamId: string;
+	teamName?: string | null;
+	teamDescription?: string | null;
+	fullName?: string | null;
+	avatarUrl?: string | null;
+	countryCode?: string | null;
+	dateFormat?: string | null;
+	locale?: string | null;
+	country?: string | null;
+	city?: string | null;
+	region?: string | null;
+	timezone?: string | null;
+	additionalContext?: string;
 }
 
 export const chatCache = {
-  getUserContext: (
-    userId: string,
-    teamId: string
-  ): Promise<ChatUserContext | undefined> => {
-    if (isDevelopment) return Promise.resolve(undefined);
-    return userContextCache.get<ChatUserContext>(`${userId}:${teamId}`);
-  },
+	getUserContext: (
+		userId: string,
+		teamId: string,
+	): Promise<ChatUserContext | undefined> => {
+		if (isDevelopment) return Promise.resolve(undefined);
+		return userContextCache.get<ChatUserContext>(`${userId}:${teamId}`);
+	},
 
-  setUserContext: (
-    userId: string,
-    teamId: string,
-    context: ChatUserContext
-  ): Promise<void> => {
-    if (isDevelopment) return Promise.resolve();
-    return userContextCache.set(`${userId}:${teamId}`, context);
-  },
+	setUserContext: (
+		userId: string,
+		teamId: string,
+		context: ChatUserContext,
+	): Promise<void> => {
+		if (isDevelopment) return Promise.resolve();
+		return userContextCache.set(`${userId}:${teamId}`, context);
+	},
 };

@@ -3,10 +3,10 @@ import { useChat } from "@ai-sdk-tools/store";
 import type { UIChatMessage } from "@mimir/api/ai/types";
 import { DefaultChatTransport, generateId } from "ai";
 import { useMemo } from "react";
+import { ChatInput, type ChatInputMessage } from "./chat-input";
+import { Messages } from "./chat-messages";
 import { ChatTitle } from "./chat-title";
 import { useChatWidget } from "./chat-widget";
-import { ChatInput } from "./input";
-import { Messages } from "./messages";
 
 export const ChatInterface = ({
 	id,
@@ -16,7 +16,7 @@ export const ChatInterface = ({
 	showMessages?: boolean;
 }) => {
 	// const { chatId: chatIdParam } = useChatParams();
-	const { setChatId, chatId: chatIdParam } = useChatWidget();
+	const { setChatId, chatId: chatIdParam, show } = useChatWidget();
 
 	// Use provided id, or get from route, or generate new one
 	const providedId = id ?? chatIdParam;
@@ -52,10 +52,19 @@ export const ChatInterface = ({
 			api: `${process.env.NEXT_PUBLIC_SERVER_URL}/api/chat`,
 			fetch: authenticatedFetch,
 			prepareSendMessagesRequest({ messages, id }) {
+				const lastMessage = messages[messages.length - 1] as ChatInputMessage;
+
+				const agentChoice = lastMessage.metadata?.agentChoice;
+				const toolChoice = lastMessage.metadata?.toolChoice;
+				const contextItems = lastMessage.metadata?.contextItems || [];
+
 				return {
 					body: {
 						id,
-						message: messages[messages.length - 1],
+						message: lastMessage,
+						contextItems,
+						agentChoice,
+						toolChoice,
 						timezone: new Intl.DateTimeFormat().resolvedOptions().timeZone,
 					},
 				};
@@ -71,10 +80,12 @@ export const ChatInterface = ({
 				) : (
 					<div className="pointer-events-none h-full" />
 				)}
-				<div className="">
-					<div className="flex items-end justify-between space-x-4 py-2">
-						<ChatTitle />
-					</div>
+				<div>
+					{show && (
+						<div className="flex items-end justify-between space-x-4 py-2">
+							<ChatTitle />
+						</div>
+					)}
 					<ChatInput />
 				</div>
 			</div>

@@ -1,34 +1,21 @@
 import { randomUUID } from "node:crypto";
-import { setContext } from "@api/ai/context";
-import { generateSystemPrompt } from "@api/ai/generate-system-prompt";
-import { createToolRegistry } from "@api/ai/tool-types";
+import { buildAppContext } from "@api/ai/agents/config/shared";
+import { mainAgent } from "@api/ai/agents/main";
 import type { UIChatMessage } from "@api/ai/types";
 import { getUserContext } from "@api/ai/utils/get-user-context";
 import { createAdminClient } from "@api/lib/supabase";
-import { shouldForceStop } from "@api/utils/streaming-utils";
 import { Client4, type WebSocketMessage } from "@mattermost/client";
 import type { UserProfile } from "@mattermost/types/users";
 import { integrationsCache } from "@mimir/cache/integrations-cache";
-import { db } from "@mimir/db/client";
-import {
-	getChatById,
-	saveChat,
-	saveChatMessage,
-} from "@mimir/db/queries/chats";
+import { getChatById, saveChatMessage } from "@mimir/db/queries/chats";
 import {
 	getIntegrationByType,
 	getLinkedUserByExternalId,
 } from "@mimir/db/queries/integrations";
 import type { integrations } from "@mimir/db/schema";
-import { op, trackMessage } from "@mimir/events/server";
+import { trackMessage } from "@mimir/events/server";
 import { getApiUrl } from "@mimir/utils/envs";
-import {
-	convertToModelMessages,
-	generateText,
-	stepCountIs,
-	streamText,
-	type UIMessage,
-} from "ai";
+import type { UIMessage } from "ai";
 import { fetch } from "bun";
 import WebSocket from "ws";
 import { log } from "../logger";
@@ -58,6 +45,11 @@ const wsClients: Record<string, WebSocket> = {};
 export const initMattermostSingle = async (
 	integration: typeof integrations.$inferSelect,
 ) => {
+	const config = integration.config as {
+		url: string;
+		token: string;
+	};
+
 	// listen for start requests
 	integrationsCache.listenStart(async (integrationId) => {
 		if (integrationId === integration.id) {
@@ -100,8 +92,8 @@ export const initMattermostSingle = async (
 
 	// test the connection before locking
 	const client = new Client4();
-	client.setUrl(integration.config.url);
-	client.setToken(integration.config.token);
+	client.setUrl(config.url);
+	client.setToken(config.token);
 	let me: UserProfile;
 
 	try {
@@ -140,10 +132,10 @@ export const initMattermostSingle = async (
 		const initializeSocket = async () => {
 			delete wsClients[integration.id];
 			wsClients[integration.id] = new WebSocket(
-				`${integration.config.url.replace("http", "ws")}/api/v4/websocket`,
+				`${config.url.replace("http", "ws")}/api/v4/websocket`,
 				{
 					headers: {
-						Authorization: `Bearer ${integration.config.token}`,
+						Authorization: `Bearer ${config.token}`,
 					},
 				},
 			);
@@ -240,7 +232,6 @@ export const initMattermostSingle = async (
 										getChatById(threadId, integration.teamId),
 									]);
 									const previousMessages = chat ? chat.messages : [];
-									const allMessages = [...previousMessages];
 									const userMessage: UIChatMessage = {
 										id: typedData.post.id,
 										role: "user",
@@ -252,13 +243,6 @@ export const initMattermostSingle = async (
 										],
 									};
 
-									if (!chat) {
-										await saveChat({
-											chatId: threadId,
-											teamId: integration.teamId,
-											userId: associetedUser.userId,
-										});
-									}
 									const unsavedMessages: {
 										message: UIChatMessage;
 										createdAt: string;
@@ -273,13 +257,11 @@ export const initMattermostSingle = async (
 										teams.find((t) => t.id === channel.team_id) ?? teams[0];
 									const teamName = team?.name || "default";
 
-									const systemPrompt = `${generateSystemPrompt(userContext)}
-                   
-                  If you create a task add the next link to the task description to allow easy access to the context, append at the end of the description and use markdown format:
-                  CONTEXT LINK: [Context Link](${
-										integration.config.url
+									const systemPrompt = `If you create a task add the next link to the task description to allow easy access to the context, append at the end of the description and use markdown format:
+									CONTEXT LINK: [Context Link](${
+										config.url
 									}/${teamName}/pl/${threadId})
-                  `;
+									`;
 
 									if (threadId) {
 										const posts = await client.getPostThread(threadId, true);
@@ -289,7 +271,11 @@ export const initMattermostSingle = async (
 										postsArray.sort((a, b) => a.create_at - b.create_at);
 
 										for (const post of postsArray) {
-											if (previousMessages.find((m) => m.id === post.id)) {
+											if (
+												previousMessages.find((m) => {
+													return m.id === post.id;
+												})
+											) {
 												continue;
 											}
 
@@ -310,7 +296,7 @@ export const initMattermostSingle = async (
 													);
 													const fileResponse = await fetch(fileRemoteUrl, {
 														headers: {
-															Authorization: `Bearer ${integration.config.token}`,
+															Authorization: `Bearer ${config.token}`,
 														},
 													});
 													const fileBlob = await fileResponse.blob();
@@ -351,7 +337,6 @@ export const initMattermostSingle = async (
 													message,
 													createdAt: new Date(post.create_at).toISOString(),
 												});
-												allMessages.push(message);
 											}
 										}
 									} else {
@@ -365,7 +350,11 @@ export const initMattermostSingle = async (
 										postArray.sort((a, b) => a.create_at - b.create_at);
 
 										for (const post of postArray) {
-											if (previousMessages.find((m) => m.id === post.id)) {
+											if (
+												previousMessages.find((m) => {
+													return m.id === post.id;
+												})
+											) {
 												continue;
 											}
 											const files = post.metadata.files;
@@ -383,7 +372,7 @@ export const initMattermostSingle = async (
 													);
 													const fileResponse = await fetch(fileRemoteUrl, {
 														headers: {
-															Authorization: `Bearer ${integration.config.token}`,
+															Authorization: `Bearer ${config.token}`,
 														},
 													});
 													const fileBlob = await fileResponse.blob();
@@ -424,16 +413,9 @@ export const initMattermostSingle = async (
 													message,
 													createdAt: new Date(post.create_at).toISOString(),
 												});
-												allMessages.push(message);
 											}
 										}
 									}
-
-									// Add user message to unsaved messages
-									unsavedMessages.push({
-										message: userMessage,
-										createdAt: new Date(typedData.post.create_at).toISOString(),
-									});
 
 									// Save unsaved messages to the database
 									const savePromises: Promise<unknown>[] = [];
@@ -441,70 +423,34 @@ export const initMattermostSingle = async (
 										savePromises.push(
 											saveChatMessage({
 												chatId: threadId,
-												teamId: integration.teamId,
 												userId: associetedUser.userId,
 												message,
-												createdAt,
+												createdAt: new Date(createdAt).toISOString(),
 											}),
 										);
 									}
 									await Promise.all(savePromises);
 
-									// Add user message to all messages
-									allMessages.push(userMessage);
-
-									setContext({
-										db,
-										user: userContext,
-										//@ts-expect-error
-										writer: undefined,
-										artifactSupport: false,
-									});
-
 									console.log(`genering response for thread ${threadId}`);
-
 									const thinkingPost = await client.createPost({
 										channel_id: typedData.post.channel_id,
-										message: "_Mimir is forging your tasks..._",
+										message: "_Thinking..._",
 										root_id: threadId ?? typedData.post.id,
 									});
 
+									const appContext = buildAppContext(
+										{ ...userContext, integrationType: "mattermost" },
+										threadId,
+									);
+
 									const systemMessage: UIChatMessage = await new Promise(
 										(resolve, reject) => {
-											const result = streamText({
-												model: "openai/gpt-4o",
-												system: systemPrompt,
-												messages: convertToModelMessages(allMessages),
-												tools: {
-													...createToolRegistry(),
-												},
-												onStepFinish: async (step) => {},
-												stopWhen: (step) => {
-													// Stop if we've reached 10 steps (original condition)
-													if (stepCountIs(10)(step)) {
-														return true;
-													}
-
-													// Force stop if any tool has completed its full streaming response
-													return shouldForceStop(step);
-												},
-												onError: (error) => {
-													console.error(error);
-												},
-												onFinish: async ({ usage }) => {
-													await trackMessage({
-														userId: userContext.userId,
-														source: "mattermost",
-														model: "openai/gpt-4o",
-														teamId: integration.teamId,
-														teamName: userContext.teamName ?? undefined,
-														input: usage.inputTokens,
-														output: usage.outputTokens,
-													});
-												},
-											});
-
-											const messageStream = result.toUIMessageStream({
+											const messageStream = mainAgent.toUIMessageStream({
+												message: userMessage,
+												strategy: "auto",
+												maxRounds: 5,
+												maxSteps: 20,
+												context: appContext,
 												sendFinish: true,
 												onFinish: ({ responseMessage }) => {
 													resolve(responseMessage as UIChatMessage);
@@ -514,21 +460,13 @@ export const initMattermostSingle = async (
 											// read the stream to completion to avoid memory leaks
 											(async () => {
 												try {
-													for await (const _part of messageStream) {
-														// no-op
-													}
-												} catch (error) {
-													reject(error);
+													await messageStream.json();
+												} catch (e) {
+													reject(e);
 												}
 											})();
 										},
 									);
-
-									await saveChatMessage({
-										chatId: threadId,
-										userId: associetedUser.userId,
-										message: systemMessage,
-									});
 
 									const body =
 										systemMessage.parts[systemMessage.parts.length - 1]

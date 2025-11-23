@@ -1,7 +1,7 @@
 import { createTaskPullRequest } from "@api/lib/copilot";
 import { tool } from "ai";
 import z from "zod";
-import { getContext } from "../context";
+import type { AppContext } from "../agents/config/shared";
 
 export const createTaskPullRequestToolSchema = z.object({
 	taskId: z
@@ -14,13 +14,14 @@ export const createTaskPullRequestToolSchema = z.object({
 export const createTaskPullRequestTool = tool({
 	description: "Create a new github pull request for a task.",
 	inputSchema: createTaskPullRequestToolSchema,
-	execute: async function* (input) {
-		const { db, user } = getContext();
+	execute: async function* (input, executionOptions) {
+		const { userId, teamId } =
+			executionOptions.experimental_context as AppContext;
 
 		try {
 			const response = await createTaskPullRequest({
 				taskId: input.taskId,
-				teamId: user.teamId,
+				teamId: teamId,
 			});
 			yield {
 				text: response,

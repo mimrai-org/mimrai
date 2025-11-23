@@ -27,7 +27,7 @@ export const KanbanTask = ({
 	return (
 		<motion.div
 			className={cn(
-				"flex min-h-14 cursor-pointer flex-col rounded-none bg-secondary transition-background hover:bg-secondary/50",
+				"flex min-h-14 cursor-pointer flex-col rounded-none bg-accent transition-colors hover:bg-accent/50",
 				{
 					"opacity-50!": task.column?.type === "done",
 				},
@@ -49,21 +49,21 @@ export const KanbanTask = ({
 			<div className="p-3">
 				<div className="flex h-full grow-1 flex-col justify-between gap-2">
 					<div className="flex items-center justify-between gap-2">
-						<span className={"font-medium text-sm"}>
+						<span className={"flex items-start gap-1 text-sm"}>
 							{task.sequence !== null && (
-								<span className="mr-2 text-muted-foreground">
+								<span className="mr-2 text-muted-foreground tabular-nums">
 									{task.sequence}
 								</span>
 							)}
-							{task.title}
+							<span className="break-words font-medium">{task.title}</span>
 						</span>
 						<KanbanAssignee task={task} />
 					</div>
 
 					<div className="mt-2 flex flex-wrap items-center gap-2">
-						{task.priority ? <Priority value={task.priority} /> : <div />}
+						{task.priority && <Priority value={task.priority} />}
 						{task.project && (
-							<div className="flex h-5.5 items-center gap-1 border bg-secondary px-2 font-medium text-xs">
+							<div className="flex h-5.5 items-center gap-1 border px-2 font-medium text-xs">
 								<ProjectIcon className="size-3.5" {...task.project} />
 								{task.project.name}
 							</div>
@@ -76,7 +76,7 @@ export const KanbanTask = ({
 							</div>
 						)}
 						{task.dueDate && (
-							<time className="flex h-5.5 items-center border bg-secondary px-2 font-medium text-xs tabular-nums">
+							<time className="flex h-5.5 items-center border px-2 font-medium text-xs tabular-nums">
 								{format(new Date(task.dueDate), "PP")}
 							</time>
 						)}

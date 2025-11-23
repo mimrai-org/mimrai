@@ -1,16 +1,20 @@
+import { db } from "@db/index";
 import { labels } from "@db/schema";
 import { tool } from "ai";
 import { and, eq } from "drizzle-orm";
 import z from "zod";
-import { getContext } from "../context";
+import type { AppContext } from "../agents/config/shared";
 
 export const getLabelsToolSchema = z.object({});
 
 export const getLabelsTool = tool({
 	description: "Get labels for your tasks",
 	inputSchema: getLabelsToolSchema,
-	execute: async function* (input) {
-		const { db, user } = getContext();
+	execute: async function* (input, executionOptions) {
+		const { userId, teamId } =
+			executionOptions.experimental_context as AppContext;
+
+		yield { text: "Retrieving labels..." };
 
 		const data = await db
 			.select({
@@ -19,9 +23,10 @@ export const getLabelsTool = tool({
 				description: labels.description,
 			})
 			.from(labels)
-			.where(and(eq(labels.teamId, user.teamId)));
+			.where(and(eq(labels.teamId, teamId)));
 
 		yield {
+			text: `Found ${data.length} labels.`,
 			data,
 		};
 	},

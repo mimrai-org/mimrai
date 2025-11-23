@@ -6,6 +6,7 @@ import { billingRouter } from "./billing";
 import { chatRouter } from "./chats";
 import { checklistsRouter } from "./checklists";
 import { columnsRouter } from "./columns";
+import { chatFeedbackRouter } from "./feedback";
 import { githubRouter } from "./github";
 import { importsRouter } from "./imports";
 import { integrationsRouter } from "./integrations";
@@ -46,6 +47,7 @@ export const appRouter = router({
 	checklists: checklistsRouter,
 	projects: projectsRouter,
 	waitlist: waitlistRouter,
+	chatFeedback: chatFeedbackRouter,
 });
 export type AppRouter = typeof appRouter;
 export type RouterOutputs = inferRouterOutputs<AppRouter>;

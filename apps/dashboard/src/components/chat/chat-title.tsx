@@ -1,5 +1,4 @@
-import { useArtifact } from "@ai-sdk-tools/artifacts/client";
-import { chatTitleArtifact } from "@api/ai/artifacts/chat-title";
+import { useDataPart } from "@ai-sdk-tools/store";
 import { useQuery } from "@tanstack/react-query";
 import {
 	Command,
@@ -30,7 +29,13 @@ export const ChatTitle = () => {
 	const { show, setChatId, title: loadedTitle } = useChatWidget();
 	const [search, setSearch] = useState("");
 	const [debouncedSearch] = useDebounceValue(search, 300);
-	const { data } = useArtifact(chatTitleArtifact);
+	const [data] = useDataPart<ChatTitleData>("chat-title", {
+		onData: (dataPart) => {
+			if (dataPart.data.title) {
+				// document.title = `${dataPart.data.title}`;
+			}
+		},
+	});
 	const chatTitle = data as ChatTitleData;
 
 	const { data: chatHistory } = useQuery(
@@ -51,19 +56,19 @@ export const ChatTitle = () => {
 
 	return (
 		<AnimatePresence>
-			{show && (
+			{show ? (
 				<motion.div
 					initial={{ opacity: 0, y: -10 }}
 					animate={{ opacity: 1, y: 0 }}
 					exit={{ opacity: 0, y: -10 }}
 					transition={{ duration: 0.2 }}
-					className="min-w-32"
+					className="w-fit"
 				>
 					<Popover>
-						<PopoverTrigger>
+						<PopoverTrigger className="w-fit">
 							<div className="flex items-center gap-2 text-foreground text-xs">
 								<ChevronDown className="size-3" />
-								<div>
+								<div className="whitespace-nowrap">
 									{loadedTitle || chatTitle?.title || "New conversation"}
 								</div>
 							</div>
@@ -96,6 +101,8 @@ export const ChatTitle = () => {
 						</PopoverContent>
 					</Popover>
 				</motion.div>
+			) : (
+				<div />
 			)}
 		</AnimatePresence>
 	);

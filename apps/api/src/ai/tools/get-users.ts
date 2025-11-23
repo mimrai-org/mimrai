@@ -1,7 +1,7 @@
 import { getMembers } from "@db/queries/teams";
 import { tool } from "ai";
 import z from "zod";
-import { getContext } from "../context";
+import type { AppContext } from "../agents/config/shared";
 
 export const getTasksToolSchema = z.object({
 	search: z
@@ -13,11 +13,13 @@ export const getTasksToolSchema = z.object({
 export const getUsersTool = tool({
 	description: "Get members/users of your team",
 	inputSchema: getTasksToolSchema,
-	execute: async function* ({ search }) {
-		const { db, user } = getContext();
+	execute: async function* ({ search }, executionOptions) {
+		const { teamId } = executionOptions.experimental_context as AppContext;
+
+		yield { text: "Retrieving users..." };
 
 		const result = await getMembers({
-			teamId: user.teamId,
+			teamId: teamId,
 			search,
 		});
 
@@ -27,6 +29,7 @@ export const getUsersTool = tool({
 		}
 
 		yield {
+			text: `Found ${result.length} users.`,
 			data: result,
 		};
 	},

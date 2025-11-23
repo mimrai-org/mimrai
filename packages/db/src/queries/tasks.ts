@@ -126,7 +126,15 @@ export const getTasks = async ({
 		);
 
 	if (input.search) {
-		if (!Number.isNaN(Number.parseInt(input.search, 10))) {
+		// Check if the search input is a UUID
+		const isUUID =
+			/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+				input.search,
+			);
+
+		if (isUUID) {
+			whereClause.push(eq(tasks.id, input.search));
+		} else if (!Number.isNaN(Number.parseInt(input.search, 10))) {
 			whereClause.push(eq(tasks.sequence, Number.parseInt(input.search, 10)));
 		} else {
 			const query = buildSearchQuery(input.search);
