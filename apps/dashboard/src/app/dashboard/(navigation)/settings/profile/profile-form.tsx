@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import z from "zod";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { queryClient, trpc } from "@/utils/trpc";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const schema = z.object({
 	name: z.string().min(2, "Name must be at least 2 characters long"),
@@ -71,35 +72,40 @@ export const ProfileForm = ({
 					)}
 				/>
 
-				<FormField
-					control={form.control}
-					name="locale"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>{t("forms.teamForm.locale.label")}</FormLabel>
-							<FormControl>
-								<Select value={field.value} onValueChange={field.onChange}>
-									<SelectTrigger className="w-full">
-										<SelectValue
-											placeholder={t("forms.teamForm.locale.placeholder")}
-											{...field}
-										/>
-									</SelectTrigger>
-									<SelectContent>
-										{LOCALES.map((locale) => (
-											<SelectItem key={locale.code} value={locale.code}>
-												{locale.name}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+			<FormField
+				control={form.control}
+				name="locale"
+				render={({ field }) => (
+					<FormItem>
+						<FormLabel>{t("forms.teamForm.locale.label")}</FormLabel>
+						<FormControl>
+							<Select value={field.value} onValueChange={field.onChange}>
+								<SelectTrigger className="w-full">
+									<SelectValue
+										placeholder={t("forms.teamForm.locale.placeholder")}
+										{...field}
+									/>
+								</SelectTrigger>
+								<SelectContent>
+									{LOCALES.map((locale) => (
+										<SelectItem key={locale.code} value={locale.code}>
+											{locale.name}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</FormControl>
+						<FormMessage />
+					</FormItem>
+				)}
+			/>
 
-				<div className="flex justify-end">
+			<div className="space-y-2">
+				<FormLabel>Theme</FormLabel>
+				<ThemeToggle />
+			</div>
+
+			<div className="flex justify-end">
 					<Button type="submit" disabled={isPending}>
 						{isPending && <Loader2Icon className="animate-spin" />}
 						{t("common.saveChanges")}
