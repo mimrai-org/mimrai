@@ -1,34 +1,35 @@
+import { db } from "@db/index";
 import { checklistItems, tasks } from "@db/schema";
 import { getTaskPermalink } from "@mimir/utils/tasks";
 import { tool } from "ai";
 import { and, eq } from "drizzle-orm";
 import z from "zod";
-import { getContext } from "../context";
+import type { AppContext } from "../agents/config/shared";
 
-export const getSubtasksToolSchema = z.object({
-	taskId: z.string(),
+export const getChecklistItemsSchema = z.object({
+	taskId: z.string().describe("Tasks ID"),
 });
 
-export const getSubtasksTool = tool({
-	description: "Get subtasks for a specific task",
-	inputSchema: getSubtasksToolSchema,
-	execute: async function* (input) {
-		const { db, user } = getContext();
-
-		yield { text: "Retrieving subtasks..." };
+export const getChecklistItemsTool = tool({
+	description: "Retrieve checklist items for a specific task.",
+	inputSchema: getChecklistItemsSchema,
+	execute: async function* (input, executionOptions) {
+		const { userId, teamId } =
+			executionOptions.experimental_context as AppContext;
 
 		const [task] = await db
 			.select()
 			.from(tasks)
-			.where(eq(tasks.id, input.taskId))
-			.limit(1);
+			.where(and(eq(tasks.id, input.taskId), eq(tasks.teamId, teamId)));
 
 		if (!task) {
 			yield {
-				text: `No task found with ID ${input.taskId}.`,
+				text: "No task found in your team.",
 			};
 			return;
 		}
+
+		yield { text: "Retrieving subtasks..." };
 
 		const data = await db
 			.select({
@@ -41,7 +42,7 @@ export const getSubtasksTool = tool({
 			.where(
 				and(
 					eq(checklistItems.taskId, input.taskId),
-					eq(checklistItems.teamId, user.teamId),
+					eq(checklistItems.teamId, teamId),
 				),
 			);
 

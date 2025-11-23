@@ -7,16 +7,28 @@ export const op = new OpenPanel({
 
 export const trackMessage = async ({
 	userId,
+	model,
+	teamId,
 	teamName,
 	source,
+	input,
+	output,
 }: {
 	userId: string;
+	teamId: string;
 	teamName?: string;
+	model: string;
 	source: string;
+	input?: number;
+	output?: number;
 }) => {
 	await op.track("message", {
 		profileId: userId,
 		source,
+		model,
+		teamId,
 		teamName,
+		input,
+		output,
 	});
 };

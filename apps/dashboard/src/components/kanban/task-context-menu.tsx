@@ -12,13 +12,25 @@ import {
 } from "@mimir/ui/context-menu";
 import { LabelBadge } from "@mimir/ui/label-badge";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+	BoxIcon,
+	CircleDashedIcon,
+	CopyPlusIcon,
+	SignalHighIcon,
+	SparklesIcon,
+	TagsIcon,
+	TrashIcon,
+	UserIcon,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { queryClient, trpc } from "@/utils/trpc";
+import { useChatContext } from "../chat/chat-context/store";
+import { useChatWidget } from "../chat/chat-widget";
 import { ColumnIcon } from "../column-icon";
 import Loader from "../loader";
 import { ProjectIcon } from "../project-icon";
-import { Assignee, AssigneeAvatar } from "./asignee";
+import { Assignee, AssigneeAvatar } from "./asignee-avatar";
 import { PriorityItem } from "./priority";
 
 export const TaskContextMenu = ({
@@ -33,6 +45,8 @@ export const TaskContextMenu = ({
 	additionalItems?: React.ReactNode;
 }) => {
 	const { setParams } = useTaskParams();
+	const { setItems } = useChatContext();
+	const { toggle } = useChatWidget();
 
 	const { mutateAsync: deleteTask } = useMutation(
 		trpc.tasks.delete.mutationOptions({
@@ -160,6 +174,7 @@ export const TaskContextMenu = ({
 				</ContextMenuLabel> */}
 				<ContextMenuSub>
 					<ContextMenuSubTrigger className="flex items-center gap-2">
+						<CircleDashedIcon className="text-muted-foreground" />
 						Move to
 					</ContextMenuSubTrigger>
 					<ContextMenuSubContent className="w-48">
@@ -183,13 +198,35 @@ export const TaskContextMenu = ({
 					onClick={() => cloneTask({ taskId: task.id })}
 					disabled={isCloning}
 				>
-					{isCloning && <Loader />}
+					{isCloning ? (
+						<Loader className="text-muted-foreground" />
+					) : (
+						<CopyPlusIcon className="text-muted-foreground" />
+					)}
 					Clone
+				</ContextMenuItem>
+
+				<ContextMenuItem
+					onClick={() => {
+						setItems([
+							{
+								type: "task",
+								id: task.id,
+								label: task.title,
+								key: `task-${task.id}`,
+							},
+						]);
+						toggle(true);
+					}}
+				>
+					<SparklesIcon className="text-muted-foreground" />
+					Ask MIMIR
 				</ContextMenuItem>
 
 				<ContextMenuSeparator />
 				<ContextMenuSub>
 					<ContextMenuSubTrigger className="flex items-center gap-2">
+						<TagsIcon className="text-muted-foreground" />
 						Labels
 					</ContextMenuSubTrigger>
 					<ContextMenuSubContent className="w-52">
@@ -224,6 +261,7 @@ export const TaskContextMenu = ({
 				</ContextMenuSub>
 				<ContextMenuSub>
 					<ContextMenuSubTrigger className="flex items-center gap-2">
+						<SignalHighIcon className="text-muted-foreground" />
 						Priority
 					</ContextMenuSubTrigger>
 					<ContextMenuSubContent className="w-32">
@@ -241,6 +279,7 @@ export const TaskContextMenu = ({
 				</ContextMenuSub>
 				<ContextMenuSub>
 					<ContextMenuSubTrigger className="flex items-center gap-2">
+						<BoxIcon className="text-muted-foreground" />
 						Project
 					</ContextMenuSubTrigger>
 					<ContextMenuSubContent className="w-32">
@@ -259,10 +298,12 @@ export const TaskContextMenu = ({
 				</ContextMenuSub>
 				<ContextMenuSub>
 					<ContextMenuSubTrigger className="flex items-center gap-2">
+						<UserIcon className="text-muted-foreground" />
 						Assign to
 					</ContextMenuSubTrigger>
 					<ContextMenuSubContent className="w-48">
 						<ContextMenuItem
+							// @ts-expect-error
 							onClick={handleUpdateTask.bind(null, { assigneeId: null })}
 						>
 							<div className="flex items-center gap-2">
@@ -286,6 +327,7 @@ export const TaskContextMenu = ({
 						variant="destructive"
 						onClick={handleDeleteTask.bind(null, task.id)}
 					>
+						<TrashIcon />
 						Delete
 					</ContextMenuItem>
 				)}

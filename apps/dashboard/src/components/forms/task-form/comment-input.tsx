@@ -73,7 +73,7 @@ export const CommentInput = ({
 				autoFocus={autoFocus}
 				onChange={(e) => setComment(e)}
 				placeholder="Leave a comment..."
-				className="border border-input bg-accent px-4 py-2 [&_div]:min-h-[60px]"
+				className="border border-input bg-input px-4 py-2 dark:bg-input/30 [&_div]:min-h-[60px]"
 			/>
 		</div>
 	);

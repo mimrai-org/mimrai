@@ -44,7 +44,7 @@ export function NavUser({
 							// className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
 							className="flex items-center border border-transparent py-2 hover:border-input"
 						>
-							<Avatar className="h-8 w-8 rounded-lg border">
+							<Avatar className="h-8 w-8 rounded-sm">
 								<AvatarImage src={user.image!} alt={user.name} />
 								<AvatarFallback
 									className="rounded-none"

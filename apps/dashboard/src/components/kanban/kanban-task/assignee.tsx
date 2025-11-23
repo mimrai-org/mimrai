@@ -14,7 +14,7 @@ import {
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { queryClient, trpc } from "@/utils/trpc";
-import { Assignee, AssigneeAvatar } from "../asignee";
+import { Assignee, AssigneeAvatar } from "../asignee-avatar";
 import type { KanbanTask } from "./kanban-task";
 
 export const KanbanAssignee = ({ task }: { task: KanbanTask }) => {
@@ -57,7 +57,7 @@ export const KanbanAssignee = ({ task }: { task: KanbanTask }) => {
 			<Popover>
 				<PopoverTrigger>
 					<div className="flex items-center">
-						{coworkers.length > 0 && (
+						{coworkers.length > 0 ? (
 							<div className="flex flex-row-reverse items-center">
 								{coworkers.map((coworker, index) => (
 									<div
@@ -70,6 +70,8 @@ export const KanbanAssignee = ({ task }: { task: KanbanTask }) => {
 									</div>
 								))}
 							</div>
+						) : (
+							<AssigneeAvatar />
 						)}
 					</div>
 				</PopoverTrigger>

@@ -40,7 +40,15 @@ export default function RootLayout({
 			>
 				<NuqsAdapter>
 					<Providers>{children}</Providers>
-					<Toaster />
+					<Toaster
+						toastOptions={{
+							classNames: {
+								toast: "rounded-none!",
+								title: "text-xs!",
+								description: "text-xs!",
+							},
+						}}
+					/>
 					<OpenPanelProvider />
 				</NuqsAdapter>
 			</body>

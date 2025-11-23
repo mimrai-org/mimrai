@@ -2,6 +2,7 @@
 import {
 	Dialog,
 	DialogContent,
+	DialogFooter,
 	DialogHeader,
 	DialogTitle,
 } from "@mimir/ui/dialog";
@@ -34,13 +35,13 @@ export const TaskUpdateSheet = () => {
 
 	return (
 		<Dialog open={isOpen} onOpenChange={() => setParams({ taskId: null })}>
-			<DialogHeader>
-				<DialogTitle />
-			</DialogHeader>
 			<DialogContent
 				showCloseButton={true}
 				className="max-h-[85vh] overflow-y-auto pt-0 sm:min-w-[60vw]"
 			>
+				<DialogHeader className="hidden">
+					<DialogTitle />
+				</DialogHeader>
 				{task ? (
 					<TaskForm
 						defaultValues={{

@@ -1,7 +1,7 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { Assignee } from "@/components/kanban/asignee";
+import { Assignee } from "@/components/kanban/asignee-avatar";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/utils/trpc";
 

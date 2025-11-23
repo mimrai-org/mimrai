@@ -36,7 +36,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { Response } from "@/components/ai-elements/response";
 import { Editor } from "@/components/editor";
-import { Assignee, AssigneeAvatar } from "@/components/kanban/asignee";
+import { Assignee, AssigneeAvatar } from "@/components/kanban/asignee-avatar";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { cn } from "@/lib/utils";
 import { queryClient, trpc } from "@/utils/trpc";

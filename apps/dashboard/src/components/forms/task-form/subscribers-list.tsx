@@ -10,7 +10,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@mimir/ui/popover";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { EyeIcon, EyeOffIcon, PlusIcon } from "lucide-react";
-import { AssigneeAvatar } from "@/components/kanban/asignee";
+import { AssigneeAvatar } from "@/components/kanban/asignee-avatar";
 import { useUser } from "@/hooks/use-user";
 import { queryClient, trpc } from "@/utils/trpc";
 

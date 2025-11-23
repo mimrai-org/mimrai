@@ -126,7 +126,15 @@ export const getTasks = async ({
 		);
 
 	if (input.search) {
-		if (!Number.isNaN(Number.parseInt(input.search, 10))) {
+		// Check if the search input is a UUID
+		const isUUID =
+			/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+				input.search,
+			);
+
+		if (isUUID) {
+			whereClause.push(eq(tasks.id, input.search));
+		} else if (!Number.isNaN(Number.parseInt(input.search, 10))) {
 			whereClause.push(eq(tasks.sequence, Number.parseInt(input.search, 10)));
 		} else {
 			const query = buildSearchQuery(input.search);
@@ -140,7 +148,7 @@ export const getTasks = async ({
 	if (input.view === "board" || input.view === "workstation") {
 		whereClause.push(
 			or(
-				inArray(columns.type, ["in_progress", "to_do"]),
+				inArray(columns.type, ["in_progress", "to_do", "review"]),
 				and(
 					eq(columns.type, "done"),
 					gte(tasks.updatedAt, subDays(new Date(), 3).toISOString()),
@@ -251,7 +259,13 @@ export const getTasks = async ({
 		);
 
 	if (input.view === "board") {
-		query.orderBy(tasks.order);
+		query.orderBy(
+			asc(
+				sql`CASE ${tasks.priority} WHEN 'urgent' THEN 1 WHEN 'high' THEN 2 WHEN 'medium' THEN 3 WHEN 'low' THEN 4 END`,
+			),
+			desc(tasks.dueDate),
+			tasks.order,
+		);
 	} else if (input.view === "workstation") {
 		query.orderBy(
 			asc(
@@ -840,7 +854,7 @@ export const cloneTask = async ({
 	teamId: string;
 	userId: string;
 }) => {
-	const task = await getTaskById(taskId, teamId);
+	const task = await getTaskById(taskId, userId);
 	if (!task) throw new Error("Task not found");
 
 	const newTask = await createTask({

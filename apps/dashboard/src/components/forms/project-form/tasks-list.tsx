@@ -2,7 +2,6 @@ import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/ui/button";
 import {
 	Command,
-	CommandDialog,
 	CommandEmpty,
 	CommandGroup,
 	CommandInput,
@@ -10,12 +9,6 @@ import {
 	CommandSeparator,
 } from "@ui/components/ui/command";
 import { ContextMenuItem } from "@ui/components/ui/context-menu";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@ui/components/ui/dropdown-menu";
 import {
 	Popover,
 	PopoverContent,
@@ -73,7 +66,7 @@ export const TasksList = ({ projectId }: { projectId: string }) => {
 				<AddTaskButton projectId={projectId} />
 			</div>
 			<AnimatePresence>
-				<ul className="flex flex-col gap-2 py-2">
+				<ul className="flex flex-col py-2">
 					{listData.map((task) => (
 						<TaskContextMenu
 							key={task.id}
@@ -95,7 +88,7 @@ export const TasksList = ({ projectId }: { projectId: string }) => {
 							}
 						>
 							<li>
-								<TaskItem task={task} className="border py-2" />
+								<TaskItem task={task} className="" />
 							</li>
 						</TaskContextMenu>
 					))}
@@ -126,7 +119,7 @@ const AddTaskButton = ({ projectId }: { projectId: string }) => {
 		trpc.tasks.get.queryOptions({
 			search: debouncedSearch,
 			nProjectId: [projectId],
-			pageSize: 20,
+			pageSize: 10,
 		}),
 	);
 
@@ -179,18 +172,17 @@ const AddTaskButton = ({ projectId }: { projectId: string }) => {
 								<span className="ml-1 truncate font-medium">{task.title}</span>
 							</CommandItem>
 						))}
+						<CommandSeparator className="my-2" />
+						<CommandItem
+							onSelect={() =>
+								setParams({ createTask: true, taskProjectId: projectId })
+							}
+						>
+							<PlusIcon />
+							Create new task
+						</CommandItem>
 					</CommandGroup>
 					<CommandEmpty>No tasks found.</CommandEmpty>
-					<CommandSeparator className="my-2" />
-					<Button
-						variant="outline"
-						className="w-full"
-						onClick={() =>
-							setParams({ createTask: true, taskProjectId: projectId })
-						}
-					>
-						Create new task
-					</Button>
 				</Command>
 			</PopoverContent>
 		</Popover>

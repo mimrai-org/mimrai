@@ -1,9 +1,10 @@
-import { add, format } from "date-fns";
+import { UTCDate } from "@date-fns/utc";
+import { format } from "date-fns";
 import { and, asc, desc, eq, gte, inArray, lte, not, sql } from "drizzle-orm";
 import { db } from "../index";
 import { activities, columns, tasks, users, usersOnTeams } from "../schema";
 
-export const getTasksCompletedByDay = async ({
+export const getTasksBurnup = async ({
 	teamId,
 	startDate,
 	endDate,
@@ -16,40 +17,50 @@ export const getTasksCompletedByDay = async ({
 		string,
 		{
 			taskCompletedCount: number;
-			checklistItemsCompletedCount: number;
+			taskCreatedCount: number;
 		}
 	>();
 
-	// fill in dates with 0 completions
-	const currentDate = new Date(startDate);
-	while (currentDate <= endDate) {
-		const dateKey = format(currentDate, "yyyy-MM-dd 00:00:00+00");
-		data.set(dateKey, {
-			taskCompletedCount: 0,
-			checklistItemsCompletedCount: 0,
-		});
-		currentDate.setDate(currentDate.getDate() + 1);
-	}
+	const seriesDates = sql`generate_series(${startDate.toISOString()}::timestamp, ${endDate.toISOString()}::timestamp, '1 day'::interval) AS created_at(date)`;
 
-	const tasksCompleted = await db
-		.select({
-			date: sql<Date>`date_trunc('day', ${activities.createdAt})`,
-			completedCount: sql<number>`COUNT(*)`,
-		})
-		.from(activities)
-		.where(
-			and(
-				eq(activities.teamId, teamId),
-				eq(activities.type, "task_completed"),
-				gte(activities.createdAt, startDate.toISOString()),
-				lte(activities.createdAt, endDate.toISOString()),
-			),
-		)
-		.groupBy(sql`date_trunc('day', ${activities.createdAt})`)
-		.orderBy(sql`date_trunc('day', ${activities.createdAt}) ASC`);
+	const [tasksCompleted, tasksCreated] = await Promise.all([
+		db
+			.select({
+				createdAt: sql<Date>`created_at.date`,
+				completedCount: sql<number>`SUM(COUNT(${activities.id})) OVER (ORDER BY DATE(created_at.date) ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)`,
+			})
+			.from(seriesDates)
+			.leftJoin(
+				activities,
+				and(
+					eq(sql`DATE(${activities.createdAt})`, sql`DATE(created_at.date)`),
+					eq(activities.teamId, teamId),
+					eq(activities.type, "task_completed"),
+				),
+			)
+			.groupBy(sql`created_at.date`),
+		db
+			.select({
+				createdAt: sql<Date>`created_at.date`,
+				createdCount: sql<number>`SUM(COUNT(${activities.id})) OVER (ORDER BY DATE(created_at.date) ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)`,
+			})
+			.from(seriesDates)
+			.leftJoin(
+				activities,
+				and(
+					eq(sql`DATE(${activities.createdAt})`, sql`DATE(created_at.date)`),
+					eq(activities.teamId, teamId),
+					eq(activities.type, "task_created"),
+				),
+			)
+			.groupBy(sql`created_at.date`),
+	]);
 
 	for (const row of tasksCompleted) {
-		const dateKey = format(row.date, "yyyy-MM-dd 00:00:00+00");
+		const dateKey = format(
+			new UTCDate(row.createdAt),
+			"yyyy-MM-dd 00:00:00+00",
+		);
 		const current = data.get(dateKey);
 		data.set(dateKey, {
 			...current!,
@@ -57,29 +68,15 @@ export const getTasksCompletedByDay = async ({
 		});
 	}
 
-	const checklistItemsCompleted = await db
-		.select({
-			date: sql<Date>`date_trunc('day', ${activities.createdAt})`,
-			completedCount: sql<number>`COUNT(*)`,
-		})
-		.from(activities)
-		.where(
-			and(
-				eq(activities.teamId, teamId),
-				eq(activities.type, "checklist_item_completed"),
-				gte(activities.createdAt, startDate.toISOString()),
-				lte(activities.createdAt, endDate.toISOString()),
-			),
-		)
-		.groupBy(sql`date_trunc('day', ${activities.createdAt})`)
-		.orderBy(sql`date_trunc('day', ${activities.createdAt}) ASC`);
-
-	for (const row of checklistItemsCompleted) {
-		const dateKey = format(row.date, "yyyy-MM-dd 00:00:00+00");
+	for (const createdTask of tasksCreated) {
+		const dateKey = format(
+			new UTCDate(createdTask.createdAt),
+			"yyyy-MM-dd 00:00:00+00",
+		);
 		const current = data.get(dateKey);
 		data.set(dateKey, {
 			...current!,
-			checklistItemsCompletedCount: Number(row.completedCount),
+			taskCreatedCount: Number(createdTask.createdCount),
 		});
 	}
 
@@ -196,4 +193,74 @@ export const getTasksTodo = async ({ teamId }: { teamId: string }) => {
 		);
 
 	return data;
+};
+
+export const getTasksByColumn = async ({
+	teamId,
+	startDate,
+	endDate,
+}: {
+	teamId: string;
+	startDate: Date;
+	endDate: Date;
+}) => {
+	const data = await db
+		.select({
+			column: {
+				id: columns.id,
+				name: columns.name,
+				type: columns.type,
+			},
+			taskCount: sql<number>`COUNT(${tasks.id})`,
+		})
+		.from(tasks)
+		.innerJoin(columns, eq(tasks.columnId, columns.id))
+		.where(
+			and(
+				eq(tasks.teamId, teamId),
+				not(inArray(columns.type, ["done", "backlog"])),
+			),
+		)
+		.groupBy(columns.id)
+		.orderBy(asc(columns.order));
+
+	return data.map((item) => ({
+		...item,
+		taskCount: Number(item.taskCount),
+	}));
+};
+
+export const getTasksCompletionRate = async ({
+	teamId,
+	startDate,
+	endDate,
+}: {
+	teamId: string;
+	startDate: Date;
+	endDate: Date;
+}) => {
+	const seriesDates = sql`generate_series(${startDate.toISOString()}::timestamp, ${endDate.toISOString()}::timestamp, '1 day'::interval) AS created_at(date)`;
+
+	// get tasks completion by date
+	const data = await db
+		.select({
+			date: sql<Date>`DATE(created_at.date)`,
+			completedCount: sql<number>`COUNT(${activities.id})`,
+		})
+		.from(seriesDates)
+		.innerJoin(
+			activities,
+			and(
+				eq(sql`DATE(${activities.createdAt})`, sql`DATE(created_at.date)`),
+				eq(activities.teamId, teamId),
+				eq(activities.type, "task_completed"),
+			),
+		)
+		.groupBy(sql`DATE(created_at.date)`)
+		.orderBy(asc(sql`DATE(created_at.date)`));
+
+	return data.map((item) => ({
+		date: format(new UTCDate(item.date), "yyyy-MM-dd"),
+		completedCount: Number(item.completedCount),
+	}));
 };

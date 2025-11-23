@@ -38,7 +38,7 @@ export const Priority = ({
 	const Icon = PriorityIcon[value];
 	return (
 		<PriorityTooltip value={value}>
-			<div className="mb-1">{Icon}</div>
+			<div>{Icon}</div>
 		</PriorityTooltip>
 	);
 };

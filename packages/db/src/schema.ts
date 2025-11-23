@@ -369,6 +369,18 @@ export const tasksOnColumnsRelations = relations(columns, ({ many }) => ({
 	tasks: many(tasks),
 }));
 
+export const workingMemory = pgTable("working_memory", {
+	id: text("id").primaryKey().notNull(),
+	chatId: text("chat_id").notNull(),
+	userId: text("user_id").notNull(),
+	content: text("content").notNull(),
+	updatedAt: timestamp("updated_at", {
+		withTimezone: true,
+	})
+		.defaultNow()
+		.notNull(),
+});
+
 export const chats = pgTable(
 	"chats",
 	{
@@ -402,8 +414,8 @@ export const chatMessages = pgTable(
 			.primaryKey()
 			.notNull(),
 		chatId: text("chat_id").notNull(),
-		teamId: text("team_id"),
 		userId: text("user_id").notNull(),
+		role: text("role"),
 		content: jsonb("content").$type<UIChatMessage>().notNull(),
 		createdAt: timestamp("created_at", {
 			withTimezone: true,
@@ -412,7 +424,6 @@ export const chatMessages = pgTable(
 	},
 	(table) => [
 		index("chat_messages_chat_id_index").on(table.chatId),
-		index("chat_messages_team_id_index").on(table.teamId),
 		index("chat_messages_user_id_index").on(table.userId),
 	],
 );

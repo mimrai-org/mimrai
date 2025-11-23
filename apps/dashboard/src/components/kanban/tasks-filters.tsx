@@ -10,7 +10,7 @@ import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";
 import { trpc } from "@/utils/trpc";
 import { LabelInput } from "../forms/task-form/label-input";
 import { ProjectIcon } from "../project-icon";
-import { Assignee, AssigneeAvatar } from "./asignee";
+import { Assignee, AssigneeAvatar } from "./asignee-avatar";
 
 export const TasksFilters = ({
 	showAssigneeFilter = true,

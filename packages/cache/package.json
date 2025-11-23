@@ -11,7 +11,9 @@
   "exports": {
     "./redis-client": "./src/redis-client.ts",
     "./integrations-cache": "./src/integrations-cache.ts",
-    "./users-cache": "./src/users-cache.ts"
+    "./users-cache": "./src/users-cache.ts",
+    "./chat-feedback-cache": "./src/chat-feedback-cache.ts",
+    "./shared-redis": "./src/shared-redis.ts"
   },
   "dependencies": {
     "@mimir/tsconfig": "workspace:*",

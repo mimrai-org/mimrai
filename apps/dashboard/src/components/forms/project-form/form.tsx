@@ -1,11 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@ui/components/ui/button";
-import { Form, FormField } from "@ui/components/ui/form";
-import { BoxIcon } from "lucide-react";
+import { Form } from "@ui/components/ui/form";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import Loader from "@/components/loader";
-import { ProjectIcon } from "@/components/project-icon";
 import { useProjectParams } from "@/hooks/use-project-params";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { queryClient, trpc } from "@/utils/trpc";

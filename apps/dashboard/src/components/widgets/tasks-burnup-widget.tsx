@@ -1,10 +1,9 @@
 "use client";
+import { UTCDate } from "@date-fns/utc";
 import { Card, CardContent } from "@mimir/ui/card";
 import {
 	type ChartConfig,
 	ChartContainer,
-	ChartLegend,
-	ChartLegendContent,
 	ChartTooltip,
 	ChartTooltipContent,
 } from "@mimir/ui/chart";
@@ -19,23 +18,23 @@ const chartConfig = {
 		label: "Tasks Completed",
 		color: "var(--chart-2)",
 	},
-	checklistItemsCompletedCount: {
-		label: "Checklist Items Completed",
-		color: "var(--chart-1)",
+	taskCreatedCount: {
+		label: "Tasks Created",
+		color: "var(--chart-4)",
 	},
 } satisfies ChartConfig;
 
-export const TasksCompletedByDayWidget = () => {
+export const TasksBurnupWidget = () => {
 	const [dateRange, setDateRange] = useState<{
 		startDate: Date;
 		endDate: Date;
 	}>({
-		startDate: sub(new Date(), { days: 7 }),
-		endDate: new Date(),
+		startDate: sub(new UTCDate(), { days: 7 }),
+		endDate: new UTCDate(),
 	});
 
 	const { data } = useQuery(
-		trpc.widgets.tasksCompletedByDay.queryOptions({
+		trpc.widgets.tasksBurnup.queryOptions({
 			...dateRange,
 		}),
 	);
@@ -47,39 +46,17 @@ export const TasksCompletedByDayWidget = () => {
 					config={chartConfig}
 					className="aspect-auto h-[250px] w-full"
 				>
-					<AreaChart
-						accessibilityLayer
-						data={data || []}
-						// margin={{
-						// 	left: 12,
-						// 	right: 12,
-						// }}
-					>
-						{/* <CartesianGrid vertical={false} /> */}
+					<AreaChart accessibilityLayer data={data || []}>
 						<XAxis
 							dataKey={"date"}
 							tickLine={false}
 							axisLine={false}
 							tickMargin={8}
-							tickFormatter={(value) => format(value, "MMM dd")}
+							tickFormatter={(value) => format(new UTCDate(value), "MMM dd")}
 						/>
 						<defs>
 							<linearGradient
 								id="fillTaskCompletedCount"
-								x1="0"
-								y1="0"
-								x2="0"
-								y2="1"
-							>
-								<stop
-									offset="5%"
-									stopColor="var(--chart-2)"
-									stopOpacity={0.8}
-								/>
-								<stop offset="95%" stopColor="var(--chart-2)" stopOpacity={0} />
-							</linearGradient>
-							<linearGradient
-								id="fillChecklistItemsCompletedCount"
 								x1="0"
 								y1="0"
 								x2="0"
@@ -92,6 +69,20 @@ export const TasksCompletedByDayWidget = () => {
 								/>
 								<stop offset="95%" stopColor="var(--chart-1)" stopOpacity={0} />
 							</linearGradient>
+							<linearGradient
+								id="fillTaskCreatedCount"
+								x1="0"
+								y1="0"
+								x2="0"
+								y2="1"
+							>
+								<stop
+									offset="5%"
+									stopColor="var(--chart-4)"
+									stopOpacity={0.8}
+								/>
+								<stop offset="95%" stopColor="var(--chart-4)" stopOpacity={0} />
+							</linearGradient>
 						</defs>
 						<ChartTooltip
 							cursor={false}
@@ -101,14 +92,14 @@ export const TasksCompletedByDayWidget = () => {
 							dataKey={"taskCompletedCount"}
 							type={"monotone"}
 							fill="url(#fillTaskCompletedCount)"
-							stroke="var(--chart-2)"
+							stroke="var(--chart-1)"
 							stackId={"a"}
 						/>
 						<Area
-							dataKey={"checklistItemsCompletedCount"}
+							dataKey={"taskCreatedCount"}
 							type={"monotone"}
-							fill="url(#fillChecklistItemsCompletedCount)"
-							stroke="var(--chart-1)"
+							fill="url(#fillTaskCreatedCount)"
+							stroke="var(--chart-4)"
 							stackId={"a"}
 						/>
 					</AreaChart>

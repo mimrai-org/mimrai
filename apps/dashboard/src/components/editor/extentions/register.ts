@@ -9,13 +9,17 @@ import Link from "@tiptap/extension-link";
 import Mention from "@tiptap/extension-mention";
 import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
-import { mergeAttributes, posToDOMRect, ReactRenderer } from "@tiptap/react";
+import {
+	type Editor,
+	mergeAttributes,
+	posToDOMRect,
+	ReactRenderer,
+} from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Markdown } from "tiptap-markdown";
-import { queryClient, trpc } from "@/utils/trpc";
-import { MentionList } from "./mention-list";
+import { suggestionsOptions } from "./suggestions";
 
-const updatePosition = (editor, element) => {
+const updatePosition = (editor: Editor, element: HTMLElement) => {
 	const virtualElement = {
 		getBoundingClientRect: () =>
 			posToDOMRect(
@@ -51,6 +55,7 @@ const extensions = ({
 	Underline,
 	Image.configure({
 		inline: true,
+		// @ts-expect-error missing resize package
 		resize: {
 			enabled: true,
 			directions: ["top", "right", "bottom", "left"],
@@ -73,28 +78,17 @@ const extensions = ({
 				mergeAttributes(
 					{
 						class: "border py-0.5 px-1 font-medium",
+						"data-mention-type": node.attrs.type,
 					},
 					options.HTMLAttributes,
 				),
-				`@${node.attrs.label}`,
+				`${node.attrs.mentionSuggestionChar}${node.attrs.label}`,
 			];
 		},
 		deleteTriggerWithBackspace: true,
-		suggestion: {
-			items: async ({ query }) => {
-				const members = await queryClient.fetchQuery(
-					trpc.teams.getMembers.queryOptions({
-						includeSystemUsers: true,
-						isMentionable: true,
-					}),
-				);
-				return members
-					.filter((member) =>
-						member.name.toLowerCase().includes(query.toLowerCase()),
-					)
-					.slice(0, 5);
-			},
-
+		suggestions: suggestionsOptions.map((suggestion) => ({
+			char: suggestion.char,
+			items: suggestion.fetcher,
 			command: ({ props, editor, range }) => {
 				if (props.id) onMention?.(props.id, props.label ?? "");
 				editor
@@ -102,7 +96,11 @@ const extensions = ({
 					.focus()
 					.insertContentAt(range, {
 						type: "mention",
-						attrs: props,
+						attrs: {
+							...props,
+							mentionSuggestionChar: suggestion.char,
+							type: suggestion.type,
+						},
 					})
 					.run();
 			},
@@ -112,7 +110,7 @@ const extensions = ({
 
 				return {
 					onStart: (props) => {
-						component = new ReactRenderer(MentionList, {
+						component = new ReactRenderer(suggestion.listComponent, {
 							props,
 							editor: props.editor,
 						});
@@ -132,7 +130,7 @@ const extensions = ({
 						if (!props.clientRect) {
 							return;
 						}
-						updatePosition(props.editor, component?.element);
+						updatePosition(props.editor, component?.element!);
 					},
 
 					onKeyDown: (props) => {
@@ -150,7 +148,7 @@ const extensions = ({
 					},
 				};
 			},
-		},
+		})),
 	}),
 
 	FileHandler.configure({

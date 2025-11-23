@@ -9,7 +9,7 @@ import { logger, schemaTask } from "@trigger.dev/sdk";
 import { generateObject } from "ai";
 import * as cptable from "xlsx/dist/cpexcel.full.mjs";
 import * as XLSX from "xlsx/xlsx.mjs";
-import { z } from "zod";
+import z from "zod";
 
 export const tasksImportJob = schemaTask({
 	id: "tasks-import",
@@ -103,7 +103,7 @@ export const tasksImportJob = schemaTask({
 					.string()
 					.optional()
 					.describe(
-						"The header name for the task priority. Must be one of [low, medium, high]",
+						"The header name for the task priority. Must be one of [low, medium, high, urgent]",
 					),
 				assignee: z
 					.string()

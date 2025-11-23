@@ -1,6 +1,5 @@
 import { DataSelectInput } from "@mimir/ui/data-select-input";
 import { FormControl, FormField, FormItem } from "@mimir/ui/form";
-import { BoxIcon } from "lucide-react";
 import { useFormContext } from "react-hook-form";
 import { ProjectIcon } from "@/components/project-icon";
 import { trpc } from "@/utils/trpc";
@@ -18,6 +17,8 @@ export const ProjectSelect = () => {
 					<FormControl>
 						<DataSelectInput
 							size="sm"
+							clearable
+							renderClear={() => "No project"}
 							className="h-6! text-xs"
 							queryOptions={trpc.projects.get.queryOptions(
 								{},
@@ -26,7 +27,7 @@ export const ProjectSelect = () => {
 								},
 							)}
 							value={field.value || null}
-							onChange={(value) => field.onChange(value || undefined)}
+							onChange={(value) => field.onChange(value || null)}
 							getLabel={(item) => item?.name ?? ""}
 							getValue={(item) => item?.id ?? ""}
 							placeholder="No project"

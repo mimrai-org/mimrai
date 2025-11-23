@@ -8,6 +8,7 @@ import gmailOAuthRouter from "./gmail-oauth";
 import { importsRouter } from "./imports";
 import { integrationsRouter } from "./integrations";
 import { slackRouter } from "./slack";
+import { transcriptionRouter } from "./transcription";
 
 const routers = new OpenAPIHono<Context>();
 
@@ -23,5 +24,6 @@ routers.route("/github", githubRouter);
 routers.route("/imports", importsRouter);
 routers.route("/attachments", attachmentsRouter);
 routers.route("/slack", slackRouter);
+routers.route("/transcription", transcriptionRouter);
 
 export { routers };

@@ -1,15 +1,14 @@
-import { getColumns } from "@db/queries/columns";
 import { getTeamById } from "@mimir/db/queries/teams";
 import { getUserById } from "@mimir/db/queries/users";
 import { HTTPException } from "hono/http-exception";
 import { type ChatUserContext, chatCache } from "../chat-cache";
 
 interface GetUserContextParams {
-  userId: string;
-  teamId: string;
-  country?: string;
-  city?: string;
-  timezone?: string;
+	userId: string;
+	teamId: string;
+	country?: string;
+	city?: string;
+	timezone?: string;
 }
 
 /**
@@ -17,61 +16,52 @@ interface GetUserContextParams {
  * Fetches team and user data if not cached, then caches the result
  */
 export async function getUserContext({
-  userId,
-  teamId,
-  country,
-  city,
-  timezone,
+	userId,
+	teamId,
+	country,
+	city,
+	timezone,
 }: GetUserContextParams): Promise<ChatUserContext> {
-  // Try to get cached context first
-  const cached = await chatCache.getUserContext(userId, teamId);
-  if (cached) {
-    return cached;
-  }
+	// Try to get cached context first
+	const cached = await chatCache.getUserContext(userId, teamId);
+	if (cached) {
+		return cached;
+	}
 
-  // If not cached, fetch team and user data in parallel
-  const [team, user, columns] = await Promise.all([
-    getTeamById(teamId),
-    getUserById(userId),
-    getColumns({
-      teamId,
-      pageSize: 10,
-    }),
-  ]);
+	// If not cached, fetch team and user data in parallel
+	const [team, user] = await Promise.all([
+		getTeamById(teamId),
+		getUserById(userId),
+	]);
 
-  if (!team || !user) {
-    throw new HTTPException(404, {
-      message: "User or team not found",
-    });
-  }
+	if (!team || !user) {
+		throw new HTTPException(404, {
+			message: "User or team not found",
+		});
+	}
 
-  const context: ChatUserContext = {
-    userId,
-    teamId,
-    teamName: team.name,
-    teamDescription: team.description,
-    fullName: user.name,
-    locale: team.locale ?? user.locale ?? "en-US",
-    dateFormat: user.dateFormat,
-    country,
-    city,
-    timezone,
-    columns: columns.data.map((col) => ({
-      id: col.id,
-      name: col.name,
-      description: col.description,
-    })),
-  };
+	const context: ChatUserContext = {
+		userId,
+		teamId,
+		teamName: team.name,
+		teamDescription: team.description,
+		fullName: user.name,
+		locale: team.locale ?? user.locale ?? "en-US",
+		dateFormat: user.dateFormat,
+		country,
+		city,
+		timezone,
+	};
 
-  // Cache for future requests (non-blocking)
-  chatCache.setUserContext(userId, teamId, context).catch((err) => {
-    console.warn({
-      msg: "Failed to cache user context",
-      userId,
-      teamId,
-      error: err.message,
-    });
-  });
+	// Cache for future requests (non-blocking)
+	chatCache.setUserContext(userId, teamId, context).catch((err) => {
+		console.warn({
+			msg: "Failed to cache user context",
+			userId,
+			teamId,
+			error: err.message,
+		});
+	});
 
-  return context;
+	return context;
 }

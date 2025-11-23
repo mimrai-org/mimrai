@@ -1,20 +1,13 @@
-import { setContext } from "@api/ai/context";
-import { generateSystemPrompt } from "@api/ai/generate-system-prompt";
-import { createToolRegistry } from "@api/ai/tool-types";
+import { buildAppContext } from "@api/ai/agents/config/shared";
+import { mainAgent } from "@api/ai/agents/main";
 import type { UIChatMessage } from "@api/ai/types";
 import { getUserContext } from "@api/ai/utils/get-user-context";
-import { shouldForceStop } from "@api/utils/streaming-utils";
 import { db } from "@mimir/db/client";
 import { getChatById, saveChatMessage } from "@mimir/db/queries/chats";
 import { createTaskComment } from "@mimir/db/queries/tasks";
 import { getSystemUser } from "@mimir/db/queries/users";
 import { activities, tasks } from "@mimir/db/schema";
-import {
-	convertToModelMessages,
-	stepCountIs,
-	streamText,
-	type UIMessage,
-} from "ai";
+import type { UIMessage } from "ai";
 import { and, eq } from "drizzle-orm";
 
 export const handleTaskComment = async ({
@@ -72,26 +65,6 @@ export const handleTaskComment = async ({
 	if (!task) {
 		throw new Error("Task not found");
 	}
-
-	const systemPrompt = `${generateSystemPrompt(userContext)}
-	
-		<IMPORTANT>
-			This message was posted as a comment on a task, THIS IS NOT A CHAT, your response will be posted as a comment for the task, you have to following context to answer appropriately.
-			<rules>
-				- Do not mention anything that you are working with this task, the user already knows that.
-				- Do not mention the task title or description unless specifically asked.
-				- Keep your answer focused on the task at hand.
-				- Provide clear and concise information relevant to the task.
-				- If the comment is a question, provide a direct answer based on the task information.
-				- Do not include any greetings or sign-offs in your response.
-			</rules>
-			<task-context>
-				id: ${taskId}
-				title: ${task.title}
-				description: ${task.description ?? "No description"}
-			</task-context>
-		</IMPORTANT>
-	`;
 
 	const unsavedMessages: {
 		message: UIChatMessage;
@@ -163,36 +136,39 @@ export const handleTaskComment = async ({
 		),
 	);
 
-	setContext({
-		db,
-		user: userContext,
-		// @ts-expect-error
-		writer: null,
-		artifactSupport: false,
-	});
+	const appContext = buildAppContext(
+		{
+			...userContext,
+			integrationType: "whatsapp",
+			additionalContext: `
+				<IMPORTANT>
+					This message was posted as a comment on a task, THIS IS NOT A CHAT, your response will be posted as a comment for the task, you have to following context to answer appropriately.
+					<rules>
+						- Do not mention anything that you are working with this task, the user already knows that.
+						- Do not mention the task title or description unless specifically asked.
+						- Keep your answer focused on the task at hand.
+						- Provide clear and concise information relevant to the task.
+						- If the comment is a question, provide a direct answer based on the task information.
+						- Do not include any greetings or sign-offs in your response.
+					</rules>
+					<task-context>
+						id: ${taskId}
+						title: ${task.title}
+						description: ${task.description ?? "No description"}
+					</task-context>
+				</IMPORTANT>
+			`,
+		},
+		chatId,
+	);
 
 	const text: UIChatMessage = await new Promise((resolve, reject) => {
-		const result = streamText({
-			model: "openai/gpt-4o",
-			system: systemPrompt,
-			messages: convertToModelMessages(allMessages),
-			// @ts-expect-error
-			tools: {
-				...createToolRegistry(),
-			},
-			onStepFinish: async (step) => {},
-			stopWhen: (step) => {
-				// Stop if we've reached 10 steps (original condition)
-				if (stepCountIs(10)(step)) {
-					return true;
-				}
-
-				// Force stop if any tool has completed its full streaming response
-				return shouldForceStop(step);
-			},
-		});
-
-		const messageStream = result.toUIMessageStream({
+		const messageStream = mainAgent.toUIMessageStream({
+			message: userMessage,
+			strategy: "auto",
+			maxRounds: 5,
+			maxSteps: 20,
+			context: appContext,
 			sendFinish: true,
 			onFinish: ({ responseMessage }) => {
 				resolve(responseMessage as UIChatMessage);
@@ -202,11 +178,9 @@ export const handleTaskComment = async ({
 		// read the stream to completion to avoid memory leaks
 		(async () => {
 			try {
-				for await (const _part of messageStream) {
-					// no-op
-				}
-			} catch (error) {
-				reject(error);
+				await messageStream.json();
+			} catch (e) {
+				reject(e);
 			}
 		})();
 	});

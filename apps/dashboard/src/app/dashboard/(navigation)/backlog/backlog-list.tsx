@@ -14,7 +14,7 @@ import {
 	EmptyStateIcon,
 	EmptyStateTitle,
 } from "@/components/empty-state";
-import { AssigneeAvatar } from "@/components/kanban/asignee";
+import { AssigneeAvatar } from "@/components/kanban/asignee-avatar";
 import { TaskContextMenu } from "@/components/kanban/task-context-menu";
 import { TasksFilters } from "@/components/kanban/tasks-filters";
 import { TaskItem } from "@/components/task-item";

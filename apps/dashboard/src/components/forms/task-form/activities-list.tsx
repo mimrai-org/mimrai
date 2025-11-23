@@ -15,7 +15,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Response } from "@/components/ai-elements/response";
-import { AssigneeAvatar } from "@/components/kanban/asignee";
+import { AssigneeAvatar } from "@/components/kanban/asignee-avatar";
 import { queryClient, trpc } from "@/utils/trpc";
 import { CommentInput } from "./comment-input";
 

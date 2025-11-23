@@ -104,7 +104,7 @@ export const ProjectsList = () => {
 									<Progress {...project.progress} />
 								</div>
 								<button
-									className="flex h-5 items-center gap-2 rounded-xs bg-secondary px-1"
+									className="flex h-5 items-center gap-2 rounded-none bg-secondary px-1"
 									type="button"
 								>
 									<LayersIcon className="size-3" />
@@ -146,7 +146,7 @@ export const Progress = ({
 	return (
 		<Tooltip>
 			<TooltipTrigger className="w-full">
-				<div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
+				<div className="h-1.5 w-full overflow-hidden rounded-full bg-input">
 					<div
 						className="h-full bg-primary transition-all duration-500"
 						style={{ width: `${percentage}%` }}

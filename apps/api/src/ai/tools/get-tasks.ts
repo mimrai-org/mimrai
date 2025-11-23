@@ -3,54 +3,30 @@ import { getAppUrl } from "@mimir/utils/envs";
 import { getTaskPermalink } from "@mimir/utils/tasks";
 import { tool } from "ai";
 import z from "zod";
-import { taskFiltersArtifact } from "../artifacts/task-filters";
-import { getContext } from "../context";
+import type { AppContext } from "../agents/config/shared";
 
 export const getTasksToolSchema = z.object({
-	search: z
-		.string()
-		.optional()
-		.describe(
-			"Prefer searching by task sequence to find a specific task. Use keywords otherwise",
-		),
-	assigneeId: z
-		.array(z.string())
-		.optional()
-		.describe("List of user IDs to filter tasks assigned to these users"),
-	cursor: z
-		.string()
-		.optional()
-		.describe(
-			"Cursor for pagination, representing the last item from the previous page",
-		),
-	pageSize: z
-		.number()
-		.min(1)
-		.max(25)
-		.default(10)
-		.describe("Number of transactions to return per page (1-25)"),
+	search: z.string().optional().describe("Search query"),
+	assigneeId: z.array(z.string()).optional().describe("Users IDs"),
+	cursor: z.string().optional().describe("Pagination cursor"),
+	pageSize: z.number().min(1).max(100).default(10).describe("Page size"),
 });
 
 export const getTasksTool = tool({
-	description:
-		"Retrieve a list of tasks. Supports pagination. If the user wants to know more about a specific task use the sequence number to search for it.",
+	description: "Retrieve a list of tasks",
 	inputSchema: getTasksToolSchema,
-	execute: async function* ({ search, cursor, pageSize, assigneeId }) {
+	execute: async function* (
+		{ search, cursor, pageSize, assigneeId },
+		executionOptions,
+	) {
 		try {
-			const { user, artifactSupport } = getContext();
+			const { userId, teamId } =
+				executionOptions.experimental_context as AppContext;
 
 			yield { text: "Fetching tasks...", status: "loading" };
 
-			if (artifactSupport && [search, assigneeId].filter(Boolean).length > 0) {
-				const taskFilters = taskFiltersArtifact.stream({
-					search,
-					assigneeId,
-				});
-				taskFilters.complete();
-			}
-
 			const result = await getTasks({
-				teamId: user.teamId,
+				teamId: teamId,
 				assigneeId: assigneeId,
 				view: "board",
 				cursor,
@@ -79,9 +55,7 @@ export const getTasksTool = tool({
 			}));
 
 			yield {
-				text: "I've applied the task filters you provided. You can view the filtered tasks in your board.",
 				boardUrl: `${getAppUrl()}/dashboard`,
-				status: "success",
 				data: mappedData,
 			};
 		} catch (error) {
