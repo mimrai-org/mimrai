@@ -117,6 +117,11 @@ export const handleWhatsappMessage = async ({
 			maxSteps: 20,
 			context: appContext,
 			sendFinish: true,
+			onError(error) {
+				console.error("Error in message stream:", error);
+				reject(error);
+				return "There was an error processing your message.";
+			},
 			onFinish: ({ responseMessage }) => {
 				resolve(responseMessage as UIChatMessage);
 			},
