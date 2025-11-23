@@ -9,16 +9,10 @@ export default function Page() {
 			<div className="w-full">
 				<TasksBurnupWidget />
 			</div>
-			<div className="grid w-full grid-cols-1 gap-6 md:grid-cols-4">
-				<div className="h-full">
-					<TasksByColumnWidget />
-				</div>
-				<div className="h-full">
-					<TasksCompletionRate />
-				</div>
-				<div className="h-full md:col-span-2">
-					<TasksTodoWidget />
-				</div>
+			<div className="grid w-full grid-cols-1 items-stretch gap-6 md:grid-cols-4">
+				<TasksByColumnWidget />
+				<TasksCompletionRate />
+				<TasksTodoWidget className="md:col-span-2" />
 			</div>
 		</div>
 	);

@@ -35,7 +35,7 @@ export const TasksByColumnWidget = () => {
 	);
 
 	return (
-		<Card>
+		<Card className="flex flex-col justify-between">
 			<CardHeader>
 				<CardDescription>
 					Determine the distribution of tasks across different columns

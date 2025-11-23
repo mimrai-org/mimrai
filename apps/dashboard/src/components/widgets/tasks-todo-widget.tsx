@@ -22,14 +22,16 @@ import { ColumnIcon } from "../column-icon";
 import { AssigneeAvatar } from "../kanban/asignee-avatar";
 import { Priority } from "../kanban/priority";
 
-export const TasksTodoWidget = () => {
+export const TasksTodoWidget = ({ className }: { className?: string }) => {
 	const { setParams } = useTaskParams();
 	const { data } = useQuery(trpc.widgets.tasksTodo.queryOptions());
 
 	return (
-		<Card>
+		<Card className={className}>
 			<CardHeader>
-				<CardDescription>Tasks that are yet to be completed.</CardDescription>
+				<CardDescription>
+					Important tasks that are yet to be completed
+				</CardDescription>
 			</CardHeader>
 			<CardContent>
 				<Table>

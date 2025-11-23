@@ -35,7 +35,7 @@ export const TasksCompletionRate = () => {
 	);
 
 	return (
-		<Card>
+		<Card className="flex flex-col justify-between">
 			<CardHeader>
 				<CardDescription>
 					Tasks completion rate over the last week
