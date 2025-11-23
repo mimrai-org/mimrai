@@ -367,7 +367,7 @@
         "drizzle-orm": "0.44.6",
         "mime-types": "^3.0.1",
         "redis": "^5.8.2",
-        "twilio": "^5.10.4",
+        "twilio": "^5.10.6",
         "ws": "^8.18.3",
         "zod": "^4.1.11",
       },
@@ -3981,6 +3981,8 @@
     "@mimir/events/@types/react": ["@types/react@19.1.1", "", { "dependencies": { "csstype": "^3.0.2" } }, "sha512-ePapxDL7qrgqSF67s0h9m412d9DbXyC1n59O2st+9rjuuamWsZuD2w55rqY12CbzsZ7uVXb5Nw0gEp9Z8MMutQ=="],
 
     "@mimir/integration/ai": ["ai@5.0.98", "", { "dependencies": { "@ai-sdk/gateway": "2.0.13", "@ai-sdk/provider": "2.0.0", "@ai-sdk/provider-utils": "3.0.17", "@opentelemetry/api": "1.9.0" }, "peerDependencies": { "zod": "^3.25.76 || ^4.1.8" } }, "sha512-RpMnwnml68Swblobvk6IdF7HLZrog72Ve6H5J3aN+A/JPg4y5CjCXeQyK1N4wJStyuTa6AoKYfJR5F4e/aVpHQ=="],
+
+    "@mimir/integration/twilio": ["twilio@5.10.6", "", { "dependencies": { "axios": "^1.12.0", "dayjs": "^1.11.9", "https-proxy-agent": "^5.0.0", "jsonwebtoken": "^9.0.2", "qs": "^6.9.4", "scmp": "^2.1.0", "xmlbuilder": "^13.0.2" } }, "sha512-mZkB1JHvIuxv4J0MUP+iNyK4xQi6XhtqZdiowDSZzOgT2MhYhGOtDTorb6+Y8NFsb589W3njtAUnRCPcXaiX3g=="],
 
     "@mimir/integration/zod": ["zod@4.1.12", "", {}, "sha512-JInaHOamG8pt5+Ey8kGmdcAcg3OL9reK8ltczgHTAwNhMys/6ThXHityHxVV2p3fkw/c+MAvBHFVYHFZDmjMCQ=="],
 
