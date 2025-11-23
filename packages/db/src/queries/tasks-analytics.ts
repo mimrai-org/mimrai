@@ -215,13 +215,7 @@ export const getTasksByColumn = async ({
 		})
 		.from(tasks)
 		.innerJoin(columns, eq(tasks.columnId, columns.id))
-		.where(
-			and(
-				eq(tasks.teamId, teamId),
-				gte(tasks.createdAt, startDate.toISOString()),
-				lte(tasks.createdAt, endDate.toISOString()),
-			),
-		)
+		.where(and(eq(tasks.teamId, teamId)))
 		.groupBy(columns.id)
 		.orderBy(asc(columns.order));
 

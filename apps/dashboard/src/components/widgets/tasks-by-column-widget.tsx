@@ -78,7 +78,7 @@ export const TasksByColumnWidget = () => {
 							cursor={false}
 							content={<ChartTooltipContent hideLabel />}
 						/>
-						<Bar dataKey={"taskCount"} fill="var(--chart-2)" barSize={10} />
+						<Bar dataKey={"taskCount"} fill="var(--chart-2)" />
 					</BarChart>
 				</ChartContainer>
 			</CardContent>
