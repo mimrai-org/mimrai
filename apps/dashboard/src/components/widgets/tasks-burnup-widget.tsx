@@ -4,8 +4,6 @@ import { Card, CardContent } from "@mimir/ui/card";
 import {
 	type ChartConfig,
 	ChartContainer,
-	ChartLegend,
-	ChartLegendContent,
 	ChartTooltip,
 	ChartTooltipContent,
 } from "@mimir/ui/chart";
@@ -22,7 +20,7 @@ const chartConfig = {
 	},
 	taskCreatedCount: {
 		label: "Tasks Created",
-		color: "var(--chart-1)",
+		color: "var(--chart-4)",
 	},
 } satisfies ChartConfig;
 
@@ -66,10 +64,10 @@ export const TasksBurnupWidget = () => {
 							>
 								<stop
 									offset="5%"
-									stopColor="var(--chart-2)"
+									stopColor="var(--chart-1)"
 									stopOpacity={0.8}
 								/>
-								<stop offset="95%" stopColor="var(--chart-2)" stopOpacity={0} />
+								<stop offset="95%" stopColor="var(--chart-1)" stopOpacity={0} />
 							</linearGradient>
 							<linearGradient
 								id="fillTaskCreatedCount"
@@ -80,14 +78,10 @@ export const TasksBurnupWidget = () => {
 							>
 								<stop
 									offset="5%"
-									stopColor="var(--color-gray-500)"
+									stopColor="var(--chart-4)"
 									stopOpacity={0.8}
 								/>
-								<stop
-									offset="95%"
-									stopColor="var(--color-gray-500)"
-									stopOpacity={0}
-								/>
+								<stop offset="95%" stopColor="var(--chart-4)" stopOpacity={0} />
 							</linearGradient>
 						</defs>
 						<ChartTooltip
@@ -98,14 +92,14 @@ export const TasksBurnupWidget = () => {
 							dataKey={"taskCompletedCount"}
 							type={"monotone"}
 							fill="url(#fillTaskCompletedCount)"
-							stroke="var(--chart-2)"
+							stroke="var(--chart-1)"
 							stackId={"a"}
 						/>
 						<Area
 							dataKey={"taskCreatedCount"}
 							type={"monotone"}
 							fill="url(#fillTaskCreatedCount)"
-							stroke="var(--color-gray-500)"
+							stroke="var(--chart-4)"
 							stackId={"a"}
 						/>
 					</AreaChart>

@@ -22,13 +22,12 @@ export const getProjects = async ({
 					"completed",
 				),
 			inProgress:
-				sql<number>`COUNT(${tasks.id}) FILTER (WHERE ${columns.type} IN ('in_progress', 'review'))`.as(
+				sql<number>`COUNT(${tasks.id}) FILTER (WHERE ${columns.type} IN ('in_progress', 'review', 'to_do', 'backlog'))`.as(
 					"in_progress",
 				),
 		})
 		.from(tasks)
 		.innerJoin(columns, eq(tasks.columnId, columns.id))
-		.where(and(notInArray(columns.type, ["backlog"])))
 		.groupBy(tasks.projectId)
 		.as("progress_sq");
 

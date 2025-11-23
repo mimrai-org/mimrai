@@ -80,8 +80,6 @@ export const getTasksBurnup = async ({
 		});
 	}
 
-	console.log(data);
-
 	return Array.from(data.entries()).map(([date, value]) => ({
 		date,
 		...value,
@@ -195,4 +193,40 @@ export const getTasksTodo = async ({ teamId }: { teamId: string }) => {
 		);
 
 	return data;
+};
+
+export const getTasksByColumn = async ({
+	teamId,
+	startDate,
+	endDate,
+}: {
+	teamId: string;
+	startDate: Date;
+	endDate: Date;
+}) => {
+	const data = await db
+		.select({
+			column: {
+				id: columns.id,
+				name: columns.name,
+				type: columns.type,
+			},
+			taskCount: sql<number>`COUNT(${tasks.id})`,
+		})
+		.from(tasks)
+		.innerJoin(columns, eq(tasks.columnId, columns.id))
+		.where(
+			and(
+				eq(tasks.teamId, teamId),
+				gte(tasks.createdAt, startDate.toISOString()),
+				lte(tasks.createdAt, endDate.toISOString()),
+			),
+		)
+		.groupBy(columns.id)
+		.orderBy(asc(columns.order));
+
+	return data.map((item) => ({
+		...item,
+		taskCount: Number(item.taskCount),
+	}));
 };
