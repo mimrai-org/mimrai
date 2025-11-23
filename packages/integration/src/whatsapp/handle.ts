@@ -113,10 +113,10 @@ export const handleWhatsappMessage = async ({
 		process.env.TWILIO_AUTH_TOKEN!,
 	);
 
-	await client.messaging.v2.typingIndicator.create({
-		messageId: id,
-		channel: "whatsapp",
-	});
+	// await client.messaging.v2.typingIndicator.create({
+	// 	messageId: id,
+	// 	channel: "whatsapp",
+	// });
 
 	const text: UIChatMessage = await new Promise((resolve, reject) => {
 		const messageStream = mainAgent.toUIMessageStream({
