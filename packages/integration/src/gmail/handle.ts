@@ -1,3 +1,4 @@
+import { getGoogleClient } from "@integration/google/client";
 import { db } from "@mimir/db/client";
 import {
 	createIntakeItem,
@@ -113,10 +114,7 @@ export class GmailHandle {
 			);
 		}
 
-		this.auth = new google.auth.OAuth2(
-			process.env.GOOGLE_CLIENT_ID,
-			process.env.GOOGLE_CLIENT_SECRET,
-		);
+		this.auth = getGoogleClient();
 
 		this.auth.setCredentials({
 			refresh_token: config.refreshToken,
