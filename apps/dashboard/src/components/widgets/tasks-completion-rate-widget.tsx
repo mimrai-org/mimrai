@@ -9,17 +9,17 @@ import {
 } from "@ui/components/ui/chart";
 import { sub } from "date-fns";
 import { useState } from "react";
-import { Bar, BarChart, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, Line, LineChart, XAxis, YAxis } from "recharts";
 import { trpc } from "@/utils/trpc";
 
 const chartConfig = {
-	taskCount: {
+	completedCount: {
 		label: "Tasks",
 		color: "var(--chart-2)",
 	},
 } satisfies ChartConfig;
 
-export const TasksByColumnWidget = () => {
+export const TasksCompletionRate = () => {
 	const [dateRange, setDateRange] = useState<{
 		startDate: Date;
 		endDate: Date;
@@ -29,7 +29,7 @@ export const TasksByColumnWidget = () => {
 	});
 
 	const { data } = useQuery(
-		trpc.widgets.tasksByColumn.queryOptions({
+		trpc.widgets.tasksCompletionRate.queryOptions({
 			...dateRange,
 		}),
 	);
@@ -38,37 +38,38 @@ export const TasksByColumnWidget = () => {
 		<Card>
 			<CardHeader>
 				<CardDescription>
-					Determine the distribution of tasks across different columns
+					Tasks completion rate over the last week
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
 				<ChartContainer config={chartConfig}>
-					<BarChart
-						accessibilityLayer
-						data={data || []}
-						layout="horizontal"
-						margin={{ bottom: 5 }}
-					>
-						<YAxis type="number" dataKey={"taskCount"} hide />
+					<LineChart accessibilityLayer data={data || []}>
+						<YAxis type="number" dataKey={"completedCount"} hide />
 						<XAxis
-							type="category"
 							tickLine={false}
-							tickMargin={10}
 							axisLine={false}
-							dataKey="column.name"
+							tickMargin={8}
+							dataKey="date"
 							tickFormatter={(value) =>
-								(value as string)
-									.split(" ")
-									.map((word) => word.slice(0, 4))
-									.join(" ")
+								new Date(value as string).toLocaleDateString("en-US", {
+									day: "numeric",
+									month: "short",
+								})
 							}
 						/>
 						<ChartTooltip
 							cursor={false}
 							content={<ChartTooltipContent hideLabel />}
 						/>
-						<Bar dataKey={"taskCount"} fill="var(--chart-2)" />
-					</BarChart>
+						<Line
+							type="monotone"
+							dataKey="completedCount"
+							stroke="var(--chart-2)"
+							strokeWidth={3}
+							dot={{ r: 4, strokeWidth: 2, fill: "var(--chart-2)" }}
+							activeDot={{ r: 6 }}
+						/>
+					</LineChart>
 				</ChartContainer>
 			</CardContent>
 		</Card>

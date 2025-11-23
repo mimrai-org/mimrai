@@ -1,5 +1,6 @@
 import { TasksBurnupWidget } from "@/components/widgets/tasks-burnup-widget";
 import { TasksByColumnWidget } from "@/components/widgets/tasks-by-column-widget";
+import { TasksCompletionRate } from "@/components/widgets/tasks-completion-rate-widget";
 import { TasksTodoWidget } from "@/components/widgets/tasks-todo-widget";
 
 export default function Page() {
@@ -12,7 +13,10 @@ export default function Page() {
 				<div className="h-full">
 					<TasksByColumnWidget />
 				</div>
-				<div className="h-full md:col-span-3">
+				<div className="h-full">
+					<TasksCompletionRate />
+				</div>
+				<div className="h-full md:col-span-2">
 					<TasksTodoWidget />
 				</div>
 			</div>

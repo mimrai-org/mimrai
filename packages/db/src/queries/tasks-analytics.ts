@@ -215,12 +215,52 @@ export const getTasksByColumn = async ({
 		})
 		.from(tasks)
 		.innerJoin(columns, eq(tasks.columnId, columns.id))
-		.where(and(eq(tasks.teamId, teamId)))
+		.where(
+			and(
+				eq(tasks.teamId, teamId),
+				not(inArray(columns.type, ["done", "backlog"])),
+			),
+		)
 		.groupBy(columns.id)
 		.orderBy(asc(columns.order));
 
 	return data.map((item) => ({
 		...item,
 		taskCount: Number(item.taskCount),
+	}));
+};
+
+export const getTasksCompletionRate = async ({
+	teamId,
+	startDate,
+	endDate,
+}: {
+	teamId: string;
+	startDate: Date;
+	endDate: Date;
+}) => {
+	const seriesDates = sql`generate_series(${startDate.toISOString()}::timestamp, ${endDate.toISOString()}::timestamp, '1 day'::interval) AS created_at(date)`;
+
+	// get tasks completion by date
+	const data = await db
+		.select({
+			date: sql<Date>`DATE(created_at.date)`,
+			completedCount: sql<number>`COUNT(${activities.id})`,
+		})
+		.from(seriesDates)
+		.innerJoin(
+			activities,
+			and(
+				eq(sql`DATE(${activities.createdAt})`, sql`DATE(created_at.date)`),
+				eq(activities.teamId, teamId),
+				eq(activities.type, "task_completed"),
+			),
+		)
+		.groupBy(sql`DATE(created_at.date)`)
+		.orderBy(asc(sql`DATE(created_at.date)`));
+
+	return data.map((item) => ({
+		date: format(new UTCDate(item.date), "yyyy-MM-dd"),
+		completedCount: Number(item.completedCount),
 	}));
 };

@@ -20,7 +20,7 @@ export default async function Page({ params, searchParams }: Props) {
 	const session = await getSession();
 
 	if (!session?.user) {
-		return redirect(`/sign-up?callbackUrl=/invites/${inviteId}&email=${email}`);
+		return redirect(`/sign-in?callbackUrl=/invites/${inviteId}&email=${email}`);
 	}
 
 	const invite = await queryClient.fetchQuery(

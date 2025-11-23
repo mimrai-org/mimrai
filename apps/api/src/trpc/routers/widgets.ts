@@ -3,6 +3,7 @@ import { protectedProcedure, router } from "@api/trpc/init";
 import {
 	getTasksBurnup,
 	getTasksByColumn,
+	getTasksCompletionRate,
 	getTasksSummaryByMember,
 	getTasksTodo,
 } from "@mimir/db/queries/tasks-analytics";
@@ -22,6 +23,16 @@ export const widgetsRouter = router({
 		.input(getWidgetSchema)
 		.query(async ({ ctx, input }) => {
 			return getTasksByColumn({
+				teamId: ctx.user.teamId!,
+				startDate: input.startDate,
+				endDate: input.endDate,
+			});
+		}),
+
+	tasksCompletionRate: protectedProcedure
+		.input(getWidgetSchema)
+		.query(async ({ ctx, input }) => {
+			return getTasksCompletionRate({
 				teamId: ctx.user.teamId!,
 				startDate: input.startDate,
 				endDate: input.endDate,
