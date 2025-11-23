@@ -112,7 +112,7 @@ export const auth = betterAuth<BetterAuthOptions>({
 		},
 	},
 	advanced: {
-		useSecureCookies: true,
+		useSecureCookies: process.env.NODE_ENV !== "development",
 		crossSubDomainCookies: {
 			enabled: true,
 			domain: process.env.BETTER_AUTH_DOMAIN || "localhost",
