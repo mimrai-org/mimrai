@@ -39,6 +39,7 @@ ${
 	- Use simple lists with dashes or numbers for multiple items.
 	- Keep large list responses to a maximum of 5 items.
 	- Share links as full URLs without hyperlinking or any special formatting.
+	- Always send on top of the message the name of the team "${context.teamName}" to remind the user which team they are interacting with.
 	`
 			: ""
 }
