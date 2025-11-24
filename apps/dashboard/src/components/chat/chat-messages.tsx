@@ -73,6 +73,7 @@ function extractAiSdkSources(parts: UIMessage["parts"]): SourceItem[] {
 
 export const Messages = ({ isStreaming }: { isStreaming?: boolean }) => {
 	const user = useUser();
+
 	const status = useChatStatus();
 	const messages = useChatMessages<UIChatMessage>();
 	return (
@@ -199,7 +200,10 @@ export const Messages = ({ isStreaming }: { isStreaming?: boolean }) => {
 											</MessageContent>
 										</div>
 										{message.role === "user" && (
-											<MessageAvatar src={""} name={user?.name ?? "User"} />
+											<MessageAvatar
+												src={user?.image || ""}
+												name={user?.name ?? "User"}
+											/>
 										)}
 									</Message>
 								)}

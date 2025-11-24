@@ -69,8 +69,11 @@ export const MessageAvatar = ({
 	className,
 	...props
 }: MessageAvatarProps) => (
-	<Avatar className={cn("size-6 ring-1 ring-border", className)} {...props}>
-		<AvatarImage alt="" className="mt-0 mb-0" src={src} />
-		<AvatarFallback>{name?.slice(0, 1) || "ME"}</AvatarFallback>
-	</Avatar>
+	console.log("Avatar render", { src, name, className, props }),
+	(
+		<Avatar className={cn("size-6 ring-1 ring-border", className)} {...props}>
+			<AvatarImage alt="" className="mt-0 mb-0" src={src} />
+			<AvatarFallback>{name?.slice(0, 1) || "ME"}</AvatarFallback>
+		</Avatar>
+	)
 );

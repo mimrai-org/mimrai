@@ -99,6 +99,10 @@ export const auth = betterAuth<BetterAuthOptions>({
 			clientId: process.env.GITHUB_CLIENT_ID || "",
 			clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
 		},
+		twitter: {
+			clientId: process.env.X_CLIENT_ID || "",
+			clientSecret: process.env.X_CLIENT_SECRET || "",
+		},
 	},
 	user: {
 		modelName: "users",
