@@ -35,14 +35,14 @@ export const AssigneeAvatar = ({
 	return (
 		<Tooltip delayDuration={500}>
 			<TooltipTrigger asChild>
-				<Avatar
-					className={cn("size-6 bg-primary text-primary-foreground", className)}
-					style={{
-						backgroundColor: color || undefined,
-						color: color ? getContrast(color) : undefined,
-					}}
-				>
-					<AvatarFallback className="bg-transparent">
+				<Avatar className={cn("size-6", className)}>
+					<AvatarFallback
+						className="bg-primary text-primary-foreground"
+						style={{
+							backgroundColor: color || undefined,
+							color: color ? getContrast(color) : undefined,
+						}}
+					>
 						{name ? name.charAt(0).toUpperCase() : null}
 					</AvatarFallback>
 					{image && (
