@@ -1,9 +1,17 @@
 import {
+	bulkUpdateActivitiesSchema,
 	deleteActivitySchema,
+	getActivitiesCountSchema,
 	getActivitiesSchema,
 } from "@api/schemas/activities";
 import { protectedProcedure, router } from "@api/trpc/init";
-import { deleteActivity, getActivities } from "@mimir/db/queries/activities";
+import {
+	bulkUpdateActivity,
+	deleteActivity,
+	getActivities,
+	getActivitiesCount,
+	hasNewActivities,
+} from "@mimir/db/queries/activities";
 
 export const activitiesRouter = router({
 	get: protectedProcedure
@@ -11,7 +19,9 @@ export const activitiesRouter = router({
 		.query(async ({ ctx, input }) => {
 			return getActivities({
 				...input,
+				priority: input.priority as [number, number] | undefined,
 				teamId: ctx.user.teamId!,
+				...(input.onlyForUser ? { userId: ctx.user.id } : {}),
 			});
 		}),
 
@@ -23,4 +33,31 @@ export const activitiesRouter = router({
 				teamId: ctx.user.teamId!,
 			});
 		}),
+
+	bulkUpdate: protectedProcedure
+		.input(bulkUpdateActivitiesSchema)
+		.mutation(async ({ ctx, input }) => {
+			return bulkUpdateActivity({
+				...input,
+				teamId: ctx.user.teamId!,
+				userId: ctx.user.id,
+			});
+		}),
+
+	count: protectedProcedure
+		.input(getActivitiesCountSchema)
+		.query(async ({ ctx, input }) => {
+			return getActivitiesCount({
+				...input,
+				teamId: ctx.user.teamId!,
+				userId: ctx.user.id,
+			});
+		}),
+
+	hasNew: protectedProcedure.query(async ({ ctx }) => {
+		return hasNewActivities({
+			teamId: ctx.user.teamId!,
+			userId: ctx.user.id,
+		});
+	}),
 });

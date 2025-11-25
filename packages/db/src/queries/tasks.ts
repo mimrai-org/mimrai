@@ -361,6 +361,9 @@ export const createTask = async ({
 		userId,
 		teamId: task.teamId,
 		type: "task_created",
+		metadata: {
+			title: task.title,
+		},
 		groupId: task.id,
 	});
 

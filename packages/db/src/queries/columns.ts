@@ -170,7 +170,7 @@ export const createDefaultColumns = async (teamId: string) => {
 			name: "To Do",
 			description: "Tasks to be done",
 			order: 1,
-			type: "in_progress" as const,
+			type: "to_do" as const,
 		},
 		{
 			name: "In Progress",

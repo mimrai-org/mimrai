@@ -6,6 +6,7 @@ import {
 	gte,
 	type InferSelectModel,
 	inArray,
+	lte,
 	type SQL,
 	sql,
 } from "drizzle-orm";
@@ -13,6 +14,7 @@ import { db } from "..";
 import {
 	activities,
 	type activitySourceEnum,
+	type activityStatusEnum,
 	type activityTypeEnum,
 	type checklistItems,
 	tasks,
@@ -303,13 +305,21 @@ export const createTaskUpdateActivity = async ({
 export const getActivities = async ({
 	teamId,
 	type,
+	search,
 	cursor,
+	userId,
 	groupId,
-	pageSize,
+	priority,
+	status,
+	pageSize = 20,
 }: {
 	teamId?: string;
 	type?: (typeof activityTypeEnum.enumValues)[number][];
+	search?: string;
 	groupId?: string;
+	userId?: string;
+	priority?: [number, number];
+	status?: (typeof activityStatusEnum.enumValues)[number][];
 	cursor?: string;
 	pageSize?: number;
 }) => {
@@ -318,6 +328,18 @@ export const getActivities = async ({
 	teamId && whereClause.push(eq(activities.teamId, teamId));
 	type && whereClause.push(inArray(activities.type, type));
 	groupId && whereClause.push(eq(activities.groupId, groupId));
+	priority &&
+		priority.length === 2 &&
+		whereClause.push(
+			and(
+				gte(activities.priority, priority[0]),
+				lte(activities.priority, priority[1]),
+			)!,
+		);
+	status && whereClause.push(inArray(activities.status, status));
+	userId && whereClause.push(eq(activities.userId, userId));
+	search &&
+		whereClause.push(sql`activities.metadata->>'title' ILIKE ${`%${search}%`}`);
 
 	// Convert cursor to offset
 	const offset = cursor ? Number.parseInt(cursor, 10) : 0;
@@ -329,6 +351,8 @@ export const getActivities = async ({
 			createdAt: activities.createdAt,
 			metadata: activities.metadata,
 			userId: activities.userId,
+			status: activities.status,
+			priority: activities.priority,
 			user: {
 				id: users.id,
 				name: users.name,
@@ -470,4 +494,76 @@ export const deleteActivity = async ({
 		.where(and(...whereClause))
 		.returning();
 	return data;
+};
+
+export const bulkUpdateActivity = async ({
+	ids,
+	status,
+	userId,
+	teamId,
+}: {
+	ids: string[];
+	status?: (typeof activityStatusEnum.enumValues)[number];
+	userId?: string;
+	teamId?: string;
+}) => {
+	const whereClause: SQL[] = [inArray(activities.id, ids)];
+
+	userId && whereClause.push(eq(activities.userId, userId));
+	teamId && whereClause.push(eq(activities.teamId, teamId));
+	const data = await db
+		.update(activities)
+		.set({ status })
+		.where(and(...whereClause))
+		.returning();
+	return data;
+};
+
+export const getActivitiesCount = async ({
+	teamId,
+	userId,
+	status,
+}: {
+	teamId: string;
+	userId?: string;
+	status?: (typeof activityStatusEnum.enumValues)[number][];
+}) => {
+	const whereClause: SQL[] = [eq(activities.teamId, teamId)];
+
+	userId && whereClause.push(eq(activities.userId, userId));
+	status && whereClause.push(inArray(activities.status, status));
+	const [record] = await db
+		.select({
+			count: sql`COUNT(*)`,
+		})
+		.from(activities)
+		.where(and(...whereClause));
+	if (!record) return 0;
+
+	return Number(record.count);
+};
+
+export const hasNewActivities = async ({
+	teamId,
+	userId,
+}: {
+	teamId: string;
+	userId: string;
+}) => {
+	const [record] = await db
+		.select({
+			id: activities.id,
+		})
+		.from(activities)
+		.where(
+			and(
+				eq(activities.teamId, teamId),
+				eq(activities.userId, userId),
+				eq(activities.status, "unread"),
+				gte(activities.createdAt, sql`now() - interval '7 days'`),
+			),
+		)
+		.limit(1);
+
+	return !!record;
 };

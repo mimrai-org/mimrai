@@ -16,6 +16,7 @@ import {
 	pgEnum,
 	pgTable,
 	primaryKey,
+	smallint,
 	text,
 	timestamp,
 	unique,
@@ -599,6 +600,12 @@ export const activitySourceEnum = pgEnum("activity_source", [
 	"checklist_item",
 ]);
 
+export const activityStatusEnum = pgEnum("activity_status", [
+	"unread",
+	"read",
+	"archived",
+]);
+
 export const activities = pgTable(
 	"activities",
 	{
@@ -612,6 +619,8 @@ export const activities = pgTable(
 		source: activitySourceEnum("source"),
 		type: activityTypeEnum("type").notNull(),
 		metadata: jsonb("metadata").$type<Record<string, any>>(),
+		status: activityStatusEnum("status").default("unread").notNull(),
+		priority: smallint("priority").default(1).notNull(), // 1-3 = notifications, 4-10 = insights only
 		createdAt: timestamp("created_at", {
 			withTimezone: true,
 			mode: "string",
@@ -620,6 +629,11 @@ export const activities = pgTable(
 	(table) => [
 		index("activity_group_id_index").on(table.groupId),
 		index("activity_type_index").on(table.type),
+		index("activity_inbox_index").on(
+			table.priority,
+			table.status,
+			table.userId,
+		),
 		foreignKey({
 			columns: [table.userId],
 			foreignColumns: [users.id],
