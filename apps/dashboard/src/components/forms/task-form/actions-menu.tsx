@@ -7,16 +7,24 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@ui/components/ui/dropdown-menu";
-import { EllipsisVerticalIcon } from "lucide-react";
+import {
+	CopyIcon,
+	CopyPlusIcon,
+	EllipsisVerticalIcon,
+	ShareIcon,
+	TrashIcon,
+} from "lucide-react";
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 import Loader from "@/components/loader";
+import { useShareableParams } from "@/hooks/use-shareable-params";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { queryClient, trpc } from "@/utils/trpc";
 import type { TaskFormValues } from "./form-type";
 
 export const ActionsMenu = () => {
 	const { setParams } = useTaskParams();
+	const { setParams: setShareableParams } = useShareableParams();
 	const form = useFormContext<TaskFormValues>();
 
 	const { mutate: deleteTask, isPending: isDeleting } = useMutation(
@@ -85,8 +93,20 @@ export const ActionsMenu = () => {
 					}}
 					disabled={isCloning}
 				>
-					{isCloning && <Loader />}
+					{isCloning ? <Loader /> : <CopyPlusIcon />}
 					Clone
+				</DropdownMenuItem>
+				<DropdownMenuItem
+					onClick={() => {
+						setShareableParams({
+							createShareable: true,
+							shareableResourceId: form.getValues().id!,
+							shareableResourceType: "task",
+						});
+					}}
+				>
+					<ShareIcon />
+					Share
 				</DropdownMenuItem>
 				<DropdownMenuItem
 					variant="destructive"
@@ -97,7 +117,7 @@ export const ActionsMenu = () => {
 						})
 					}
 				>
-					{isDeleting && <Loader />}
+					{isDeleting ? <Loader /> : <TrashIcon />}
 					Delete
 				</DropdownMenuItem>
 			</DropdownMenuContent>

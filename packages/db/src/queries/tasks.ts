@@ -1,4 +1,5 @@
 import type { DeleteTaskInput } from "@api/schemas/tasks";
+import { getTaskPermalink } from "@mimir/utils/tasks";
 import { subDays } from "date-fns";
 import {
 	and,
@@ -25,6 +26,8 @@ import {
 	labelsOnTasks,
 	projects,
 	pullRequestPlan,
+	shareable,
+	type shareablePolicyEnum,
 	tasks,
 	users,
 	usersOnTeams,
@@ -530,6 +533,24 @@ export const getTaskById = async (id: string, userId?: string) => {
 		.groupBy(labelsOnTasks.taskId)
 		.as("labels_subquery");
 
+	const checklistSubquery = db
+		.select({
+			taskId: checklistItems.taskId,
+			completed:
+				sql<number>`COUNT(CASE WHEN ${checklistItems.isCompleted} = true THEN 1 END)`.as(
+					"completed",
+				),
+			total: sql<number>`COUNT(${checklistItems.id})`.as("total"),
+			checklist: sql<
+				TaskChecklistItem[]
+			>`COALESCE(json_agg(jsonb_build_object('id', ${checklistItems.id}, 'description', ${checklistItems.description}, 'isCompleted', ${checklistItems.isCompleted}, 'assigneeId', ${checklistItems.assigneeId}) ) FILTER (WHERE ${checklistItems.id} IS NOT NULL), '[]'::json)`.as(
+				"checklist",
+			),
+		})
+		.from(checklistItems)
+		.groupBy(checklistItems.taskId)
+		.as("checklist_subquery");
+
 	const [task] = await db
 		.select({
 			id: tasks.id,
@@ -538,12 +559,22 @@ export const getTaskById = async (id: string, userId?: string) => {
 			assigneeId: tasks.assigneeId,
 			sequence: tasks.sequence,
 			projectId: tasks.projectId,
+			project: {
+				id: projects.id,
+				name: projects.name,
+				color: projects.color,
+			},
 			assignee: {
 				id: users.id,
 				name: users.name,
 				email: users.email,
 				image: users.image,
 				color: users.color,
+			},
+			checklistSummary: {
+				completed: checklistSubquery.completed,
+				total: checklistSubquery.total,
+				checklist: checklistSubquery.checklist,
 			},
 			columnId: tasks.columnId,
 			order: tasks.order,
@@ -578,8 +609,10 @@ export const getTaskById = async (id: string, userId?: string) => {
 		.where(and(...whereClause))
 		.innerJoin(columns, eq(tasks.columnId, columns.id))
 		.innerJoin(usersOnTeams, eq(usersOnTeams.teamId, tasks.teamId))
+		.leftJoin(checklistSubquery, eq(checklistSubquery.taskId, tasks.id))
 		.leftJoin(labelsSubquery, eq(labelsSubquery.taskId, tasks.id))
 		.leftJoin(users, eq(tasks.assigneeId, users.id))
+		.leftJoin(projects, eq(tasks.projectId, projects.id))
 		.leftJoin(
 			pullRequestPlan,
 			and(

@@ -26,6 +26,7 @@
     "./columns": "./src/columns.ts",
     "./tax": "./src/tax.ts",
     "./tasks": "./src/tasks.ts",
-    "./recurrence": "./src/recurrence.ts"
+    "./recurrence": "./src/recurrence.ts",
+    "./shareable": "./src/shareable.ts"
   }
 }

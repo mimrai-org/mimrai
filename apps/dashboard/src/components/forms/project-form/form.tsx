@@ -7,6 +7,7 @@ import Loader from "@/components/loader";
 import { useProjectParams } from "@/hooks/use-project-params";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { queryClient, trpc } from "@/utils/trpc";
+import { ActionsMenu } from "./actions-menu";
 import { ProjectColorPicker } from "./color-picker";
 import { Description } from "./description";
 import { type ProjectFormValues, projectFormSchema } from "./form-type";
@@ -113,6 +114,7 @@ export const ProjectForm = ({
 									{(isCreating || isUpdating) && <Loader />}
 									{defaultValues?.id ? "Save" : "Create"}
 								</Button>
+								<ActionsMenu />
 							</div>
 						</div>
 					</div>

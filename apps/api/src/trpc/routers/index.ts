@@ -1,3 +1,4 @@
+import { shareable } from "@db/schema";
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { check } from "zod";
 import { protectedProcedure, publicProcedure, router } from "../init";
@@ -14,6 +15,7 @@ import { labelsRouter } from "./labels";
 import { notificationSettingsRouter } from "./notification-settings";
 import { projectsRouter } from "./projects";
 import { resumeSettingsRouter } from "./resume-settings";
+import { shareableRouter } from "./shareable";
 import { tasksRouter } from "./tasks";
 import { teamsRouter } from "./teams";
 import { usersRouter } from "./users";
@@ -48,6 +50,7 @@ export const appRouter = router({
 	projects: projectsRouter,
 	waitlist: waitlistRouter,
 	chatFeedback: chatFeedbackRouter,
+	shareable: shareableRouter,
 });
 export type AppRouter = typeof appRouter;
 export type RouterOutputs = inferRouterOutputs<AppRouter>;

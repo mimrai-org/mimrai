@@ -9,6 +9,7 @@ import {
 	getDuplicatedTasksSchema,
 	getTaskSubscribersSchema,
 	getTasksSchema,
+	shareTaskSchema,
 	smartCompleteResponseSchema,
 	smartCompleteSchema,
 	subscribeTaskSchema,

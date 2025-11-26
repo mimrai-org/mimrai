@@ -917,3 +917,51 @@ export const waitlist = pgTable("waitlist", {
 	authorized: boolean("authorized").default(false).notNull(),
 	createdAt: timestamp("created_at").notNull().defaultNow(),
 });
+
+export const shareablePolicyEnum = pgEnum("share_policy", [
+	"private",
+	"public",
+]);
+
+export const shareableTypeEnum = pgEnum("shared_resource_type", [
+	"task",
+	"project",
+]);
+
+export const shareable = pgTable(
+	"shared_resources",
+	{
+		id: text("id").primaryKey().notNull(),
+		resourceType: shareableTypeEnum("resource_type").notNull(),
+		resourceId: text("resource_id").notNull(),
+		teamId: text("team_id").notNull(),
+		policy: shareablePolicyEnum("policy").default("private").notNull(),
+		authorizedEmails: text("authorized_emails").array().default([]).notNull(),
+		createdAt: timestamp("created_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
+		updatedAt: timestamp("updated_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
+	},
+	(table) => [
+		unique("unique_shared_resource_per_team").on(
+			table.resourceType,
+			table.resourceId,
+			table.teamId,
+		),
+		unique("unique_shared_resource_id").on(table.resourceId),
+		index("shared_resources_team_id_index").on(table.teamId),
+		index("shared_resources_resource_index").on(
+			table.resourceType,
+			table.resourceId,
+		),
+		foreignKey({
+			columns: [table.teamId],
+			foreignColumns: [teams.id],
+			name: "shared_resources_team_id_fkey",
+		}).onDelete("cascade"),
+	],
+);

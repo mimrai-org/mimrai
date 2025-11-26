@@ -1,4 +1,4 @@
-import { priorityEnum } from "@db/schema";
+import { priorityEnum, shareablePolicyEnum } from "@db/schema";
 import z from "zod";
 import { mention } from "../../../../packages/notifications/src/types";
 import { paginationSchema } from "./base";
@@ -143,4 +143,10 @@ export const unsubscribeTaskSchema = z.object({
 export const subscribeTaskSchema = z.object({
 	id: z.string(),
 	userId: z.string(),
+});
+
+export const shareTaskSchema = z.object({
+	id: z.string(),
+	authorizedEmails: z.array(z.string().email()).optional(),
+	policy: z.enum(shareablePolicyEnum.enumValues),
 });
