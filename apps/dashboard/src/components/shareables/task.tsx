@@ -19,24 +19,26 @@ export const TaskShareable = ({
 			</div>
 			<Response>{task.description || "No description provided."}</Response>
 
-			<div className="space-y-2">
-				{task.checklistSummary.checklist.map((item) => (
-					<div
-						key={item.id}
-						className={cn("flex items-center gap-2 text-sm", {
-							"line-through opacity-50": item.isCompleted,
-						})}
-					>
-						<Checkbox
-							checked={item.isCompleted}
-							className="pointer-events-none"
-						/>
-						<Response>
-							{item.description || "No description provided."}
-						</Response>
-					</div>
-				))}
-			</div>
+			{task.checklistSummary?.checklist?.length > 0 && (
+				<div className="space-y-2">
+					{task.checklistSummary.checklist.map((item) => (
+						<div
+							key={item.id}
+							className={cn("flex items-center gap-2 text-sm", {
+								"line-through opacity-50": item.isCompleted,
+							})}
+						>
+							<Checkbox
+								checked={item.isCompleted}
+								className="pointer-events-none"
+							/>
+							<Response>
+								{item.description || "No description provided."}
+							</Response>
+						</div>
+					))}
+				</div>
+			)}
 		</div>
 	);
 };
