@@ -34,6 +34,11 @@ export const MemberInviteForm = () => {
 				form.reset();
 				toast.success("Invite sent successfully!");
 			},
+			onError: (error) => {
+				toast.error(
+					error.message || "An error occurred while sending the invite.",
+				);
+			},
 		}),
 	);
 

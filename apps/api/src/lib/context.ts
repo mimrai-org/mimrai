@@ -50,6 +50,7 @@ export async function createContext({ context }: CreateContextOptions) {
 			...user,
 			scopes,
 		},
+		team: currentTeam ?? null,
 	};
 }
 

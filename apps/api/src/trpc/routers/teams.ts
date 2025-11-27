@@ -17,8 +17,9 @@ import {
 } from "@api/schemas/teams";
 import { protectedProcedure, router } from "@api/trpc/init";
 import {
+	checkLimit,
 	createTrialSubscription,
-	updateSubscriptionUsersUsage,
+	updateSubscriptionUsage,
 } from "@api/utils/billing";
 import {
 	changeOwner,
@@ -42,6 +43,7 @@ import {
 } from "@mimir/db/queries/user-invites";
 import { getAvailableTeams } from "@mimir/db/queries/users";
 import { InviteEmail } from "@mimir/email/emails/invite";
+import { TRPCError } from "@trpc/server";
 
 export const teamsRouter = router({
 	getAvailable: protectedProcedure
@@ -76,6 +78,11 @@ export const teamsRouter = router({
 				customerId: customer.id,
 			});
 
+			if (process.env.DISABLE_BILLING === "true") {
+				return team;
+			}
+
+			// Create a trial subscription for the team
 			await createTrialSubscription({
 				teamId: team.id,
 				recurringInterval: "monthly",
@@ -158,13 +165,23 @@ export const teamsRouter = router({
 		})
 		.input(acceptTeamInviteSchema)
 		.mutation(async ({ ctx, input }) => {
+			const canInvite = await checkLimit({
+				teamId: ctx.user.teamId!,
+				type: "users",
+				movement: 1,
+			});
+
+			if (!canInvite) {
+				throw new Error("Team user limit reached");
+			}
+
 			const invite = await acceptTeamInvite({
 				userId: ctx.user.id,
 				userInviteId: input.inviteId,
 			});
 
 			// Update the subscription with the new user count
-			updateSubscriptionUsersUsage({ teamId: invite.teamId });
+			updateSubscriptionUsage({ teamId: invite.teamId, type: "users" });
 
 			return invite;
 		}),
@@ -202,6 +219,20 @@ export const teamsRouter = router({
 		.meta({ scopes: ["team:write"] })
 		.input(createTeamInviteSchema)
 		.mutation(async ({ ctx, input }) => {
+			const canInvite = await checkLimit({
+				teamId: ctx.user.teamId!,
+				type: "users",
+				movement: 1,
+			});
+
+			if (!canInvite) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Team user limit reached",
+					cause: "TEAM_USER_LIMIT_REACHED",
+				});
+			}
+
 			const invite = await createTeamInvite({
 				email: input.email,
 				teamId: ctx.user.teamId!,
@@ -227,7 +258,7 @@ export const teamsRouter = router({
 	leave: protectedProcedure.mutation(async ({ ctx }) => {
 		const membership = await leaveTeam(ctx.user.id, ctx.user.teamId!);
 		// Update the subscription with the new user count
-		updateSubscriptionUsersUsage({ teamId: ctx.user.teamId! });
+		updateSubscriptionUsage({ teamId: ctx.user.teamId!, type: "users" });
 		return membership;
 	}),
 
@@ -260,7 +291,7 @@ export const teamsRouter = router({
 
 			const membership = await leaveTeam(input.userId, ctx.user.teamId!);
 			// Update the subscription with the new user count
-			updateSubscriptionUsersUsage({ teamId: ctx.user.teamId! });
+			updateSubscriptionUsage({ teamId: ctx.user.teamId!, type: "users" });
 			return membership;
 		}),
 

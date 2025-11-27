@@ -1,14 +1,24 @@
 import type { Scope } from "@api/lib/scopes";
+import type { PlanSlug } from "@mimir/utils/plans";
 import { initTRPC, TRPCError } from "@trpc/server";
 import type { Context } from "../lib/context";
 
 type Meta = {
 	/**
+	 * require user to belong to a team
 	 * @default true
 	 */
 	team?: boolean;
 
+	/**
+	 * require scopes for this procedure
+	 */
 	scopes?: Scope[];
+
+	/**
+	 * require plan for this procedure
+	 */
+	plans?: PlanSlug[];
 };
 export const t = initTRPC.context<Context>().meta<Meta>().create({
 	// transformer: superjson,
@@ -37,6 +47,25 @@ export const protectedProcedure = t.procedure
 			});
 		}
 
+		if (meta?.plans && meta.plans.length > 0) {
+			// check if user's team plan is in the required plans
+			if (!ctx.team) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "User's team information is missing",
+					cause: "No team",
+				});
+			}
+
+			if (!meta.plans.includes(ctx.team.plan)) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Insufficient plan level",
+					cause: "Insufficient plan level",
+				});
+			}
+		}
+
 		if (meta?.scopes) {
 			const hasRequiredScopes = meta.scopes.every((scope) =>
 				ctx.user.scopes.includes(scope),
@@ -60,7 +89,7 @@ export const protectedProcedure = t.procedure
 	.use(async ({ next }) => {
 		const result = await next();
 		if (!result.ok) {
-			console.error(result.error);
+			console.error((result as any).error);
 		}
 		return result;
 	});

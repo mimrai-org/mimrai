@@ -130,6 +130,7 @@ export const getAvailableTeams = async (userId: string) => {
 		.select({
 			id: teams.id,
 			name: teams.name,
+			plan: teams.plan,
 			role: usersOnTeams.role,
 		})
 		.from(usersOnTeams)

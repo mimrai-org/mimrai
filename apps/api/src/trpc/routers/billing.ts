@@ -2,7 +2,7 @@ import { stripeClient } from "@api/lib/payments";
 import { createCheckoutSchema } from "@api/schemas/billing";
 import { protectedProcedure, router } from "@api/trpc/init";
 import { buildSubscriptionItems } from "@api/utils/billing";
-import { getTeamById } from "@mimir/db/queries/teams";
+import { getTeamById, updateTeamPlan } from "@mimir/db/queries/teams";
 import { getAppUrl } from "@mimir/utils/envs";
 import { getPlanBySlug, getPlans, type PlanSlug } from "@mimir/utils/plans";
 
@@ -14,13 +14,14 @@ export const billingRouter = router({
 			expand: [],
 			limit: 1,
 		});
-		const plan = getPlanBySlug(team!.plan!);
 		const subscription = result.data[0];
+		const plan = getPlanBySlug(team!.plan!);
 
 		return {
 			trialEnd: subscription?.trial_end,
 			status: subscription?.status,
 			planName: plan?.name,
+			planSlug: team!.plan!,
 		};
 	}),
 
@@ -74,6 +75,12 @@ export const billingRouter = router({
 		.input(createCheckoutSchema)
 		.mutation(async ({ ctx, input }) => {
 			const team = await getTeamById(ctx.user.teamId!);
+			const result = await stripeClient.subscriptions.list({
+				customer: team!.customerId!,
+				expand: [],
+				limit: 1,
+			});
+			const subscription = result.data[0];
 
 			const items = await buildSubscriptionItems({
 				planSlug: input.planSlug as PlanSlug,
@@ -81,7 +88,42 @@ export const billingRouter = router({
 				recurringInterval: input.recurringInterval,
 			});
 
-			return await stripeClient.checkout.sessions.create({
+			// If subscription exists, we are upgrading/downgrading
+			if (subscription) {
+				const itemsToDelete = subscription.items.data;
+
+				// Update the existing subscription
+				await stripeClient.subscriptions.update(subscription.id, {
+					cancel_at_period_end: false,
+					items: [
+						// Delete old items
+						...itemsToDelete.map((item) => ({
+							id: item.id,
+							deleted: true,
+						})),
+						// Add new items
+						...items.map((item) => ({
+							price: item.price,
+							quantity: item.quantity,
+						})),
+					],
+					billing_cycle_anchor: "now",
+				});
+
+				await updateTeamPlan({
+					customerId: team!.customerId!,
+					plan: input.planSlug as PlanSlug,
+					subscriptionId: subscription.id,
+					canceledAt: null,
+				});
+
+				return {
+					isUpgradeDowngrade: true,
+					url: `${getAppUrl()}/dashboard/settings/billing`,
+				};
+			}
+
+			const session = await stripeClient.checkout.sessions.create({
 				mode: "subscription",
 				customer: team!.customerId!,
 				saved_payment_method_options: {
@@ -100,6 +142,11 @@ export const billingRouter = router({
 				},
 				success_url: `${getAppUrl()}/dashboard/settings/billing?checkout=success`,
 			});
+
+			return {
+				isUpgradeDowngrade: false,
+				url: session.url!,
+			};
 		}),
 
 	portal: protectedProcedure

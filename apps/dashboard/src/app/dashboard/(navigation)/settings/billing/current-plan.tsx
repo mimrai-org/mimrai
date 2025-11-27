@@ -12,10 +12,12 @@ import {
 import { Skeleton } from "@mimir/ui/skeleton";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
+import { usePlanParams } from "@/hooks/use-plan-params";
 import { trpc } from "@/utils/trpc";
 import { PlanList } from "./plan-list";
 
 export const CurrentPlan = () => {
+	const { setParams: setPlanParams } = usePlanParams();
 	const { data: team } = useQuery(trpc.teams.getCurrent.queryOptions());
 	const { data: subscription, isLoading } = useQuery(
 		trpc.billing.subscription.queryOptions(),
@@ -23,10 +25,6 @@ export const CurrentPlan = () => {
 
 	const { data: upcomingInvoice } = useQuery(
 		trpc.billing.upcomingInvoice.queryOptions(),
-	);
-
-	const { mutateAsync: createCheckout } = useMutation(
-		trpc.billing.checkout.mutationOptions(),
 	);
 
 	const { mutateAsync: createPortal } = useMutation(
@@ -48,35 +46,18 @@ export const CurrentPlan = () => {
 		window.location.href = data.url;
 	};
 
-	const handleCheckout = async (
-		planSlug: string,
-		recurringInterval: "monthly" | "yearly",
-	) => {
-		if (!team) return;
-
-		const data = await createCheckout({
-			planSlug,
-			recurringInterval,
-		});
-
-		window.open(data.url!, "_blank");
-	};
-
 	if (isLoading) {
 		return <Skeleton className="h-52 w-full" />;
 	}
 
-	if (!subscription) {
+	if (!subscription || subscription.status !== "active") {
 		return (
 			<Card>
 				<CardHeader>
-					<CardTitle>No Plan</CardTitle>
-					<CardDescription>
-						You are currently on the free plan. Upgrade to access more features.
-					</CardDescription>
+					<CardDescription>Select a plan continue using Mimrai</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<PlanList onClickPlan={handleCheckout} />
+					<PlanList />
 				</CardContent>
 			</Card>
 		);
@@ -119,8 +100,20 @@ export const CurrentPlan = () => {
 					</div>
 				)}
 			</CardContent>
-			<CardFooter>
-				<Button variant="default" onClick={handleManageBilling}>
+			<CardFooter className="flex gap-2">
+				{subscription?.status === "active" && (
+					<Button
+						variant="default"
+						onClick={() => {
+							setPlanParams({
+								selectPlan: true,
+							});
+						}}
+					>
+						Upgrade
+					</Button>
+				)}
+				<Button variant="secondary" type="button" onClick={handleManageBilling}>
 					{trialDaysLeft > 0 ? "Upgrade" : "Manage Billing"}
 				</Button>
 			</CardFooter>

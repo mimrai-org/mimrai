@@ -7,28 +7,69 @@ import {
 	type PriceType,
 } from "@mimir/utils/plans";
 
-export const updateSubscriptionUsersUsage = async ({
+export const checkLimit = async ({
 	teamId,
+	type,
+	movement = 0,
 }: {
 	teamId: string;
+	type: PriceType;
+	movement?: number;
 }) => {
+	if (process.env.DISABLE_BILLING === "true") {
+		return true;
+	}
+	const team = await getTeamById(teamId);
+	if (!team) {
+		throw new Error("Team not found");
+	}
+	const plan = getPlanBySlug(team.plan!);
+	if (!plan) {
+		throw new Error("Plan not found");
+	}
+	const limit = plan.limits[type];
+	if (limit === undefined) {
+		return true;
+	}
+
+	switch (type) {
+		case "users": {
+			const members = await getPriceQuantity({ teamId, type: "users" });
+			return members + movement <= limit;
+		}
+		default:
+			return true;
+	}
+};
+
+export const updateSubscriptionUsage = async ({
+	teamId,
+	type,
+}: {
+	teamId: string;
+	type: PriceType;
+}) => {
+	if (process.env.DISABLE_BILLING === "true") {
+		return;
+	}
+
 	const team = await getTeamById(teamId);
 	if (team.subscriptionId) {
 		const quantity = await getPriceQuantity({
 			teamId,
-			type: "users",
+			type,
 		});
 		const subscription = await stripeClient.subscriptions.retrieve(
 			team.subscriptionId,
 		);
-		const usersPrice = getSubscriptionItemByType(
-			"users",
+		const stripePrice = getSubscriptionItemByType(
+			type,
 			team.plan!,
 			subscription,
 		);
 
-		if (usersPrice) {
-			await stripeClient.subscriptionItems.update(usersPrice.id, {
+		if (stripePrice) {
+			await stripeClient.subscriptionItems.update(stripePrice.id, {
 				quantity,
 			});
 		}
@@ -89,7 +130,7 @@ export const createTrialSubscription = async ({
 	if (!team) {
 		throw new Error("Team not found");
 	}
-	const plan = getPlanBySlug("starter"); // Default to starter plan
+	const plan = getPlanBySlug("team"); // Default to starter plan
 
 	if (!plan) {
 		throw new Error("Plan not found");
@@ -104,7 +145,7 @@ export const createTrialSubscription = async ({
 	const subscription = await stripeClient.subscriptions.create({
 		customer: team.customerId!,
 		items,
-		trial_period_days: 14,
+		trial_period_days: 7,
 		trial_settings: {
 			end_behavior: {
 				missing_payment_method: "cancel",

@@ -4,6 +4,7 @@ import { IntegrationInstallSheet } from "./integration-install-sheet";
 import { LabelCreateSheet } from "./label-create-sheet";
 import { LabelUpdateSheet } from "./label-update-sheet";
 import { MemberUpdateSheet } from "./member-update-sheet";
+import { PlanSelectSheet } from "./plan-select-sheet";
 import { ProjectCreateSheet } from "./project-create-sheet";
 import { ProjectUpdateSheet } from "./project-update-sheet";
 import { ShareableCreateSheet } from "./shareable-create-sheet.tsx";
@@ -26,6 +27,7 @@ export const GlobalSheets = () => {
 			<ProjectCreateSheet />
 			<ProjectUpdateSheet />
 			<ShareableCreateSheet />
+			<PlanSelectSheet />
 		</>
 	);
 };
