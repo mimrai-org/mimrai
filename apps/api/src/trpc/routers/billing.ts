@@ -126,6 +126,7 @@ export const billingRouter = router({
 			const session = await stripeClient.checkout.sessions.create({
 				mode: "subscription",
 				customer: team!.customerId!,
+				payment_method_collection: "if_required",
 				saved_payment_method_options: {
 					payment_method_save: "enabled",
 					allow_redisplay_filters: ["always"],
