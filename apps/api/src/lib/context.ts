@@ -6,6 +6,8 @@ import {
 import type { Context as HonoContext } from "hono";
 import { auth } from "./auth";
 import { roleScopes } from "./scopes";
+import { userCache } from "@mimir/cache/users-cache";
+import { teamCache } from "@mimir/cache/teams-cache";
 
 export type CreateContextOptions = {
 	context: HonoContext;
@@ -17,10 +19,16 @@ export async function createContext({ context }: CreateContextOptions) {
 	});
 
 	if (!session?.user) {
+		// @ts-expect-error
 		return { session: null };
 	}
 
-	const user = await getUserById(session?.user.id);
+	let user: Awaited<ReturnType<typeof getUserById>> = await userCache.get(session.user.id);
+	if (!user) {
+		user = await getUserById(session.user.id);
+		userCache.set(session.user.id, user);
+	}
+
 	let currentTeam:
 		| Awaited<ReturnType<typeof getAvailableTeams>>[number]
 		| undefined;
@@ -34,11 +42,18 @@ export async function createContext({ context }: CreateContextOptions) {
 			currentTeam = teams[0];
 		}
 	} else {
-		// verify teamId is valid
-		const teams = await getAvailableTeams(user.id);
-		currentTeam = teams.find((t) => t.id === user.teamId);
+		let cachedTeam = await teamCache.get(`${user.id}:${user.teamId}`);
+		if (cachedTeam) {
+			currentTeam = cachedTeam;
+		} else {
+			// verify teamId is valid
+			const teams = await getAvailableTeams(user.id);
+			currentTeam = teams.find((t) => t.id === user.teamId);
+	
+			if (!currentTeam) throw new Error("User's current team is not valid");
+			teamCache.set(`${user.id}:${user.teamId}`, currentTeam);
+		}
 
-		if (!currentTeam) throw new Error("User's current team is not valid");
 	}
 
 	const role = currentTeam?.role;

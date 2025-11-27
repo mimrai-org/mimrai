@@ -12,6 +12,7 @@
     "./redis-client": "./src/redis-client.ts",
     "./integrations-cache": "./src/integrations-cache.ts",
     "./users-cache": "./src/users-cache.ts",
+    "./teams-cache": "./src/teams-cache.ts",
     "./chat-feedback-cache": "./src/chat-feedback-cache.ts",
     "./shared-redis": "./src/shared-redis.ts"
   },
