@@ -4,6 +4,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Badge } from "@ui/components/ui/badge";
 import { CheckIcon } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import Loader from "@/components/loader";
 import { usePlanParams } from "@/hooks/use-plan-params";
 import { trpc } from "@/utils/trpc";
@@ -32,6 +33,10 @@ export const PlanList = () => {
 				} else {
 					window.open(data.url!, "_blank");
 				}
+			},
+			onError: (error) => {
+				toast.error(error.message);
+				setLoadingPlanSlug(null);
 			},
 		}),
 	);

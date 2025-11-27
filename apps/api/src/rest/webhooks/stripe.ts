@@ -1,6 +1,6 @@
 import { stripeClient } from "@api/lib/payments";
-import { updateSubscriptionUsage } from "@api/utils/billing";
 import { OpenAPIHono } from "@hono/zod-openapi";
+import { updateSubscriptionUsage } from "@mimir/billing";
 import { updateTeamPlan } from "@mimir/db/queries/teams";
 import { getPlanByPriceId } from "@mimir/utils/plans";
 import type { Stripe } from "stripe";
@@ -36,6 +36,7 @@ app.post(async (c) => {
 			// update subscription users usage
 			await updateSubscriptionUsage({
 				teamId: event.data.object.metadata.teamId,
+				type: "users",
 			});
 			break;
 		}

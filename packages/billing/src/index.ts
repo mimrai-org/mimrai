@@ -1,11 +1,15 @@
-import { stripeClient } from "@api/lib/payments";
-import { getMembers, getTeamById, updateTeamPlan } from "@db/queries/teams";
+import {
+	getMembers,
+	getTeamById,
+	updateTeamPlan,
+} from "@mimir/db/queries/teams";
 import {
 	getPlanBySlug,
 	getSubscriptionItemByType,
 	type PlanSlug,
 	type PriceType,
 } from "@mimir/utils/plans";
+import { stripeClient } from "./lib/payments";
 
 export const checkLimit = async ({
 	teamId,
@@ -54,6 +58,11 @@ export const updateSubscriptionUsage = async ({
 	}
 
 	const team = await getTeamById(teamId);
+
+	if (!team) {
+		throw new Error("Team not found");
+	}
+
 	if (team.subscriptionId) {
 		const quantity = await getPriceQuantity({
 			teamId,
@@ -108,13 +117,25 @@ export const buildSubscriptionItems = async ({
 	}
 	const prices = plan.pricesIds[recurringInterval];
 	const pricesWithQuantities = await Promise.all(
-		Object.keys(prices).map(async (priceType) => ({
-			price: prices[priceType as PriceType],
-			quantity: await getPriceQuantity({
+		Object.keys(prices).map(async (priceType) => {
+			const quantity = await getPriceQuantity({
 				type: priceType as PriceType,
 				teamId,
-			}),
-		})),
+			});
+
+			const limit = plan.limits[priceType as PriceType];
+
+			if (limit !== undefined && quantity > limit) {
+				throw new Error(
+					`Quantity for ${priceType} exceeds plan limit of ${limit}. Reduce quantity before changing plan.`,
+				);
+			}
+
+			return {
+				price: prices[priceType as PriceType],
+				quantity,
+			};
+		}),
 	);
 	return pricesWithQuantities;
 };

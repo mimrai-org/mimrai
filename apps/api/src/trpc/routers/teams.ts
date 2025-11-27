@@ -20,7 +20,7 @@ import {
 	checkLimit,
 	createTrialSubscription,
 	updateSubscriptionUsage,
-} from "@api/utils/billing";
+} from "@mimir/billing";
 import {
 	changeOwner,
 	createTeam,

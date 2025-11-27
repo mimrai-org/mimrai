@@ -1,7 +1,7 @@
 import { stripeClient } from "@api/lib/payments";
 import { createCheckoutSchema } from "@api/schemas/billing";
 import { protectedProcedure, router } from "@api/trpc/init";
-import { buildSubscriptionItems } from "@api/utils/billing";
+import { buildSubscriptionItems } from "@mimir/billing";
 import { getTeamById, updateTeamPlan } from "@mimir/db/queries/teams";
 import { getAppUrl } from "@mimir/utils/envs";
 import { getPlanBySlug, getPlans, type PlanSlug } from "@mimir/utils/plans";
