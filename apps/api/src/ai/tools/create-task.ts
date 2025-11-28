@@ -1,3 +1,4 @@
+import { openai } from "@ai-sdk/openai";
 import { getColumns } from "@db/queries/columns";
 import { getLabels } from "@db/queries/labels";
 import { createTask } from "@db/queries/tasks";
@@ -85,16 +86,19 @@ export const createTaskTool = tool({
 			});
 
 			const result = await generateObject({
-				model: "gpt-4o-mini",
+				model: openai("gpt-4o-mini"),
 				schema: z.object({
-					assigneeId: z.string().optional().describe("User ID of the assignee"),
+					assigneeId: z
+						.string()
+						.optional()
+						.describe("User ID (uuid) of the assignee"),
 					columnId: z
 						.string()
-						.describe("Column ID where the task will be created"),
+						.describe("Column ID (uuid) where the task will be created"),
 					labelsIds: z
 						.array(z.string())
 						.optional()
-						.describe("Array of label IDs to be assigned to the task"),
+						.describe("Array of label IDs (uuid) to be assigned to the task"),
 				}),
 				prompt: `Based on the following options, provide the assignee ID, column ID and labels IDs for the new task.
 
