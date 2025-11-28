@@ -72,6 +72,11 @@ const data: {
 			],
 		},
 		{
+			title: "Intake",
+			url: "/dashboard/intake",
+			icon: InboxIcon,
+		},
+		{
 			title: "Projects",
 			url: "/dashboard/projects",
 			icon: BoxIcon,

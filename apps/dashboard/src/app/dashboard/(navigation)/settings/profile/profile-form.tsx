@@ -21,6 +21,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
 import z from "zod";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { queryClient, trpc } from "@/utils/trpc";
 
@@ -98,6 +99,11 @@ export const ProfileForm = ({
 						</FormItem>
 					)}
 				/>
+
+				<div className="space-y-2">
+					<FormLabel>Theme</FormLabel>
+					<ThemeToggle />
+				</div>
 
 				<div className="flex justify-end">
 					<Button type="submit" disabled={isPending}>

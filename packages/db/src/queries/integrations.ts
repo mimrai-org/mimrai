@@ -49,7 +49,6 @@ export const installIntegration = async ({
 		throw new Error("Integration already installed for this team");
 	}
 
-	// Validate config against the schema
 	const safeConfig = registry.configSchema.safeParse(config);
 
 	if (!safeConfig.success) {
@@ -368,6 +367,56 @@ export const getLinkedUserByUserId = async ({
 			eq(integrationUserLink.integrationId, integrations.id),
 		)
 		.limit(1);
+
+	return link;
+};
+
+export const createIntegrationUserLink = async ({
+	userId,
+	externalUserId,
+	externalUserName,
+	integrationId,
+	integrationType,
+}: {
+	userId: string;
+	externalUserId: string;
+	externalUserName?: string;
+	integrationId?: string;
+	integrationType?: IntegrationName;
+}) => {
+	const whereClause: SQL[] = [
+		eq(integrationUserLink.userId, userId),
+		eq(integrationUserLink.externalUserId, externalUserId),
+	];
+
+	if (integrationId) {
+		whereClause.push(eq(integrationUserLink.integrationId, integrationId));
+	}
+
+	if (integrationType) {
+		whereClause.push(eq(integrationUserLink.integrationType, integrationType));
+	}
+
+	const [existing] = await db
+		.select()
+		.from(integrationUserLink)
+		.where(and(...whereClause))
+		.limit(1);
+
+	if (existing) {
+		return existing;
+	}
+
+	const [link] = await db
+		.insert(integrationUserLink)
+		.values({
+			userId,
+			externalUserId,
+			externalUserName,
+			integrationId,
+			integrationType,
+		})
+		.returning();
 
 	return link;
 };

@@ -7,6 +7,7 @@ import z from "zod";
 import { useIntegrationParams } from "@/hooks/use-integration-params";
 import { queryClient, trpc } from "@/utils/trpc";
 import { IntegrationGithubForm } from "./integration-github-form";
+import { IntegrationGmailForm } from "./integration-gmail-form";
 import { IntegrationMattermostForm } from "./integration-mattermost-form";
 
 const schemas = {
@@ -15,6 +16,9 @@ const schemas = {
 		url: z.string().url("Invalid URL"),
 	}),
 	github: z.object({}),
+	gmail: z.object({
+		refreshToken: z.string().min(1, "Refresh token is required"),
+	}),
 	example: z.object({}),
 	whatsapp: z.object({}),
 };
@@ -83,6 +87,16 @@ export const IntegrationConfigForm = <N extends IntegrationName>({
 			case "github":
 				return (
 					<IntegrationGithubForm
+						defaultValues={defaultValues}
+						onSubmit={handleSubmit}
+						isValid={isValid}
+						error={error}
+						integrationId={id!}
+					/>
+				);
+			case "gmail":
+				return (
+					<IntegrationGmailForm
 						defaultValues={defaultValues}
 						onSubmit={handleSubmit}
 						isValid={isValid}

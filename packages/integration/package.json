@@ -16,7 +16,8 @@
     "./mattermost": "./src/mattermost/index.ts",
     "./task-comments": "./src/task-comments/index.ts",
     "./slack": "./src/slack/index.ts",
-    "./whatsapp": "./src/whatsapp/index.ts"
+    "./whatsapp": "./src/whatsapp/index.ts",
+    "./gmail/handle": "./src/gmail/handle.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "2.0.62",
@@ -26,8 +27,11 @@
     "@mimir/events": "workspace:*",
     "@mimir/utils": "workspace:*",
     "@slack/bolt": "^4.6.0",
+    "cheerio": "^1.0.0",
     "ai": "5.0.87",
     "drizzle-orm": "0.44.6",
+    "google-auth-library": "^10.5.0",
+    "googleapis": "^166.0.0",
     "mime-types": "^3.0.1",
     "redis": "^5.8.2",
     "twilio": "^5.10.6",
