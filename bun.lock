@@ -359,6 +359,7 @@
       "name": "@mimir/jobs",
       "version": "0.0.1",
       "dependencies": {
+        "@ai-sdk/openai": "2.0.62",
         "@date-fns/tz": "^1.4.1",
         "@fast-csv/format": "5.0.2",
         "@mimir/db": "workspace:*",

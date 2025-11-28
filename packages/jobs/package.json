@@ -29,6 +29,7 @@
     "heic-convert": "1.2.4",
     "node-xlsx": "^0.24.0",
     "sharp": "0.34.4",
+    "@ai-sdk/openai": "2.0.62",
     "trigger.dev": "^4.0.4",
     "xlsx": "^0.18.5",
     "zod": "4.1.10"

@@ -12,6 +12,7 @@ export const scheduleDailyNotificationsJob = schedules.task({
 	cron: "0 5 * * *", // Every day at 5am
 	run: async (payload, ctx) => {
 		const db = getDb();
+
 		const usersOnTeamsList = await db
 			.select()
 			.from(usersOnTeams)
