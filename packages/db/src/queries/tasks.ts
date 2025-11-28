@@ -675,7 +675,7 @@ export const createTaskComment = async ({
 	mentions = [],
 }: {
 	taskId: string;
-	userId: string;
+	userId?: string;
 	teamId?: string;
 	replyTo?: string;
 	comment: string;

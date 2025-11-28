@@ -52,6 +52,11 @@ export const en = {
 				description:
 					"Receive a daily summary of my completed tasks and activities.",
 			},
+			follow_up: {
+				title: "Follow-Up",
+				description:
+					"Receive follow-up messages to help keep my tasks on track.",
+			},
 		},
 		channels: {
 			in_app: "In-App",

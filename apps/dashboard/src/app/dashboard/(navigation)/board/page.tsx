@@ -1,6 +1,7 @@
 import { Provider as ChatProvider } from "@ai-sdk-tools/store";
 import { Suspense } from "react";
 import { Board } from "@/components/kanban/board/board";
+import { TasksSuggestions } from "@/components/tasks-suggestions/tasks-suggestions";
 
 type Props = {
 	searchParams: Promise<{
@@ -18,6 +19,7 @@ export default function DashboardPage({ searchParams }: Props) {
 						<Board />
 					</Suspense>
 				</div>
+				<TasksSuggestions />
 			</div>
 		</ChatProvider>
 	);

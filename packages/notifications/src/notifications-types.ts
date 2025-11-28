@@ -58,6 +58,13 @@ export const allNotificationTypes: NotificationType[] = [
 		order: 1,
 	},
 	{
+		type: "follow_up",
+		channels: ["mattermost", "whatsapp"],
+		showInSettings: true,
+		category: "tasks",
+		order: 7,
+	},
+	{
 		type: "checklist_item_created",
 		channels: ["mattermost"],
 		showInSettings: true,

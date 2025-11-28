@@ -592,6 +592,7 @@ export const activityTypeEnum = pgEnum("activity_type", [
 	"daily_digest",
 	"daily_pulse",
 	"daily_end_of_day",
+	"follow_up",
 ]);
 
 export const activitySourceEnum = pgEnum("activity_source", [
@@ -962,6 +963,66 @@ export const shareable = pgTable(
 			columns: [table.teamId],
 			foreignColumns: [teams.id],
 			name: "shared_resources_team_id_fkey",
+		}).onDelete("cascade"),
+	],
+);
+
+export const taskSuggestionsStatusEnum = pgEnum("suggestion_status", [
+	"pending",
+	"accepted",
+	"rejected",
+]);
+
+export type TaskSuggestionPayload =
+	| {
+			type: "move";
+			columnId: string;
+	  }
+	| {
+			type: "assign";
+			assigneeId: string;
+	  }
+	| {
+			type: "comment";
+			comment: string;
+	  };
+
+export const taskSuggestions = pgTable(
+	"task_suggestions",
+	{
+		id: text("id")
+			.$defaultFn(() => randomUUID())
+			.primaryKey()
+			.notNull(),
+		teamId: text("team_id").notNull(),
+		content: text("content").notNull(),
+		status: taskSuggestionsStatusEnum("status").default("pending").notNull(),
+
+		taskId: text("task_id").notNull(),
+		payload: jsonb("payload").$type<TaskSuggestionPayload>().notNull(),
+
+		// Key to prevent duplicate suggestions
+		key: text("key").notNull(),
+
+		createdAt: timestamp("created_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
+		updatedAt: timestamp("updated_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
+	},
+	(table) => [
+		foreignKey({
+			columns: [table.teamId],
+			foreignColumns: [teams.id],
+			name: "task_suggestions_team_id_fkey",
+		}).onDelete("cascade"),
+		foreignKey({
+			columns: [table.taskId],
+			foreignColumns: [tasks.id],
+			name: "task_suggestions_task_id_fkey",
 		}).onDelete("cascade"),
 	],
 );
