@@ -43,7 +43,6 @@ export default function RootLayout({
 					<Toaster
 						toastOptions={{
 							classNames: {
-								toast: "rounded-none!",
 								title: "text-xs!",
 								description: "text-xs!",
 							},

@@ -50,6 +50,7 @@ export const KanbanAssignee = ({ task }: { task: KanbanTask }) => {
 
 	return (
 		<div
+			className="flex items-center"
 			onClick={(e) => {
 				e.stopPropagation();
 			}}

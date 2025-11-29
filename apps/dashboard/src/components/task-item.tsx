@@ -44,7 +44,7 @@ export const TaskItem = ({
 			layout
 			layoutId={`task-${task.id}`}
 			className={cn(
-				"flex w-full flex-col justify-between gap-2 border-b p-4 transition-colors hover:bg-accent/50 sm:flex-row",
+				"flex w-full flex-col justify-between gap-2 rounded-sm bg-background p-4 transition-colors hover:bg-background/80 sm:flex-row",
 				className,
 			)}
 			onClick={(e) => {

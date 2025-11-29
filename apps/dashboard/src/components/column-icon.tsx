@@ -19,13 +19,13 @@ export const ColumnIcon = ({
 		case "backlog":
 			return <CircleDotIcon className={className} />;
 		case "in_progress":
-			return <CircleGaugeIcon className={className} />;
+			return <CircleGaugeIcon className={cn(className, "text-amber-500")} />;
 		case "review":
 			return <CircleStarIcon className={cn(className)} />;
 		case "to_do":
 			return <CircleDashedIcon className={className} />;
 		case "done":
-			return <CircleCheckIcon className={cn(className)} />;
+			return <CircleCheckIcon className={cn(className, "text-emerald-500")} />;
 		default:
 			return null;
 	}

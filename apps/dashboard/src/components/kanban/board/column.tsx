@@ -28,7 +28,7 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 
 	return (
 		<Kanban.Column
-			className="h-auto min-h-[200px] min-w-86 max-w-86 grow-1 bg-muted/10"
+			className="h-auto min-h-[200px] min-w-86 max-w-86 grow-1"
 			value={columnName}
 		>
 			<ColumnContextMenu column={column}>
@@ -42,9 +42,11 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 							)}
 						>
 							<ColumnIcon className="size-4!" type={column.type} />
-							<span>{tasks.length}</span>
 						</Badge>
 						<span className="font-medium text-sm">{columnName}</span>
+						<span className="font-mono text-muted-foreground text-xs">
+							{tasks.length}
+						</span>
 					</div>
 
 					<div className="flex items-center gap-2">
@@ -92,6 +94,22 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 						</Kanban.Item>
 					</TaskContextMenu>
 				))}
+
+				<div>
+					<Button
+						className="w-full justify-start border border-transparent border-dashed text-start text-xs hover:border-input hover:bg-background/20!"
+						variant={"ghost"}
+						onClick={() => {
+							setTaskParams({
+								createTask: true,
+								taskColumnId: column.id,
+							});
+						}}
+					>
+						<PlusIcon className="size-3.5" />
+						Create Task
+					</Button>
+				</div>
 
 				{/* Drag overlay */}
 				<div

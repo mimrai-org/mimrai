@@ -117,7 +117,7 @@ export const WorkstationList = () => {
 			<AnimatePresence>
 				{tasks?.data.map((task) => (
 					<TaskContextMenu task={task} key={task.id}>
-						<li className="group gap-2 border px-4 transition-all hover:bg-accent/50">
+						<li className="group gap-2 rounded-sm bg-background px-4 transition-all hover:bg-background/80">
 							<div className="flex w-full items-center gap-4 transition-all duration-300">
 								<DropdownMenu>
 									<DropdownMenuTrigger asChild>
@@ -142,7 +142,7 @@ export const WorkstationList = () => {
 								{/* <WorkConfirmDialogTrigger asChild taskId={task.id}> */}
 								<TaskItem
 									task={task}
-									className="border-0 px-0 hover:bg-transparent"
+									className="border-0 bg-transparent px-0 hover:bg-transparent"
 								/>
 
 								{/* </WorkConfirmDialogTrigger> */}

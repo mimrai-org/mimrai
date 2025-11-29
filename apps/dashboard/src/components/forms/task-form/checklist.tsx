@@ -146,7 +146,7 @@ export const TaskChecklist = ({ taskId }: { taskId: string }) => {
 												onSuccess={() => setActiveUpdateId(null)}
 											/>
 										) : (
-											<div className="flex items-start justify-between gap-2 bg-secondary px-4 py-2 text-secondary-foreground">
+											<div className="flex items-start justify-between gap-2 rounded-sm bg-input px-4 py-2 text-secondary-foreground dark:bg-input/30">
 												<div className="flex gap-2">
 													<Checkbox
 														checked={item.isCompleted}
@@ -363,7 +363,7 @@ export const TaskChecklistItemForm = ({
 	};
 
 	return (
-		<div className="border px-4 py-2">
+		<div className="rounded-sm border bg-input px-4 py-2 dark:bg-input/30">
 			<Form {...form}>
 				<form
 					id="checklist-form"

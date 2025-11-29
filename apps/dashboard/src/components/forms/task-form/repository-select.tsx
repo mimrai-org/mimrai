@@ -1,6 +1,7 @@
 import { DataSelectInput } from "@mimir/ui/data-select-input";
 import { FormControl, FormField, FormItem } from "@mimir/ui/form";
 import { useQuery } from "@tanstack/react-query";
+import { Button } from "@ui/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -38,8 +39,11 @@ export const RepositorySelect = () => {
 				<FormItem>
 					<FormControl>
 						<DropdownMenu>
-							<DropdownMenuTrigger>
-								<div className="flex h-6 items-center justify-between gap-4 bg-secondary px-2 text-xs">
+							<DropdownMenuTrigger asChild>
+								<Button
+									variant={"secondary"}
+									className="flex h-6 items-center justify-between gap-4 rounded-sm px-2 text-xs"
+								>
 									<div className="flex items-center gap-2">
 										<GithubIcon className="size-3.5 text-muted-foreground" />
 										{field.value ? (
@@ -54,7 +58,7 @@ export const RepositorySelect = () => {
 										)}
 									</div>
 									<ChevronDown className="size-3.5 text-muted-foreground" />
-								</div>
+								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent>
 								<DropdownMenuGroup>

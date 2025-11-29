@@ -18,11 +18,11 @@ export const NavSuggestions = () => {
 		<Button
 			size={"sm"}
 			className={cn("relative size-8 rounded-full", {
-				"bg-primary text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground":
+				"bg-primary text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground dark:hover:bg-primary/80 dark:hover:text-primary-foreground":
 					showTaskSuggestions,
 			})}
 			type="button"
-			variant={"secondary"}
+			variant={"ghost"}
 			onClick={() => setParams({ showTaskSuggestions: !showTaskSuggestions })}
 		>
 			<LightbulbIcon />

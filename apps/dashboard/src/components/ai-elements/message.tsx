@@ -20,17 +20,17 @@ export const Message = ({ className, from, ...props }: MessageProps) => (
 );
 
 const messageContentVariants = cva(
-	"is-user:dark flex flex-col gap-2 overflow-hidden rounded-xs text-sm",
+	"is-user:dark flex flex-col gap-2 overflow-hidden rounded-sm text-sm",
 	{
 		variants: {
 			variant: {
 				contained: [
 					"max-w-[80%] py-3",
 					"group-[.is-user]:border-none group-[.is-user]:bg-accent group-[.is-user]:px-4 group-[.is-user]:text-foreground",
-					"group-[.is-assistant]:border-none group-[.is-assistant]:bg-card group-[.is-assistant]:text-foreground",
+					"group-[.is-assistant]:border-none group-[.is-assistant]:bg-background group-[.is-assistant]:text-foreground",
 				],
 				flat: [
-					"group-[.is-user]:max-w-[80%] group-[.is-user]:bg-secondary group-[.is-user]:px-4 group-[.is-user]:py-3 group-[.is-user]:text-foreground",
+					"group-[.is-user]:max-w-[80%] group-[.is-user]:bg-background group-[.is-user]:px-4 group-[.is-user]:py-3 group-[.is-user]:text-foreground",
 					"group-[.is-assistant]:text-foreground",
 				],
 			},

@@ -13,7 +13,7 @@ export const NavNotifications = () => {
 				size={"sm"}
 				className="relative size-8 rounded-full"
 				type="button"
-				variant={"secondary"}
+				variant={"ghost"}
 			>
 				<BellIcon />
 				{data && (

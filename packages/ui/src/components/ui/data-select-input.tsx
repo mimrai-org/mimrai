@@ -78,7 +78,7 @@ export const DataSelectInput = <
 					variant="outline"
 					role="combobox"
 					className={cn(
-						"w-full justify-between truncate rounded-xs text-left",
+						"w-full justify-between truncate text-left",
 						!value && "text-muted-foreground",
 						className,
 					)}

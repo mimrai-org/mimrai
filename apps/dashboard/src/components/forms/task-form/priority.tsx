@@ -28,7 +28,7 @@ export const Priority = () => {
 							value={field.value ?? undefined}
 							onValueChange={field.onChange}
 						>
-							<SelectTrigger className="h-6! border-none bg-secondary text-xs hover:bg-secondary/80 dark:bg-secondary/80 hover:dark:bg-secondary/70">
+							<SelectTrigger className="h-6! text-xs">
 								{field.value && (
 									<div className="flex items-center gap-2 capitalize">
 										<PriorityItem value={field.value} />

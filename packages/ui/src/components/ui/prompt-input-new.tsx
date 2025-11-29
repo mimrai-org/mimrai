@@ -82,7 +82,7 @@ export function PromptInputAttachment({
 
 	return (
 		<div
-			className={cn("group relative h-14 w-14 border", className)}
+			className={cn("group relative h-14 w-14 rounded-sm border", className)}
 			key={data.id}
 			{...props}
 		>
@@ -504,7 +504,7 @@ export const PromptInput = ({
 			/>
 			<form
 				className={cn(
-					"w-full overflow-hidden border bg-background dark:bg-background",
+					"w-full overflow-hidden rounded-sm border bg-background dark:bg-background",
 					className,
 				)}
 				onSubmit={handleSubmit}
@@ -555,7 +555,7 @@ export const PromptInputTextarea = ({
 	return (
 		<Textarea
 			className={cn(
-				"w-full resize-none rounded-none border-none p-3 pt-3 text-sm shadow-none outline-none ring-0",
+				"w-full resize-none rounded-sm border-none p-3 pt-3 text-sm shadow-none outline-none ring-0",
 				"field-sizing-content bg-transparent placeholder:text-[rgba(102,102,102,0.5)] dark:bg-transparent",
 				"max-h-[55px] min-h-[55px]",
 				"focus-visible:ring-0",

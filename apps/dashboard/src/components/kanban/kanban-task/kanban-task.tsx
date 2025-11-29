@@ -1,7 +1,7 @@
 import type { RouterOutputs } from "@mimir/api/trpc";
 import { LabelBadge } from "@mimir/ui/label-badge";
 import { format } from "date-fns";
-import { BoxIcon, CheckSquareIcon } from "lucide-react";
+import { BoxIcon, CheckSquareIcon, CircleCheckIcon } from "lucide-react";
 import { motion } from "motion/react";
 import { ColumnIcon } from "@/components/column-icon";
 import { ProjectIcon } from "@/components/project-icon";
@@ -28,7 +28,7 @@ export const KanbanTask = ({
 	return (
 		<motion.div
 			className={cn(
-				"flex min-h-14 cursor-pointer flex-col rounded-none bg-accent transition-colors hover:bg-accent/50",
+				"flex min-h-14 cursor-pointer flex-col rounded-sm bg-background transition-colors hover:bg-background/80",
 				{
 					"opacity-50!": task.column?.type === "done",
 				},
@@ -50,29 +50,27 @@ export const KanbanTask = ({
 			<div className="p-3">
 				<div className="flex h-full grow-1 flex-col justify-between gap-0.5">
 					<div className="flex items-center justify-between gap-2">
-						<span className={"flex items-start gap-1 text-sm"}>
+						<div className={"flex items-start gap-1 text-xs"}>
+							{task.priority && (
+								<div className="flex items-center">
+									<Priority value={task.priority} />
+								</div>
+							)}
 							{task.sequence !== null && (
-								<span className="mr-2 text-muted-foreground tabular-nums">
+								<span className="mr-2 font-mono text-muted-foreground tabular-nums">
 									{task.sequence}
 								</span>
 							)}
-							<div className="flex items-start gap-2">
-								<div className="break-words font-medium text-sm">
-									{task.title}
-								</div>
-							</div>
-						</span>
+						</div>
 						<KanbanAssignee task={task} />
+					</div>
+					<div className="flex items-start gap-2">
+						<div className="break-words font-medium text-sm">{task.title}</div>
 					</div>
 
 					<div className="mt-2 flex flex-wrap items-center gap-1">
-						{task.priority && (
-							<div className="flex items-center">
-								<Priority value={task.priority} />
-							</div>
-						)}
 						{task.project && (
-							<div className="flex h-5.5 items-center gap-1 border border-border/50 px-2 font-medium text-xs">
+							<div className="flex h-5.5 items-center gap-1 rounded-sm border border-border/50 px-2 font-medium text-xs">
 								<ProjectIcon className="size-3.5" {...task.project} />
 								{task.project.name}
 							</div>
@@ -90,14 +88,14 @@ export const KanbanTask = ({
 							</div>
 						)}
 						{task.dueDate && (
-							<time className="flex h-5.5 items-center border border-border/50 px-2 font-medium text-xs tabular-nums">
+							<time className="flex h-5.5 items-center rounded-sm border border-border/50 px-2 font-medium text-xs tabular-nums">
 								{format(new Date(task.dueDate), "PP")}
 							</time>
 						)}
 						{task.checklistSummary?.total > 0 && (
 							<div
 								className={cn(
-									"flex h-5.5 items-center border border-border/50 px-2 font-medium text-muted-foreground text-xs",
+									"flex h-5.5 items-center px-2 font-medium text-muted-foreground text-xs",
 									{
 										"bg-primary px-2 text-primary-foreground":
 											task.checklistSummary.completed ===
@@ -105,7 +103,7 @@ export const KanbanTask = ({
 									},
 								)}
 							>
-								<CheckSquareIcon className="mr-1 inline size-3.5" />
+								<CircleCheckIcon className="mr-1 inline size-3.5" />
 								{task.checklistSummary.completed}/{task.checklistSummary.total}
 							</div>
 						)}

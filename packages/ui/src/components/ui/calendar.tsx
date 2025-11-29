@@ -71,7 +71,7 @@ function Calendar({
 					defaultClassNames.dropdowns,
 				),
 				dropdown_root: cn(
-					"relative rounded-none border border-input shadow-xs has-focus:border-ring has-focus:ring-[3px] has-focus:ring-ring/50",
+					"relative rounded-sm border border-input shadow-xs has-focus:border-ring has-focus:ring-[3px] has-focus:ring-ring/50",
 					defaultClassNames.dropdown_root,
 				),
 				dropdown: cn(
@@ -82,13 +82,13 @@ function Calendar({
 					"select-none font-medium",
 					captionLayout === "label"
 						? "text-sm"
-						: "flex h-8 items-center gap-1 rounded-none pr-1 pl-2 text-sm [&>svg]:size-3.5 [&>svg]:text-muted-foreground",
+						: "flex h-8 items-center gap-1 rounded-sm pr-1 pl-2 text-sm [&>svg]:size-3.5 [&>svg]:text-muted-foreground",
 					defaultClassNames.caption_label,
 				),
 				table: "w-full border-collapse",
 				weekdays: cn("flex", defaultClassNames.weekdays),
 				weekday: cn(
-					"flex-1 select-none rounded-none font-normal text-[0.8rem] text-muted-foreground",
+					"flex-1 select-none rounded-sm font-normal text-[0.8rem] text-muted-foreground",
 					defaultClassNames.weekday,
 				),
 				week: cn("mt-2 flex w-full", defaultClassNames.week),
@@ -111,7 +111,7 @@ function Calendar({
 				range_middle: cn("rounded-none", defaultClassNames.range_middle),
 				range_end: cn("rounded-r-none bg-accent", defaultClassNames.range_end),
 				today: cn(
-					"rounded-none bg-accent text-accent-foreground data-[selected=true]:rounded-none",
+					"rounded-sm bg-accent text-accent-foreground data-[selected=true]:rounded-sm",
 					defaultClassNames.today,
 				),
 				outside: cn(

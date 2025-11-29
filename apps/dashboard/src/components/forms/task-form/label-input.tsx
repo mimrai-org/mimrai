@@ -70,7 +70,7 @@ export const LabelInput = ({
 									}}
 								>
 									<Checkbox checked={isSelected} />
-									<LabelBadge {...label} />
+									<LabelBadge {...label} className="bg-transparent" />
 								</CommandItem>
 							);
 						})}

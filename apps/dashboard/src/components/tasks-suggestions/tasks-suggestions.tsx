@@ -129,7 +129,7 @@ export const TasksSuggestions = () => {
 						right: -500,
 					}}
 					animate={{
-						right: 0,
+						right: 12,
 					}}
 					exit={{
 						right: -500,
@@ -165,7 +165,7 @@ export const TasksSuggestions = () => {
 						</div>
 
 						{data && data.length === 0 && (
-							<div className="pointer-events-auto w-fit self-end border bg-background/50 p-4 text-center text-muted-foreground text-sm backdrop-blur-xl">
+							<div className="pointer-events-auto w-fit self-end rounded-sm border bg-background/50 p-4 text-center text-muted-foreground text-sm backdrop-blur-xl">
 								No task suggestions available
 							</div>
 						)}
@@ -181,7 +181,7 @@ export const TasksSuggestions = () => {
 										transition={transition}
 										layout
 										whileHover={"hover"}
-										className="group pointer-events-auto border bg-background/50 p-4 backdrop-blur-xl"
+										className="group pointer-events-auto rounded-sm border bg-background/50 p-4 backdrop-blur-xl"
 									>
 										<div className="flex items-center gap-4">
 											<div>

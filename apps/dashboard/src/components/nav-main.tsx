@@ -61,7 +61,11 @@ export function NavMain({
 					return (
 						<Collapsible key={item.title} asChild defaultOpen={isActive}>
 							<SidebarMenuItem>
-								<SidebarMenuButton asChild tooltip={item.title}>
+								<SidebarMenuButton
+									asChild
+									tooltip={item.title}
+									isActive={isActive}
+								>
 									<Link
 										href={item.url}
 										className={cn(
@@ -99,6 +103,7 @@ export function NavMain({
 														<SidebarMenuSubItem key={subItem.title}>
 															<SidebarMenuSubButton
 																asChild
+																// isActive={isSubActive}
 																className={cn(
 																	"text-muted-foreground hover:bg-transparent focus-visible:bg-transparent",
 																	{

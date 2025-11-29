@@ -86,7 +86,7 @@ export const ProjectsList = () => {
 				<ContextMenu key={project.id}>
 					<ContextMenuTrigger asChild>
 						<li
-							className="flex w-full flex-wrap justify-between border-b p-4 text-sm transition-colors last:border-0 hover:bg-muted"
+							className="flex w-full flex-wrap justify-between rounded-sm bg-background p-4 text-sm transition-colors last:border-0 hover:bg-background/80"
 							onClick={() => {
 								queryClient.setQueryData(
 									trpc.projects.getById.queryKey({ id: project.id }),
@@ -104,7 +104,7 @@ export const ProjectsList = () => {
 									<Progress {...project.progress} />
 								</div>
 								<button
-									className="flex h-5 items-center gap-2 rounded-none bg-secondary px-1"
+									className="flex h-5 items-center gap-2 rounded-sm bg-secondary px-2"
 									type="button"
 								>
 									<LayersIcon className="size-3" />

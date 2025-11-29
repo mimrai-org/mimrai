@@ -282,7 +282,7 @@ export const TaskContextMenu = ({
 						<BoxIcon className="text-muted-foreground" />
 						Project
 					</ContextMenuSubTrigger>
-					<ContextMenuSubContent className="w-32">
+					<ContextMenuSubContent className="w-auto">
 						{projects?.data.map((project) => (
 							<ContextMenuItem
 								key={project.id}

@@ -17,7 +17,7 @@ export const LabelBadge = ({
 		<Badge
 			// style={{ backgroundColor: color, color: getContrast(color) }}
 			className={cn(
-				"flex justify-start gap-2 rounded-xs text-start",
+				"flex justify-start gap-2 rounded-sm text-start",
 				className,
 			)}
 			variant={variant}

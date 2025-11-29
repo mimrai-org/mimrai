@@ -22,6 +22,30 @@ export default function DashboardLayout({
 						<div className="flex flex-1 flex-col px-6 py-6">{children}</div>
 						<ChatWidget />
 						<TasksSuggestions />
+
+						{/* Add a noise background */}
+						<div className="pointer-events-none fixed inset-0 z-0">
+							<svg
+								className="h-full w-full"
+								preserveAspectRatio="xMidYMid slice"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								<filter id="noiseFilter">
+									<feTurbulence
+										type="fractalNoise"
+										baseFrequency="0.8"
+										numOctaves="8"
+										stitchTiles="stitch"
+									/>
+								</filter>
+								<rect
+									width="100%"
+									height="100%"
+									filter="url(#noiseFilter)"
+									opacity="0.03"
+								/>
+							</svg>
+						</div>
 					</SidebarInset>
 				</SidebarProvider>
 			</Suspense>

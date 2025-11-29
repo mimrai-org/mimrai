@@ -40,7 +40,7 @@ export const TasksBurnupWidget = () => {
 	);
 
 	return (
-		<Card className="border-0 py-0">
+		<Card className="">
 			<CardContent className="px-0">
 				<ChartContainer
 					config={chartConfig}
