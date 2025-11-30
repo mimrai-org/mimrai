@@ -42,7 +42,6 @@ export const TaskItem = ({
 			animate={{ opacity: 1, y: 0 }}
 			exit={{ opacity: 0, y: 10 }}
 			layout
-			layoutId={`task-${task.id}`}
 			className={cn(
 				"flex w-full flex-col justify-between gap-2 rounded-sm bg-background p-4 transition-colors hover:bg-background/80 sm:flex-row",
 				className,

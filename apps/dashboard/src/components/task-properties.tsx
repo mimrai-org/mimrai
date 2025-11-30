@@ -21,13 +21,13 @@ export const propertiesComponents = {
 	priority: (task: Task) => task.priority && <Priority value={task.priority} />,
 	dueDate: (task: Task) =>
 		task.dueDate && (
-			<time className="flex h-5.5 items-center bg-secondary px-2 text-xs tabular-nums">
+			<time className="flex h-5.5 items-center rounded-sm bg-secondary px-2 text-xs tabular-nums">
 				{format(new Date(task.dueDate), "PP")}
 			</time>
 		),
 	column: (task: Task) =>
 		task.column && (
-			<time className="flex h-5.5 items-center bg-secondary px-2 text-xs tabular-nums">
+			<time className="flex h-5.5 items-center rounded-sm bg-secondary px-2 text-xs tabular-nums">
 				<ColumnIcon {...task.column} className="size-3.5" />
 				<span className="ml-1">{task.column.name}</span>
 			</time>
@@ -35,10 +35,13 @@ export const propertiesComponents = {
 	checklist: (task: Task) =>
 		task.checklistSummary?.total > 0 && (
 			<div
-				className={cn("flex h-5.5 items-center text-muted-foreground text-xs", {
-					"bg-primary px-2 text-primary-foreground":
-						task.checklistSummary.completed === task.checklistSummary.total,
-				})}
+				className={cn(
+					"flex h-5.5 items-center rounded-sm text-muted-foreground text-xs",
+					{
+						"bg-primary px-2 text-primary-foreground":
+							task.checklistSummary.completed === task.checklistSummary.total,
+					},
+				)}
 			>
 				<CheckSquareIcon className="mr-1 inline size-3.5" />
 				{task.checklistSummary.completed}/{task.checklistSummary.total}
@@ -46,7 +49,7 @@ export const propertiesComponents = {
 		),
 	project: (task: Task) =>
 		task.project && (
-			<span className="flex h-5.5 items-center gap-2 bg-secondary px-2 text-xs">
+			<span className="flex h-5.5 items-center gap-2 rounded-sm bg-secondary px-2 text-xs">
 				<ProjectIcon className="size-3.5" {...task.project} />
 				{task.project.name}
 			</span>

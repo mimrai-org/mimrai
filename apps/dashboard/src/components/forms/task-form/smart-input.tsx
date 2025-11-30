@@ -40,7 +40,7 @@ export const SmartInput = ({
 				ref={inputRef}
 				className={cn(
 					"border-0 bg-transparent focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent",
-					"text-base placeholder:text-lg md:text-lg",
+					"text-base placeholder:text-base md:text-lg",
 				)}
 				placeholder="Describe what you want to do..."
 				value={value}

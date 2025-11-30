@@ -15,8 +15,8 @@ export function WebSearchButton() {
 			className={cn(
 				"flex cursor-pointer items-center transition-colors duration-200",
 				isWebSearch
-					? "rounded-none bg-[rgba(0,0,0,0.05)] pr-2 hover:bg-[rgba(0,0,0,0.08)] dark:bg-[rgba(255,255,255,0.05)] dark:hover:bg-[rgba(255,255,255,0.08)]"
-					: "hover:bg-[rgba(0,0,0,0.05)] dark:hover:bg-[rgba(255,255,255,0.05)]",
+					? "rounded-sm bg-[rgba(0,0,0,0.05)] pr-2 hover:bg-[rgba(0,0,0,0.08)] dark:bg-[rgba(255,255,255,0.05)] dark:hover:bg-[rgba(255,255,255,0.08)]"
+					: "rounded-sm hover:bg-[rgba(0,0,0,0.05)] dark:hover:bg-[rgba(255,255,255,0.05)]",
 			)}
 		>
 			<span className="flex size-8 items-center justify-center">

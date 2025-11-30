@@ -126,17 +126,20 @@ export const WorkstationList = () => {
 									<DropdownMenuContent>
 										{columns?.data
 											?.filter((column) => column.id !== task.columnId)
-											.map((column) => (
-												<DropdownMenuItem
-													key={column.id}
-													onClick={() => {
-														updateTask({ id: task.id, columnId: column.id });
-													}}
-												>
-													<ColumnIcon type={column.type} className="size-4" />
-													{column.name}
-												</DropdownMenuItem>
-											))}
+											.map((column) => {
+												if (column.order <= task.column.order) return null;
+												return (
+													<DropdownMenuItem
+														key={column.id}
+														onClick={() => {
+															updateTask({ id: task.id, columnId: column.id });
+														}}
+													>
+														<ColumnIcon type={column.type} className="size-4" />
+														{column.name}
+													</DropdownMenuItem>
+												);
+											})}
 									</DropdownMenuContent>
 								</DropdownMenu>
 								{/* <WorkConfirmDialogTrigger asChild taskId={task.id}> */}

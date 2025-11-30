@@ -4,6 +4,7 @@ import { Provider, type UIMessage } from "@ai-sdk-tools/store";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/ui/button";
 import { generateId } from "ai";
+import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { XIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -44,10 +45,23 @@ export const useChatWidget = create<ChatContainerState>()((set, get) => ({
 
 export const ChatWidget = () => {
 	const pathname = usePathname();
+
 	const lastPathname = useRef<string>(pathname);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const { show, toggle, chatId, setChatId, setTitle, setHover, hover } =
 		useChatWidget();
+
+	const { scrollY } = useScroll();
+	const [scrollingDown, setScrollingDown] = useState(false);
+	const lastScrollY = useRef(0);
+	useMotionValueEvent(scrollY, "change", (latest) => {
+		if (latest > lastScrollY.current) {
+			setScrollingDown(true);
+		} else {
+			setScrollingDown(false);
+		}
+		lastScrollY.current = latest;
+	});
 
 	useEffect(() => {
 		if (pathname !== lastPathname.current) {
@@ -122,7 +136,8 @@ export const ChatWidget = () => {
 		>
 			<div
 				className={cn("absolute inset-0 transition-all duration-300", {
-					"pointer-events-auto bg-sidebar-inset opacity-100": show,
+					"pointer-events-auto bg-sidebar-inset/95 opacity-100 backdrop-blur-sm":
+						show,
 					"pointer-events-none opacity-0": !show,
 				})}
 			>
@@ -141,21 +156,50 @@ export const ChatWidget = () => {
 				<Provider
 					initialMessages={(initialMessages?.messages as UIMessage[]) ?? []}
 				>
-					<div
+					<motion.div
 						ref={containerRef}
+						variants={{
+							show: {
+								height: "100vh",
+								translateY: 0,
+							},
+							default: {
+								translateY: 0,
+							},
+							hover: {
+								translateY: -5,
+							},
+							scroll: {
+								translateY: 60,
+							},
+						}}
+						transition={{
+							type: "spring",
+							stiffness: 300,
+							damping: 30,
+						}}
+						initial="default"
+						animate={
+							show
+								? hover
+									? "hover"
+									: "show"
+								: scrollingDown
+									? "scroll"
+									: "default"
+						}
+						whileHover={"hover"}
 						className={cn(
-							"-translate-x-1/2 pointer-events-none absolute bottom-0 left-1/2 h-screen pb-2 transition-[translate,min-height] duration-200",
+							"-translate-x-1/2 pointer-events-none absolute bottom-0 left-1/2 h-screen pb-2",
 							{
-								"translate-y-[calc(65px)]": !show && !hover,
-								"translate-y-[calc(40px)]": hover && !show,
-								"pointer-events-auto h-screen": show,
+								"pointer-events-auto": show,
 							},
 						)}
 					>
-						<div className="h-full w-3xl bg-transparent">
+						<div className="hidden h-full w-3xl bg-transparent md:block">
 							{isFetched && <ChatInterface showMessages={show} id={chatId} />}
 						</div>
-					</div>
+					</motion.div>
 					{process.env.NODE_ENV === "development" && (
 						<AIDevtools
 							config={{

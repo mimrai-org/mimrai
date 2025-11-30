@@ -1,11 +1,9 @@
 "use client";
 
-import type { RouterOutputs } from "@api/trpc/routers";
 import { Button } from "@mimir/ui/button";
-import { LabelBadge } from "@mimir/ui/label-badge";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { Loader2Icon, PlusIcon } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence } from "motion/react";
 import { useMemo } from "react";
 import {
 	EmptyState,
@@ -14,13 +12,12 @@ import {
 	EmptyStateIcon,
 	EmptyStateTitle,
 } from "@/components/empty-state";
-import { AssigneeAvatar } from "@/components/kanban/asignee-avatar";
 import { TaskContextMenu } from "@/components/kanban/task-context-menu";
 import { TasksFilters } from "@/components/kanban/tasks-filters";
 import { TaskItem } from "@/components/task-item";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";
-import { queryClient, trpc } from "@/utils/trpc";
+import { trpc } from "@/utils/trpc";
 
 export const BacklogList = () => {
 	const { setParams } = useTaskParams();
@@ -92,7 +89,7 @@ export const BacklogList = () => {
 			</div>
 
 			<AnimatePresence>
-				<ul className="flex flex-col py-4">
+				<ul className="flex flex-col gap-4 py-4">
 					{listData.map((task) => (
 						<TaskContextMenu key={task.id} task={task}>
 							<li>
