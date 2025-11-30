@@ -5,7 +5,6 @@ import {
 	useChatStatus,
 	useDataPart,
 } from "@ai-sdk-tools/store";
-import { Button } from "@mimir/ui/button";
 import {
 	PromptInput,
 	PromptInputActionAddAttachments,
@@ -20,12 +19,9 @@ import {
 	PromptInputToolbar,
 	PromptInputTools,
 } from "@mimir/ui/prompt-input-new";
-import type { Editor as EditorType } from "@tiptap/react";
-import { ArrowUp, Square, StarsIcon } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { useChatParams } from "@/hooks/use-chat-params";
 import { useChatStore } from "@/store/chat";
-import { Editor } from "../editor";
 import { ChatContextList } from "./chat-context/chat-context";
 // import { suggestionsOptions } from "../editor/extentions/suggestions";
 import { type ContextItem, useChatContext } from "./chat-context/store";

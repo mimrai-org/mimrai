@@ -161,7 +161,7 @@ export const ChatWidget = () => {
 						variants={{
 							show: {
 								height: "100vh",
-								translateY: 0,
+								translateY: -10,
 							},
 							default: {
 								translateY: 0,
@@ -179,16 +179,8 @@ export const ChatWidget = () => {
 							damping: 30,
 						}}
 						initial="default"
-						animate={
-							show
-								? hover
-									? "hover"
-									: "show"
-								: scrollingDown
-									? "scroll"
-									: "default"
-						}
-						whileHover={"hover"}
+						animate={show ? "show" : scrollingDown ? "scroll" : "default"}
+						whileHover={show ? undefined : "hover"}
 						className={cn(
 							"-translate-x-1/2 pointer-events-none absolute bottom-0 left-1/2 h-screen pb-2",
 							{
