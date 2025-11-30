@@ -67,9 +67,9 @@ export const SettingsNavbar = () => {
 							href={to}
 							key={to}
 							className={cn(
-								"rounded-none border border-transparent px-4 py-2 transition-all hover:border-muted hover:text-accent-foreground",
+								"rounded-sm border border-transparent px-4 py-2 transition-all hover:border-muted hover:text-accent-foreground",
 								{
-									"bg-accent font-medium text-accent-foreground":
+									"bg-background font-medium text-foreground":
 										pathname.includes(to),
 								},
 							)}

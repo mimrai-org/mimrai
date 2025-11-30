@@ -32,7 +32,7 @@ export const NotificationItem = ({
 	);
 
 	return (
-		<div className="flex items-center justify-between px-2 py-4 hover:bg-accent/50">
+		<div className="flex items-center justify-between rounded-sm bg-background px-4 py-4 hover:bg-background/80">
 			<div className="flex items-center gap-2">
 				<Checkbox
 					checked={selectedIds.get(id)}

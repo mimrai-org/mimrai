@@ -237,7 +237,7 @@ export const CommentActivityItem = ({
 		<div className="space-y-2">
 			<ContextMenu>
 				<ContextMenuTrigger>
-					<div className="group space-y-1 border px-4 py-4 text-muted-foreground text-sm">
+					<div className="group space-y-1 rounded-sm border px-4 py-4 text-muted-foreground text-sm">
 						<div className="flex flex-wrap items-center text-muted-foreground text-xs">
 							<AssigneeAvatar
 								{...activity.user}

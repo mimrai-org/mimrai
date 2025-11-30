@@ -4,6 +4,7 @@ import { subDays } from "date-fns";
 import {
 	and,
 	arrayContains,
+	arrayOverlaps,
 	asc,
 	desc,
 	eq,
@@ -112,9 +113,7 @@ export const getTasks = async ({
 		);
 	input.columnId && whereClause.push(inArray(tasks.columnId, input.columnId));
 	input.teamId && whereClause.push(eq(tasks.teamId, input.teamId));
-	input.labels &&
-		input.labels.length > 0 &&
-		whereClause.push(inArray(labelsOnTasks.labelId, input.labels));
+
 	input.recurring && whereClause.push(isNotNull(tasks.recurringJobId));
 	input.projectId &&
 		input.projectId.length > 0 &&
@@ -191,6 +190,12 @@ export const getTasks = async ({
 		.leftJoin(labels, eq(labels.id, labelsOnTasks.labelId))
 		.groupBy(labelsOnTasks.taskId)
 		.as("labels_subquery");
+
+	input.labels &&
+		input.labels.length > 0 &&
+		whereClause.push(
+			sql`${tasks.id} IN (SELECT ${labelsOnTasks.taskId} FROM ${labelsOnTasks} WHERE ${labelsOnTasks.labelId} = ANY(ARRAY[${input.labels.join(",")}]))`,
+		);
 
 	const query = db
 		.select({

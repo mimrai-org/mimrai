@@ -56,13 +56,13 @@ export const NotificationList = () => {
 	}, [items]);
 
 	return (
-		<div>
+		<div className="flex flex-col gap-2">
 			{items.map((activity) => {
 				const props = getNotificationItemProps(activity);
 				if (!props) return null;
 				if (props.title === "undefined") return null;
 				return (
-					<div key={activity.id} className="border-b last:border-0">
+					<div key={activity.id}>
 						<NotificationItem {...props} />
 					</div>
 				);

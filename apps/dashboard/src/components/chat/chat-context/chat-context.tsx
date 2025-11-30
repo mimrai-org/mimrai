@@ -57,7 +57,7 @@ export const ChatContextItem = ({
 			initial={{ opacity: 0, y: -10 }}
 			animate={{ opacity: 1, y: 0 }}
 			exit={{ opacity: 0, y: 10 }}
-			className="flex w-fit flex-nowrap divide-x border bg-secondary py-1"
+			className="flex w-fit flex-nowrap divide-x rounded-sm border bg-secondary py-1"
 		>
 			<button
 				type="button"
