@@ -2,7 +2,7 @@ import { openai } from "@ai-sdk/openai";
 import { getDb } from "@jobs/init";
 import { createActivity } from "@mimir/db/queries/activities";
 import { createTaskSuggestion } from "@mimir/db/queries/tasks-suggestions";
-import { columns, tasks, users, usersOnTeams } from "@mimir/db/schema";
+import { columns, tasks, teams, users, usersOnTeams } from "@mimir/db/schema";
 import { logger, schemaTask } from "@trigger.dev/sdk";
 import { generateObject } from "ai";
 import { and, eq, inArray, isNull, lte, not, sql } from "drizzle-orm";
@@ -15,6 +15,17 @@ export const generateTeamSuggestionsJob = schemaTask({
 	}),
 	run: async (payload, ctx) => {
 		const db = getDb();
+
+		const [team] = await db
+			.select()
+			.from(teams)
+			.where(eq(teams.id, payload.teamId))
+			.limit(1);
+
+		if (!team) {
+			logger.warn(`Team with ID ${payload.teamId} not found. Exiting.`);
+			return;
+		}
 
 		// Find tasks that have been in the same column for more than 7 days
 		const inactiveTasks = await db
@@ -84,6 +95,7 @@ export const generateTeamSuggestionsJob = schemaTask({
 		const prompt = `
 <guidelines>
 	- Do not make up any information. Only use the data provided.
+	- Respect the team's timezone and locale when suggesting follow-up messages.
 	- For each user, decide:
 		- if they need a follow-up message, and what it should say
 			- Make the message friendly and helpful, do not pressure the user
@@ -94,10 +106,24 @@ export const generateTeamSuggestionsJob = schemaTask({
 		- assign to a specific user, if the task is unassigned based on team members descriptions
 		- move to a different column, if the task seems stuck in the current column
 		- add a comment to the task, suggesting next steps or asking for clarification
+		- never suggest moving a task forward if it is overdue or inactive, instead suggest re-assigning or commenting
 	- Provide a reason for each suggested update
 		- Include task title in the reason for context
+		- Include the overdue or inactive duration in the reason if relevant
 		- If the the update involves assigning include the user name
 </guidelines>
+
+<team-context>
+	timezone: ${team.timezone || "UTC"}
+	description: ${team.description || "No description provided"}
+	locale: ${team.locale || "en-US"}
+	current date: ${new Date().toLocaleDateString(team.locale || "en-US", {
+		timeZone: team.timezone || "UTC",
+		year: "numeric",
+		month: "2-digit",
+		day: "2-digit",
+	})}
+</team-context>
 
 <tasks>
 	INACTIVES:
