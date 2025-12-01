@@ -80,19 +80,6 @@ export const TaskForm = ({
 		),
 	);
 
-	const { mutate: removeTaskFromPullRequestPlan } = useMutation(
-		trpc.github.removeTrasksFromPullRequestPlan.mutationOptions({
-			onSuccess: () => {
-				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
-				queryClient.invalidateQueries(
-					trpc.tasks.getById.queryOptions({
-						id: id!,
-					}),
-				);
-			},
-		}),
-	);
-
 	const { mutate: createTask, isPending: isPendingCreate } = useMutation(
 		trpc.tasks.create.mutationOptions({
 			onMutate: () => {
@@ -136,24 +123,26 @@ export const TaskForm = ({
 
 	const title = form.watch("title");
 	const [debouncedTitle] = useDebounceValue(title, 500);
-	const { isDirty, isValid } = form.formState;
 
-	// useEffect(() => {
-	// 	return () => {
-	// 		if (isValid && isDirty) {
-	// 			const values = form.getValues();
-	// 			if (!values.id) return;
+	useEffect(() => {
+		return () => {
+			const { isValid, isDirty } = form.formState;
+			if (isDirty) {
+				const values = form.getValues();
+				if (!values.id) return;
 
-	// 			const mentions = parseMentions(editorRef.current?.getJSON() || {});
-	// 			// Auto save for existing tasks
-	// 			updateTask({
-	// 				id: values.id,
-	// 				...values,
-	// 				mentions,
-	// 			});
-	// 		}
-	// 	};
-	// }, [isDirty, isValid]);
+				if (!isValid) return;
+
+				const mentions = parseMentions(editorRef.current?.getJSON() || {});
+				// Auto save for existing tasks
+				updateTask({
+					id: values.id,
+					...values,
+					mentions,
+				});
+			}
+		};
+	}, []);
 
 	const parseMentions = (data: any) => {
 		const mentions: string[] = (data.content || []).flatMap(parseMentions);
