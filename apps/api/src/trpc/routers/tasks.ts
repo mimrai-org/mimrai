@@ -1,5 +1,4 @@
 import { getUserContext } from "@api/ai/utils/get-user-context";
-import { createTaskPullRequest } from "@api/lib/copilot";
 import {
 	cloneTaskSchema,
 	commentTaskSchema,
@@ -9,7 +8,6 @@ import {
 	getDuplicatedTasksSchema,
 	getTaskSubscribersSchema,
 	getTasksSchema,
-	shareTaskSchema,
 	smartCompleteResponseSchema,
 	smartCompleteSchema,
 	subscribeTaskSchema,
@@ -85,6 +83,7 @@ export const tasksRouter = router({
 	update: protectedProcedure
 		.input(updateTaskSchema)
 		.mutation(async ({ ctx, input }) => {
+			const oldTask = await getTaskById(input.id, ctx.user.id);
 			const task = await updateTask({
 				...input,
 				userId: ctx.user.id,
@@ -113,6 +112,21 @@ export const tasksRouter = router({
 				// Schedule the job to create the next occurrence
 				await createRecurringTaskJob.trigger({
 					originalTaskId: task.id,
+				});
+			} else if (oldTask.recurringJobId) {
+				// If recurring was removed, cancel any existing job
+				try {
+					await runs.cancel(oldTask.recurringJobId);
+				} catch (error) {
+					// Failed to cancel existing job, log and continue
+					console.warn(
+						`Failed to cancel existing recurring job with ID ${oldTask.recurringJobId} for task ID ${task.id}:`,
+						error,
+					);
+				}
+				await updateTaskRecurringJob({
+					jobId: null,
+					taskId: task.id,
 				});
 			}
 

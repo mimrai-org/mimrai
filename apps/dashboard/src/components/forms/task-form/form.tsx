@@ -130,10 +130,6 @@ export const TaskForm = ({
 						groupId: task.id,
 					}),
 				);
-
-				form.reset(undefined, {
-					keepValues: true,
-				});
 			},
 		}),
 	);
@@ -142,22 +138,22 @@ export const TaskForm = ({
 	const [debouncedTitle] = useDebounceValue(title, 500);
 	const { isDirty, isValid } = form.formState;
 
-	useEffect(() => {
-		return () => {
-			if (isValid && isDirty) {
-				const values = form.getValues();
-				if (!values.id) return;
+	// useEffect(() => {
+	// 	return () => {
+	// 		if (isValid && isDirty) {
+	// 			const values = form.getValues();
+	// 			if (!values.id) return;
 
-				const mentions = parseMentions(editorRef.current?.getJSON() || {});
-				// Auto save for existing tasks
-				updateTask({
-					id: values.id,
-					...values,
-					mentions,
-				});
-			}
-		};
-	}, [isDirty, isValid]);
+	// 			const mentions = parseMentions(editorRef.current?.getJSON() || {});
+	// 			// Auto save for existing tasks
+	// 			updateTask({
+	// 				id: values.id,
+	// 				...values,
+	// 				mentions,
+	// 			});
+	// 		}
+	// 	};
+	// }, [isDirty, isValid]);
 
 	const parseMentions = (data: any) => {
 		const mentions: string[] = (data.content || []).flatMap(parseMentions);

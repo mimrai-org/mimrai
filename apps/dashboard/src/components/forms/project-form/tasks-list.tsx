@@ -14,7 +14,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@ui/components/ui/popover";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, XIcon } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -66,7 +66,7 @@ export const TasksList = ({ projectId }: { projectId: string }) => {
 				<AddTaskButton projectId={projectId} />
 			</div>
 			<AnimatePresence>
-				<ul className="flex flex-col py-2">
+				<ul className="flex flex-col gap-2 py-2">
 					{listData.map((task) => (
 						<TaskContextMenu
 							key={task.id}
@@ -83,12 +83,16 @@ export const TasksList = ({ projectId }: { projectId: string }) => {
 										});
 									}}
 								>
+									<XIcon />
 									Remove from project
 								</ContextMenuItem>
 							}
 						>
 							<li>
-								<TaskItem task={task} className="" />
+								<TaskItem
+									task={task}
+									className="bg-accent hover:bg-accent/80"
+								/>
 							</li>
 						</TaskContextMenu>
 					))}
