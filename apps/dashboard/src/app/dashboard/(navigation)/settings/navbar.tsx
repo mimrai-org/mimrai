@@ -38,8 +38,9 @@ export const SettingsNavbar = () => {
 				label: t("settings.sidebar.notifications"),
 			},
 			{
-				to: "/dashboard/settings/resumes",
-				label: t("settings.sidebar.resumes"),
+				to: "/dashboard/settings/autopilot",
+				label: "Autopilot",
+				scopes: ["team:write"],
 			},
 			{
 				to: "/dashboard/settings/integrations",

@@ -1,11 +1,23 @@
+import { TZDate } from "@date-fns/tz";
 import { getDb } from "@jobs/init";
 import { createActivity } from "@mimir/db/queries/activities";
-import { columns, tasks, teams } from "@mimir/db/schema";
+import { autopilotSettings, columns, tasks, teams } from "@mimir/db/schema";
 import { getTaskPermalink } from "@mimir/utils/tasks";
-import { schemaTask } from "@trigger.dev/sdk";
+import { logger, schemaTask } from "@trigger.dev/sdk";
 import { generateText } from "ai";
 import { format } from "date-fns";
-import { and, asc, count, desc, eq, inArray, sql } from "drizzle-orm";
+import {
+	and,
+	arrayContains,
+	asc,
+	count,
+	desc,
+	eq,
+	inArray,
+	isNull,
+	or,
+	sql,
+} from "drizzle-orm";
 import z from "zod";
 
 export const createDigestActivityJob = schemaTask({
@@ -23,6 +35,30 @@ export const createDigestActivityJob = schemaTask({
 		const [team] = await db.select().from(teams).where(eq(teams.id, teamId));
 		if (!team) {
 			throw new Error("Team not found");
+		}
+
+		const currentDate = new TZDate(new Date(), team.timezone || "UTC");
+		const currentWeekday = currentDate.getDay(); // 0 (Sun) to 6 (Sat)
+
+		const [settings] = await db
+			.select()
+			.from(autopilotSettings)
+			.where(
+				and(
+					eq(autopilotSettings.teamId, teamId),
+					or(
+						isNull(autopilotSettings.allowedWeekdays),
+						arrayContains(autopilotSettings.allowedWeekdays, [currentWeekday]),
+					),
+				),
+			)
+			.limit(1);
+
+		if (!settings || !settings.enabled) {
+			logger.info(
+				`Autopilot settings disabled for team ID ${teamId}. Exiting.`,
+			);
+			return;
 		}
 
 		const pendingTasks = await db

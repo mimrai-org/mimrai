@@ -1,7 +1,8 @@
 import { TZDate } from "@date-fns/tz";
 import { getDb } from "@jobs/init";
-import { teams } from "@mimir/db/schema";
-import { schedules } from "@trigger.dev/sdk";
+import { autopilotSettings, teams } from "@mimir/db/schema";
+import { logger, schedules } from "@trigger.dev/sdk";
+import { eq } from "drizzle-orm";
 import { generateTeamSuggestionsJob } from "./generate-team-suggestions-job";
 
 export const scheduleDailyTeamsSuggestions = schedules.task({
@@ -13,6 +14,19 @@ export const scheduleDailyTeamsSuggestions = schedules.task({
 		const teamsList = await db.select().from(teams);
 
 		for (const team of teamsList) {
+			const [settings] = await db
+				.select()
+				.from(autopilotSettings)
+				.where(eq(autopilotSettings.teamId, team.id))
+				.limit(1);
+
+			if (!settings || !settings.enabled) {
+				logger.info(
+					`Autopilot settings disabled for team ID ${team.id}. Exiting.`,
+				);
+				continue;
+			}
+
 			const executionDate = new TZDate(new Date(), team.timezone || "UTC");
 			executionDate.setHours(9, 0, 0, 0); // Set to 9:00 AM in team's timezone
 

@@ -1,6 +1,7 @@
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { protectedProcedure, publicProcedure, router } from "../init";
 import { activitiesRouter } from "./activities";
+import { autopilotSettingsRouter } from "./autopilot-settings";
 import { billingRouter } from "./billing";
 import { chatRouter } from "./chats";
 import { checklistsRouter } from "./checklists";
@@ -12,7 +13,6 @@ import { integrationsRouter } from "./integrations";
 import { labelsRouter } from "./labels";
 import { notificationSettingsRouter } from "./notification-settings";
 import { projectsRouter } from "./projects";
-import { resumeSettingsRouter } from "./resume-settings";
 import { shareableRouter } from "./shareable";
 import { tasksRouter } from "./tasks";
 import { tasksSuggestionsRouter } from "./tasks-suggestions";
@@ -43,7 +43,7 @@ export const appRouter = router({
 	github: githubRouter,
 	imports: importsRouter,
 	notificationSettings: notificationSettingsRouter,
-	resumeSettings: resumeSettingsRouter,
+	autopilotSettings: autopilotSettingsRouter,
 	widgets: widgetsRouter,
 	checklists: checklistsRouter,
 	projects: projectsRouter,

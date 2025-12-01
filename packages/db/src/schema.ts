@@ -790,8 +790,8 @@ export const notificationSettings = pgTable(
 	],
 );
 
-export const resumeSettings = pgTable(
-	"resume_settings",
+export const autopilotSettings = pgTable(
+	"autopilot_settings",
 	{
 		id: text()
 			.$defaultFn(() => randomUUID())
@@ -799,19 +799,11 @@ export const resumeSettings = pgTable(
 			.notNull(),
 		teamId: text("team_id").notNull(),
 		enabled: boolean("enabled").default(false).notNull(),
-		cronPrompt: text("cron_prompt").default("").notNull(),
-		cronExpression: text("cron_expression").default("0 0 * * *").notNull(), // default to every day at midnight
-		instructions: text("instructions").default("").notNull(),
-		jobId: text("job_id"),
-		shouldUpdateJob: boolean("should_update_job").default(false).notNull(),
-		nextRunAt: timestamp("next_run_at", {
-			withTimezone: true,
-			mode: "string",
-		}),
-		lastRunAt: timestamp("last_run_at", {
-			withTimezone: true,
-			mode: "string",
-		}),
+		allowedWeekdays: integer("allowed_weekdays")
+			.array()
+			.default([1, 2, 3, 4, 5])
+			.notNull(), // 0 = Sunday, 6 = Saturday
+		enableFollowUps: boolean("enable_follow_ups").default(false).notNull(),
 		createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
 			.defaultNow()
 			.notNull(),
@@ -820,11 +812,11 @@ export const resumeSettings = pgTable(
 			.notNull(),
 	},
 	(table) => [
-		unique("unique_resume_settings_per_team").on(table.teamId),
+		unique("unique_autopilot_settings_per_team").on(table.teamId),
 		foreignKey({
 			columns: [table.teamId],
 			foreignColumns: [teams.id],
-			name: "resume_settings_team_id_fkey",
+			name: "autopilot_settings_team_id_fkey",
 		}).onDelete("cascade"),
 	],
 );
