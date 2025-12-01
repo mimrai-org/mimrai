@@ -4,6 +4,7 @@ import { getLabels } from "@db/queries/labels";
 import { createTask } from "@db/queries/tasks";
 import { getDuplicateTaskEmbedding } from "@db/queries/tasks-embeddings";
 import { getMembers } from "@db/queries/teams";
+import { trackTaskCreated } from "@mimir/events/server";
 import { getTaskPermalink } from "@mimir/utils/tasks";
 import { generateObject, tool } from "ai";
 import z from "zod";
@@ -36,7 +37,7 @@ export const createTaskTool = tool({
 	inputSchema: createTaskToolSchema,
 	execute: async function* (input, executionOptions) {
 		try {
-			const { userId, teamId } =
+			const { userId, teamId, teamName } =
 				executionOptions.experimental_context as AppContext;
 			yield {
 				text: `Creating task: ${input.title}`,
@@ -140,6 +141,13 @@ export const createTaskTool = tool({
 				attachments: input.attachments || [],
 				labels: result.object.labelsIds || [],
 				userId: userId,
+			});
+
+			trackTaskCreated({
+				userId: userId,
+				teamId: teamId,
+				teamName: teamName,
+				source: "tool",
 			});
 
 			yield {

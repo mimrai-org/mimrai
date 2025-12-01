@@ -33,6 +33,7 @@ import {
 	updateTaskRecurringJob,
 } from "@mimir/db/queries/tasks";
 import { getDuplicateTaskEmbedding } from "@mimir/db/queries/tasks-embeddings";
+import { trackTaskCreated } from "@mimir/events/server";
 import { handleTaskComment } from "@mimir/integration/task-comments";
 import { createRecurringTaskJob } from "@mimir/jobs/tasks/create-recurring-task-job";
 import { runs } from "@trigger.dev/sdk";
@@ -57,6 +58,13 @@ export const tasksRouter = router({
 				...input,
 				userId: ctx.user.id,
 				teamId: ctx.user.teamId!,
+			});
+
+			trackTaskCreated({
+				userId: ctx.user.id,
+				teamId: ctx.team.id,
+				teamName: ctx.team.name,
+				source: "api",
 			});
 
 			// If recurring is set, schedule the first occurrence
