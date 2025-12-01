@@ -21,7 +21,10 @@ export const AutopilotSettings = () => {
 			</CardHeader>
 			<CardContent>
 				{settings ? (
-					<AutopilotSettingsForm defaultValues={settings} />
+					<AutopilotSettingsForm
+						defaultValues={settings}
+						enabled={settings.enabled}
+					/>
 				) : (
 					<div>Loading...</div>
 				)}

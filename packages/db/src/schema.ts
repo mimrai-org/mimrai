@@ -801,9 +801,8 @@ export const autopilotSettings = pgTable(
 		enabled: boolean("enabled").default(false).notNull(),
 		allowedWeekdays: integer("allowed_weekdays")
 			.array()
-			.default([1, 2, 3, 4, 5])
-			.notNull(), // 0 = Sunday, 6 = Saturday
-		enableFollowUps: boolean("enable_follow_ups").default(false).notNull(),
+			.default([1, 2, 3, 4, 5]), // 0 = Sunday, 6 = Saturday
+		enableFollowUps: boolean("enable_follow_ups").default(false),
 		createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
 			.defaultNow()
 			.notNull(),

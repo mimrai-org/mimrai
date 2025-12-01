@@ -17,14 +17,16 @@ import { trpc } from "@/utils/trpc";
 
 const schema = z.object({
 	enabled: z.boolean(),
-	enableFollowUps: z.boolean().optional(),
-	allowedWeekdays: z.array(z.number().min(0).max(6)).optional(),
+	enableFollowUps: z.boolean().optional().nullable(),
+	allowedWeekdays: z.array(z.number().min(0).max(6)).optional().nullable(),
 });
 
 export const AutopilotSettingsForm = ({
 	defaultValues,
+	enabled,
 }: {
 	defaultValues?: Partial<z.infer<typeof schema>>;
+	enabled?: boolean;
 }) => {
 	const form = useZodForm(schema, {
 		defaultValues: {
@@ -32,7 +34,7 @@ export const AutopilotSettingsForm = ({
 			allowedWeekdays: [1, 2, 3, 4, 5],
 			...defaultValues,
 		},
-		disabled: !defaultValues?.enabled,
+		disabled: !enabled,
 	});
 
 	const { mutate: upsertAutopilotSettings, isPending } = useMutation(
@@ -59,7 +61,10 @@ export const AutopilotSettingsForm = ({
 	);
 
 	const handleSubmit = (values: z.infer<typeof schema>) => {
-		upsertAutopilotSettings(values);
+		upsertAutopilotSettings({
+			...values,
+			enabled,
+		});
 	};
 
 	return (
@@ -78,7 +83,7 @@ export const AutopilotSettingsForm = ({
 							</div>
 							<FormControl>
 								<Switch
-									checked={field.value}
+									checked={!!field.value}
 									onCheckedChange={field.onChange}
 									disabled={field.disabled}
 								/>
@@ -128,7 +133,7 @@ export const AutopilotSettingsForm = ({
 				/>
 
 				<div className="flex justify-end gap-2">
-					<Button type="submit" disabled={isPending || !defaultValues?.enabled}>
+					<Button type="submit" disabled={isPending || !enabled}>
 						{isPending && <Loader />}
 						Save Settings
 					</Button>

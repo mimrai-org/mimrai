@@ -8,6 +8,8 @@ export const upsertAutopilotSettings = async ({
 }: {
 	teamId: string;
 	enabled?: boolean;
+	allowedWeekdays?: number[] | null;
+	enableFollowUps?: boolean;
 }) => {
 	const [settings] = await db
 		.insert(autopilotSettings)
