@@ -210,14 +210,17 @@ export const getProjectProgress = async ({
 				),
 		})
 		.from(projects)
-		.leftJoin(tasks, eq(projects.id, tasks.projectId))
-		.leftJoin(columns, eq(tasks.columnId, columns.id))
-		.leftJoin(users, eq(tasks.assigneeId, users.id))
+		.innerJoin(tasks, eq(projects.id, tasks.projectId))
+		.innerJoin(columns, eq(tasks.columnId, columns.id))
+		.innerJoin(users, eq(tasks.assigneeId, users.id))
 		.where(and(...whereClause))
 		.groupBy(users.id);
 
 	return {
-		overall,
+		overall: {
+			completed: overall?.completed ? Number(overall.completed) : 0,
+			inProgress: overall?.inProgress ? Number(overall.inProgress) : 0,
+		},
 		members: members?.map((member) => ({
 			id: member.id,
 			name: member.name,

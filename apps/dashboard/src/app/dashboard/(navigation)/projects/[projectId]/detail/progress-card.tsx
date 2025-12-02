@@ -22,8 +22,11 @@ export const ProjectProgressCard = ({ projectId }: { projectId: string }) => {
 				</div>
 				<div className="flex justify-start gap-2 text-xs">
 					<div className="flex gap-2 rounded-xs py-0.5">
-						<span className="text-muted-foreground">In Progress</span>
-						<span>{data?.overall?.inProgress ?? 0}</span>
+						<span className="text-muted-foreground">Total</span>
+						<span>
+							{(data?.overall?.inProgress ?? 0) +
+								(data?.overall?.completed ?? 0)}
+						</span>
 					</div>
 					<div className="flex gap-2 rounded-xs py-0.5">
 						<span className="text-muted-foreground">Completed</span>

@@ -95,27 +95,29 @@ export const ProjectForm = ({
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(handleSubmit)} className="h-full">
 					<div className="w-full space-y-4">
-						<div className="max-w-4xl space-y-4">
-							<ProjectColorPicker />
+						<div className="space-y-4">
+							<div className="flex justify-between">
+								<ProjectColorPicker />
+								<div className="flex justify-end">
+									<div className="flex items-center gap-4">
+										<span className="text-muted-foreground text-xs">
+											Last saved at {lastSavedAt?.toLocaleString()}
+										</span>
+										<Button
+											type="submit"
+											variant={"default"}
+											size={"sm"}
+											disabled={isCreating || isUpdating}
+										>
+											{isCreating || isUpdating ? <Loader /> : <SaveIcon />}
+											{defaultValues?.id ? "Save" : "Create"}
+										</Button>
+										<ActionsMenu />
+									</div>
+								</div>
+							</div>
 							<Name />
 							<Description />
-						</div>
-						<div className="flex justify-end">
-							<div className="flex items-center gap-4">
-								<span className="text-muted-foreground text-xs">
-									Last saved at {lastSavedAt?.toLocaleString()}
-								</span>
-								<Button
-									type="submit"
-									variant={"default"}
-									size={"sm"}
-									disabled={isCreating || isUpdating}
-								>
-									{isCreating || isUpdating ? <Loader /> : <SaveIcon />}
-									{defaultValues?.id ? "Save" : "Create"}
-								</Button>
-								<ActionsMenu />
-							</div>
 						</div>
 					</div>
 				</form>

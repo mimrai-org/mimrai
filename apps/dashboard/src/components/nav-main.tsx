@@ -41,7 +41,7 @@ export function NavMain({
 	const pathname = usePathname();
 
 	return (
-		<SidebarGroup className="pt-6">
+		<SidebarGroup>
 			<SidebarMenu>
 				<SidebarMenuItem className="mb-2">
 					<CreateButton />

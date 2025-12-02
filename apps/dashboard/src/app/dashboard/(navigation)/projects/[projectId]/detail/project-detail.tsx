@@ -13,7 +13,7 @@ export const ProjectDetail = ({ projectId }: { projectId: string }) => {
 	);
 
 	return (
-		<div className="h-full px-6 py-6">
+		<div className="mx-auto h-full max-w-6xl px-6 py-6">
 			{data && (
 				<div className="space-y-6">
 					<ProjectForm
@@ -21,7 +21,7 @@ export const ProjectDetail = ({ projectId }: { projectId: string }) => {
 							...data,
 						}}
 					/>
-					<div className="grid gap-6 md:grid-cols-3">
+					<div className="grid gap-6 md:grid-cols-2">
 						<MilestonesCard projectId={projectId} />
 						<ProjectProgressCard projectId={projectId} />
 					</div>

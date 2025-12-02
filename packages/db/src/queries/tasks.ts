@@ -346,10 +346,24 @@ export const createTask = async ({
 }) => {
 	const { sequence, order } = await getNextTaskSequence(input.teamId);
 	const permalinkId = await generateTaskPermalinkId();
+	let projectId = input.projectId;
+
+	// get default project
+	const defaultProject = await db
+		.select()
+		.from(projects)
+		.where(and(eq(projects.teamId, input.teamId)))
+		.limit(2);
+
+	if (defaultProject && defaultProject.length === 1) {
+		projectId = defaultProject[0]?.id;
+	}
+
 	const [task] = await db
 		.insert(tasks)
 		.values({
 			...input,
+			projectId,
 			milestoneId: input.projectId === null ? null : input.milestoneId,
 			sequence,
 			permalinkId,

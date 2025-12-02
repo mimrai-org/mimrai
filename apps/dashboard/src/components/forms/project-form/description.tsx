@@ -18,7 +18,7 @@ export const Description = ({
 				<FormItem>
 					<FormControl>
 						<Editor
-							className="[&_div]:min-h-[100px]"
+							className="[&_.tiptap]:min-h-[100px]"
 							placeholder="Add a short summary..."
 							value={field.value ?? ""}
 							onChange={(value) => {
