@@ -28,7 +28,7 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 
 	return (
 		<Kanban.Column
-			className="h-[calc(100vh-160px)] min-h-[200px] min-w-72 max-w-86 grow-1 overflow-y-auto rounded-sm"
+			className="min-h-[200px] min-w-72 max-w-86 grow-1 rounded-sm"
 			value={columnName}
 		>
 			<ColumnContextMenu column={column}>
@@ -70,60 +70,61 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 					</div>
 				</div>
 			</ColumnContextMenu>
+			<div className="h-[calc(100vh-195px)] grow-1 overflow-y-auto">
+				<div className="relative h-full space-y-2">
+					{tasks.map((task) => (
+						<TaskContextMenu task={task} key={task.id}>
+							<Kanban.Item
+								value={task.id}
+								asHandle
+								asChild
+								onClick={(e) => {
+									e.preventDefault();
+									e.stopPropagation();
 
-			<div className="relative flex grow-1 flex-col gap-2">
-				{tasks.map((task) => (
-					<TaskContextMenu task={task} key={task.id}>
-						<Kanban.Item
-							value={task.id}
-							asHandle
-							asChild
-							onClick={(e) => {
-								e.preventDefault();
-								e.stopPropagation();
+									// Prefetch/Cache data before navigation
+									queryClient.setQueryData(
+										trpc.tasks.getById.queryKey({ id: task.id }),
+										task,
+									);
+									setTaskParams({ taskId: task.id });
+								}}
+							>
+								<KanbanTask task={task} />
+							</Kanban.Item>
+						</TaskContextMenu>
+					))}
 
-								// Prefetch/Cache data before navigation
-								queryClient.setQueryData(
-									trpc.tasks.getById.queryKey({ id: task.id }),
-									task,
-								);
-								setTaskParams({ taskId: task.id });
+					<div>
+						<Button
+							className="w-full justify-start border border-transparent border-dashed text-start text-xs hover:border-input hover:bg-background/20!"
+							variant={"ghost"}
+							onClick={() => {
+								setTaskParams({
+									createTask: true,
+									taskColumnId: column.id,
+								});
 							}}
 						>
-							<KanbanTask task={task} />
-						</Kanban.Item>
-					</TaskContextMenu>
-				))}
+							<PlusIcon className="size-3.5" />
+							Create Task
+						</Button>
+					</div>
 
-				<div>
-					<Button
-						className="w-full justify-start border border-transparent border-dashed text-start text-xs hover:border-input hover:bg-background/20!"
-						variant={"ghost"}
-						onClick={() => {
-							setTaskParams({
-								createTask: true,
-								taskColumnId: column.id,
-							});
-						}}
+					{/* Drag overlay */}
+					<div
+						className={cn(
+							"pointer-events-none absolute inset-0 flex items-center justify-center rounded-sm border bg-black/80 opacity-0 backdrop-blur-none transition-opacity duration-200",
+							{
+								"opacity-100":
+									overColumnName === columnName && Boolean(activeTaskId),
+							},
+						)}
 					>
-						<PlusIcon className="size-3.5" />
-						Create Task
-					</Button>
-				</div>
-
-				{/* Drag overlay */}
-				<div
-					className={cn(
-						"pointer-events-none absolute inset-0 flex items-center justify-center border bg-black/80 opacity-0 backdrop-blur-none transition-opacity duration-200",
-						{
-							"opacity-100":
-								overColumnName === columnName && Boolean(activeTaskId),
-						},
-					)}
-				>
-					<div className="text-xs">
-						Drag here to move task to{" "}
-						<strong className="border px-1 py-0.5">{columnName}</strong>
+						<div className="text-xs">
+							Drag here to move task to{" "}
+							<strong className="border px-1 py-0.5">{columnName}</strong>
+						</div>
 					</div>
 				</div>
 			</div>
