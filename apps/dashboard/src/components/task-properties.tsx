@@ -6,6 +6,7 @@ import { CheckSquareIcon } from "lucide-react";
 import { ColumnIcon } from "./column-icon";
 import { AssigneeAvatar } from "./kanban/asignee-avatar";
 import { Priority } from "./kanban/priority";
+import { MilestoneIcon } from "./milestone-icon";
 import { ProjectIcon } from "./project-icon";
 
 type Task = RouterOutputs["tasks"]["get"]["data"][number];
@@ -52,6 +53,13 @@ export const propertiesComponents = {
 			<span className="flex h-5.5 items-center gap-2 rounded-sm bg-secondary px-2 text-xs">
 				<ProjectIcon className="size-3.5" {...task.project} />
 				{task.project.name}
+			</span>
+		),
+	milestone: (task: Task) =>
+		task.milestone && (
+			<span className="flex h-5.5 items-center gap-2 rounded-sm bg-secondary px-2 text-xs">
+				<MilestoneIcon className="size-3.5" {...task.milestone} />
+				{task.milestone.name}
 			</span>
 		),
 };

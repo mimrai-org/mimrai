@@ -21,6 +21,7 @@ export const TaskItem = ({
 		"dueDate",
 		"column",
 		"project",
+		"milestone",
 		"checklist",
 		"labels",
 		"assignee",
