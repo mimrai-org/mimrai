@@ -1,4 +1,4 @@
-# Base image with Bun v2
+# Base image with Bun v3
 FROM oven/bun:1.2.22 AS base
 
 # Install turbo CLI globally using Bun
