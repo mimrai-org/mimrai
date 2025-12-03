@@ -46,13 +46,18 @@ export const TasksFilters = ({
 
 	const { setParams, ...params } = useTasksFilterParams();
 	const [filter, setFilter] = useState<Partial<typeof params>>(params);
+
 	const debouncedSetParams = useDebounceCallback(setParams, 500);
 	const firstRender = useRef(true);
+	const previousPathname = useRef(pathname);
 
 	// Reset filters on path change
 	useEffect(() => {
-		setFilter({});
-	}, [pathname, setParams]);
+		if (previousPathname.current !== pathname) {
+			setFilter({});
+			previousPathname.current = pathname;
+		}
+	}, [pathname]);
 
 	useEffect(() => {
 		if (firstRender.current) return;
@@ -175,7 +180,7 @@ export const TasksFilters = ({
 								},
 							)}
 							multiple
-							value={filter.taskMilestoneId || null}
+							value={filter.taskMilestoneId ?? null}
 							onChange={(value) =>
 								setFilter({ ...filter, taskMilestoneId: value })
 							}
@@ -353,4 +358,20 @@ export const TasksFilters = ({
 			</div>
 		</div>
 	);
+};
+
+export const CleanTasksFilters = () => {
+	const pathname = usePathname();
+	const { setParams } = useTasksFilterParams();
+	const previousPathname = useRef(pathname);
+
+	// Reset filters on path change
+	useEffect(() => {
+		if (previousPathname.current !== pathname) {
+			setParams(null);
+			previousPathname.current = pathname;
+		}
+	}, [pathname, setParams]);
+
+	return null;
 };

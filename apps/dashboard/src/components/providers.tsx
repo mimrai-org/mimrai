@@ -15,7 +15,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 			>
 				{children}
 			</ThemeProvider>
-
+			{/* <CleanTasksFilters /> */}
 			{/* <ReactQueryDevtools /> */}
 		</QueryClientProvider>
 	);

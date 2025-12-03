@@ -71,6 +71,9 @@ export const DataSelectInput = <
 		return data?.filter((item) => value.includes(getValue(item))) || [];
 	}, [data, value, getValue]);
 
+	if (placeholder === "Filter by milestone")
+		console.log("DataSelectInput", { placeholder, value, multipleValues });
+
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
