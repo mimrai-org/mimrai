@@ -6,7 +6,7 @@ import { useMemo } from "react";
 import { BoardColumn } from "./column";
 import { type Task, useKanbanBoard, useKanbanStore } from "./use-kanban-board"; // The hook we created above
 
-export function Board() {
+export function TasksBoard() {
 	const { setActiveTaskId, setOverColumnName } = useKanbanStore();
 
 	// Use our custom hook for logic

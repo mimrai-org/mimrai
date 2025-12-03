@@ -13,6 +13,7 @@ export default function DashboardPage({ searchParams }: Props) {
 			<div className="h-full w-full overflow-hidden">
 				<Suspense>
 					<TasksView
+						// default value
 						viewType="board"
 						columnType={["to_do", "in_progress", "review", "done"]}
 					/>

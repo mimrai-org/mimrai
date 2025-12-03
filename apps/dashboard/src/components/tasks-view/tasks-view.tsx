@@ -4,7 +4,7 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { createContext, useContext, useMemo } from "react";
 import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";
 import { trpc, type trpcClient } from "@/utils/trpc";
-import { Board } from "../kanban/board/board";
+import { TasksBoard } from "../kanban/board/board";
 import type { propertiesComponents } from "./task-properties";
 import { TasksFilters, type TasksFiltersProps } from "./tasks-filters";
 import { TasksList } from "./tasks-list";
@@ -15,7 +15,9 @@ export type TasksViewContextValue = {
 	tasks: RouterOutputs["tasks"]["get"]["data"];
 	properties: Array<keyof typeof propertiesComponents>;
 	viewType: TasksViewType;
-	changeViewType?: (type: TasksViewType) => void;
+	fetchNextPage: () => void;
+	hasNextPage?: boolean;
+	isLoading?: boolean;
 };
 export const TasksViewContext = createContext<TasksViewContextValue | null>(
 	null,
@@ -104,29 +106,39 @@ export const TasksView = ({
 			preFilters.labels,
 			preFilters.taskProjectId,
 			preFilters.taskMilestoneId,
+			preFilters.columnType,
+			preFilters.recurring,
 			viewType,
 		],
 	);
 
-	const { data: tasks } = useInfiniteQuery(
+	const { data, fetchNextPage, hasNextPage, isLoading } = useInfiniteQuery(
 		trpc.tasks.get.infiniteQueryOptions(filters, {
 			placeholderData: (prev) => prev,
 			getNextPageParam: (lastPage) => lastPage.meta.cursor,
 		}),
 	);
 
-	const listData = useMemo(
-		() => tasks?.pages.flatMap((page) => page.data) || [],
-		[tasks],
+	const tasks = useMemo(
+		() => data?.pages.flatMap((page) => page.data) || [],
+		[data],
 	);
 
 	return (
 		<TasksViewProvider
-			value={{ filters, tasks: listData, viewType, properties }}
+			value={{
+				filters,
+				tasks,
+				viewType,
+				properties,
+				fetchNextPage,
+				hasNextPage,
+				isLoading,
+			}}
 		>
 			<TasksFilters showFilters={showFilters} />
-			{viewType === "board" ? <Board /> : null}
-			{viewType === "list" ? <TasksList /> : null}
+			{viewType === "board" && <TasksBoard />}
+			{viewType === "list" && <TasksList />}
 		</TasksViewProvider>
 	);
 };
