@@ -5,7 +5,11 @@ export default function Page() {
 	return (
 		<Suspense>
 			<div className="h-full">
-				<TasksView viewType={"list"} recurring={true} />
+				<TasksView
+					viewType={"list"}
+					recurring={true}
+					showEmptyColumns={false}
+				/>
 			</div>
 		</Suspense>
 	);

@@ -1,9 +1,7 @@
 "use client";
 import type { RouterInputs, RouterOutputs } from "@api/trpc/routers";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { usePathname } from "next/navigation";
-import { createContext, useContext, useMemo, useRef, useState } from "react";
-import { useDebounceCallback } from "usehooks-ts";
+import { createContext, useContext, useMemo, useState } from "react";
 import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";
 import { trpc } from "@/utils/trpc";
 import { TasksBoard } from "../kanban/board/board";

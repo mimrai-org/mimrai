@@ -16,6 +16,7 @@ export default function DashboardPage({ searchParams }: Props) {
 						// default value
 						viewType="board"
 						columnType={["to_do", "in_progress", "review", "done"]}
+						showEmptyColumns={true}
 					/>
 				</Suspense>
 			</div>
