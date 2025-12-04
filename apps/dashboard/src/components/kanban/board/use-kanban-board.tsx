@@ -10,7 +10,6 @@ import {
 	useTasksGrouped,
 } from "@/components/tasks-view/tasks-group";
 import { useTasksViewContext } from "@/components/tasks-view/tasks-view";
-import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";
 import { trpc } from "@/utils/trpc";
 
 // Types
@@ -47,8 +46,6 @@ const DEFAULT_EMPTY_COLUMN_ORDER = 64000;
 
 export function useKanbanBoard() {
 	const { tasks, filters } = useTasksViewContext();
-
-	const { groupBy } = useTasksFilterParams();
 	const queryClient = useQueryClient();
 
 	// 2. Mutations
@@ -140,7 +137,7 @@ export function useKanbanBoard() {
 		const overTask = tasks.find((t) => t.id === overId);
 		if (!activeTask || !overTask) return;
 
-		const options = tasksGroupByOptions[groupBy as TasksGroupBy];
+		const options = tasksGroupByOptions[filters.groupBy as TasksGroupBy];
 		const columnUpdateKey = options.updateKey;
 
 		const targetColumnTasks = tasks.filter(

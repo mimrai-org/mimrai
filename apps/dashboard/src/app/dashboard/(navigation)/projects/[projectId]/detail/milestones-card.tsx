@@ -102,7 +102,7 @@ export const MilestonesCard = ({ projectId }: { projectId: string }) => {
 												</span>
 											</div>
 											<div className="flex items-center gap-2 text-xs">
-												<Link href={`./tasks?taskMilestoneId=${milestone.id}`}>
+												<Link href={`./tasks?mId=${milestone.id}`}>
 													<motion.button
 														type="button"
 														variants={{

@@ -84,9 +84,9 @@ export const TaskProperty = memo(
 		property: keyof typeof propertiesComponents;
 		task: Task;
 	}) => {
-		const { properties } = useTasksViewContext();
+		const { filters } = useTasksViewContext();
 
-		if (!properties.includes(property)) return null;
+		if (!filters.properties?.includes(property)) return null;
 
 		const Component = propertiesComponents[property];
 		return <>{Component(task)}</>;
@@ -94,10 +94,10 @@ export const TaskProperty = memo(
 );
 
 export const TaskProperties = ({ task }: { task: Task }) => {
-	const { properties } = useTasksViewContext();
+	const { filters } = useTasksViewContext();
 
 	return propertiesList.map((property) => {
-		if (!properties.includes(property)) return null;
+		if (!filters.properties?.includes(property)) return null;
 
 		return <TaskProperty key={property} property={property} task={task} />;
 	});

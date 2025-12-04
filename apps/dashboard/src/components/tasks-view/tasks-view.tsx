@@ -1,20 +1,32 @@
 "use client";
-import type { RouterOutputs } from "@api/trpc/routers";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { createContext, useContext, useMemo } from "react";
+import type { RouterInputs, RouterOutputs } from "@api/trpc/routers";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { usePathname } from "next/navigation";
+import { createContext, useContext, useMemo, useRef, useState } from "react";
+import { useDebounceCallback } from "usehooks-ts";
 import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";
-import { trpc, type trpcClient } from "@/utils/trpc";
+import { trpc } from "@/utils/trpc";
 import { TasksBoard } from "../kanban/board/board";
 import type { propertiesComponents } from "./task-properties";
 import { TasksFilters, type TasksFiltersProps } from "./tasks-filters";
+import type { TasksGroupBy } from "./tasks-group";
 import { TasksList } from "./tasks-list";
 
 export type TasksViewType = "board" | "list";
-export type TasksViewContextValue = {
-	filters: Parameters<typeof trpc.tasks.get.queryKey>[0];
-	tasks: RouterOutputs["tasks"]["get"]["data"];
-	properties: Array<keyof typeof propertiesComponents>;
+export type TasksViewContextFilters = Exclude<
+	RouterInputs["tasks"]["get"],
+	void | undefined
+> & {
+	showEmptyColumns?: boolean;
+	groupBy: TasksGroupBy;
 	viewType: TasksViewType;
+	properties?: Array<keyof typeof propertiesComponents>;
+};
+export type TasksViewContextValue = {
+	filters: TasksViewContextFilters;
+	setFilters: (filters: Partial<TasksViewContextFilters>) => void;
+
+	tasks: RouterOutputs["tasks"]["get"]["data"];
 	fetchNextPage: () => void;
 	hasNextPage?: boolean;
 	isLoading?: boolean;
@@ -47,70 +59,32 @@ export const useTasksViewContext = () => {
 	return context;
 };
 
+const defaultFilters: TasksViewContextFilters = {
+	viewType: "board" as TasksViewType,
+	properties: [
+		"assignee",
+		"dueDate",
+		"priority",
+		"labels",
+		"milestone",
+		"project",
+	] as Array<keyof typeof propertiesComponents>,
+	groupBy: "column" as TasksGroupBy,
+};
+
 export const TasksView = ({
 	showFilters,
 	...props
 }: Partial<
-	Omit<ReturnType<typeof useTasksFilterParams>, "setParams" | "hasParams"> &
-		Pick<TasksFiltersProps, "showFilters">
+	TasksViewContextFilters & Pick<TasksFiltersProps, "showFilters">
 >) => {
-	const { setParams, ...params } = useTasksFilterParams();
+	const { params } = useTasksFilterParams();
 
-	// Combine URL params with props
-	const preFilters = Object.entries(params).reduce(
-		(acc, [key, value]) => {
-			if (params[key as keyof typeof params] != null) {
-				const paramsValue = params[key as keyof typeof params];
-				// @ts-expect-error
-				acc[key] = paramsValue;
-				return acc;
-			}
-
-			if (props[key as keyof typeof props]) {
-				// @ts-expect-error
-				acc[key] = props[key as keyof typeof props];
-				return acc;
-			}
-
-			return acc;
-		},
-		{} as typeof params,
-	);
-
-	// Determine view type
-	const viewType = (preFilters.viewType as TasksViewType) || "board";
-	// Determine properties to show
-	const properties = useMemo(
-		() =>
-			(preFilters.properties as Array<keyof typeof propertiesComponents>) || [],
-		[preFilters.properties],
-	);
-
-	const filters = useMemo<Parameters<typeof trpcClient.tasks.get.query>[0]>(
-		() => ({
-			assigneeId: preFilters.assigneeId ?? undefined,
-			columnId: preFilters.columnId ?? undefined,
-			columnType: preFilters.columnType ?? undefined,
-			search: preFilters.search ?? undefined,
-			labels: preFilters.labels ?? undefined,
-			projectId: preFilters.taskProjectId ?? undefined,
-			milestoneId: preFilters.taskMilestoneId ?? undefined,
-			recurring: preFilters.recurring ?? undefined,
-			pageSize: 100,
-			view: viewType,
-		}),
-		[
-			preFilters.assigneeId,
-			preFilters.search,
-			preFilters.columnId,
-			preFilters.labels,
-			preFilters.taskProjectId,
-			preFilters.taskMilestoneId,
-			preFilters.columnType,
-			preFilters.recurring,
-			viewType,
-		],
-	);
+	const [filters, setFilters] = useState<TasksViewContextFilters>({
+		...defaultFilters,
+		...props,
+		...params,
+	});
 
 	const { data, fetchNextPage, hasNextPage, isLoading } = useInfiniteQuery(
 		trpc.tasks.get.infiniteQueryOptions(filters, {
@@ -128,17 +102,17 @@ export const TasksView = ({
 		<TasksViewProvider
 			value={{
 				filters,
+				setFilters: (newFilters) =>
+					setFilters((prev) => ({ ...prev, ...newFilters })),
 				tasks,
-				viewType,
-				properties,
 				fetchNextPage,
 				hasNextPage,
 				isLoading,
 			}}
 		>
 			<TasksFilters showFilters={showFilters} />
-			{viewType === "board" && <TasksBoard />}
-			{viewType === "list" && <TasksList />}
+			{filters.viewType === "board" && <TasksBoard />}
+			{filters.viewType === "list" && <TasksList />}
 		</TasksViewProvider>
 	);
 };

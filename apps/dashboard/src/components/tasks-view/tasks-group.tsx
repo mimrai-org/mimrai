@@ -1,7 +1,6 @@
 import type { RouterOutputs } from "@api/trpc/routers";
 import { type UseQueryOptions, useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";
 import { trpc } from "@/utils/trpc";
 import { ColumnIcon } from "../column-icon";
 import { AssigneeAvatar } from "../kanban/asignee-avatar";
@@ -167,8 +166,7 @@ const priorityOrder: Record<string, number> = {
 };
 
 export const useTasksSorted = () => {
-	const { groupBy } = useTasksFilterParams();
-	const { tasks } = useTasksViewContext();
+	const { tasks, filters } = useTasksViewContext();
 
 	return useMemo(() => {
 		if (!tasks) return [];
@@ -177,7 +175,7 @@ export const useTasksSorted = () => {
 			// Weight-based sorting: each criterion only breaks ties from the previous one
 			const comparisons = [
 				// 1. Sort by column order (only when grouping by column)
-				groupBy === "column" ? a.column.order - b.column.order : 0,
+				filters.groupBy === "column" ? a.column.order - b.column.order : 0,
 				// 2. Sort by priority (urgent > high > medium > low)
 				(priorityOrder[a.priority ?? ""] ?? 5) -
 					(priorityOrder[b.priority ?? ""] ?? 5),
@@ -196,22 +194,25 @@ export const useTasksSorted = () => {
 			}
 			return 0;
 		});
-	}, [tasks, groupBy]);
+	}, [tasks, filters.groupBy]);
 };
 
 export const useTasksGrouped = () => {
-	const { groupBy } = useTasksFilterParams();
+	const { filters } = useTasksViewContext();
 	const tasks = useTasksSorted();
 
 	const { data: columns } = useQuery(
-		tasksGroupByOptions[groupBy as TasksGroupBy]?.queryOptions,
+		tasksGroupByOptions[filters.groupBy as TasksGroupBy]?.queryOptions,
 	);
 
 	const group = useMemo(() => {
 		if (!tasks) return {};
+		if (!columns) return {};
 
 		const group: TasksGroup = {};
 		for (const column of columns || []) {
+			// if the column type doesn't match the current groupBy, early return
+			if (column.type !== filters.groupBy) return {};
 			const colName = column.name;
 			if (!group[colName]) {
 				group[colName] = {
@@ -222,14 +223,14 @@ export const useTasksGrouped = () => {
 		}
 
 		for (const task of tasks) {
-			const options = tasksGroupByOptions[groupBy as TasksGroupBy];
+			const options = tasksGroupByOptions[filters.groupBy as TasksGroupBy];
 			const groupName = options.getGroupName(task);
 			if (!group[groupName]) {
 				group[groupName] = {
 					column: {
 						id: null,
 						name: groupName,
-						type: groupBy as TasksGroupBy,
+						type: filters.groupBy as TasksGroupBy,
 						icon: null,
 						data: null,
 						original: null,
@@ -240,8 +241,17 @@ export const useTasksGrouped = () => {
 			group[groupName]?.tasks.push(task);
 		}
 
+		// If showEmptyColumns is false, remove empty columns
+		if (filters?.showEmptyColumns === false) {
+			for (const key of Object.keys(group)) {
+				if (group[key]?.tasks.length === 0) {
+					delete group[key];
+				}
+			}
+		}
+
 		return group;
-	}, [tasks, columns, groupBy]);
+	}, [tasks, columns, filters.groupBy, filters?.showEmptyColumns]);
 
 	return {
 		tasks: group,

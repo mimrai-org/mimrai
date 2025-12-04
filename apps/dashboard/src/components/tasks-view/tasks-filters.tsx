@@ -16,22 +16,19 @@ import {
 	EyeIcon,
 	KanbanIcon,
 	ListIcon,
-	MenuIcon,
 	SearchIcon,
 	TagsIcon,
 	UserIcon,
 } from "lucide-react";
-import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
-import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";
 import { trpc } from "@/utils/trpc";
 import { LabelInput } from "../forms/task-form/label-input";
 import { Assignee, AssigneeAvatar } from "../kanban/asignee-avatar";
 import { MilestoneIcon } from "../milestone-icon";
 import { ProjectIcon } from "../project-icon";
 import { propertiesComponents } from "./task-properties";
-import { tasksGroupByItems } from "./tasks-group";
+import { type TasksGroupBy, tasksGroupByItems } from "./tasks-group";
 import { useTasksViewContext } from "./tasks-view";
 
 export type TasksFiltersProps = {
@@ -41,23 +38,12 @@ export type TasksFiltersProps = {
 export const TasksFilters = ({
 	showFilters = ["assignee", "project", "milestone", "labels"],
 }: TasksFiltersProps) => {
-	const pathname = usePathname();
-	const { viewType } = useTasksViewContext();
+	const { filters, setFilters } = useTasksViewContext();
 
-	const { setParams, ...params } = useTasksFilterParams();
-	const [filter, setFilter] = useState<Partial<typeof params>>(params);
+	const [search, setSearch] = useState(filters.search || "");
 
-	const debouncedSetParams = useDebounceCallback(setParams, 500);
+	const debouncedSetFilters = useDebounceCallback(setFilters, 500);
 	const firstRender = useRef(true);
-	const previousPathname = useRef(pathname);
-
-	// Reset filters on path change
-	useEffect(() => {
-		if (previousPathname.current !== pathname) {
-			setFilter({});
-			previousPathname.current = pathname;
-		}
-	}, [pathname]);
 
 	useEffect(() => {
 		if (firstRender.current) return;
@@ -67,8 +53,10 @@ export const TasksFilters = ({
 	}, []);
 
 	useEffect(() => {
-		debouncedSetParams(filter);
-	}, [filter, debouncedSetParams]);
+		debouncedSetFilters({
+			search: search,
+		});
+	}, [search]);
 
 	return (
 		<div className="flex w-full items-center justify-between gap-4 border-b p-2">
@@ -79,8 +67,8 @@ export const TasksFilters = ({
 						variant={"ghost"}
 						placeholder="Search tasks..."
 						className="w-52 pl-8"
-						value={filter.search || ""}
-						onChange={(e) => setFilter({ ...filter, search: e.target.value })}
+						value={search || ""}
+						onChange={(e) => setSearch(e.target.value)}
 					/>
 				</div>
 
@@ -95,9 +83,9 @@ export const TasksFilters = ({
 									select: (data) => data,
 								},
 							)}
-							value={filter.assigneeId}
+							value={filters.assigneeId}
 							multiple
-							onChange={(value) => setFilter({ ...filter, assigneeId: value })}
+							onChange={(value) => setFilters({ assigneeId: value || null })}
 							getValue={(item) => item.id}
 							getLabel={(item) => item?.name || item?.email || "Unassigned"}
 							placeholder="Filter by assignee"
@@ -135,10 +123,8 @@ export const TasksFilters = ({
 								},
 							)}
 							multiple
-							value={filter.taskProjectId || null}
-							onChange={(value) =>
-								setFilter({ ...filter, taskProjectId: value })
-							}
+							value={filters.projectId || null}
+							onChange={(value) => setFilters({ projectId: value || null })}
 							getLabel={(item) => item?.name ?? ""}
 							getValue={(item) => item?.id ?? ""}
 							placeholder="Filter by project"
@@ -180,10 +166,8 @@ export const TasksFilters = ({
 								},
 							)}
 							multiple
-							value={filter.taskMilestoneId ?? null}
-							onChange={(value) =>
-								setFilter({ ...filter, taskMilestoneId: value })
-							}
+							value={filters.milestoneId ?? null}
+							onChange={(value) => setFilters({ milestoneId: value || null })}
 							getLabel={(item) => item?.name ?? ""}
 							getValue={(item) => item?.id ?? ""}
 							placeholder="Filter by milestone"
@@ -217,8 +201,8 @@ export const TasksFilters = ({
 					<div className="relative flex items-center">
 						<TagsIcon className="absolute left-2 size-4 text-muted-foreground" />
 						<LabelInput
-							value={filter.labels || []}
-							onChange={(labels) => setFilter({ ...filter, labels })}
+							value={filters.labels || []}
+							onChange={(labels) => setFilters({ labels })}
 							placeholder="Add labels to filter"
 							className="min-w-[120px] pl-8"
 						/>
@@ -249,13 +233,13 @@ export const TasksFilters = ({
 												"rounded-sm border px-2 py-1 capitalize hover:bg-accent/10",
 												{
 													"bg-accent hover:bg-accent/80":
-														params.properties?.includes(
+														filters.properties?.includes(
 															key as keyof typeof propertiesComponents,
 														),
 												},
 											)}
 											onClick={() => {
-												const currentProperties = params.properties || [];
+												const currentProperties = filters.properties || [];
 												if (
 													currentProperties.includes(
 														key as keyof typeof propertiesComponents,
@@ -267,14 +251,14 @@ export const TasksFilters = ({
 															prop !==
 															(key as keyof typeof propertiesComponents),
 													);
-													setParams({
-														...params,
+													setFilters({
+														...filters,
 														properties: newProperties,
 													});
 												} else {
 													// Add property
-													setParams({
-														...params,
+													setFilters({
+														...filters,
 														properties: [
 															...currentProperties,
 															key as keyof typeof propertiesComponents,
@@ -288,7 +272,7 @@ export const TasksFilters = ({
 									))}
 								</div>
 							</div>
-
+							<hr />
 							<div className="space-y-2">
 								<div className="text-muted-foreground text-xs">View As</div>
 								<div className="grid h-16 grid-cols-2 gap-2">
@@ -297,12 +281,12 @@ export const TasksFilters = ({
 										className={cn(
 											"flex h-full items-center justify-center rounded-md border p-2 hover:bg-accent/80",
 											{
-												"bg-accent": viewType === "list",
+												"bg-accent": filters.viewType === "list",
 											},
 										)}
 										onClick={() => {
-											setParams({
-												...params,
+											setFilters({
+												...filters,
 												viewType: "list",
 											});
 										}}
@@ -314,12 +298,12 @@ export const TasksFilters = ({
 										className={cn(
 											"flex h-full items-center justify-center rounded-md border p-2 hover:bg-accent/80",
 											{
-												"bg-accent": viewType === "board",
+												"bg-accent": filters.viewType === "board",
 											},
 										)}
 										onClick={() => {
-											setParams({
-												...params,
+											setFilters({
+												...filters,
 												viewType: "board",
 											});
 										}}
@@ -328,12 +312,13 @@ export const TasksFilters = ({
 									</button>
 								</div>
 							</div>
+							<hr />
 							<div className="space-y-4">
 								<div className="text-muted-foreground text-xs">Group By</div>
 								<RadioGroup
-									value={params.groupBy || "column"}
+									value={filters.groupBy || "column"}
 									onValueChange={(value) =>
-										setParams({ ...params, groupBy: value })
+										setFilters({ ...filters, groupBy: value as TasksGroupBy })
 									}
 								>
 									{tasksGroupByItems.map((item) => (
@@ -352,26 +337,29 @@ export const TasksFilters = ({
 									))}
 								</RadioGroup>
 							</div>
+							<hr />
+							<div className="flex items-center gap-2">
+								<Checkbox
+									id="show-empty-columns"
+									checked={filters?.showEmptyColumns || false}
+									onCheckedChange={(checked) =>
+										setFilters({
+											...filters,
+											showEmptyColumns: !!checked,
+										})
+									}
+								/>
+								<Label
+									htmlFor="show-empty-columns"
+									className="text-muted-foreground text-xs"
+								>
+									Show Empty Columns
+								</Label>
+							</div>
 						</div>
 					</PopoverContent>
 				</Popover>
 			</div>
 		</div>
 	);
-};
-
-export const CleanTasksFilters = () => {
-	const pathname = usePathname();
-	const { setParams } = useTasksFilterParams();
-	const previousPathname = useRef(pathname);
-
-	// Reset filters on path change
-	useEffect(() => {
-		if (previousPathname.current !== pathname) {
-			setParams(null);
-			previousPathname.current = pathname;
-		}
-	}, [pathname, setParams]);
-
-	return null;
 };

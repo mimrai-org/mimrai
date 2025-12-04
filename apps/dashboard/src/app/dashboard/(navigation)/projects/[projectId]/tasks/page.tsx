@@ -7,5 +7,11 @@ type Props = {
 export default async function Page({ params }: Props) {
 	const { projectId } = await params;
 
-	return <TasksView viewType={"list"} taskProjectId={[projectId]} />;
+	return (
+		<TasksView
+			viewType={"list"}
+			projectId={[projectId]}
+			showEmptyColumns={false}
+		/>
+	);
 }
