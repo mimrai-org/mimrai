@@ -4,22 +4,37 @@ import { AnimatePresence } from "motion/react";
 import { TaskContextMenu } from "../kanban/task-context-menu";
 import Loader from "../loader";
 import { TaskItem } from "./task-item";
+import { useTasksGrouped } from "./tasks-group";
 import { useTasksViewContext } from "./tasks-view";
 
 export const TasksList = () => {
-	const { tasks, fetchNextPage, hasNextPage, isLoading } =
-		useTasksViewContext();
+	const { fetchNextPage, hasNextPage, isLoading } = useTasksViewContext();
+
+	const { tasks } = useTasksGrouped();
 
 	return (
 		<AnimatePresence mode="popLayout">
-			<ul className="flex flex-col gap-2 py-4">
-				{tasks.map((task) => (
-					<TaskContextMenu key={task.id} task={task}>
-						<li>
-							<TaskItem task={task} />
-						</li>
-					</TaskContextMenu>
-				))}
+			<div className="flex flex-col gap-2 py-4">
+				{Object.entries(tasks).map(([_, taskGroup]) => {
+					return (
+						<div key={taskGroup.column.id} className="flex flex-col gap-2">
+							<h2 className="flex items-center gap-2 bg-card px-4 py-2 text-sm">
+								{taskGroup.column.icon}
+								{taskGroup.column.name}
+								<span className="text-muted-foreground text-xs">
+									{taskGroup.tasks.length}
+								</span>
+							</h2>
+							{taskGroup.tasks.map((task) => (
+								<TaskContextMenu key={task.id} task={task}>
+									<div>
+										<TaskItem task={task} />
+									</div>
+								</TaskContextMenu>
+							))}
+						</div>
+					);
+				})}
 
 				{hasNextPage && (
 					<li className="flex items-center justify-center">
@@ -35,7 +50,7 @@ export const TasksList = () => {
 						</Button>
 					</li>
 				)}
-			</ul>
+			</div>
 		</AnimatePresence>
 	);
 };

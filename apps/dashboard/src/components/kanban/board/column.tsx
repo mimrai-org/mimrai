@@ -4,7 +4,7 @@ import { Button } from "@mimir/ui/button";
 import * as Kanban from "@mimir/ui/kanban";
 import { Badge } from "@ui/components/ui/badge";
 import { PlusIcon } from "lucide-react";
-import type { GenericColumn } from "@/components/tasks-view/tasks-group";
+import type { GenericGroup } from "@/components/tasks-view/tasks-group";
 // UI & Logic
 import { useTaskParams } from "@/hooks/use-task-params";
 import { cn } from "@/lib/utils";
@@ -15,7 +15,7 @@ import { TaskContextMenu } from "./../task-context-menu";
 import { type Task, useKanbanStore } from "./use-kanban-board";
 
 interface BoardColumnProps {
-	column: GenericColumn;
+	column: GenericGroup;
 	columnName: string;
 	tasks: Task[];
 }

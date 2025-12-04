@@ -1,13 +1,13 @@
 "use client";
 
 import type { RouterOutputs } from "@mimir/api/trpc";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import * as React from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { create } from "zustand";
 import {
-	type GenericColumn,
+	type GenericGroup,
 	type TasksGroupBy,
 	tasksGroupByOptions,
+	useTasksGrouped,
 } from "@/components/tasks-view/tasks-group";
 import { useTasksViewContext } from "@/components/tasks-view/tasks-view";
 import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";
@@ -22,7 +22,7 @@ export type Project = RouterOutputs["projects"]["get"]["data"][number];
 export type KanbanData = Record<
 	string,
 	{
-		column: GenericColumn;
+		column: GenericGroup;
 		tasks: Task[];
 	}
 >;
@@ -51,65 +51,12 @@ export function useKanbanBoard() {
 	const { groupBy } = useTasksFilterParams();
 	const queryClient = useQueryClient();
 
-	const { data: columns } = useQuery(
-		tasksGroupByOptions[groupBy as TasksGroupBy]?.queryOptions,
-	);
-
 	// 2. Mutations
 	const { mutateAsync: updateTask } = useMutation(
 		trpc.tasks.update.mutationOptions(),
 	);
 
-	// 3. Derived State (Grouping)
-	const boardData = React.useMemo<KanbanData>(() => {
-		if (!tasks) return {};
-
-		const priorityOrder: Record<string, number> = {
-			urgent: 1,
-			high: 2,
-			medium: 3,
-			low: 4,
-		};
-
-		const sortedTasks = [...tasks].sort((a, b) => {
-			// Weight-based sorting: each criterion only breaks ties from the previous one
-			const comparisons = [
-				// 1. Sort by column order (only when grouping by column)
-				groupBy === "column" ? a.column.order - b.column.order : 0,
-				// 2. Sort by priority (urgent > high > medium > low)
-				(priorityOrder[a.priority ?? ""] ?? 5) -
-					(priorityOrder[b.priority ?? ""] ?? 5),
-				// 3. Sort by due date (earliest first, no due date goes last)
-				(a.dueDate ? new Date(a.dueDate).getTime() : Number.POSITIVE_INFINITY) -
-					(b.dueDate
-						? new Date(b.dueDate).getTime()
-						: Number.POSITIVE_INFINITY),
-				// 4. Sort by order (fallback)
-				a.order - b.order,
-			];
-
-			// Return the first non-zero comparison (cascading sort)
-			for (const diff of comparisons) {
-				if (diff !== 0) return diff;
-			}
-			return 0;
-		});
-
-		const group: KanbanData = {};
-		for (const column of columns || []) {
-			const options = tasksGroupByOptions[column.type];
-
-			const colName = column.name;
-			if (!group[colName]) {
-				group[colName] = {
-					column,
-					tasks: options.select(sortedTasks, column),
-				};
-			}
-		}
-
-		return group;
-	}, [tasks, groupBy, columns]);
+	const { tasks: boardData, columns } = useTasksGrouped();
 
 	// 4. Logic: Calculate New Order
 	const calculateNewOrder = (
