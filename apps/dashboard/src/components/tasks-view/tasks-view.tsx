@@ -88,10 +88,16 @@ export const TasksView = ({
 	});
 
 	const { data, fetchNextPage, hasNextPage, isLoading } = useInfiniteQuery(
-		trpc.tasks.get.infiniteQueryOptions(filters, {
-			placeholderData: (prev) => prev,
-			getNextPageParam: (lastPage) => lastPage.meta.cursor,
-		}),
+		trpc.tasks.get.infiniteQueryOptions(
+			{
+				...filters,
+				view: filters.viewType,
+			},
+			{
+				placeholderData: (prev) => prev,
+				getNextPageParam: (lastPage) => lastPage.meta.cursor,
+			},
+		),
 	);
 
 	const tasks = useMemo(
