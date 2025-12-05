@@ -71,6 +71,7 @@ const defaultFilters: TasksViewContextFilters = {
 		"project",
 	] as Array<keyof typeof propertiesComponents>,
 	groupBy: "column" as TasksGroupBy,
+	pageSize: 100,
 };
 
 export const TasksView = ({
