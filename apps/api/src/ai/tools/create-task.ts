@@ -2,7 +2,6 @@ import { openai } from "@ai-sdk/openai";
 import { getColumns } from "@db/queries/columns";
 import { getLabels } from "@db/queries/labels";
 import { createTask } from "@db/queries/tasks";
-import { getDuplicateTaskEmbedding } from "@db/queries/tasks-embeddings";
 import { getMembers } from "@db/queries/teams";
 import { trackTaskCreated } from "@mimir/events/server";
 import { getTaskPermalink } from "@mimir/utils/tasks";
@@ -25,6 +24,8 @@ export const createTaskToolSchema = z.object({
 	column: z
 		.string()
 		.describe("Name of the column where the task should be created"),
+	projectId: z.string().optional().describe("ID of the project (uuid)"),
+	milestoneId: z.string().optional().describe("ID of the milestone (uuid)"),
 
 	attachments: z
 		.array(z.url())
@@ -137,6 +138,8 @@ export const createTaskTool = tool({
 					? new Date(input.dueDate).toISOString()
 					: undefined,
 				priority: input.priority || "medium",
+				projectId: input.projectId,
+				milestoneId: input.milestoneId,
 				teamId: teamId,
 				attachments: input.attachments || [],
 				labels: result.object.labelsIds || [],

@@ -3,3 +3,4 @@ node_modules
 .alchemy
 .env
 out
+TEST_PROMPTS.md

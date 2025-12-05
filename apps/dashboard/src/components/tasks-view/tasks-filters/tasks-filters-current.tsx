@@ -97,14 +97,30 @@ const TasksFiltersCurrentItem = ({
 							<div className="text-muted-foreground">{option.label}</div>
 							any of
 							<div className="flex items-center gap-2">
-								{Array.isArray(displayValue)
-									? displayValue.map((item) => (
+								{Array.isArray(displayValue) ? (
+									displayValue.length > 1 ? (
+										<div className="flex items-center gap-1">
+											{displayValue.map((item) => (
+												<div
+													key={item.value}
+													className="-ml-3 first:ml-0 [&_svg]:fill-background"
+												>
+													{item.icon}
+												</div>
+											))}
+											<span>
+												{displayValue.length} {option.label}s
+											</span>
+										</div>
+									) : (
+										displayValue.map((item) => (
 											<div key={item.value} className="flex items-center gap-1">
 												{item.icon}
 												<span>{item.label}</span>
 											</div>
 										))
-									: null}
+									)
+								) : null}
 							</div>
 						</button>
 					</DropdownMenuTrigger>

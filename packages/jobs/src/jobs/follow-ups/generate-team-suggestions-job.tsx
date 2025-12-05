@@ -4,8 +4,10 @@ import { getDb } from "@jobs/init";
 import { createActivity } from "@mimir/db/queries/activities";
 import { createTaskSuggestion } from "@mimir/db/queries/tasks-suggestions";
 import {
+	activities,
 	autopilotSettings,
 	columns,
+	taskSuggestions,
 	tasks,
 	teams,
 	users,
@@ -17,6 +19,7 @@ import {
 	and,
 	arrayContains,
 	eq,
+	gte,
 	inArray,
 	isNull,
 	lte,
@@ -121,6 +124,34 @@ export const generateTeamSuggestionsJob = schemaTask({
 			return;
 		}
 
+		// Find last follow-up suggestions sent in the last 3 days
+		const threeDaysAgo = new Date();
+		threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+
+		const recentFollowUps = await db
+			.select()
+			.from(activities)
+			.where(
+				and(
+					eq(activities.teamId, payload.teamId),
+					eq(activities.type, "follow_up"),
+					gte(activities.createdAt, threeDaysAgo.toISOString()),
+				),
+			)
+			.limit(10);
+
+		// Recent tasks suggestions
+		const recentTaskSuggestions = await db
+			.select()
+			.from(taskSuggestions)
+			.where(
+				and(
+					eq(taskSuggestions.teamId, payload.teamId),
+					gte(taskSuggestions.createdAt, threeDaysAgo.toISOString()),
+				),
+			)
+			.limit(10);
+
 		// Find team members
 		const teamMembers = await db
 			.select()
@@ -153,6 +184,9 @@ export const generateTeamSuggestionsJob = schemaTask({
 		- Include task title in the reason for context
 		- Include the overdue or inactive duration in the reason if relevant
 		- If the the update involves assigning include the user name
+	- Use the historical follow-ups and task suggestions to plan new follow-ups and suggestions
+		- avoid repeating the same follow-up messages if they were recently sent
+		- avoid suggesting the same task updates that were recently suggested
 </guidelines>
 
 <team-context>
@@ -166,6 +200,30 @@ export const generateTeamSuggestionsJob = schemaTask({
 		day: "2-digit",
 	})}
 </team-context>
+
+<historical-follow-ups>
+	${
+		recentFollowUps
+			.map(
+				(fu) =>
+					`- userId: ${fu.groupId}, message: ${fu.metadata?.message || "No message"}, createdAt: ${fu.createdAt}`,
+			)
+			.join("\n") || "No recent follow-ups."
+	}
+</historical-follow-ups>
+
+<historical-task-suggestions>
+	${
+		recentTaskSuggestions
+			.map(
+				(ts) =>
+					`- taskId: ${ts.taskId}, content: ${ts.content}, payload: ${JSON.stringify(
+						ts.payload,
+					)}, createdAt: ${ts.createdAt}, status: ${ts.status}`,
+			)
+			.join("\n") || "No recent task suggestions."
+	}
+</historical-task-suggestions>
 
 <tasks>
 	INACTIVES:

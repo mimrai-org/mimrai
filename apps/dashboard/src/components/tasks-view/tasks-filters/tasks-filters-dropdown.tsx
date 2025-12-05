@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/ui/button";
 import {
 	DropdownMenu,
+	DropdownMenuCheckboxItem,
 	DropdownMenuContent,
 	DropdownMenuGroup,
 	DropdownMenuItem,
@@ -133,16 +134,27 @@ export const TasksFiltersDropdownSub = ({
 					</DropdownMenuGroup>
 					<DropdownMenuGroup>
 						{localResults?.map((item) => (
-							<DropdownMenuItem
+							<DropdownMenuCheckboxItem
 								textValue="#"
 								key={item.value}
-								onSelect={() => {
+								checked={
+									option.multiple
+										? (
+												filters[
+													option.filterKey as keyof typeof filters
+												] as any[]
+											)?.includes(item.value as any)
+										: filters[option.filterKey as keyof typeof filters] ===
+											item.value
+								}
+								onSelect={(e) => e.preventDefault()}
+								onCheckedChange={() => {
 									handleToggle(item.value);
 								}}
 							>
 								{item.icon}
 								{item.label}
-							</DropdownMenuItem>
+							</DropdownMenuCheckboxItem>
 						))}
 					</DropdownMenuGroup>
 				</DropdownMenuSubContent>

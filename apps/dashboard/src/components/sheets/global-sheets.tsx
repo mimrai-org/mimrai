@@ -1,3 +1,4 @@
+import { TasksSuggestions } from "../tasks-suggestions/tasks-suggestions";
 import { ColumnCreateSheet } from "./column-create-sheet";
 import { ColumnUpdateSheet } from "./column-update-sheet ";
 import { IntegrationInstallSheet } from "./integration-install-sheet";
@@ -28,6 +29,7 @@ export const GlobalSheets = () => {
 			<ProjectUpdateSheet />
 			<ShareableCreateSheet />
 			<PlanSelectSheet />
+			<TasksSuggestions />
 		</>
 	);
 };

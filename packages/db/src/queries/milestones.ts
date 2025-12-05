@@ -99,11 +99,14 @@ export const createMilestone = async ({
 	teamId: string;
 	projectId: string;
 }) => {
-	const milestone = await db.insert(milestones).values({
-		...input,
-		teamId,
-		projectId,
-	});
+	const [milestone] = await db
+		.insert(milestones)
+		.values({
+			...input,
+			teamId,
+			projectId,
+		})
+		.returning();
 
 	return milestone;
 };
@@ -162,12 +165,13 @@ export const updateMilestone = async ({
 	const whereClause: SQL[] = [eq(milestones.id, id)];
 	if (teamId) whereClause.push(eq(milestones.teamId, teamId));
 
-	const result = await db
+	const [result] = await db
 		.update(milestones)
 		.set({
 			...input,
 			updatedAt: new Date().toISOString(),
 		})
-		.where(and(...whereClause));
+		.where(and(...whereClause))
+		.returning();
 	return result;
 };

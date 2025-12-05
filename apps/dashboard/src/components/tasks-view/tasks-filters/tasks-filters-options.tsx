@@ -73,13 +73,15 @@ export const tasksFilterOptions = {
 						value: label.id,
 						label: label.name,
 						icon: (
-							<div
-								className="size-2 rounded-full"
-								style={{
-									backgroundColor: label.color,
-									color: getContrast(label.color),
-								}}
-							/>
+							<div className="flex size-4 items-center justify-center">
+								<div
+									className="size-2 rounded-full"
+									style={{
+										backgroundColor: label.color,
+										color: getContrast(label.color),
+									}}
+								/>
+							</div>
 						),
 						original: label,
 					})),

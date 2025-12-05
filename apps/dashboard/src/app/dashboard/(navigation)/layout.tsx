@@ -4,7 +4,6 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { ChatWidget } from "@/components/chat/chat-widget";
 import Header from "@/components/header";
 import { GlobalSheets } from "@/components/sheets/global-sheets";
-import { TasksSuggestions } from "@/components/tasks-suggestions/tasks-suggestions";
 
 export default function DashboardLayout({
 	children,
@@ -21,7 +20,6 @@ export default function DashboardLayout({
 						<Header />
 						<div className="flex flex-1 flex-col">{children}</div>
 						<ChatWidget />
-						<TasksSuggestions />
 
 						{/* Add a noise background */}
 						{/* <div className="pointer-events-none fixed inset-0 z-0 size-full overflow-hidden">

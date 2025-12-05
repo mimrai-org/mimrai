@@ -13,6 +13,7 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@ui/components/ui/tooltip";
+import { format } from "date-fns";
 import { BoxIcon, LayersIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
@@ -24,6 +25,7 @@ import {
 	EmptyStateIcon,
 	EmptyStateTitle,
 } from "@/components/empty-state";
+import { MilestoneIcon } from "@/components/milestone-icon";
 import { ProjectIcon } from "@/components/project-icon";
 import { useProjectParams } from "@/hooks/use-project-params";
 import { queryClient, trpc } from "@/utils/trpc";
@@ -96,12 +98,32 @@ export const ProjectsList = () => {
 									project,
 								);
 								router.push(`/dashboard/projects/${project.id}/detail`);
-								// setParams({ projectId: project.id });
 							}}
 						>
 							<div className="flex items-center gap-2">
 								<ProjectIcon className="size-4" color={project.color} />
 								<h3 className="font-medium">{project.name}</h3>
+								{project.milestone?.name && (
+									<div
+										role="button"
+										tabIndex={0}
+										onClick={(e) => {
+											e.stopPropagation();
+											router.push(
+												`/dashboard/projects/${project.id}/tasks?mId=${project.milestone?.id}`,
+											);
+										}}
+										className="ml-2 flex items-center gap-1 text-xs opacity-70 transition-opacity hover:opacity-100"
+									>
+										<MilestoneIcon {...project.milestone} className="size-4" />
+										<span>{project.milestone.name}</span>
+										{project.milestone.dueDate && (
+											<span>
+												{format(new Date(project.milestone.dueDate), "MMM dd")}
+											</span>
+										)}
+									</div>
+								)}
 							</div>
 							<div className="flex items-center gap-4">
 								<div className="w-24 sm:w-48">

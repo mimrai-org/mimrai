@@ -5,6 +5,7 @@ import { formatRelative } from "date-fns";
 import {
 	CheckIcon,
 	CircleDashedIcon,
+	EyeIcon,
 	MessageSquareIcon,
 	SparklesIcon,
 	UserIcon,
@@ -18,6 +19,7 @@ import {
 	type Transition,
 } from "motion/react";
 import { toast } from "sonner";
+import { useTaskParams } from "@/hooks/use-task-params";
 import { useTaskSuggestionsParams } from "@/hooks/use-tasks-suggestions-params";
 import { queryClient, trpc } from "@/utils/trpc";
 import Loader from "../loader";
@@ -47,6 +49,7 @@ const transition = {
 
 export const TasksSuggestions = () => {
 	const { showTaskSuggestions, setParams } = useTaskSuggestionsParams();
+	const { setParams: setTasksParams } = useTaskParams();
 
 	const { data } = useQuery(
 		trpc.tasksSuggestions.get.queryOptions({
@@ -139,10 +142,10 @@ export const TasksSuggestions = () => {
 						duration: 0.4,
 						bounce: 0.2,
 					}}
-					className="pointer-events-none fixed top-[100px] right-0"
+					className="pointer-events-none fixed top-[100px] right-0 z-60"
 				>
 					<div className="flex w-[400px] flex-col gap-4 text-sm">
-						<div className="pointer-events-auto flex justify-end gap-4 px-4">
+						<div className="pointer-events-auto ml-auto flex w-fit justify-end gap-4 rounded-sm bg-background p-4">
 							{data && data.length > 1 && (
 								<button
 									type="button"
@@ -221,6 +224,19 @@ export const TasksSuggestions = () => {
 												>
 													{isAccepting ? <Loader /> : <CheckIcon />}
 													Accept
+												</Button>
+												<Button
+													variant="ghost"
+													disabled={isLoading}
+													size="sm"
+													onClick={() =>
+														setTasksParams({
+															taskId: suggestion.taskId,
+														})
+													}
+												>
+													<EyeIcon />
+													View Task
 												</Button>
 												<Button
 													variant="ghost"

@@ -30,6 +30,7 @@ export const MilestonesCard = ({ projectId }: { projectId: string }) => {
 		trpc.milestones.get.infiniteQueryOptions(
 			{
 				pageSize: 5,
+				projectId: projectId,
 			},
 			{
 				getNextPageParam: (lastPage) => lastPage.meta?.cursor,

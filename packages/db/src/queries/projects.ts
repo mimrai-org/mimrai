@@ -1,18 +1,30 @@
-import { and, eq, inArray, notInArray, type SQL, sql } from "drizzle-orm";
+import {
+	and,
+	eq,
+	ilike,
+	inArray,
+	notInArray,
+	type SQL,
+	sql,
+} from "drizzle-orm";
 import { db } from "..";
-import { columns, projects, tasks, users } from "../schema";
+import { columns, milestones, projects, tasks, users } from "../schema";
 
 export const getProjects = async ({
+	search,
 	teamId,
 	pageSize = 20,
 	cursor,
 }: {
+	search?: string;
 	teamId?: string;
 	pageSize?: number;
 	cursor?: string;
 }) => {
 	const whereClause: SQL[] = [];
 	if (teamId) whereClause.push(eq(projects.teamId, teamId));
+	if (search)
+		whereClause.push(ilike(projects.name, `%${search.replace(/%/g, "\\%")}%`));
 
 	const progressSubquery = db
 		.select({
@@ -42,11 +54,18 @@ export const getProjects = async ({
 				completed: progressSubquery.completed,
 				inProgress: progressSubquery.inProgress,
 			},
+			milestone: {
+				id: milestones.id,
+				name: milestones.name,
+				dueDate: milestones.dueDate,
+				color: milestones.color,
+			},
 			createdAt: projects.createdAt,
 			updatedAt: projects.updatedAt,
 		})
 		.from(projects)
 		.leftJoin(progressSubquery, eq(projects.id, progressSubquery.projectId))
+		.leftJoin(milestones, eq(projects.id, milestones.projectId))
 		.where(and(...whereClause));
 
 	// Apply pagination
@@ -93,11 +112,14 @@ export const createProject = async ({
 	userId: string;
 	teamId: string;
 }) => {
-	const project = await db.insert(projects).values({
-		...input,
-		userId,
-		teamId,
-	});
+	const [project] = await db
+		.insert(projects)
+		.values({
+			...input,
+			userId,
+			teamId,
+		})
+		.returning();
 
 	return project;
 };
@@ -155,13 +177,14 @@ export const updateProject = async ({
 	const whereClause: SQL[] = [eq(projects.id, id)];
 	if (teamId) whereClause.push(eq(projects.teamId, teamId));
 
-	const result = await db
+	const [result] = await db
 		.update(projects)
 		.set({
 			...input,
 			updatedAt: new Date().toISOString(),
 		})
-		.where(and(...whereClause));
+		.where(and(...whereClause))
+		.returning();
 	return result;
 };
 
