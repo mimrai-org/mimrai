@@ -1,12 +1,4 @@
-import {
-	and,
-	eq,
-	ilike,
-	inArray,
-	notInArray,
-	type SQL,
-	sql,
-} from "drizzle-orm";
+import { and, asc, eq, ilike, type SQL, sql } from "drizzle-orm";
 import { db } from "..";
 import { columns, milestones, projects, tasks, users } from "../schema";
 
@@ -43,6 +35,20 @@ export const getProjects = async ({
 		.groupBy(tasks.projectId)
 		.as("progress_sq");
 
+	const milestonesSubquery = db
+		.select({
+			id: milestones.id,
+			name: milestones.name,
+			dueDate: milestones.dueDate,
+			color: milestones.color,
+			projectId: milestones.projectId,
+		})
+		.from(milestones)
+		.where(eq(milestones.projectId, projects.id))
+		.orderBy(asc(milestones.dueDate))
+		.limit(1)
+		.as("milestones_sq");
+
 	const query = db
 		.select({
 			id: projects.id,
@@ -55,17 +61,17 @@ export const getProjects = async ({
 				inProgress: progressSubquery.inProgress,
 			},
 			milestone: {
-				id: milestones.id,
-				name: milestones.name,
-				dueDate: milestones.dueDate,
-				color: milestones.color,
+				id: milestonesSubquery.id,
+				name: milestonesSubquery.name,
+				dueDate: milestonesSubquery.dueDate,
+				color: milestonesSubquery.color,
 			},
 			createdAt: projects.createdAt,
 			updatedAt: projects.updatedAt,
 		})
 		.from(projects)
 		.leftJoin(progressSubquery, eq(projects.id, progressSubquery.projectId))
-		.leftJoin(milestones, eq(projects.id, milestones.projectId))
+		.leftJoinLateral(milestonesSubquery, sql`TRUE`)
 		.where(and(...whereClause));
 
 	// Apply pagination
