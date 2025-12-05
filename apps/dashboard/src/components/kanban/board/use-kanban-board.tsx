@@ -167,7 +167,10 @@ export function useKanbanBoard() {
 
 	const updateCache = (updatedTask: Partial<Task>) => {
 		queryClient.setQueryData(
-			trpc.tasks.get.infiniteQueryKey(filters),
+			trpc.tasks.get.infiniteQueryKey({
+				...filters,
+				view: filters.viewType,
+			}),
 			(old) => {
 				if (!old) return old;
 				return {
