@@ -6,16 +6,9 @@ import {
 	ColorPickerArea,
 	ColorPickerHueSlider,
 } from "@mimir/ui/color-picker";
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormMessage,
-} from "@mimir/ui/form";
+import { Form, FormControl, FormField, FormItem } from "@mimir/ui/form";
 import { Input } from "@mimir/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@mimir/ui/popover";
-import { Textarea } from "@mimir/ui/textarea";
 import { PopoverClose } from "@radix-ui/react-popover";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Calendar } from "@ui/components/ui/calendar";
@@ -24,7 +17,7 @@ import {
 	CalendarClockIcon,
 	Loader2,
 	PlusIcon,
-	Target,
+	SaveIcon,
 	XIcon,
 } from "lucide-react";
 import { useState } from "react";
@@ -269,6 +262,8 @@ export const MilestoneForm = ({
 						>
 							{isCreating || isUpdating ? (
 								<Loader2 className="animate-spin" />
+							) : defaultValues?.id ? (
+								<SaveIcon />
 							) : (
 								<PlusIcon />
 							)}

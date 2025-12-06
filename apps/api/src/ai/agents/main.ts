@@ -1,5 +1,5 @@
-import { openai } from "@ai-sdk/openai";
 import { createAgent, formatContextForLLM } from "@api/ai/agents/config/shared";
+import { gateway } from "ai";
 import { columnsAgent } from "./columns";
 import { generalAgent } from "./general";
 import { projectsAgent } from "./projects";
@@ -8,8 +8,7 @@ import { usersAgent } from "./users";
 
 export const mainAgent = createAgent({
 	name: "triage",
-	model: openai("gpt-4o-mini"),
-	temperature: 0.1,
+	model: gateway("openai/gpt-4o-mini"),
 	modelSettings: {
 		toolChoice: {
 			type: "tool",

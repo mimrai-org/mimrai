@@ -4,6 +4,7 @@ import {
 	createAgent,
 	formatContextForLLM,
 } from "@api/ai/agents/config/shared";
+import { gateway } from "ai";
 import { createMilestoneTool } from "../tools/create-milestone";
 import { createProjectTool } from "../tools/create-project";
 import { getMilestonesTool } from "../tools/get-milestones";
@@ -13,8 +14,7 @@ import { updateProjectTool } from "../tools/update-project";
 
 export const projectsAgent = createAgent({
 	name: "projects",
-	model: openai("gpt-4o-mini"),
-	temperature: 0.3,
+	model: gateway("openai/gpt-5-mini"),
 	instructions: (
 		ctx,
 	) => `You are a project management specialist for ${ctx.companyName}. Your goal is to help manage projects, track progress, and monitor deadlines. 
