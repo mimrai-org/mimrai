@@ -9,7 +9,6 @@ import {
 import { CheckIcon, Loader2Icon, SparklesIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { toast } from "sonner";
 import { useDebounceValue } from "usehooks-ts";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/utils/trpc";
@@ -29,6 +28,21 @@ export const SmartInput = () => {
 		trpc.tasks.smartComplete.mutationOptions({
 			onSuccess: (data) => {
 				setExplanation(data.explanation);
+
+				// clean up empty properties
+				if (data) {
+					for (const key in data) {
+						if (
+							(data as any)[key] === null ||
+							(data as any)[key] === "" ||
+							(Array.isArray((data as any)[key]) &&
+								(data as any)[key].length === 0)
+						) {
+							delete (data as any)[key];
+						}
+					}
+				}
+
 				form.reset(
 					{
 						showSmartInput: true,

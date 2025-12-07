@@ -9,9 +9,10 @@ import { KanbanAssignee } from "../kanban/kanban-task/assignee";
 import { Priority } from "../kanban/priority";
 import { MilestoneIcon } from "../milestone-icon";
 import { ProjectIcon } from "../project-icon";
+import { TaskPropertyDueDate } from "./due-date";
 import { useTasksViewContext } from "./tasks-view";
 
-type Task = RouterOutputs["tasks"]["get"]["data"][number];
+export type Task = RouterOutputs["tasks"]["get"]["data"][number];
 export const propertiesComponents = {
 	priority: (task: Task) => task.priority && <Priority value={task.priority} />,
 	column: (task: Task) =>
@@ -33,12 +34,7 @@ export const propertiesComponents = {
 			))}
 		</div>
 	),
-	dueDate: (task: Task) =>
-		task.dueDate && (
-			<time className="flex h-5.5 items-center rounded-sm bg-secondary px-2 text-xs tabular-nums">
-				{format(new Date(task.dueDate), "PP")}
-			</time>
-		),
+	dueDate: (task: Task) => task.dueDate && <TaskPropertyDueDate task={task} />,
 
 	checklist: (task: Task) =>
 		task.checklistSummary?.total > 0 && (

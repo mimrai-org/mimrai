@@ -12,7 +12,7 @@ import {
 	PopoverTrigger,
 } from "@ui/components/ui/popover";
 import { formatRelative } from "date-fns";
-import { ChevronDownIcon } from "lucide-react";
+import { CalendarIcon, ChevronDownIcon } from "lucide-react";
 import { useFormContext } from "react-hook-form";
 
 export const DueDate = () => {
@@ -31,6 +31,7 @@ export const DueDate = () => {
 									variant="secondary"
 									className="h-6 w-fit justify-between font-normal text-xs"
 								>
+									<CalendarIcon className="text-muted-foreground" />
 									{field.value ? (
 										formatRelative(field.value, new Date())
 									) : (
