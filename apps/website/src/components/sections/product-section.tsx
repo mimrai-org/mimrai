@@ -58,12 +58,12 @@ export const ProductSection: React.FC = () => {
 						whileInView={{ opacity: 1, y: 0 }}
 						viewport={{ once: true }}
 						transition={{ duration: 0.6, delay: 0.3 }}
-						className="group relative flex min-h-[400px] flex-col justify-between overflow-hidden border border-white/5 bg-surface p-8 transition-colors hover:border-white/10"
+						className="group relative flex min-h-[400px] flex-col justify-between overflow-hidden rounded-md border border-white/5 bg-surface p-8 transition-colors hover:border-white/10"
 					>
 						<div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]" />
 
 						<div className="relative z-10">
-							<div className="mb-6 flex h-10 w-10 items-center justify-center border border-white/5 bg-white/5 text-white">
+							<div className="mb-6 flex h-10 w-10 items-center justify-center rounded-md border border-white/5 bg-white/5 text-white">
 								<Layers size={20} />
 							</div>
 							<h3 className="mb-2 font-light text-2xl text-white">
@@ -80,7 +80,7 @@ export const ProductSection: React.FC = () => {
 								{[1, 2, 3].map((i) => (
 									<div
 										key={i}
-										className={`border border-white/5 p-3 bg-white/${4 - i} flex transform items-center gap-3 backdrop-blur-sm transition-transform group-hover:translate-x-1`}
+										className={`rounded-md border border-white/5 p-3 bg-white/${4 - i} flex transform items-center gap-3 backdrop-blur-sm transition-transform group-hover:translate-x-1`}
 									>
 										<div
 											className={`h-2 w-2 ${i === 1 ? "bg-orange-400" : "bg-zinc-600"}`}
@@ -99,10 +99,10 @@ export const ProductSection: React.FC = () => {
 						whileInView={{ opacity: 1, y: 0 }}
 						viewport={{ once: true }}
 						transition={{ duration: 0.6, delay: 0.4 }}
-						className="group relative flex min-h-[400px] flex-col justify-between overflow-hidden border border-white/10 p-8 transition-colors hover:border-white/20"
+						className="group relative flex min-h-[400px] flex-col justify-between overflow-hidden rounded-md border border-white/10 p-8 transition-colors hover:border-white/20"
 					>
 						<div className="relative z-10">
-							<div className="mb-6 flex h-10 w-10 items-center justify-center border border-indigo-500/20 bg-indigo-500/10 text-indigo-300">
+							<div className="mb-6 flex h-10 w-10 items-center justify-center rounded-md border border-indigo-500/20 bg-indigo-500/10 text-indigo-300">
 								<Bot size={20} />
 							</div>
 							<h3 className="mb-2 font-light text-2xl text-white">
@@ -117,7 +117,7 @@ export const ProductSection: React.FC = () => {
 						<div className="relative mt-10 flex h-32 items-center justify-center">
 							<Waveform className="opacity-60" />
 							<div className="absolute inset-0 flex items-center justify-center">
-								<div className="flex items-center gap-2 border border-white/10 bg-surface px-4 py-2 text-white text-xs">
+								<div className="flex items-center gap-2 rounded-md border border-white/10 bg-surface px-4 py-2 text-white text-xs">
 									<Zap size={12} className="fill-yellow-400 text-yellow-400" />
 									<span>Efficiency +24%</span>
 								</div>

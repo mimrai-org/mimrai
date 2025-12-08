@@ -1,6 +1,14 @@
 "use client";
 import { motion } from "framer-motion";
-import { Activity, Bell, GitMerge, Moon, Sun, Users } from "lucide-react";
+import {
+	Activity,
+	Bell,
+	GitMerge,
+	Maximize2,
+	Moon,
+	Sun,
+	Users,
+} from "lucide-react";
 import type React from "react";
 
 interface FeatureCardProps {
@@ -19,9 +27,9 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
 			hidden: { opacity: 0, y: 20 },
 			visible: { opacity: 1, y: 0 },
 		}}
-		className="group border border-white/5 bg-surface p-6 transition-colors hover:border-white/10"
+		className="group rounded-md border border-white/5 bg-surface p-6 transition-colors hover:border-white/10"
 	>
-		<div className="mb-4 flex h-10 w-10 items-center justify-center bg-white/5 text-zinc-400 transition-colors group-hover:text-white">
+		<div className="mb-4 flex h-10 w-10 items-center justify-center text-zinc-400 transition-colors group-hover:text-white">
 			<Icon size={20} strokeWidth={1.5} />
 		</div>
 		<h4 className="mb-2 font-medium text-lg text-white">{title}</h4>
@@ -38,10 +46,10 @@ export const FeaturesGrid: React.FC = () => {
 				"Start your day with an AI-curated list of what actually matters.",
 		},
 		{
-			icon: Activity,
-			title: "Mid-Day Pulse",
+			icon: Maximize2,
+			title: "Zen Mode",
 			description:
-				"Real-time check-ins that adjust priorities based on team progress.",
+				"Minimize distractions with a focus-driven interface that adapts to your workflow.",
 		},
 		{
 			icon: Moon,

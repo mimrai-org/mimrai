@@ -23,10 +23,10 @@ export const Showcase: React.FC = () => {
 					whileInView={{ opacity: 1, scale: 1, y: 0 }}
 					viewport={{ once: true }}
 					transition={{ duration: 0.8, ease: "easeOut" }}
-					className="relative mx-auto flex h-[500px] max-w-4xl flex-col overflow-hidden border border-white/10 bg-surface"
+					className="relative mx-auto flex h-[500px] max-w-4xl flex-col overflow-hidden bg-surface"
 				>
 					<Image
-						src={"/images/showcase.png"}
+						src={"/images/showcase2.png"}
 						alt="Mimir AI Showcase"
 						width={1366}
 						height={768}

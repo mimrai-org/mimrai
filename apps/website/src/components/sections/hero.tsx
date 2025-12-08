@@ -72,10 +72,10 @@ export const Hero: React.FC = () => {
 							duration: 6,
 							ease: "easeInOut",
 						}}
-						className="relative overflow-hidden border border-white/10 bg-background p-1"
+						className="relative overflow-hidden bg-background p-1"
 					>
 						<Image
-							src={"/images/board2.png"}
+							src={"/images/board4.png"}
 							alt="Abstract representation of a smart task"
 							className="size-full object-cover"
 							width={1366}

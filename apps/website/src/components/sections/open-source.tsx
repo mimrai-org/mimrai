@@ -13,7 +13,7 @@ export const OpenSource: React.FC = () => {
 						initial={{ opacity: 0, y: 10 }}
 						whileInView={{ opacity: 1, y: 0 }}
 						viewport={{ once: true }}
-						className="mb-6 inline-flex items-center gap-2 border border-white/10 bg-white/5 px-3 py-1 font-medium text-xs text-zinc-400"
+						className="mb-6 inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-3 py-1 font-medium text-xs text-zinc-400"
 					>
 						<GithubIcon size={12} />
 						<span>AGPL-3.0 License</span>
@@ -71,7 +71,7 @@ export const OpenSource: React.FC = () => {
 					whileInView={{ opacity: 1, scale: 1 }}
 					viewport={{ once: true }}
 					transition={{ delay: 0.4 }}
-					className="relative border border-white/10 bg-surface p-6"
+					className="relative rounded-md border border-white/10 bg-surface p-6"
 				>
 					<div className="mb-4 flex items-center gap-2 border-white/5 border-b pb-4">
 						<div className="h-2 w-2 bg-zinc-600" />

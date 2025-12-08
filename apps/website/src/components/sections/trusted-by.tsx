@@ -14,7 +14,7 @@ const LogoPlaceholder = ({
 	logoClassName?: string;
 	logoSrc?: string;
 }) => (
-	<div className="flex h-12 cursor-pointer items-center justify-center gap-2 border border-white/5 bg-white/5 px-4 opacity-40 grayscale transition-opacity hover:opacity-80">
+	<div className="flex h-12 cursor-pointer items-center justify-center gap-2 rounded-md bg-white/5 px-4 opacity-40 grayscale transition-opacity hover:opacity-80">
 		{logoSrc && (
 			<Image
 				src={logoSrc}
