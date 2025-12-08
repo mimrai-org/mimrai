@@ -11,7 +11,7 @@ export const PLANS = [
 			yearly: 0,
 		},
 		limits: {
-			users: 1,
+			users: 5,
 		},
 		pricesIds: {
 			sandbox: {
@@ -33,7 +33,12 @@ export const PLANS = [
 		},
 		features: [
 			{ name: "Unlimited Tasks", key: "unlimited-tasks" as const },
-			{ name: "1 Member", key: "one-member" as const },
+			{ name: "Unlimited Projects", key: "unlimited-projects" as const },
+			{ name: "Up to 5 Members", key: "free-members" as const },
+			{
+				name: "Integration with Third-Party Services",
+				key: "integrations" as const,
+			},
 		],
 	},
 	{
@@ -68,6 +73,7 @@ export const PLANS = [
 		},
 		features: [
 			{ name: "Unlimited Tasks", key: "unlimited-tasks" as const },
+			{ name: "Unlimited Projects", key: "unlimited-projects" as const },
 			{ name: "Unlimited Members", key: "unlimited-members" as const },
 			{ name: "Basic Analytics", key: "basic-analytics" as const },
 			{ name: "AI Assistance", key: "ai" as const },

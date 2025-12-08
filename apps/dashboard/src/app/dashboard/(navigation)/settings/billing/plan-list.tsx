@@ -101,7 +101,7 @@ export const PlanList = () => {
 							{plan.features?.map((feature, i) => (
 								<li key={i} className="flex items-center gap-2 text-sm">
 									<CheckIcon className="size-4" />
-									{feature}
+									{feature.name}
 								</li>
 							))}
 						</ul>
@@ -114,10 +114,7 @@ export const PlanList = () => {
 								data-track={`select-plan-${plan.name.toLowerCase()}`}
 							>
 								{loadingPlanSlug === plan.slug && isLoading && <Loader />}
-								Get
-								<Badge variant={"secondary"} className="rounded-none">
-									{plan.name}
-								</Badge>
+								Get {plan.name}
 							</Button>
 						</div>
 					</div>
