@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ZenModeTask } from "./view";
 
 export const ZenModeScrollSpy = ({
@@ -9,9 +9,13 @@ export const ZenModeScrollSpy = ({
 	task: ZenModeTask;
 	contentRef: React.RefObject<HTMLElement | null>;
 }) => {
+	const [contentRendered, setContentRendered] = useState(false);
 	const content = task.description;
+
 	const elements = useMemo(() => {
 		if (!content) return [];
+		if (!contentRef.current) return [];
+		if (!contentRendered) return [];
 		const headings =
 			contentRef.current?.querySelectorAll("h1, h2, h3, h4, h5, h6") || [];
 		return Array.from(headings).map((heading) => ({
@@ -20,7 +24,15 @@ export const ZenModeScrollSpy = ({
 			text: heading.textContent || "",
 			level: Number.parseInt(heading.tagName.substring(1), 10),
 		}));
-	}, [content, contentRef?.current]);
+	}, [content, contentRef?.current, contentRendered]);
+
+	useEffect(() => {
+		// Delay to ensure content is rendered
+		const timeout = setTimeout(() => {
+			setContentRendered(true);
+		}, 500);
+		return () => clearTimeout(timeout);
+	}, []);
 
 	return (
 		<nav className="-translate-y-1/2 fixed top-1/2 right-4 hidden max-h-[70vh] w-16 overflow-y-auto p-4 text-sm md:block">

@@ -75,9 +75,17 @@ export const Response = memo(
 				ul: (props) => <CustomUnorderedList {...props} />,
 				ol: (props) => <CustomOrderedList {...props} />,
 				li: (props) => <CustomListItem {...props} />,
+				h1: ({ children, node, ...props }) => (
+					<h2
+						className="font-medium text-primary text-xl tracking-wide"
+						{...props}
+					>
+						{children}
+					</h2>
+				),
 				h2: ({ children, node, ...props }) => (
 					<h3
-						className="font-medium text-primary text-sm tracking-wide"
+						className="font-medium text-base text-primary tracking-wide"
 						{...props}
 					>
 						{children}
@@ -98,6 +106,11 @@ export const Response = memo(
 					>
 						{children}
 					</h4>
+				),
+				p: ({ children, node, ...props }) => (
+					<div className="leading-6" {...props}>
+						{children}
+					</div>
 				),
 				table: (props) => <Table {...props} className="border" />,
 				a: (props) => {
