@@ -6,6 +6,7 @@ import { getUserContext } from "@api/ai/utils/get-user-context";
 import { createAdminClient } from "@api/lib/supabase";
 import { Client4, type WebSocketMessage } from "@mattermost/client";
 import type { UserProfile } from "@mattermost/types/users";
+import { checkPlanFeatures } from "@mimir/billing";
 import { integrationsCache } from "@mimir/cache/integrations-cache";
 import { getChatById, saveChatMessage } from "@mimir/db/queries/chats";
 import {
@@ -227,6 +228,20 @@ export const initMattermostSingle = async (
 								// handle the message
 
 								if (isMentioned) {
+									const canAccess = await checkPlanFeatures(
+										integration.teamId,
+										["ai"],
+									);
+									if (!canAccess) {
+										await client.createPost({
+											channel_id: typedData.post.channel_id,
+											message:
+												"Your team plan does not include AI features. Please upgrade your plan to use this feature.",
+											root_id: threadId ?? typedData.post.id,
+										});
+										return;
+									}
+
 									const [userContext, chat] = await Promise.all([
 										getUserContext({
 											userId: associetedUser.userId,

@@ -3,6 +3,7 @@ import { mainAgent } from "@api/ai/agents/main";
 import type { UIChatMessage } from "@api/ai/types";
 import { getUserContext } from "@api/ai/utils/get-user-context";
 import { createAdminClient } from "@api/lib/supabase";
+import { checkPlanFeatures } from "@mimir/billing";
 import {
 	getIntegrationByType,
 	getLinkedUserByExternalId,
@@ -54,6 +55,16 @@ export const handleSlackMessage = async ({
 	const client = new webApi.WebClient(
 		(integration.config as { accessToken: string }).accessToken,
 	);
+
+	const canAccess = await checkPlanFeatures(integration.teamId, ["ai"]);
+	if (!canAccess) {
+		await client.chat.postMessage({
+			channel: channel,
+			thread_ts: threadTs,
+			text: "Your team plan does not include AI features. Please upgrade your plan to use this feature.",
+		});
+		return;
+	}
 
 	const thinkingMessage = await client.chat.postMessage({
 		channel: channel,

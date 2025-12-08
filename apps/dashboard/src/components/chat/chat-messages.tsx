@@ -1,19 +1,23 @@
-import { useChatMessages, useChatStatus } from "@ai-sdk-tools/store";
+import {
+	useChatMessages,
+	useChatStatus as useChatStoreStatus,
+} from "@ai-sdk-tools/store";
 import type { UIChatMessage } from "@mimir/api/ai/types";
 import { cn } from "@ui/lib/utils";
 import type { UIMessage } from "ai";
 import { PaperclipIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
+import { useChatStatus } from "@/hooks/use-chat-status";
 import { useUser } from "@/hooks/use-user";
 import { Conversation, ConversationContent } from "../ai-elements/conversation";
 import { Message, MessageAvatar, MessageContent } from "../ai-elements/message";
 import { Response } from "../ai-elements/response";
 import { FaviconStack } from "../favicon-stack";
-import Loader from "../loader";
 import { ChatContextList } from "./chat-context/chat-context";
 import type { ContextItem } from "./chat-context/store";
 import { ChatMessageActions } from "./chat-message-actions";
+import { ChatStatusIndicators } from "./chat-status-indicators";
 
 interface SourceItem {
 	url: string;
@@ -74,8 +78,13 @@ function extractAiSdkSources(parts: UIMessage["parts"]): SourceItem[] {
 export const Messages = ({ isStreaming }: { isStreaming?: boolean }) => {
 	const user = useUser();
 
-	const status = useChatStatus();
 	const messages = useChatMessages<UIChatMessage>();
+	const status = useChatStoreStatus();
+	const { agentStatus, currentToolCall, hasTextContent } = useChatStatus(
+		messages,
+		status,
+	);
+
 	return (
 		<Conversation className="h-full w-full">
 			<ConversationContent>
@@ -231,6 +240,12 @@ export const Messages = ({ isStreaming }: { isStreaming?: boolean }) => {
 							</motion.div>
 						);
 					})}
+					<ChatStatusIndicators
+						agentStatus={agentStatus}
+						currentToolCall={currentToolCall}
+						status={status}
+						hasTextContent={hasTextContent}
+					/>
 				</AnimatePresence>
 			</ConversationContent>
 		</Conversation>

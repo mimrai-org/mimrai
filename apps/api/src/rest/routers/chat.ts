@@ -1,21 +1,16 @@
-import {
-	buildAppContext,
-	formatContextForLLM,
-} from "@api/ai/agents/config/shared";
+import { buildAppContext } from "@api/ai/agents/config/shared";
 import { mainAgent } from "@api/ai/agents/main";
 import { formatLLMContextItems } from "@api/ai/utils/format-context-items";
 import { getUserContext } from "@api/ai/utils/get-user-context";
 import type { Context } from "@api/rest/types";
 import { chatRequestSchema } from "@api/schemas/chat";
-import { db } from "@db/index";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { smoothStream } from "ai";
+import { withPlanFeatures } from "../middleware/plan-feature";
 
 const app = new OpenAPIHono<Context>();
 
-const MAX_MESSAGES_IN_CONTEXT = 20;
-
-app.post("/", async (c) => {
+app.post("/", withPlanFeatures(["ai"]), async (c) => {
 	const body = await c.req.json();
 	const validationresult = chatRequestSchema.safeParse(body);
 

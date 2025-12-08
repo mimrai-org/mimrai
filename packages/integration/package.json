@@ -25,6 +25,7 @@
     "@mimir/db": "workspace:*",
     "@mimir/events": "workspace:*",
     "@mimir/utils": "workspace:*",
+    "@mimir/billing": "workspace:*",
     "@slack/bolt": "^4.6.0",
     "ai": "5.0.87",
     "drizzle-orm": "0.44.6",

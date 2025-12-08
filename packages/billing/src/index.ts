@@ -1,3 +1,4 @@
+import { teamCache } from "@mimir/cache/teams-cache";
 import {
 	getMembers,
 	getTeamById,
@@ -6,6 +7,8 @@ import {
 import {
 	getPlanBySlug,
 	getSubscriptionItemByType,
+	PLANS,
+	type PlanFeatureKey,
 	type PlanSlug,
 	type PriceType,
 } from "@mimir/utils/plans";
@@ -184,4 +187,26 @@ export const createTrialSubscription = async ({
 		customerId: team.customerId!,
 		canceledAt: null,
 	});
+};
+
+export const checkPlanFeatures = async (
+	teamId: string,
+	features: PlanFeatureKey[],
+) => {
+	let team = await teamCache.get(teamId);
+	if (!team) {
+		team = await getTeamById(teamId);
+	}
+	if (!team) {
+		throw new Error("Team not found");
+	}
+	teamCache.set(teamId, team);
+
+	const teamPlan = getPlanBySlug(team.plan!);
+	if (!teamPlan) {
+		throw new Error("Plan not found");
+	}
+	return features.every((feature) =>
+		teamPlan.features.some((f) => f.key === feature),
+	);
 };

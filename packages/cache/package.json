@@ -18,6 +18,9 @@
   },
   "dependencies": {
     "@mimir/tsconfig": "workspace:*",
+    "@mimir/db": "workspace:*",
+    "@mimir/utils": "workspace:*",
+    "@mimir/cache": "workspace:*",
     "@types/redis": "^4.0.11",
     "redis": "^5.8.2",
     "redlock-universal": "^0.6.3"

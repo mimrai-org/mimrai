@@ -31,7 +31,10 @@ export const PLANS = [
 				},
 			},
 		},
-		features: ["Unlimited Tasks", "1 Member"],
+		features: [
+			{ name: "Unlimited Tasks", key: "unlimited-tasks" as const },
+			{ name: "1 Member", key: "one-member" as const },
+		],
 	},
 	{
 		name: "Team",
@@ -64,10 +67,15 @@ export const PLANS = [
 			},
 		},
 		features: [
-			"Unlimited Tasks",
-			"Unlimited Members",
-			"AI Assistance",
-			"Integration with Third-Party Services",
+			{ name: "Unlimited Tasks", key: "unlimited-tasks" as const },
+			{ name: "Unlimited Members", key: "unlimited-members" as const },
+			{ name: "Basic Analytics", key: "basic-analytics" as const },
+			{ name: "AI Assistance", key: "ai" as const },
+			{ name: "Priority Support", key: "priority-support" as const },
+			{
+				name: "Integration with Third-Party Services",
+				key: "integrations" as const,
+			},
 		],
 	},
 ];
@@ -75,6 +83,7 @@ export const PLANS = [
 export type PriceType =
 	keyof (typeof PLANS)[number]["pricesIds"]["sandbox"]["monthly"];
 export type PlanSlug = (typeof PLANS)[number]["slug"];
+export type PlanFeatureKey = (typeof PLANS)[number]["features"][number]["key"];
 
 export const getPlanByPriceId = (priceId: string) => {
 	for (let i = 0; i < PLANS.length; i++) {
