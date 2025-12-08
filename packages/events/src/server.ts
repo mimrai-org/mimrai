@@ -51,3 +51,22 @@ export const trackTaskCreated = async ({
 		teamName,
 	});
 };
+
+export const trackFollowUp = async ({
+	userId,
+	teamId,
+	teamName,
+	message,
+}: {
+	userId: string;
+	teamId: string;
+	teamName?: string;
+	message?: string;
+}) => {
+	await op.track("follow_up", {
+		profileId: userId,
+		teamId,
+		teamName,
+		message,
+	});
+};

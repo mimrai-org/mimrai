@@ -13,6 +13,7 @@ import {
 	users,
 	usersOnTeams,
 } from "@mimir/db/schema";
+import { trackFollowUp } from "@mimir/events/server";
 import { logger, schemaTask } from "@trigger.dev/sdk";
 import { generateObject } from "ai";
 import {
@@ -339,6 +340,13 @@ export const generateTeamSuggestionsJob = schemaTask({
 					},
 				}),
 			);
+
+			trackFollowUp({
+				userId: followUp.userId,
+				teamId: payload.teamId,
+				teamName: team.name || "",
+				message: followUp.message,
+			});
 		}
 		try {
 			// Await all follow-up activity creations
