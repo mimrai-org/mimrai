@@ -263,7 +263,7 @@ ${recommendation.topPriorities
 ✨ Suggested focus for today
 ${recommendation.focusMessage}
 
-Enter Focus Mode to tackle your top priority tasks: ${getAppUrl()}/dashboard/focus
+Enter Zen Mode to tackle your top priority tasks: ${getAppUrl()}/dashboard/zen
 `;
 
 		logger.info(content);
