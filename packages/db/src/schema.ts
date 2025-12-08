@@ -1061,7 +1061,7 @@ export const milestones = pgTable(
 		}).defaultNow(),
 	},
 	(table) => [
-		unique("unique_milestone_name_per_team").on(table.name, table.teamId),
+		unique("unique_milestone_name_per_project").on(table.name, table.projectId),
 		foreignKey({
 			columns: [table.teamId],
 			foreignColumns: [teams.id],

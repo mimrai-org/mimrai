@@ -937,10 +937,13 @@ export const cloneTask = async ({
 	taskId,
 	teamId,
 	userId,
+	...input
 }: {
 	taskId: string;
 	teamId: string;
 	userId: string;
+	projectId?: string | null;
+	milestoneId?: string | null;
 }) => {
 	const task = await getTaskById(taskId, userId);
 	if (!task) throw new Error("Task not found");
@@ -953,6 +956,10 @@ export const cloneTask = async ({
 		order: task.order,
 		priority: task.priority,
 		labels: task.labels?.map((label) => label.id),
+		projectId: input.projectId || task.projectId,
+		milestoneId: input.milestoneId || task.milestoneId,
+		repositoryName: task.repositoryName!,
+		branchName: task.branchName!,
 		teamId,
 		userId,
 		dueDate: task.dueDate!,

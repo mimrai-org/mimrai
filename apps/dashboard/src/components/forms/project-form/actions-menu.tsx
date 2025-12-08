@@ -13,6 +13,7 @@ import {
 	ShareIcon,
 	TrashIcon,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 import Loader from "@/components/loader";
@@ -22,6 +23,7 @@ import { queryClient, trpc } from "@/utils/trpc";
 import type { ProjectFormValues } from "./form-type";
 
 export const ActionsMenu = () => {
+	const router = useRouter();
 	const { setParams } = useProjectParams();
 	const { setParams: setShareableParams } = useShareableParams();
 	const form = useFormContext<ProjectFormValues>();
@@ -49,6 +51,22 @@ export const ActionsMenu = () => {
 		}),
 	);
 
+	const { mutate: cloneProject } = useMutation(
+		trpc.projects.clone.mutationOptions({
+			onMutate: () => {
+				toast.loading("Cloning project...", { id: "clone-project" });
+			},
+			onSuccess: (project) => {
+				queryClient.invalidateQueries(trpc.projects.get.infiniteQueryOptions());
+				toast.success("Project cloned successfully", { id: "clone-project" });
+				router.push(`/dashboard/projects/${project.id}`);
+			},
+			onError: (error) => {
+				toast.error("Failed to clone project", { id: "clone-project" });
+			},
+		}),
+	);
+
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
@@ -57,6 +75,14 @@ export const ActionsMenu = () => {
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent>
+				<DropdownMenuItem
+					onClick={() => {
+						cloneProject({ id: form.getValues().id! });
+					}}
+				>
+					<CopyPlusIcon />
+					Clone
+				</DropdownMenuItem>
 				<DropdownMenuItem
 					onClick={() => {
 						setShareableParams({

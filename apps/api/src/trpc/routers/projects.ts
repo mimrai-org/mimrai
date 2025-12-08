@@ -5,6 +5,7 @@ import {
 } from "@api/schemas/projects";
 import { protectedProcedure, router } from "@api/trpc/init";
 import {
+	cloneProject,
 	createProject,
 	deleteProject,
 	getProjectById,
@@ -74,6 +75,16 @@ export const projectsRouter = router({
 			return getProjectProgress({
 				projectId: input.id,
 				teamId: ctx.user.teamId,
+			});
+		}),
+
+	clone: protectedProcedure
+		.input(z.object({ id: z.string() }))
+		.mutation(async ({ ctx, input }) => {
+			return cloneProject({
+				projectId: input.id,
+				teamId: ctx.user.teamId,
+				userId: ctx.user.id,
 			});
 		}),
 });

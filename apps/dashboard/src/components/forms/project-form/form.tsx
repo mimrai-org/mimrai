@@ -124,7 +124,7 @@ export const ProjectForm = ({
 											{isCreating || isUpdating ? <Loader /> : <SaveIcon />}
 											{defaultValues?.id ? "Save" : "Create"}
 										</Button>
-										<ActionsMenu />
+										{defaultValues?.id && <ActionsMenu />}
 									</div>
 								</div>
 							</div>

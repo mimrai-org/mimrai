@@ -14,7 +14,7 @@ import {
 	TooltipTrigger,
 } from "@ui/components/ui/tooltip";
 import { format } from "date-fns";
-import { BoxIcon, LayersIcon } from "lucide-react";
+import { BoxIcon, CopyPlusIcon, LayersIcon, TrashIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { toast } from "sonner";
@@ -53,6 +53,22 @@ export const ProjectsList = () => {
 			},
 			onError: (error) => {
 				toast.error("Failed to delete project", { id: "delete-project" });
+			},
+		}),
+	);
+
+	const { mutate: cloneProject } = useMutation(
+		trpc.projects.clone.mutationOptions({
+			onMutate: () => {
+				toast.loading("Cloning project...", { id: "clone-project" });
+			},
+			onSuccess: (project) => {
+				queryClient.invalidateQueries(trpc.projects.get.infiniteQueryOptions());
+				toast.success("Project cloned successfully", { id: "clone-project" });
+				setParams({ projectId: project.id });
+			},
+			onError: (error) => {
+				toast.error("Failed to clone project", { id: "clone-project" });
 			},
 		}),
 	);
@@ -141,12 +157,21 @@ export const ProjectsList = () => {
 					</ContextMenuTrigger>
 					<ContextMenuContent>
 						<ContextMenuItem
+							onClick={() => {
+								cloneProject({ id: project.id });
+							}}
+						>
+							<CopyPlusIcon />
+							Clone
+						</ContextMenuItem>
+						<ContextMenuItem
 							variant="destructive"
 							disabled={isDeleting}
 							onClick={() => {
 								deleteProject({ id: project.id });
 							}}
 						>
+							<TrashIcon />
 							Delete
 						</ContextMenuItem>
 					</ContextMenuContent>

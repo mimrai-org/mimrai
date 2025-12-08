@@ -93,9 +93,9 @@ export const createMilestone = async ({
 	...input
 }: {
 	name: string;
-	description?: string;
-	dueDate?: string;
-	color?: string;
+	description?: string | null;
+	dueDate?: string | null;
+	color?: string | null;
 	teamId: string;
 	projectId: string;
 }) => {

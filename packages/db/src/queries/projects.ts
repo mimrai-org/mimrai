@@ -1,6 +1,8 @@
 import { and, asc, desc, eq, ilike, type SQL, sql } from "drizzle-orm";
 import { db } from "..";
 import { columns, milestones, projects, tasks, users } from "../schema";
+import { createMilestone } from "./milestones";
+import { cloneTask, createTask } from "./tasks";
 
 export const getProjects = async ({
 	search,
@@ -115,8 +117,8 @@ export const createProject = async ({
 	...input
 }: {
 	name: string;
-	description?: string;
-	color?: string;
+	description?: string | null;
+	color?: string | null;
 	userId: string;
 	teamId: string;
 }) => {
@@ -305,4 +307,79 @@ export const getProjectsForTimeline = async ({
 		...project,
 		milestones: milestonesData.filter((m) => m.projectId === project.id),
 	}));
+};
+
+export const cloneProject = async ({
+	projectId,
+	userId,
+	teamId,
+}: {
+	projectId: string;
+	userId: string;
+	teamId: string;
+}) => {
+	const project = await getProjectById({ projectId, teamId });
+	if (!project) throw new Error("Project not found");
+
+	const newProject = await createProject({
+		name: `${project.name} (Copy)`,
+		description: project.description,
+		color: project.color,
+		userId,
+		teamId,
+	});
+
+	if (!newProject) throw new Error("Failed to create project");
+
+	// Clone milestones
+	const projectMilestones = await db
+		.select()
+		.from(milestones)
+		.where(
+			and(eq(milestones.projectId, projectId), eq(milestones.teamId, teamId)),
+		);
+
+	const newMilestones = await Promise.all(
+		projectMilestones.map((milestone) =>
+			createMilestone({
+				name: milestone.name,
+				dueDate: milestone.dueDate,
+				color: milestone.color,
+				projectId: newProject.id,
+				teamId,
+			}),
+		),
+	);
+
+	// Create a map of old milestone IDs to new milestone IDs
+	const newMilestoneMap: Map<string, string> = new Map();
+	for (const milestone of projectMilestones) {
+		if (newMilestoneMap.has(milestone.name)) continue;
+		const newMilestone = newMilestones.find(
+			(m) => m?.name === milestone.name && m?.dueDate === milestone.dueDate,
+		);
+		if (newMilestone) {
+			newMilestoneMap.set(milestone.id, newMilestone.id);
+		}
+	}
+
+	// Clone tasks
+	const projectTasks = await db
+		.select()
+		.from(tasks)
+		.where(and(eq(tasks.projectId, projectId), eq(tasks.teamId, teamId)));
+
+	await Promise.all(
+		projectTasks.map((task) =>
+			cloneTask({
+				taskId: task.id,
+				userId,
+				teamId,
+				projectId: newProject.id,
+				milestoneId: newMilestoneMap.get(task.milestoneId || "") || null,
+			}),
+		),
+	);
+
+	return newProject;
 };
