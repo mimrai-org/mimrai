@@ -1,4 +1,4 @@
-![hero](github.jpeg)
+![hero](github.png)
 
 <h1 align="center"><b>Mimrai</b></h1>
 
