@@ -61,8 +61,8 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 					</Button>
 				</div>
 			</div>
-			<div className="h-[calc(100vh-240px)] grow-1 overflow-y-auto px-2">
-				<div className="relative h-full space-y-2 py-2">
+			<div className="max-h-[calc(100vh-220px)] grow-1 overflow-y-auto px-2">
+				<div className="relative h-full space-y-2">
 					{tasks.map((task) => (
 						<TaskContextMenu task={task} key={task.id}>
 							<Kanban.Item
