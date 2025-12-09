@@ -1,11 +1,26 @@
 "use client";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useQuery } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogHeader } from "@ui/components/ui/dialog";
+import {
+	Command,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandList,
+} from "@ui/components/ui/command";
+import {
+	Dialog,
+	DialogContent,
+	DialogFooter,
+	DialogHeader,
+} from "@ui/components/ui/dialog";
 import { Input } from "@ui/components/ui/input";
 import {
+	ArrowDownIcon,
+	ArrowUpIcon,
 	BoxIcon,
 	ChevronRight,
+	CornerDownLeftIcon,
 	LayersIcon,
 	SearchIcon,
 	TargetIcon,
@@ -56,91 +71,101 @@ export const GlobalSearchDialog = ({
 		);
 	}, [data]);
 
+	const handleOpenChange = (isOpen: boolean) => {
+		if (!isOpen) {
+			setSearch("");
+		}
+		onOpenChange(isOpen);
+	};
+
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
+		<Dialog open={open} onOpenChange={handleOpenChange}>
 			<DialogContent className="p-4" showCloseButton={false}>
 				<DialogHeader className="hidden">
 					<DialogTitle />
 				</DialogHeader>
-				<div className="relative">
-					<Input
+				<Command shouldFilter={false}>
+					<CommandInput
 						value={search}
-						onChange={(e) => setSearch(e.target.value)}
-						className="h-11 ps-11"
+						onValueChange={setSearch}
+						containerClassName="h-11"
 						placeholder="Search..."
 					/>
-					<div className="-translate-y-1/2 absolute top-1/2 left-4">
-						<SearchIcon className="size-4 text-muted-foreground" />
-					</div>
-				</div>
-				<div>
-					<AnimatePresence mode="popLayout">
-						{groupedData &&
-							Object.entries(groupedData).map(([type, items]) => {
-								return (
-									<motion.div key={type} className="mt-4">
-										<motion.h3
-											initial={{ opacity: 0, y: -10 }}
-											animate={{ opacity: 1, y: 0 }}
-											transition={{ duration: 0.2 }}
-											className="mb-2 px-4 font-medium text-muted-foreground text-xs capitalize"
+					<CommandList>
+						<AnimatePresence mode="popLayout">
+							{groupedData &&
+								Object.entries(groupedData).map(([type, items]) => {
+									return (
+										<CommandGroup
+											key={type}
+											heading={type}
+											className="capitalize"
 										>
-											{type}
-										</motion.h3>
-										{items?.map((item) => {
-											const Icon = searchIcons[item.type];
-											return (
-												<motion.button
-													type="button"
-													key={item.id}
-													className="flex w-full cursor-pointer items-center rounded-sm px-4 py-3 text-sm transition-colors hover:bg-muted"
-													variants={{
-														initial: {
-															opacity: 0,
-															y: -10,
-														},
-														animate: {
-															opacity: 1,
-															y: 0,
-														},
-													}}
-													initial={"initial"}
-													animate={"animate"}
-													whileHover={"hover"}
-													transition={{ duration: 0.2 }}
-													onClick={() => {
-														onSelect(item);
-														onOpenChange(false);
-													}}
-												>
-													<Icon
-														className="mr-2 size-4 text-muted-foreground"
-														style={{
-															color: item.color || "inherit",
-														}}
-													/>
-													{item.title}
+											{items?.map((item) => {
+												const Icon = searchIcons[item.type];
+												return (
 													<motion.div
-														className="ml-auto inline"
+														key={item.id}
 														variants={{
 															initial: {
 																opacity: 0,
+																y: -10,
 															},
-															hover: {
+															animate: {
 																opacity: 1,
+																y: 0,
 															},
 														}}
+														initial={"initial"}
+														animate={"animate"}
+														whileHover={"hover"}
+														transition={{ duration: 0.2 }}
 													>
-														<ChevronRight className="size-4 text-muted-foreground" />
+														<CommandItem
+															className="flex w-full cursor-pointer items-center rounded-sm px-4 py-3 text-sm transition-colors"
+															onSelect={() => {
+																onSelect(item);
+																onOpenChange(false);
+															}}
+														>
+															<Icon
+																className="mr-2 size-4 text-muted-foreground"
+																style={{
+																	color: item.color || "inherit",
+																}}
+															/>
+															{item.title}
+															<motion.div
+																className="ml-auto inline"
+																variants={{
+																	initial: {
+																		opacity: 0,
+																	},
+																	hover: {
+																		opacity: 1,
+																	},
+																}}
+															>
+																<ChevronRight className="size-4 text-muted-foreground" />
+															</motion.div>
+														</CommandItem>
 													</motion.div>
-												</motion.button>
-											);
-										})}
-									</motion.div>
-								);
-							})}
-					</AnimatePresence>
-				</div>
+												);
+											})}
+										</CommandGroup>
+									);
+								})}
+						</AnimatePresence>
+					</CommandList>
+				</Command>
+				<DialogFooter className="flex justify-between px-2">
+					<div />
+					<div className="flex items-center gap-4 text-muted-foreground">
+						<ArrowDownIcon className="size-4" />
+						<ArrowUpIcon className="size-4" />
+						<CornerDownLeftIcon className="size-4" />
+					</div>
+				</DialogFooter>
 			</DialogContent>
 		</Dialog>
 	);

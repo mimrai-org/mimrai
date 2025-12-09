@@ -3,6 +3,7 @@ import { Input } from "@ui/components/ui/input";
 import { SearchIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { GlobalSearchDialog } from "./global-search-dialog";
 
@@ -10,6 +11,17 @@ export const NavSearch = () => {
 	const router = useRouter();
 	const { setParams: setTaskParams } = useTaskParams();
 	const [open, setOpen] = useState(false);
+
+	useHotkeys(
+		"mod+k",
+		(e) => {
+			e.preventDefault();
+			setOpen((o) => !o);
+		},
+		{
+			enableOnContentEditable: true,
+		},
+	);
 
 	const handleNavigate = (item: {
 		id: string;
@@ -23,7 +35,7 @@ export const NavSearch = () => {
 				break;
 			case "project":
 				// navigate to project
-				router.push(`/dashboard/projects/${item.id}/overview`);
+				router.push(`/dashboard/projects/${item.id}/detail`);
 				break;
 			case "milestone":
 				// navigate to milestone
