@@ -193,6 +193,10 @@ export const checkPlanFeatures = async (
 	teamId: string,
 	features: PlanFeatureKey[],
 ) => {
+	if (process.env.DISABLE_BILLING === "true") {
+		return true;
+	}
+
 	let team = await teamCache.get(teamId);
 	if (!team) {
 		team = await getTeamById(teamId);

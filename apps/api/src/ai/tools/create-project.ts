@@ -8,6 +8,7 @@ export const createProjectToolSchema = z.object({
 	name: z.string().min(1).describe("Name of the project"),
 	description: z
 		.string()
+		.max(2000)
 		.optional()
 		.describe("Description of the project, HTML format supported"),
 	color: z
