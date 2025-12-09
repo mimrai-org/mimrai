@@ -1,5 +1,4 @@
 import { randomUUID } from "node:crypto";
-import { arch } from "node:os";
 import type { UIChatMessage } from "@api/ai/types";
 import type { IntegrationConfig, IntegrationName } from "@integration/registry";
 import { randomColor } from "@mimir/utils/random";
@@ -22,6 +21,7 @@ import {
 	unique,
 	vector,
 } from "drizzle-orm/pg-core";
+import { buildGlobalSearchView } from "./utils/global-search-view";
 
 export const tsvector = customType<{
 	data: string;
@@ -1105,3 +1105,5 @@ export const milestones = pgTable(
 		}).onDelete("cascade"),
 	],
 );
+
+export const globalSearchView = buildGlobalSearchView();

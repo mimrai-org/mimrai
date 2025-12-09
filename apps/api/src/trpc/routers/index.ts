@@ -1,3 +1,4 @@
+import { globalSearch } from "@db/queries/global-search";
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { protectedProcedure, publicProcedure, router } from "../init";
 import { activitiesRouter } from "./activities";
@@ -8,6 +9,7 @@ import { checklistsRouter } from "./checklists";
 import { statusesRouter } from "./columns";
 import { chatFeedbackRouter } from "./feedback";
 import { githubRouter } from "./github";
+import { globalSearchRouter } from "./global-search";
 import { importsRouter } from "./imports";
 import { integrationsRouter } from "./integrations";
 import { labelsRouter } from "./labels";
@@ -55,6 +57,7 @@ export const appRouter = router({
 	chatFeedback: chatFeedbackRouter,
 	shareable: shareableRouter,
 	tasksSuggestions: tasksSuggestionsRouter,
+	globalSearch: globalSearchRouter,
 });
 export type AppRouter = typeof appRouter;
 export type RouterOutputs = inferRouterOutputs<AppRouter>;
