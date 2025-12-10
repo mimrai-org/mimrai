@@ -24,8 +24,11 @@ import {
 	TargetIcon,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
+import { useProjectParams } from "@/hooks/use-project-params";
+import { useTaskParams } from "@/hooks/use-task-params";
 import { trpc } from "@/utils/trpc";
 
 export type GlobalSearchItem = {
@@ -37,24 +40,42 @@ export type GlobalSearchItem = {
 	teamId: string;
 };
 
+const defaultSearchState: GlobalSearchItem[] = [
+	{
+		id: "action",
+		type: "task",
+		title: "Create a new task",
+		teamId: "",
+	},
+	{
+		id: "action",
+		type: "project",
+		title: "Create a new project",
+		teamId: "",
+	},
+];
+
 export const GlobalSearchDialog = ({
 	open,
 	onOpenChange,
 	onSelect,
 	defaultValues,
-	defaultState,
+	defaultState = defaultSearchState,
 }: {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	onSelect: (item: GlobalSearchItem) => void;
+	onSelect?: (item: GlobalSearchItem) => void;
 	defaultValues?: {
 		search?: string;
 		type?: string[];
 	};
 	defaultState?: GlobalSearchItem[];
 }) => {
+	const router = useRouter();
 	const [search, setSearch] = useState(defaultValues?.search || "");
 	const [debouncedSearch] = useDebounceValue(search, 300);
+	const { setParams: setTaskParams } = useTaskParams();
+	const { setParams: setProjectParams } = useProjectParams();
 
 	const { data } = useQuery(
 		trpc.globalSearch.search.queryOptions({
@@ -64,24 +85,48 @@ export const GlobalSearchDialog = ({
 	);
 
 	const groupedData = useMemo(() => {
-		let dataToGroup = data;
-		if (
-			defaultState &&
-			defaultState.length > 0 &&
-			debouncedSearch.length === 0
-		) {
-			dataToGroup = defaultState;
-		}
-		const grouped = dataToGroup?.reduce(
-			(acc, item) => {
-				if (!acc[item.type]) {
-					acc[item.type] = [];
+		const dataToGroup = data;
+		const showEmptyState =
+			defaultState && defaultState.length > 0 && debouncedSearch.length === 0;
+
+		const grouped =
+			dataToGroup?.reduce(
+				(acc, item) => {
+					if (!acc[item.type]) {
+						acc[item.type] = [];
+					}
+					acc[item.type]!.push(item);
+					return acc;
+				},
+				{} as Record<string, typeof data>,
+			) ?? {};
+
+		if (showEmptyState) {
+			// slice to avoid too many items when showing empty state
+			for (const key in grouped) {
+				if (grouped[key]!.length > 1) {
+					grouped[key] = grouped[key]!.slice(0, 1);
 				}
-				acc[item.type]!.push(item);
-				return acc;
-			},
-			{} as Record<string, typeof data>,
-		);
+			}
+		}
+
+		for (const item of defaultState) {
+			// Fill missing types with default state items
+			if (!grouped?.[item.type]) {
+				grouped![item.type] = [];
+			}
+
+			if (showEmptyState) {
+				// include all default state items if no search is applied
+				grouped[item.type]!.push(item);
+			} else {
+				// include default state items that match the search
+				const shouldInclude = item.title
+					.toLowerCase()
+					.includes(debouncedSearch.toLowerCase());
+				if (shouldInclude) grouped[item.type]?.push(item);
+			}
+		}
 
 		return grouped;
 	}, [data, debouncedSearch.length, defaultState]);
@@ -91,6 +136,48 @@ export const GlobalSearchDialog = ({
 			setSearch("");
 		}
 		onOpenChange(isOpen);
+	};
+
+	const handleSelect = (item: {
+		id: string;
+		type: string;
+		parentId?: string | null;
+	}) => {
+		if (onSelect) {
+			onSelect(item as GlobalSearchItem);
+			return;
+		}
+		switch (item.type) {
+			case "task": {
+				if (item.id === "action") {
+					// navigate to create task
+					setTaskParams({ createTask: true });
+					return;
+				}
+				// navigate to task
+				setTaskParams({ taskId: item.id });
+				break;
+			}
+			case "project": {
+				if (item.id === "action") {
+					// navigate to create project
+					setProjectParams({ createProject: true });
+					return;
+				}
+				// navigate to project
+				router.push(`/dashboard/projects/${item.id}/detail`);
+				break;
+			}
+			case "milestone": {
+				// navigate to milestone
+				router.push(
+					`/dashboard/projects/${item.parentId}/tasks?mId=${item.id}`,
+				);
+				break;
+			}
+			default:
+				break;
+		}
 	};
 
 	return (
@@ -110,15 +197,21 @@ export const GlobalSearchDialog = ({
 						<AnimatePresence mode="popLayout">
 							{groupedData &&
 								Object.entries(groupedData).map(([type, items]) => {
+									if (!items || items.length === 0) {
+										return null;
+									}
 									return (
 										<CommandGroup
 											key={type}
 											heading={type}
-											className="capitalize"
+											className="[&_[cmdk-group-heading]]:capitalize"
 										>
 											{items?.map((item) => {
-												const Icon =
+												let Icon =
 													searchIcons[item.type as keyof typeof searchIcons];
+												if (item.id === "action") {
+													Icon = CornerDownLeftIcon;
+												}
 												return (
 													<motion.div
 														key={item.id}
@@ -140,7 +233,7 @@ export const GlobalSearchDialog = ({
 														<CommandItem
 															className="flex w-full cursor-pointer items-center rounded-sm px-4 py-3 text-sm transition-colors"
 															onSelect={() => {
-																onSelect(item);
+																handleSelect(item);
 																onOpenChange(false);
 															}}
 														>
