@@ -25,10 +25,10 @@ export const NavSearch = () => {
 				onClick={() => {
 					setOpen(true);
 				}}
-				className="flex w-48 items-center gap-4 rounded-md px-3 py-2 text-start text-muted-foreground text-sm hover:bg-accent dark:hover:bg-accent/30"
+				className="flex w-48 items-center gap-4 rounded-md px-3 py-2 text-start text-muted-foreground text-sm transition-colors hover:text-foreground"
 			>
 				<SearchIcon className="size-4" />
-				Search anything...
+				Find anything...
 			</button>
 			<GlobalSearchDialog open={open} onOpenChange={setOpen} />
 		</>

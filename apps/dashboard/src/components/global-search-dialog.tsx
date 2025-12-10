@@ -42,15 +42,27 @@ export type GlobalSearchItem = {
 
 const defaultSearchState: GlobalSearchItem[] = [
 	{
-		id: "action",
+		id: "action:create-task",
 		type: "task",
 		title: "Create a new task",
 		teamId: "",
 	},
 	{
-		id: "action",
+		id: "action:view-board",
+		type: "task",
+		title: "View board",
+		teamId: "",
+	},
+	{
+		id: "action:create-project",
 		type: "project",
 		title: "Create a new project",
+		teamId: "",
+	},
+	{
+		id: "action:view-projects",
+		type: "project",
+		title: "View all projects",
 		teamId: "",
 	},
 ];
@@ -147,23 +159,42 @@ export const GlobalSearchDialog = ({
 			onSelect(item as GlobalSearchItem);
 			return;
 		}
-		switch (item.type) {
-			case "task": {
-				if (item.id === "action") {
+		const isAction = item.id === "action" || item.id.startsWith("action:");
+
+		if (isAction) {
+			switch (item.id) {
+				case "action:view-board": {
+					// navigate to board view
+					router.push("/dashboard/board");
+					return;
+				}
+				case "action:view-projects": {
+					// navigate to projects view
+					router.push("/dashboard/projects");
+					return;
+				}
+				case "action:create-task": {
 					// navigate to create task
 					setTaskParams({ createTask: true });
 					return;
 				}
+				case "action:create-project": {
+					// navigate to create project
+					setProjectParams({ createProject: true });
+					return;
+				}
+				default:
+					break;
+			}
+		}
+
+		switch (item.type) {
+			case "task": {
 				// navigate to task
 				setTaskParams({ taskId: item.id });
 				break;
 			}
 			case "project": {
-				if (item.id === "action") {
-					// navigate to create project
-					setProjectParams({ createProject: true });
-					return;
-				}
 				// navigate to project
 				router.push(`/dashboard/projects/${item.id}/detail`);
 				break;
@@ -209,7 +240,10 @@ export const GlobalSearchDialog = ({
 											{items?.map((item) => {
 												let Icon =
 													searchIcons[item.type as keyof typeof searchIcons];
-												if (item.id === "action") {
+												const isAction =
+													item.id === "action" || item.id.startsWith("action:");
+
+												if (isAction) {
 													Icon = CornerDownLeftIcon;
 												}
 												return (
