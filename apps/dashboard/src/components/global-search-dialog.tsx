@@ -23,7 +23,6 @@ import {
 	LayersIcon,
 	TargetIcon,
 } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
@@ -225,80 +224,51 @@ export const GlobalSearchDialog = ({
 						placeholder="Search..."
 					/>
 					<CommandList>
-						<AnimatePresence mode="popLayout">
-							{groupedData &&
-								Object.entries(groupedData).map(([type, items]) => {
-									if (!items || items.length === 0) {
-										return null;
-									}
-									return (
-										<CommandGroup
-											key={type}
-											heading={type}
-											className="[&_[cmdk-group-heading]]:capitalize"
-										>
-											{items?.map((item) => {
-												let Icon =
-													searchIcons[item.type as keyof typeof searchIcons];
-												const isAction =
-													item.id === "action" || item.id.startsWith("action:");
+						{groupedData &&
+							Object.entries(groupedData).map(([type, items]) => {
+								if (!items || items.length === 0) {
+									return null;
+								}
+								return (
+									<CommandGroup
+										key={type}
+										heading={type}
+										className="[&_[cmdk-group-heading]]:capitalize"
+									>
+										{items?.map((item) => {
+											let Icon =
+												searchIcons[item.type as keyof typeof searchIcons];
+											const isAction =
+												item.id === "action" || item.id.startsWith("action:");
 
-												if (isAction) {
-													Icon = CornerDownLeftIcon;
-												}
-												return (
-													<motion.div
-														key={item.id}
-														variants={{
-															initial: {
-																opacity: 0,
-																y: -10,
-															},
-															animate: {
-																opacity: 1,
-																y: 0,
-															},
+											if (isAction) {
+												Icon = CornerDownLeftIcon;
+											}
+											return (
+												<CommandItem
+													key={item.id}
+													className="group flex w-full animate-fade-in cursor-pointer items-center rounded-sm px-4 py-3 text-sm transition-colors duration-200 hover:bg-accent hover:text-accent-foreground"
+													onSelect={() => {
+														handleSelect(item);
+														onOpenChange(false);
+													}}
+												>
+													<Icon
+														className="mr-2 size-4 text-muted-foreground"
+														style={{
+															color: item.color || "inherit",
 														}}
-														initial={"initial"}
-														animate={"animate"}
-														whileHover={"hover"}
-														transition={{ duration: 0.2 }}
-													>
-														<CommandItem
-															className="flex w-full cursor-pointer items-center rounded-sm px-4 py-3 text-sm transition-colors"
-															onSelect={() => {
-																handleSelect(item);
-																onOpenChange(false);
-															}}
-														>
-															<Icon
-																className="mr-2 size-4 text-muted-foreground"
-																style={{
-																	color: item.color || "inherit",
-																}}
-															/>
-															{item.title}
-															<motion.div
-																className="ml-auto inline"
-																variants={{
-																	initial: {
-																		opacity: 0,
-																	},
-																	hover: {
-																		opacity: 1,
-																	},
-																}}
-															>
-																<ChevronRight className="size-4 text-muted-foreground" />
-															</motion.div>
-														</CommandItem>
-													</motion.div>
-												);
-											})}
-										</CommandGroup>
-									);
-								})}
-						</AnimatePresence>
+													/>
+													{item.title}
+													<div className="ml-auto inline opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+														<ChevronRight className="size-4 text-muted-foreground" />
+													</div>
+												</CommandItem>
+											);
+										})}
+									</CommandGroup>
+								);
+							})}
 					</CommandList>
 				</Command>
 				<DialogFooter className="flex justify-between px-2">
