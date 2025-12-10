@@ -952,9 +952,8 @@ export const projects = pgTable(
 	],
 );
 
-export const waitlist = pgTable("waitlist", {
+export const newsletter = pgTable("newsletter", {
 	email: text("email").primaryKey().notNull(),
-	authorized: boolean("authorized").default(false).notNull(),
 	createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 

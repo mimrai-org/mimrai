@@ -14,6 +14,7 @@ import { importsRouter } from "./imports";
 import { integrationsRouter } from "./integrations";
 import { labelsRouter } from "./labels";
 import { milestonesRouter } from "./milestones";
+import { newsletterRouter } from "./newsletter";
 import { notificationSettingsRouter } from "./notification-settings";
 import { projectsRouter } from "./projects";
 import { shareableRouter } from "./shareable";
@@ -22,7 +23,6 @@ import { tasksRouter } from "./tasks";
 import { tasksSuggestionsRouter } from "./tasks-suggestions";
 import { teamsRouter } from "./teams";
 import { usersRouter } from "./users";
-import { waitlistRouter } from "./waitlist";
 import { widgetsRouter } from "./widgets";
 
 export const appRouter = router({
@@ -53,7 +53,7 @@ export const appRouter = router({
 	checklists: checklistsRouter,
 	projects: projectsRouter,
 	milestones: milestonesRouter,
-	waitlist: waitlistRouter,
+	newsletter: newsletterRouter,
 	chatFeedback: chatFeedbackRouter,
 	shareable: shareableRouter,
 	tasksSuggestions: tasksSuggestionsRouter,

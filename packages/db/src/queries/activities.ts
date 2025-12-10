@@ -154,13 +154,13 @@ export const createTaskUpdateActivity = async ({
 			value: newTask.description,
 			oldValue: oldTask.description,
 		};
-	if (oldTask.columnId !== newTask.columnId) {
-		const newColumn = await getStatusById({ id: newTask.columnId, teamId });
+	if (oldTask.statusId !== newTask.statusId) {
+		const newColumn = await getStatusById({ id: newTask.statusId, teamId });
 		changes.columnId = {
-			value: newTask.columnId,
+			value: newTask.statusId,
 			display: newColumn.name,
 			columnType: newColumn.type,
-			oldValue: oldTask.columnId,
+			oldValue: oldTask.statusId,
 		};
 	}
 	if (oldTask.dueDate !== newTask.dueDate)

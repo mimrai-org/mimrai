@@ -1,11 +1,11 @@
 import { db } from "@db/index";
 import {
 	account,
+	newsletter,
 	session,
 	userInvites,
 	users,
 	verification,
-	waitlist,
 } from "@mimir/db/schema";
 import { EmailVerificationEmail } from "@mimir/email/emails/email-verification";
 import { ResetPasswordEmail } from "@mimir/email/emails/reset-password";
@@ -34,8 +34,8 @@ export const auth = betterAuth<BetterAuthOptions>({
 
 			const [waitlistEntry] = await db
 				.select()
-				.from(waitlist)
-				.where(eq(waitlist.email, ctx.body.email))
+				.from(newsletter)
+				.where(eq(newsletter.email, ctx.body.email))
 				.limit(1);
 
 			const [invitationEntry] = await db

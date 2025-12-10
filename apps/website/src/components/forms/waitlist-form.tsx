@@ -26,7 +26,7 @@ export const WaitlistForm = () => {
 		isPending: isJoining,
 		data: waitlistData,
 	} = useMutation(
-		trpc.waitlist.join.mutationOptions({
+		trpc.newsletter.join.mutationOptions({
 			onMutate: () => {
 				toast.loading("Joining waitlist...", {
 					id: "waitlist",

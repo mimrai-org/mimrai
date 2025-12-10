@@ -1,5 +1,6 @@
 import { FeaturesGrid } from "@/components/sections/features-grid";
 import { Hero } from "@/components/sections/hero";
+import { Newsletter } from "@/components/sections/newsletter";
 import { OpenSource } from "@/components/sections/open-source";
 import { ProductSection } from "@/components/sections/product-section";
 import { Showcase } from "@/components/sections/showcase";
@@ -14,6 +15,7 @@ export default function Home() {
 			<FeaturesGrid />
 			<Showcase />
 			<OpenSource />
+			<Newsletter />
 		</>
 	);
 }

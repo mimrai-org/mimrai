@@ -1,9 +1,9 @@
 import { db } from "@db/index";
-import { waitlist } from "@db/schema";
+import { newsletter } from "@db/schema";
 import z from "zod";
 import { publicProcedure, router } from "../init";
 
-export const waitlistRouter = router({
+export const newsletterRouter = router({
 	join: publicProcedure
 		.input(
 			z.object({
@@ -14,11 +14,11 @@ export const waitlistRouter = router({
 			const { email } = input;
 
 			try {
-				await db.insert(waitlist).values({
+				await db.insert(newsletter).values({
 					email,
 				});
 			} catch (e) {
-				console.error("Error adding to waitlist:", e);
+				console.error("Error adding to newsletter:", e);
 				return { success: true };
 			}
 
