@@ -128,7 +128,9 @@ export const TaskDependencyDialog = () => {
 								}}
 							>
 								<span className="text-muted-foreground">{result.sequence}</span>
-								{result.title}
+								<div className="flex flex-1 overflow-hidden">
+									<span className="truncate">{result.title}</span>
+								</div>
 
 								<div className="ml-auto flex items-center gap-2 text-muted-foreground text-sm">
 									{propertiesComponents.status(result)}
