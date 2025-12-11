@@ -27,11 +27,7 @@ export const TaskProperty = memo(
 );
 
 export const TaskProperties = ({ task }: { task: Task }) => {
-	const { filters } = useTasksViewContext();
-
 	return propertiesList.map((property) => {
-		if (!filters.properties?.includes(property)) return null;
-
 		return <TaskProperty key={property} property={property} task={task} />;
 	});
 };

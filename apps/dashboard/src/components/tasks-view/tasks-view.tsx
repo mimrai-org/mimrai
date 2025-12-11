@@ -64,8 +64,9 @@ const defaultFilters: TasksViewContextFilters = {
 	viewType: "board" as TasksViewType,
 	properties: [
 		"assignee",
-		"dueDate",
 		"priority",
+		"dependencies",
+		"dueDate",
 		"labels",
 		"milestone",
 		"project",

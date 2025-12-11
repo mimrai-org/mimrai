@@ -144,6 +144,8 @@ const Item = ({
 						taskId,
 					}),
 				);
+
+				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
 			},
 		}),
 	);

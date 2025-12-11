@@ -61,6 +61,7 @@ export const KanbanTask = ({
 
 					<div className="mt-2 flex flex-wrap items-center gap-1.5">
 						<TaskProperty property="priority" task={task} />
+						<TaskProperty property="dependencies" task={task} />
 						<TaskProperty property="status" task={task} />
 						<TaskProperty property="labels" task={task} />
 						<TaskProperty property="project" task={task} />

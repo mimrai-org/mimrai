@@ -2,6 +2,8 @@ import type { RouterOutputs } from "@api/trpc/routers";
 import { LabelBadge } from "@ui/components/ui/label-badge";
 import { cn } from "@ui/lib/utils";
 import { CheckSquareIcon } from "lucide-react";
+import { useMemo } from "react";
+import { DependencyIcon } from "../dependency-icon";
 import { KanbanAssignee } from "../kanban/kanban-task/assignee";
 import { Priority } from "../kanban/priority";
 import { MilestoneIcon } from "../milestone-icon";
@@ -13,6 +15,46 @@ export type Task = RouterOutputs["tasks"]["get"]["data"][number];
 export const propertiesComponents = {
 	priority: (task: Pick<Task, "priority">) =>
 		task.priority && <Priority value={task.priority} />,
+	dependencies: (task: Pick<Task, "dependencies" | "id">) => {
+		const group = useMemo(() => {
+			if (!task.dependencies) return {};
+			const record: Record<string, number> = {};
+			for (const dependency of task.dependencies) {
+				const direction =
+					dependency.dependsOnTaskId === task.id ? "from" : "to";
+				const key = `${dependency.type}:${direction}`;
+				record[key] = (record[key] || 0) + 1;
+			}
+			return record;
+		}, [task.dependencies, task.id]);
+
+		if (!task.dependencies || task.dependencies.length === 0) return null;
+
+		return (
+			<div className="flex gap-2">
+				{Object.entries(group).map(([key, count]) => {
+					const [type, direction] = key.split(":") as [
+						(typeof task.dependencies)[number]["type"],
+						"to" | "from",
+					];
+					return (
+						<span
+							key={key}
+							className="flex h-5.5 items-center justify-center gap-2 rounded-sm bg-secondary px-1.5 text-xs"
+						>
+							<DependencyIcon
+								type={type}
+								direction={direction}
+								className="size-3.5"
+							/>
+
+							{count > 1 ? count : null}
+						</span>
+					);
+				})}
+			</div>
+		);
+	},
 	status: (task: Pick<Task, "status">) =>
 		task.status && (
 			<time className="flex h-5.5 items-center rounded-sm bg-secondary px-2 text-xs tabular-nums">
@@ -20,18 +62,21 @@ export const propertiesComponents = {
 				<span className="ml-1">{task.status.name}</span>
 			</time>
 		),
-	labels: (task: Pick<Task, "labels">) => (
-		<div className="flex gap-2">
-			{task.labels?.map((label) => (
-				<LabelBadge
-					key={label.id}
-					variant="secondary"
-					{...label}
-					className="bg-secondary"
-				/>
-			))}
-		</div>
-	),
+	labels: (task: Pick<Task, "labels">) => {
+		if (!task.labels || task.labels.length === 0) return null;
+		return (
+			<div className="flex gap-2">
+				{task.labels?.map((label) => (
+					<LabelBadge
+						key={label.id}
+						variant="secondary"
+						{...label}
+						className="bg-secondary"
+					/>
+				))}
+			</div>
+		);
+	},
 	dueDate: (task: Task) => task.dueDate && <TaskPropertyDueDate task={task} />,
 
 	checklist: (task: Pick<Task, "checklistSummary">) =>

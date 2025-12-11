@@ -70,6 +70,8 @@ export const TaskDependencyDialog = () => {
 						taskId: taskDependentId!,
 					}),
 				);
+
+				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
 			},
 		}),
 	);

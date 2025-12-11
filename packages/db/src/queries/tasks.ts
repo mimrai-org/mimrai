@@ -1,10 +1,7 @@
 import type { DeleteTaskInput } from "@api/schemas/tasks";
-import { getTaskPermalink } from "@mimir/utils/tasks";
 import { subDays } from "date-fns";
 import {
 	and,
-	arrayContains,
-	arrayOverlaps,
 	asc,
 	desc,
 	eq,
@@ -18,7 +15,6 @@ import {
 	sql,
 } from "drizzle-orm";
 import { nanoid } from "nanoid";
-import { buildSearchQuery } from "src/utils/search-query";
 import { db } from "..";
 import {
 	checklistItems,
@@ -27,15 +23,16 @@ import {
 	milestones,
 	projects,
 	pullRequestPlan,
-	shareable,
-	type shareablePolicyEnum,
 	statuses,
 	type statusTypeEnum,
 	tasks,
+	tasksDependencies,
 	users,
 	usersOnTeams,
 } from "../schema";
 import { unionArray } from "../utils/array";
+import { jsonAggBuildObject } from "../utils/drizzle";
+import { buildSearchQuery } from "../utils/search-query";
 import {
 	createActivity,
 	createTaskUpdateActivity,
@@ -207,6 +204,23 @@ export const getTasks = async ({
 			sql`${tasks.id} IN (SELECT ${labelsOnTasks.taskId} FROM ${labelsOnTasks} WHERE ${labelsOnTasks.labelId} = ANY(ARRAY[${input.labels.join(",")}]))`,
 		);
 
+	const dependenciesSubquery = db
+		.select({
+			dependencies: jsonAggBuildObject({
+				taskId: tasksDependencies.taskId,
+				dependsOnTaskId: tasksDependencies.dependsOnTaskId,
+				type: tasksDependencies.type,
+			}).as("dependencies"),
+		})
+		.from(tasksDependencies)
+		.where(
+			or(
+				eq(tasksDependencies.dependsOnTaskId, tasks.id),
+				eq(tasksDependencies.taskId, tasks.id),
+			),
+		)
+		.as("dependencies");
+
 	const query = db
 		.select({
 			id: tasks.id,
@@ -268,6 +282,7 @@ export const getTasks = async ({
 				type: statuses.type,
 			},
 			labels: labelsSubquery.labels,
+			dependencies: dependenciesSubquery.dependencies,
 		})
 		.from(tasks)
 		.where(and(...whereClause))
@@ -277,6 +292,7 @@ export const getTasks = async ({
 		.leftJoin(checklistSubquery, eq(checklistSubquery.taskId, tasks.id))
 		.leftJoin(projects, eq(tasks.projectId, projects.id))
 		.leftJoin(milestones, eq(tasks.milestoneId, milestones.id))
+		.leftJoinLateral(dependenciesSubquery, sql`true`)
 		.leftJoin(
 			pullRequestPlan,
 			and(
