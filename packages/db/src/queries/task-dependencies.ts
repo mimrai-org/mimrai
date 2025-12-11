@@ -263,21 +263,28 @@ export const getAvailableDependencyTasks = async ({
 	pageSize?: number;
 	search?: string;
 }) => {
+	const existingRelations = await db
+		.select({
+			taskId: tasksDependencies.taskId,
+			dependsOnTaskId: tasksDependencies.dependsOnTaskId,
+		})
+		.from(tasksDependencies)
+		.where(
+			or(
+				eq(tasksDependencies.taskId, taskId),
+				eq(tasksDependencies.dependsOnTaskId, taskId),
+			),
+		);
+	const existingRelatedTaskIds = existingRelations.flatMap((relation) => [
+		relation.taskId,
+		relation.dependsOnTaskId,
+	]);
+
 	const whereClause: SQL[] = [
 		eq(tasks.teamId, teamId),
 		notInArray(tasks.id, [taskId]),
-		notInArray(
-			tasks.id,
-			db
-				.select({ dependsOnTaskId: tasksDependencies.dependsOnTaskId })
-				.from(tasksDependencies)
-				.where(
-					or(
-						eq(tasksDependencies.taskId, taskId),
-						eq(tasksDependencies.dependsOnTaskId, taskId),
-					),
-				),
-		),
+		// Exclude tasks that are already dependencies or dependents
+		notInArray(tasks.id, existingRelatedTaskIds),
 	];
 
 	if (search) {

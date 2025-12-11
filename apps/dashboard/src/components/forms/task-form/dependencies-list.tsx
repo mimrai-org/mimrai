@@ -23,6 +23,7 @@ type Dependency = RouterOutputs["taskDependencies"]["get"]["dependsOn"][number];
 
 const dependencyMeta = [
 	{ type: "relates_to", label: "Relates to", direction: "to" },
+	{ type: "relates_to", label: "Relates to", direction: "from" },
 	{ type: "blocks", label: "Blocking to", direction: "to" },
 	{ type: "blocks", label: "Blocked by", direction: "from" },
 ];
@@ -56,14 +57,14 @@ export const TaskFormDependenciesList = () => {
 				<Item
 					dependency={dependency}
 					taskId={id}
-					key={dependency.dependsOnTaskId}
+					key={`${dependency.dependsOnTaskId}:${dependency.taskId}`}
 				/>
 			))}
 			{dependencies?.dependedBy?.map((dependency) => (
 				<Item
 					dependency={dependency}
 					taskId={id}
-					key={dependency.dependsOnTaskId}
+					key={`${dependency.dependsOnTaskId}:${dependency.taskId}`}
 				/>
 			))}
 
@@ -150,19 +151,21 @@ const Item = ({
 		}),
 	);
 
+	const type =
+		dependency.type === "blocks" &&
+		dependency.dependsOnTaskId === taskId &&
+		dependency.status.type === "done"
+			? "relates_to"
+			: dependency.type;
 	const direction = taskId === dependency.dependsOnTaskId ? "from" : "to";
 	const meta = dependencyMeta.find(
-		(m) => m.type === dependency.type && m.direction === direction,
+		(m) => m.type === type && m.direction === direction,
 	);
 
 	return (
 		<div className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-accent dark:hover:bg-accent/30">
 			<motion.div initial="initial" whileHover={"hover"} className="flex gap-2">
-				<DependencyIcon
-					type={dependency.type}
-					direction={direction}
-					className="size-4"
-				/>
+				<DependencyIcon type={type} direction={direction} className="size-4" />
 				<motion.span
 					variants={{
 						initial: { width: 0, opacity: 0 },

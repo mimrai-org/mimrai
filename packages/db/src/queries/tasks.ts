@@ -14,6 +14,7 @@ import {
 	type SQL,
 	sql,
 } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 import { db } from "..";
 import {
@@ -204,15 +205,19 @@ export const getTasks = async ({
 			sql`${tasks.id} IN (SELECT ${labelsOnTasks.taskId} FROM ${labelsOnTasks} WHERE ${labelsOnTasks.labelId} = ANY(ARRAY[${input.labels.join(",")}]))`,
 		);
 
+	const dependsOnTask = alias(tasks, "depends_on_task");
 	const dependenciesSubquery = db
 		.select({
 			dependencies: jsonAggBuildObject({
 				taskId: tasksDependencies.taskId,
 				dependsOnTaskId: tasksDependencies.dependsOnTaskId,
 				type: tasksDependencies.type,
+				statusType: statuses.type,
 			}).as("dependencies"),
 		})
 		.from(tasksDependencies)
+		.innerJoin(dependsOnTask, eq(tasksDependencies.taskId, dependsOnTask.id))
+		.innerJoin(statuses, eq(dependsOnTask.statusId, statuses.id))
 		.where(
 			or(
 				eq(tasksDependencies.dependsOnTaskId, tasks.id),

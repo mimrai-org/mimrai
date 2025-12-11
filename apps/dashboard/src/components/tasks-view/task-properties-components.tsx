@@ -20,9 +20,16 @@ export const propertiesComponents = {
 			if (!task.dependencies) return {};
 			const record: Record<string, number> = {};
 			for (const dependency of task.dependencies) {
+				const type =
+					dependency.type === "blocks" && dependency.statusType === "done"
+						? "relates_to"
+						: dependency.type;
 				const direction =
 					dependency.dependsOnTaskId === task.id ? "from" : "to";
-				const key = `${dependency.type}:${direction}`;
+				const key = `${type}:${direction}`;
+
+				console.log(dependency);
+
 				record[key] = (record[key] || 0) + 1;
 			}
 			return record;
