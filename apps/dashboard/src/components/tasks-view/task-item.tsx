@@ -2,16 +2,11 @@
 import type { RouterOutputs } from "@api/trpc/routers";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
-import { Fragment } from "react";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { cn } from "@/lib/utils";
 import { queryClient, trpc } from "@/utils/trpc";
-import {
-	type propertiesComponents,
-	propertiesList,
-	TaskProperties,
-} from "./task-properties";
-import { useTasksViewContext } from "./tasks-view";
+import { TaskProperties } from "./task-properties";
+import type { propertiesComponents } from "./task-properties-components";
 
 type Property = keyof typeof propertiesComponents;
 
@@ -30,7 +25,6 @@ export const TaskItem = ({
 }) => {
 	const router = useRouter();
 	const { setParams } = useTaskParams();
-	const { properties } = useTasksViewContext();
 
 	return (
 		<motion.button

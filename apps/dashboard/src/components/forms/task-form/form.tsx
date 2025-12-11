@@ -165,6 +165,69 @@ export const TaskForm = ({
 					) : (
 						<>
 							<div className="pt-4">
+								<div className="flex flex-wrap items-center justify-end gap-2">
+									{id && (
+										<span className="mr-2 text-muted-foreground text-xs">
+											Last saved at {format(lastSavedDate, "PP, p")}
+										</span>
+									)}
+									{id && (
+										<Button
+											variant={"ghost"}
+											size="icon"
+											type="button"
+											aria-label="Copy task link"
+											onClick={() => {
+												navigator.clipboard.writeText(
+													getTaskPermalink(permalinkId ?? id!),
+												);
+												toast.success("Task link copied to clipboard");
+											}}
+										>
+											<Link2Icon />
+										</Button>
+									)}
+									{id && (
+										<Button
+											variant={"secondary"}
+											size="sm"
+											type="button"
+											onClick={() => {
+												setItems([
+													{
+														type: "task",
+														id: id,
+														label: defaultValues?.title!,
+														key: `task-${id}`,
+													},
+												]);
+												toggle(true);
+												setParams(null);
+											}}
+										>
+											<SparklesIcon />
+											Ask MIMIR
+										</Button>
+									)}
+									<Button
+										type="submit"
+										variant={"default"}
+										size={"sm"}
+										className="text-xs"
+										disabled={
+											!form.formState.isDirty ||
+											isPendingCreate ||
+											isPendingUpdate
+										}
+									>
+										{(isPendingCreate || isPendingUpdate) && (
+											<Loader2 className="animate-spin" />
+										)}
+										{id ? "Save Changes" : "Create Task"}
+									</Button>
+
+									{id && <ActionsMenu />}
+								</div>
 								<div className="space-y-1 py-2">
 									<input className="hidden size-0 opacity-0" />
 									<div className="flex items-center justify-between gap-4 px-4">
@@ -187,70 +250,6 @@ export const TaskForm = ({
 										<div className="flex flex-col justify-between sm:flex-row">
 											<div className="space-y-4">
 												<Attachments />
-											</div>
-
-											<div className="flex flex-wrap items-center justify-end gap-2">
-												{id && (
-													<span className="mr-2 text-muted-foreground text-xs">
-														Last saved at {format(lastSavedDate, "PP, p")}
-													</span>
-												)}
-												{id && (
-													<Button
-														variant={"ghost"}
-														size="icon"
-														type="button"
-														aria-label="Copy task link"
-														onClick={() => {
-															navigator.clipboard.writeText(
-																getTaskPermalink(permalinkId ?? id!),
-															);
-															toast.success("Task link copied to clipboard");
-														}}
-													>
-														<Link2Icon />
-													</Button>
-												)}
-												{id && (
-													<Button
-														variant={"secondary"}
-														size="sm"
-														type="button"
-														onClick={() => {
-															setItems([
-																{
-																	type: "task",
-																	id: id,
-																	label: defaultValues?.title!,
-																	key: `task-${id}`,
-																},
-															]);
-															toggle(true);
-															setParams(null);
-														}}
-													>
-														<SparklesIcon />
-														Ask MIMIR
-													</Button>
-												)}
-												<Button
-													type="submit"
-													variant={"default"}
-													size={"sm"}
-													className="text-xs"
-													disabled={
-														!form.formState.isDirty ||
-														isPendingCreate ||
-														isPendingUpdate
-													}
-												>
-													{(isPendingCreate || isPendingUpdate) && (
-														<Loader2 className="animate-spin" />
-													)}
-													{id ? "Save Changes" : "Create Task"}
-												</Button>
-
-												{id && <ActionsMenu />}
 											</div>
 										</div>
 									</div>

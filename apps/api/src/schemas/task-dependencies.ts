@@ -24,3 +24,9 @@ export const deleteTaskDependencySchema = z.object({
 	taskId: z.string(),
 	dependsOnTaskId: z.string(),
 });
+
+export const getAvailableTaskDependenciesSchema = z.object({
+	taskId: z.string(),
+	search: z.string().optional(),
+	pageSize: z.number().min(1).max(100).default(10),
+});

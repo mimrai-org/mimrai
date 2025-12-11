@@ -1,6 +1,7 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, notInArray, or, type SQL, sql } from "drizzle-orm";
 import { db } from "..";
-import { tasks, tasksDependencies } from "../schema";
+import { statuses, tasks, tasksDependencies } from "../schema";
+import { buildSearchQuery } from "../utils/search-query";
 
 export const createTaskDependency = async (input: {
 	taskId: string;
@@ -124,15 +125,23 @@ export const getTaskDependencies = async ({
 			dependsOnTaskId: tasksDependencies.dependsOnTaskId,
 			type: tasksDependencies.type,
 			explanation: tasksDependencies.explanation,
+			status: {
+				id: statuses.id,
+				name: statuses.name,
+				description: statuses.description,
+				order: statuses.order,
+				type: statuses.type,
+			},
 			task: {
 				id: tasks.id,
 				title: tasks.title,
 				permalinkId: tasks.permalinkId,
-				columnId: tasks.statusId,
+				statusId: tasks.statusId,
 			},
 		})
 		.from(tasksDependencies)
 		.innerJoin(tasks, eq(tasks.id, tasksDependencies.dependsOnTaskId))
+		.innerJoin(statuses, eq(statuses.id, tasks.statusId))
 		.where(eq(tasksDependencies.taskId, taskId));
 
 	// Get tasks that depend on this task (blockers)
@@ -142,15 +151,23 @@ export const getTaskDependencies = async ({
 			dependsOnTaskId: tasksDependencies.dependsOnTaskId,
 			type: tasksDependencies.type,
 			explanation: tasksDependencies.explanation,
+			status: {
+				id: statuses.id,
+				name: statuses.name,
+				description: statuses.description,
+				order: statuses.order,
+				type: statuses.type,
+			},
 			task: {
 				id: tasks.id,
 				title: tasks.title,
 				permalinkId: tasks.permalinkId,
-				columnId: tasks.statusId,
+				statusId: tasks.statusId,
 			},
 		})
 		.from(tasksDependencies)
 		.innerJoin(tasks, eq(tasks.id, tasksDependencies.taskId))
+		.innerJoin(statuses, eq(statuses.id, tasks.statusId))
 		.where(eq(tasksDependencies.dependsOnTaskId, taskId));
 
 	return {
@@ -233,4 +250,77 @@ export const getTaskDependencyById = async ({
 		.limit(1);
 
 	return dependency;
+};
+
+export const getAvailableDependencyTasks = async ({
+	taskId,
+	pageSize = 10,
+	search,
+	teamId,
+}: {
+	taskId: string;
+	teamId: string;
+	pageSize?: number;
+	search?: string;
+}) => {
+	const whereClause: SQL[] = [
+		eq(tasks.teamId, teamId),
+		notInArray(tasks.id, [taskId]),
+		notInArray(
+			tasks.id,
+			db
+				.select({ dependsOnTaskId: tasksDependencies.dependsOnTaskId })
+				.from(tasksDependencies)
+				.where(
+					or(
+						eq(tasksDependencies.taskId, taskId),
+						eq(tasksDependencies.dependsOnTaskId, taskId),
+					),
+				),
+		),
+	];
+
+	if (search) {
+		// Check if the search input is a UUID
+		const isUUID =
+			/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+				search,
+			);
+
+		if (isUUID) {
+			whereClause.push(eq(tasks.id, search));
+		} else if (!Number.isNaN(Number.parseInt(search, 10))) {
+			whereClause.push(eq(tasks.sequence, Number.parseInt(search, 10)));
+		} else {
+			const query = buildSearchQuery(search);
+			whereClause.push(
+				sql`(to_tsquery('english', unaccent(${query})) @@ ${tasks.fts})`,
+			);
+		}
+	}
+
+	// Get tasks that can be added as dependencies (exclude self and existing dependencies)
+	const query = db
+		.select({
+			id: tasks.id,
+			title: tasks.title,
+			permalinkId: tasks.permalinkId,
+			statusId: tasks.statusId,
+			sequence: tasks.sequence,
+			status: {
+				id: statuses.id,
+				name: statuses.name,
+				type: statuses.type,
+				description: statuses.description,
+				order: statuses.order,
+			},
+		})
+		.from(tasks)
+		.innerJoin(statuses, eq(statuses.id, tasks.statusId))
+		.where(and(...whereClause))
+		.limit(pageSize);
+
+	const availableTasks = await query;
+
+	return availableTasks;
 };

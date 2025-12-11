@@ -1,6 +1,7 @@
 import {
 	createTaskDependencySchema,
 	deleteTaskDependencySchema,
+	getAvailableTaskDependenciesSchema,
 	getTaskDependenciesSchema,
 	updateTaskDependencySchema,
 } from "@api/schemas/task-dependencies";
@@ -8,6 +9,7 @@ import { protectedProcedure, router } from "@api/trpc/init";
 import {
 	createTaskDependency,
 	deleteTaskDependency,
+	getAvailableDependencyTasks,
 	getTaskDependencies,
 	getTaskDependencyById,
 	updateTaskDependency,
@@ -54,6 +56,15 @@ export const taskDependenciesRouter = router({
 		.input(deleteTaskDependencySchema)
 		.mutation(async ({ ctx, input }) => {
 			return deleteTaskDependency({
+				...input,
+				teamId: ctx.user.teamId!,
+			});
+		}),
+
+	availableTasks: protectedProcedure
+		.input(getAvailableTaskDependenciesSchema)
+		.query(async ({ ctx, input }) => {
+			return getAvailableDependencyTasks({
 				...input,
 				teamId: ctx.user.teamId!,
 			});

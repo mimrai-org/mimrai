@@ -24,7 +24,7 @@ export const TaskCreateSheet = () => {
 			<DialogHeader>
 				<DialogTitle />
 			</DialogHeader>
-			<DialogContent className="sm:min-w-[1000px]">
+			<DialogContent className="sm:min-w-[1000px]" showCloseButton={false}>
 				<TaskForm
 					defaultValues={{
 						statusId: taskStatusId || "backlog",

@@ -11,6 +11,7 @@ import { ShareableCreateSheet } from "./shareable-create-sheet.tsx";
 import { StatusCreateSheet } from "./status-create-sheet";
 import { StatusUpdateSheet } from "./status-update-sheet ";
 import { TaskCreateSheet } from "./task-create-sheet";
+import { TaskDependencyDialog } from "./task-dependency-dialog";
 import { TaskUpdateSheet } from "./task-update-sheet";
 import { TeamCreateSheet } from "./team-create-sheet";
 
@@ -31,6 +32,7 @@ export const GlobalSheets = () => {
 			<ShareableCreateSheet />
 			<PlanSelectSheet />
 			<TasksSuggestions />
+			<TaskDependencyDialog />
 		</>
 	);
 };

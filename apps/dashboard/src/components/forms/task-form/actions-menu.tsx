@@ -5,19 +5,23 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@ui/components/ui/dropdown-menu";
 import {
 	CopyIcon,
 	CopyPlusIcon,
 	EllipsisVerticalIcon,
+	FlagIcon,
 	ShareIcon,
 	TrashIcon,
 } from "lucide-react";
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
+import { DependencyIcon } from "@/components/dependency-icon";
 import Loader from "@/components/loader";
 import { useShareableParams } from "@/hooks/use-shareable-params";
+import { useTaskDependencyParams } from "@/hooks/use-task-dependency-params";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { queryClient, trpc } from "@/utils/trpc";
 import type { TaskFormValues } from "./form-type";
@@ -25,7 +29,9 @@ import type { TaskFormValues } from "./form-type";
 export const ActionsMenu = () => {
 	const { setParams } = useTaskParams();
 	const { setParams: setShareableParams } = useShareableParams();
+	const { setParams: setTaskDependecyParams } = useTaskDependencyParams();
 	const form = useFormContext<TaskFormValues>();
+	const taskId = form.watch("id");
 
 	const { mutate: deleteTask, isPending: isDeleting } = useMutation(
 		trpc.tasks.delete.mutationOptions({
@@ -86,7 +92,7 @@ export const ActionsMenu = () => {
 					<EllipsisVerticalIcon />
 				</Button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent>
+			<DropdownMenuContent className="min-w-64">
 				<DropdownMenuItem
 					onClick={() => {
 						handleClone();
@@ -108,6 +114,44 @@ export const ActionsMenu = () => {
 					<ShareIcon />
 					Share
 				</DropdownMenuItem>
+				<DropdownMenuSeparator />
+				<DropdownMenuItem
+					onSelect={() => {
+						setTaskDependecyParams({
+							dependencyType: "relates_to",
+							taskDependentId: taskId,
+							dependencyDirection: "to",
+						});
+					}}
+				>
+					<DependencyIcon type="relates_to" className="text-muted-foreground" />
+					Related to...
+				</DropdownMenuItem>
+				<DropdownMenuItem
+					onSelect={() => {
+						setTaskDependecyParams({
+							dependencyType: "blocks",
+							taskDependentId: taskId,
+							dependencyDirection: "to",
+						});
+					}}
+				>
+					<DependencyIcon type="blocks" className="text-muted-foreground" />
+					Blocking to...
+				</DropdownMenuItem>
+				<DropdownMenuItem
+					onSelect={() => {
+						setTaskDependecyParams({
+							dependencyType: "blocks",
+							taskDependentId: taskId,
+							dependencyDirection: "from",
+						});
+					}}
+				>
+					<DependencyIcon type="blocks" className="text-muted-foreground" />
+					Blocked by...
+				</DropdownMenuItem>
+				<DropdownMenuSeparator />
 				<DropdownMenuItem
 					variant="destructive"
 					disabled={isDeleting}

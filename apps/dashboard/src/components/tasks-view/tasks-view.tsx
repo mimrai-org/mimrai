@@ -5,7 +5,7 @@ import { createContext, useContext, useMemo, useState } from "react";
 import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";
 import { trpc } from "@/utils/trpc";
 import { TasksBoard } from "../kanban/board/board";
-import type { propertiesComponents } from "./task-properties";
+import type { propertiesComponents } from "./task-properties-components";
 import {
 	TasksFilters,
 	type TasksFiltersProps,

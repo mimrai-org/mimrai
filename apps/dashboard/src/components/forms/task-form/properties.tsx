@@ -2,6 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { trpc } from "@/utils/trpc";
 import { Assignee } from "./assignee";
+import { TaskFormDependenciesList } from "./dependencies-list";
 import { DueDate } from "./due-date";
 import { Labels } from "./labels";
 import { MilestoneSelect } from "./milestone-select";
@@ -37,7 +38,10 @@ export const TaskFormProperties = () => {
 				<MilestoneSelect />
 				<Recurring />
 				{isGithubConnected && <RepositorySelect />}
-				{/* <TaskFormPropertiesDropdown /> */}
+			</div>
+
+			<div className="mt-4">
+				<TaskFormDependenciesList />
 			</div>
 		</div>
 	);

@@ -36,7 +36,7 @@ export const TaskUpdateSheet = () => {
 	return (
 		<Dialog open={isOpen} onOpenChange={() => setParams({ taskId: null })}>
 			<DialogContent
-				showCloseButton={true}
+				showCloseButton={false}
 				className="max-h-[85vh] overflow-y-auto pt-0 sm:min-w-[60vw]"
 			>
 				<DialogHeader className="hidden">
