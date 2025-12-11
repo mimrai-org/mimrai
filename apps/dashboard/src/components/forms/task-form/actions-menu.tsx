@@ -148,7 +148,11 @@ export const ActionsMenu = () => {
 						});
 					}}
 				>
-					<DependencyIcon type="blocks" className="text-muted-foreground" />
+					<DependencyIcon
+						type="blocks"
+						direction="from"
+						className="text-muted-foreground"
+					/>
 					Blocked by...
 				</DropdownMenuItem>
 				<DropdownMenuSeparator />

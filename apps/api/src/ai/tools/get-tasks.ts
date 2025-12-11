@@ -47,10 +47,12 @@ export const getTasksTool = tool({
 				status: task.status,
 				statusId: task.statusId,
 				assigneeId: task.assigneeId,
+				assigneeName: task.assignee?.name,
 				dueDate: task.dueDate,
 				createdAt: task.createdAt,
 				updatedAt: task.updatedAt,
 				sequence: task.sequence,
+				dependencies: task.dependencies,
 				taskUrl: getTaskPermalink(task.permalinkId),
 			}));
 
