@@ -10,6 +10,13 @@ import {
 	FormItem,
 	FormLabel,
 } from "@ui/components/ui/form";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@ui/components/ui/select";
 import { Textarea } from "@ui/components/ui/textarea";
 import { ChevronRight, PencilIcon, SkipForward } from "lucide-react";
 import Link from "next/link";
@@ -26,14 +33,31 @@ export type WorkflowSuggestedType =
 
 const schema = z.object({
 	whatYourTeamDoes: z.string().min(5, "Please provide more details."),
-	howIsYourWorkflow: z.string().min(5, "Please provide more details."),
+	currentTool: z.string(),
+	howIsYourWorkflow: z
+		.string()
+		.min(5, "Please provide more details.")
+		.optional(),
 });
+
+const toolsList = [
+	"Asana",
+	"Trello",
+	"Jira",
+	"ClickUp",
+	"Monday.com",
+	"Notion",
+	"Linear",
+	"Microsoft Planner",
+	"Other",
+];
 
 export default function Page() {
 	const router = useRouter();
 	const form = useZodForm(schema, {
 		defaultValues: {
 			whatYourTeamDoes: "",
+			currentTool: "",
 			howIsYourWorkflow: "",
 		},
 	});
@@ -110,10 +134,39 @@ export default function Page() {
 							/>
 							<FormField
 								control={form.control}
+								name="currentTool"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>
+											What tool are you currently using for project management?
+										</FormLabel>
+										<FormControl>
+											<Select>
+												<SelectTrigger className="w-full">
+													<SelectValue placeholder="Select a tool" />
+												</SelectTrigger>
+												<SelectContent>
+													{toolsList.map((tool) => (
+														<SelectItem
+															key={tool}
+															value={tool}
+															onSelect={() => field.onChange(tool)}
+														>
+															{tool}
+														</SelectItem>
+													))}
+												</SelectContent>
+											</Select>
+										</FormControl>
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
 								name="howIsYourWorkflow"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>How is your workflow?</FormLabel>
+										<FormLabel>How is your workflow? if any</FormLabel>
 										<FormControl>
 											<Textarea
 												{...field}
@@ -140,7 +193,7 @@ export default function Page() {
 								Change information
 							</Button>
 						)}
-						<Link href="/dashboard/onboarding">
+						<Link href="/dashboard">
 							<Button type="button" variant={"ghost"}>
 								<SkipForward />
 								Skip for now

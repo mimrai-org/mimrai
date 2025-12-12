@@ -6,9 +6,11 @@ import z from "zod";
 
 export const generateWorkflow = async ({
 	whatYourTeamDoes,
+	currentTool,
 	howIsYourWorkflow,
 }: {
 	whatYourTeamDoes: string;
+	currentTool: string;
 	howIsYourWorkflow: string;
 }) => {
 	const response = await generateObject({
@@ -37,13 +39,18 @@ MIMRAI have the following features to help teams manage their workflows (dot not
 - Each label must have a unique name and a HEX color code.
 - Ensure that the suggested workflow is practical and easy to implement within MIMRAI.
 - Do not mention MIMRAI in the workflow steps. it's implied.
+- Only use the current tool as reference, do not mention it in the workflow.
+- The current tool is going to be replaced by MIMRAI, so do not suggest features that are not available in MIMRAI.
+- Ensure the workflow is tailored to the team's specific needs and context.
 </guidelines>
 `,
 		prompt: `Given the following information about a team:
     
     1. What the team does
     ${whatYourTeamDoes}
-    2. How their current workflow operates
+		2. Current project management tools they are using (if any)
+		${currentTool ?? "None"}
+    3. How their current workflow operates
     ${howIsYourWorkflow}
 
     Provide a detailed recommendation on how they can improve their workflow for better efficiency and productivity inside MIMRAI.

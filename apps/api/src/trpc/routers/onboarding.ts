@@ -14,7 +14,8 @@ export const onboardingRouter = router({
 		.input(
 			z.object({
 				whatYourTeamDoes: z.string().min(1),
-				howIsYourWorkflow: z.string().min(1),
+				currentTool: z.string().optional(),
+				howIsYourWorkflow: z.string().min(1).optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
