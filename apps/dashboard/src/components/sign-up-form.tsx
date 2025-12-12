@@ -65,9 +65,7 @@ export default function SignUpForm() {
 
 	return (
 		<div className="mx-auto my-auto w-full max-w-md p-6">
-			<h1 className="mb-6 text-start font-medium font-runic text-3xl">
-				Create Account
-			</h1>
+			<h1 className="mb-6 text-start font-medium text-3xl">Create Account</h1>
 
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">

@@ -69,9 +69,7 @@ export default function ResetPasswordForm() {
 
 	return (
 		<div className="mx-auto my-auto w-full max-w-lg p-6 text-start">
-			<h1 className="mb-4 font-runic font-semibold text-3xl">
-				Reset your password
-			</h1>
+			<h1 className="mb-4 font-semibold text-3xl">Reset your password</h1>
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
 					<FormField

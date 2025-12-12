@@ -91,7 +91,7 @@ export const TeamForm = ({
 			onSuccess: async (team) => {
 				setParams(null);
 				await switchTeam({ teamId: team.id });
-				window.location.href = "/dashboard";
+				window.location.href = "/dashboard/onboarding";
 			},
 		}),
 	);
@@ -234,23 +234,25 @@ export const TeamForm = ({
 						)}
 					/>
 
-					<FormField
-						control={form.control}
-						name="description"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>{t("forms.teamForm.description.label")}</FormLabel>
-								<FormControl>
-									<Textarea
-										placeholder={t("forms.teamForm.description.placeholder")}
-										className="min-h-[200px]"
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
+					{defaultValues?.id && (
+						<FormField
+							control={form.control}
+							name="description"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>{t("forms.teamForm.description.label")}</FormLabel>
+									<FormControl>
+										<Textarea
+											placeholder={t("forms.teamForm.description.placeholder")}
+											className="min-h-[200px]"
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					)}
 				</div>
 				{/* </ScrollArea> */}
 				{(canWriteTeam || !defaultValues?.id) && (

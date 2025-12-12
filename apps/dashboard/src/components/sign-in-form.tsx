@@ -101,7 +101,7 @@ export default function SignInForm() {
 
 	return (
 		<div className="mx-auto my-auto w-full max-w-lg p-6 text-start">
-			<h1 className="font-medium font-runic text-3xl">Nice to see you again</h1>
+			<h1 className="font-medium text-3xl">Nice to see you again</h1>
 			<p className="mb-4 text-balance text-muted-foreground">
 				<Link href="/sign-up">
 					<Button variant="link" type="button" className="px-0">

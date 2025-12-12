@@ -15,7 +15,7 @@ export const ProjectShareable = ({
 		<div className="space-y-4">
 			<div className="space-y-2">
 				<ProjectIcon {...project} />
-				<h1 className="font-medium font-runic text-2xl">{project.name}</h1>
+				<h1 className="font-medium text-2xl">{project.name}</h1>
 			</div>
 
 			{project.description && <Response>{project.description}</Response>}

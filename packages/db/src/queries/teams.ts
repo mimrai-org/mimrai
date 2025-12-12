@@ -61,18 +61,18 @@ export const createTeam = async ({
 	}
 
 	// Create default labels
-	const defaultLabels = await createDefaultLabels(team.id);
+	// const defaultLabels = await createDefaultLabels(team.id);
 
-	// Create default columns
-	const defaultColumns = await createDefaultStatuses(team.id);
+	// // Create default columns
+	// const defaultColumns = await createDefaultStatuses(team.id);
 
-	// Create default tasks
-	await createDefaultTasks({
-		statusId: defaultColumns[0]!.id,
-		labelId: defaultLabels[0]!.id,
-		assigneeId: userId,
-		teamId: team.id,
-	});
+	// // Create default tasks
+	// await createDefaultTasks({
+	// 	statusId: defaultColumns[0]!.id,
+	// 	labelId: defaultLabels[0]!.id,
+	// 	assigneeId: userId,
+	// 	teamId: team.id,
+	// });
 
 	return team;
 };

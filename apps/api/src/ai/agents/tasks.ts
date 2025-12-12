@@ -17,7 +17,7 @@ import { updateTaskTool } from "../tools/update-task";
 
 export const tasksAgent = createAgent({
 	name: "tasks",
-	model: openai("gpt-5-mini"),
+	model: openai("gpt-4o-mini"),
 	instructions: (
 		ctx,
 	) => `You are a task management specialist for ${ctx.companyName}. Your goal is to help manage tasks, track progress, and monitor deadlines. 

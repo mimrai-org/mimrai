@@ -12,7 +12,7 @@ export const TaskShareable = ({
 }) => {
 	return (
 		<div className="space-y-4">
-			<h1 className="font-medium font-runic text-2xl">{task.title}</h1>
+			<h1 className="font-medium text-2xl">{task.title}</h1>
 			<div className="flex flex-wrap gap-2">
 				{propertiesComponents.status(task)}
 				{propertiesComponents.checklist(task)}

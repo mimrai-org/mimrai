@@ -48,9 +48,7 @@ export const WaitlistForm = () => {
 	if (waitlistData) {
 		return (
 			<div>
-				<h2 className="font-runic text-lg">
-					Thank you for joining the waitlist!
-				</h2>
+				<h2 className="text-lg">Thank you for joining the waitlist!</h2>
 				<p className="text-muted-foreground text-sm">
 					We will notify you via email when we launch.
 				</p>
@@ -61,7 +59,7 @@ export const WaitlistForm = () => {
 
 	return (
 		<div>
-			<h2 className="font-runic text-lg">For small teams and fast workflows</h2>
+			<h2 className="text-lg">For small teams and fast workflows</h2>
 			<p className="mb-4 text-muted-foreground text-sm">
 				Join the waitlist to be among the first to try MIMRAI.
 			</p>

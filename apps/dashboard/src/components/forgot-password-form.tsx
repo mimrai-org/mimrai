@@ -59,9 +59,7 @@ export default function ForgotPasswordForm() {
 	if (success) {
 		return (
 			<div className="mx-auto my-auto w-full max-w-lg p-6 text-start">
-				<h1 className="mb-2 font-runic font-semibold text-3xl">
-					Check your email
-				</h1>
+				<h1 className="mb-2 font-semibold text-3xl">Check your email</h1>
 				<p className="mb-4 text-muted-foreground">
 					If an account with that email exists, we have sent a password reset
 					link to your email.
@@ -77,9 +75,7 @@ export default function ForgotPasswordForm() {
 
 	return (
 		<div className="mx-auto my-auto w-full max-w-lg p-6 text-start">
-			<h1 className="mb-4 font-runic font-semibold text-3xl">
-				Reset your password
-			</h1>
+			<h1 className="mb-4 font-semibold text-3xl">Reset your password</h1>
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
 					<FormField

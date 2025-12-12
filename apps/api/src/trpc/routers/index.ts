@@ -16,6 +16,7 @@ import { labelsRouter } from "./labels";
 import { milestonesRouter } from "./milestones";
 import { newsletterRouter } from "./newsletter";
 import { notificationSettingsRouter } from "./notification-settings";
+import { onboardingRouter } from "./onboarding";
 import { projectsRouter } from "./projects";
 import { shareableRouter } from "./shareable";
 import { taskDependenciesRouter } from "./task-dependencies";
@@ -58,6 +59,7 @@ export const appRouter = router({
 	shareable: shareableRouter,
 	tasksSuggestions: tasksSuggestionsRouter,
 	globalSearch: globalSearchRouter,
+	onboarding: onboardingRouter,
 });
 export type AppRouter = typeof appRouter;
 export type RouterOutputs = inferRouterOutputs<AppRouter>;
