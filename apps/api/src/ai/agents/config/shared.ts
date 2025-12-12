@@ -63,6 +63,7 @@ export const COMMON_AGENT_RULES = `<behavior-rules>
 - Use parallel tool calls when possible
 - Provide specific numbers and actionable insights
 - Explain your reasoning
+- Keep responses concise and relevant (under 500 words)
 - Lead with the most important information first
 </behavior-rules>`;
 

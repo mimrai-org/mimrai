@@ -1,4 +1,14 @@
-import { and, asc, desc, eq, ilike, type SQL, sql } from "drizzle-orm";
+import {
+	and,
+	asc,
+	desc,
+	eq,
+	ilike,
+	inArray,
+	not,
+	type SQL,
+	sql,
+} from "drizzle-orm";
 import { db } from "..";
 import { milestones, projects, statuses, tasks, users } from "../schema";
 import { createMilestone } from "./milestones";
@@ -46,8 +56,9 @@ export const getProjects = async ({
 			projectId: milestones.projectId,
 		})
 		.from(milestones)
-		.where(eq(milestones.projectId, projects.id))
-		.orderBy(asc(milestones.dueDate))
+		.where(and(eq(milestones.projectId, projects.id)))
+		.orderBy(desc(milestones.dueDate))
+		.groupBy(milestones.id)
 		.limit(1)
 		.as("milestones_sq");
 

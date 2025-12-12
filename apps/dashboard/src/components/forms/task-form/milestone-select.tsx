@@ -27,7 +27,9 @@ export const MilestoneSelect = () => {
 							renderClear={() => "No milestone"}
 							className="h-6! text-xs"
 							queryOptions={trpc.milestones.get.queryOptions(
-								{},
+								{
+									projectId: projectId,
+								},
 								{
 									select: (data) => data.data,
 								},

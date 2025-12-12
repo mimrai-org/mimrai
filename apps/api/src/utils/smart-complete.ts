@@ -29,6 +29,7 @@ export const buildSmartCompletePrompt = async ({
 - The description should provide enough detail for someone to understand the task without further clarification.
 - If the user prompt lacks clarity, use the context to fill in the gaps.
 - Be careful when assigning projects; only assign if the user prompt specifies it.
+- If the user prompt is short you can use it as title but make sure it is self explanatory.
 </rules>
 
 <user-context>
