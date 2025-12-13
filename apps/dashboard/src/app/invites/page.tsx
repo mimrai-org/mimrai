@@ -1,11 +1,16 @@
 import { Button } from "@mimir/ui/button";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getSession } from "@/lib/get-session";
 import { InvitationsList } from "./invitations-list";
 
 export default async function Page() {
 	const session = await getSession();
+
+	if (!session?.user?.email) {
+		return redirect("/sign-in");
+	}
 
 	return (
 		<div className="mx-auto flex h-screen w-1/3 flex-col justify-center gap-4">
@@ -15,7 +20,7 @@ export default async function Page() {
 			</div>
 			<InvitationsList email={session?.user?.email} />
 			<div className="flex justify-start">
-				<Link href={"/dashboard/onboarding"}>
+				<Link href={"/team"}>
 					<Button type="button">
 						Continue
 						<ChevronRight />

@@ -46,8 +46,8 @@ export default function Page() {
 	);
 
 	const handleSubmit = async (data: z.infer<typeof schema>) => {
-		await createTeam(data);
-		router.push("/dashboard");
+		const team = await createTeam(data);
+		router.push(`/team/${team.slug}/onboarding`);
 	};
 
 	return (

@@ -56,7 +56,9 @@ export const acceptTeamInvite = async ({
 	});
 
 	// switch user's current team
-	await switchTeam(userId, invite.teamId);
+	await switchTeam(userId, {
+		teamId: invite.teamId,
+	});
 
 	// delete invite
 	await db.delete(userInvites).where(eq(userInvites.id, userInviteId));

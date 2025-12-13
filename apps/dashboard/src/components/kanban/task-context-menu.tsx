@@ -246,7 +246,7 @@ export const TaskContextMenu = ({
 				</ContextMenuItem>
 
 				{task.assigneeId && task.assigneeId === user?.id && (
-					<Link href={`/dashboard/zen/${task.id}`}>
+					<Link href={`${user?.basePath}/zen/${task.id}`}>
 						<ContextMenuItem>
 							<Maximize2Icon />
 							Enter Zen Mode

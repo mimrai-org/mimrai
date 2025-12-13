@@ -26,7 +26,7 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 
 	return (
 		<Kanban.Column
-			className="min-h-[200px] min-w-86 max-w-86 grow-1 rounded-sm"
+			className="min-h-[200px] min-w-86 max-w-86 grow-1 rounded-sm bg-gradient-to-b from-secondary/3 to-transparent"
 			value={columnName}
 		>
 			<div className="flex items-center justify-between">

@@ -12,6 +12,7 @@ import {
 import { EyeIcon, RocketIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTaskParams } from "@/hooks/use-task-params";
+import { useUser } from "@/hooks/use-user";
 
 export const WorkConfirmDialogTrigger = ({
 	taskId,
@@ -24,6 +25,7 @@ export const WorkConfirmDialogTrigger = ({
 	className?: string;
 	asChild?: boolean;
 }) => {
+	const user = useUser();
 	const { setParams } = useTaskParams();
 	const router = useRouter();
 	return (
@@ -60,7 +62,7 @@ export const WorkConfirmDialogTrigger = ({
 						</Button>
 						<Button
 							onClick={() => {
-								router.push(`/dashboard/workstation/${taskId}`);
+								router.push(`${user?.basePath}/workstation/${taskId}`);
 							}}
 							type="button"
 						>

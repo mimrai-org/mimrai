@@ -19,17 +19,17 @@ import { trpc } from "@/utils/trpc";
 
 export const TeamSwitcher = () => {
 	const user = useUser();
-	const { setParams, teamId } = useTeamParams();
+	const { setParams } = useTeamParams();
 	const { setParams: setChatParams } = useChatParams();
 	const { data: teams } = useQuery(trpc.teams.getAvailable.queryOptions());
 	const { setLocale } = useLocaleStore();
 
 	const { mutate: switchTeam } = useMutation(
 		trpc.users.switchTeam.mutationOptions({
-			onSuccess: () => {
+			onSuccess: (data) => {
 				setChatParams(null);
 				setParams(null);
-				window.location.reload();
+				window.location.href = `/team/${data.slug}/overview`;
 			},
 			onError: () => {
 				toast.error("Failed to switch team");
@@ -45,16 +45,6 @@ export const TeamSwitcher = () => {
 			});
 		}
 	}, [user?.team]);
-
-	useEffect(() => {
-		if (!teamId) return;
-		if (!user?.team?.id) return;
-		if (teamId === user?.team?.id) return;
-		switchTeam({
-			teamId,
-		});
-		setParams(null);
-	}, [teamId, user?.team?.id]);
 
 	return (
 		<DropdownMenu>
@@ -95,7 +85,7 @@ export const TeamSwitcher = () => {
 						key={team.id}
 						onClick={() =>
 							switchTeam({
-								teamId: team.id,
+								slug: team.slug,
 							})
 						}
 					>

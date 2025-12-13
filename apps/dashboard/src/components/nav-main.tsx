@@ -40,6 +40,13 @@ export function NavMain({
 	const user = useUser();
 	const pathname = usePathname();
 
+	const addTeamToUrl = (url: string) => {
+		if (url.includes("{team}")) {
+			return url.replace("{team}", user?.team?.slug || "");
+		}
+		return url;
+	};
+
 	return (
 		<SidebarGroup>
 			<SidebarMenu>
@@ -48,8 +55,10 @@ export function NavMain({
 				</SidebarMenuItem>
 				{items.map((item) => {
 					const isActive =
-						pathname.startsWith(item.url) ||
-						item.items?.some((subItem) => pathname.startsWith(subItem.url));
+						pathname.startsWith(addTeamToUrl(item.url)) ||
+						item.items?.some((subItem) =>
+							pathname.startsWith(addTeamToUrl(subItem.url)),
+						);
 
 					if (
 						item.scopes &&
@@ -67,25 +76,22 @@ export function NavMain({
 									isActive={isActive}
 								>
 									<Link
-										href={{
-											pathname: item.url,
-											query: {},
-										}}
+										href={addTeamToUrl(item.url)}
 										className={cn(
-											"flex h-9 items-center border border-transparent text-sm!",
+											"flex h-8 items-center border border-transparent text-sm!",
 											{
 												"bg-accent": isActive,
 											},
 										)}
 									>
-										<item.icon className="size-4!" />
+										<item.icon className="size-4! text-muted-foreground" />
 										<span>{item.title}</span>
 									</Link>
 								</SidebarMenuButton>
 								{item.items?.length ? (
 									<>
 										<CollapsibleTrigger asChild>
-											<SidebarMenuAction className="mt-0.5 hover:bg-transparent data-[state=open]:rotate-90">
+											<SidebarMenuAction className="hover:bg-transparent data-[state=open]:rotate-90">
 												<ChevronRight />
 												<span className="sr-only">Toggle</span>
 											</SidebarMenuAction>
@@ -93,7 +99,9 @@ export function NavMain({
 										<CollapsibleContent>
 											<SidebarMenuSub>
 												{item.items?.map((subItem) => {
-													const isSubActive = pathname.startsWith(subItem.url);
+													const isSubActive = pathname.startsWith(
+														addTeamToUrl(subItem.url),
+													);
 
 													if (
 														subItem.scopes &&
@@ -114,7 +122,7 @@ export function NavMain({
 																	},
 																)}
 															>
-																<Link href={subItem.url}>
+																<Link href={addTeamToUrl(subItem.url)}>
 																	<span>{subItem.title}</span>
 																</Link>
 															</SidebarMenuSubButton>

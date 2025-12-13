@@ -12,11 +12,13 @@ import {
 import { Settings2Icon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { PlanList } from "@/app/dashboard/(navigation)/settings/billing/plan-list";
+import { PlanList } from "@/app/team/[team]/(navigation)/settings/billing/plan-list";
 import { usePlanParams } from "@/hooks/use-plan-params";
+import { useUser } from "@/hooks/use-user";
 import { trpc } from "@/utils/trpc";
 
 export const PlanSelectSheet = () => {
+	const user = useUser();
 	const pathname = usePathname();
 	const { data: subscription } = useQuery(
 		trpc.billing.subscription.queryOptions(),
@@ -27,7 +29,7 @@ export const PlanSelectSheet = () => {
 		subscription &&
 		subscription.status !== "active" &&
 		subscription.status !== "trialing" &&
-		!pathname.startsWith("/dashboard/settings");
+		!pathname.startsWith(`${user?.basePath}/settings`);
 
 	const isOpen = Boolean(selectPlan || forceOpen);
 
@@ -47,7 +49,7 @@ export const PlanSelectSheet = () => {
 				<DialogFooter>
 					<div>
 						{forceOpen && (
-							<Link href="/dashboard/settings/billing">
+							<Link href={`${user?.basePath}/settings/billing`}>
 								<Button size="sm" variant={"secondary"}>
 									<Settings2Icon />
 									Settings

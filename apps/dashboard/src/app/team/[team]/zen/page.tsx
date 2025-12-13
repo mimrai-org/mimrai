@@ -29,7 +29,7 @@ export default function Page() {
 		if (data && data.data.length > 0) {
 			// Redirect to the zen mode page for the first task
 			const taskId = data!.data[0]!.id;
-			router.replace(`/dashboard/zen/${taskId}`);
+			router.replace(`/team/${user?.team?.slug}/zen/${taskId}`);
 		}
 	}, [data]);
 

@@ -33,10 +33,30 @@ export const usersRouter = router({
 	switchTeam: protectedProcedure
 		.input(switchTeamSchema)
 		.mutation(async ({ ctx, input }) => {
-			const user = await switchTeam(ctx.user.id, input.teamId);
+			// check if we really need to switch
+			if ("slug" in input && ctx.team.slug === input.slug) {
+				// no switch needed
+				return {
+					user: ctx.user,
+					slug: input.slug,
+				};
+			}
+
+			if ("teamId" in input && ctx.team.id === input.teamId) {
+				// no switch needed
+				return {
+					user: ctx.user,
+					slug: ctx.team.slug,
+				};
+			}
+
+			const user = await switchTeam(ctx.user.id, input);
 			await userCache.delete(ctx.user.id);
-			await teamCache.delete(`${ctx.user.id}:${input.teamId}`);
-			return user;
+			await teamCache.delete(`${ctx.user.id}:${user.teamId}`);
+			return {
+				user,
+				slug: user.team.slug,
+			};
 		}),
 
 	updateProfile: protectedProcedure

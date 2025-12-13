@@ -105,8 +105,8 @@ export const TeamForm = ({
 		trpc.teams.create.mutationOptions({
 			onSuccess: async (team) => {
 				setParams(null);
-				await switchTeam({ teamId: team.id });
-				window.location.href = "/dashboard/onboarding";
+				await switchTeam({ slug: team.slug });
+				window.location.href = `/team/${team.slug}/onboarding`;
 			},
 		}),
 	);

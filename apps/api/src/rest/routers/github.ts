@@ -1,8 +1,8 @@
 import { sentry } from "@api/lib/instrument";
 import {
-  cancelPullRequestPlan,
-  getConnectedRepositoryByRepoId,
-  getPullRequestPlanById,
+	cancelPullRequestPlan,
+	getConnectedRepositoryByRepoId,
+	getPullRequestPlanById,
 } from "@db/queries/github";
 import { getIntegrationById } from "@db/queries/integrations";
 import { switchTeam } from "@db/queries/users";
@@ -14,78 +14,80 @@ import type { Context } from "../types";
 const app = new OpenAPIHono<Context>();
 
 app.get("/plans/:planId/cancel", async (c) => {
-  const { planId } = c.req.param();
-  const session = c.get("session");
-  const { integrationId } = c.req.query();
+	const { planId } = c.req.param();
+	const session = c.get("session");
+	const { integrationId } = c.req.query();
 
-  const plan = await getPullRequestPlanById({
-    id: planId,
-  });
+	const plan = await getPullRequestPlanById({
+		id: planId,
+	});
 
-  if (!plan) {
-    sentry.captureMessage(
-      `Attempt to cancel non-existing PR plan: ${planId}`,
-      "warning",
-      {
-        data: {
-          planId,
-          userId: session?.userId,
-        },
-      }
-    );
-    return c.json({ success: false }, 404);
-  }
+	if (!plan) {
+		sentry.captureMessage(
+			`Attempt to cancel non-existing PR plan: ${planId}`,
+			"warning",
+			{
+				data: {
+					planId,
+					userId: session?.userId,
+				},
+			},
+		);
+		return c.json({ success: false }, 404);
+	}
 
-  const user = await switchTeam(session.userId, plan.teamId);
+	const user = await switchTeam(session.userId, {
+		teamId: plan.teamId,
+	});
 
-  const integration = await getIntegrationById({
-    id: integrationId,
-    teamId: user.teamId,
-  });
+	const integration = await getIntegrationById({
+		id: integrationId,
+		teamId: user.teamId,
+	});
 
-  if (!integration) {
-    sentry.captureMessage(
-      `Attempt to cancel PR plan with non-existing integration: ${planId}`,
-      "warning",
-      {
-        data: {
-          planId,
-          userId: session?.userId,
-        },
-      }
-    );
-    return c.json({ success: false }, 404);
-  }
+	if (!integration) {
+		sentry.captureMessage(
+			`Attempt to cancel PR plan with non-existing integration: ${planId}`,
+			"warning",
+			{
+				data: {
+					planId,
+					userId: session?.userId,
+				},
+			},
+		);
+		return c.json({ success: false }, 404);
+	}
 
-  const connectedRepository = await getConnectedRepositoryByRepoId({
-    repositoryId: plan.repoId,
-    teamId: user.teamId,
-  });
+	const connectedRepository = await getConnectedRepositoryByRepoId({
+		repositoryId: plan.repoId,
+		teamId: user.teamId,
+	});
 
-  if (!connectedRepository) {
-    return c.json({ success: false }, 404);
-  }
+	if (!connectedRepository) {
+		return c.json({ success: false }, 404);
+	}
 
-  const octokit = new Octokit({
-    auth: integration.config.token,
-  });
+	const octokit = new Octokit({
+		auth: integration.config.token,
+	});
 
-  await cancelPullRequestPlan({
-    id: planId,
-    teamId: user.teamId,
-  });
+	await cancelPullRequestPlan({
+		id: planId,
+		teamId: user.teamId,
+	});
 
-  await octokit.rest.issues.updateComment({
-    owner: connectedRepository.repositoryName.split("/")[0],
-    repo: connectedRepository.repositoryName.split("/")[1],
-    comment_id: plan.commentId,
-    body: `The plan has been canceled by ${user.name}. To re-create the plan, you can reopen the pull request or push new commits.`,
-  });
+	await octokit.rest.issues.updateComment({
+		owner: connectedRepository.repositoryName.split("/")[0],
+		repo: connectedRepository.repositoryName.split("/")[1],
+		comment_id: plan.commentId,
+		body: `The plan has been canceled by ${user.name}. To re-create the plan, you can reopen the pull request or push new commits.`,
+	});
 
-  const url = new URL(`${getAppUrl()}/dashboard/pr-plan-canceled`);
-  url.searchParams.append("pullRequestPlanId", planId);
+	const url = new URL(`${getAppUrl()}/dashboard/pr-plan-canceled`);
+	url.searchParams.append("pullRequestPlanId", planId);
 
-  return c.redirect(url);
+	return c.redirect(url);
 });
 
 export { app as githubRouter };

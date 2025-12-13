@@ -31,7 +31,7 @@ export default async function Page({ params, searchParams }: Props) {
 	if (!invite) return notFound();
 
 	if (invite.email !== session.user.email) {
-		return redirect("/dashboard");
+		return redirect(`/team/${session.user.teamSlug}/overview`);
 	}
 
 	return <TeamInvite invite={invite} />;

@@ -10,6 +10,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { create } from "zustand";
+import { useUser } from "@/hooks/use-user";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/utils/trpc";
 import { ChatInterface } from "./chat-interface";
@@ -45,6 +46,7 @@ export const useChatWidget = create<ChatContainerState>()((set, get) => ({
 
 export const ChatWidget = () => {
 	const pathname = usePathname();
+	const user = useUser();
 
 	const lastPathname = useRef<string>(pathname);
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -55,7 +57,7 @@ export const ChatWidget = () => {
 	const [scrollingDown, setScrollingDown] = useState(false);
 	const lastScrollY = useRef(0);
 
-	const isOverviewPage = pathname === "/dashboard/overview";
+	const isOverviewPage = pathname === `${user?.basePath}/overview`;
 
 	useMotionValueEvent(scrollY, "change", (latest) => {
 		if (latest > lastScrollY.current) {

@@ -19,11 +19,13 @@ import { toast } from "sonner";
 import Loader from "@/components/loader";
 import { useProjectParams } from "@/hooks/use-project-params";
 import { useShareableParams } from "@/hooks/use-shareable-params";
+import { useUser } from "@/hooks/use-user";
 import { queryClient, trpc } from "@/utils/trpc";
 import type { ProjectFormValues } from "./form-type";
 
 export const ActionsMenu = () => {
 	const router = useRouter();
+	const user = useUser();
 	const { setParams } = useProjectParams();
 	const { setParams: setShareableParams } = useShareableParams();
 	const form = useFormContext<ProjectFormValues>();
@@ -59,7 +61,7 @@ export const ActionsMenu = () => {
 			onSuccess: (project) => {
 				queryClient.invalidateQueries(trpc.projects.get.infiniteQueryOptions());
 				toast.success("Project cloned successfully", { id: "clone-project" });
-				router.push(`/dashboard/projects/${project.id}`);
+				router.push(`${user?.basePath}/projects/${project.id}`);
 			},
 			onError: (error) => {
 				toast.error("Failed to clone project", { id: "clone-project" });

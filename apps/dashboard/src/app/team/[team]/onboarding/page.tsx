@@ -17,8 +17,7 @@ export default async function Page() {
 	);
 
 	// If there are pending invitations, redirect to the invitations page
-	if (invitations && invitations.length > 0)
-		return redirect("/dashboard/onboarding/invitations");
+	if (invitations && invitations.length > 0) return redirect("/invites");
 
 	const teams = await queryClient.fetchQuery(
 		trpc.teams.getAvailable.queryOptions(),
@@ -26,7 +25,7 @@ export default async function Page() {
 
 	// If the user has no teams, redirect to the create team page
 	if (teams && teams.length === 0) {
-		return redirect("/dashboard/onboarding/create-team");
+		return redirect("/create-team");
 	}
 
 	const statuses = await queryClient.fetchQuery(
@@ -36,9 +35,9 @@ export default async function Page() {
 	);
 	// If the user has no data assets, redirect to the workflow setup page
 	if (statuses && statuses.data.length === 0) {
-		return redirect("/dashboard/onboarding/workflow");
+		return redirect(`/team/${session.user.teamSlug}/onboarding/workflow`);
 	}
 
 	// If all checks pass, redirect to the main dashboard
-	return redirect("/dashboard");
+	return redirect(`/team/${session.user.teamSlug}`);
 }

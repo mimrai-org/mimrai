@@ -24,6 +24,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { useUser } from "@/hooks/use-user";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { trpc } from "@/utils/trpc";
 import { WorkflowSuggested } from "./workflow-suggested";
@@ -54,6 +55,7 @@ const toolsList = [
 
 export default function Page() {
 	const router = useRouter();
+	const user = useUser();
 	const form = useZodForm(schema, {
 		defaultValues: {
 			whatYourTeamDoes: "",
@@ -79,7 +81,7 @@ export default function Page() {
 	const { mutate: confirmWorkflow, isPending: isConfirming } = useMutation(
 		trpc.onboarding.confirmWorkflow.mutationOptions({
 			onSuccess: () => {
-				router.push("/dashboard/onboarding");
+				router.push(`/team/${user?.team?.slug}/onboarding`);
 			},
 			onError: (error) => {
 				toast.error("Failed to confirm workflow. Please try again.");
@@ -193,7 +195,7 @@ export default function Page() {
 								Change information
 							</Button>
 						)}
-						<Link href="/dashboard">
+						<Link href={`/team/${user?.team?.slug}/board`}>
 							<Button type="button" variant={"ghost"}>
 								<SkipForward />
 								Skip for now

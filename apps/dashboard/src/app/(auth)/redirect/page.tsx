@@ -11,8 +11,8 @@ export default async function Page() {
 	// TODO: Improve invite flow
 
 	if ("teamId" in session.user && !session.user.teamId) {
-		return redirect("/dashboard/onboarding");
+		return redirect(`/team/${session.user.teamSlug}/onboarding`);
 	}
 
-	return redirect("/dashboard");
+	return redirect("/team");
 }

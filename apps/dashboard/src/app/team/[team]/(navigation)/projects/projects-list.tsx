@@ -28,10 +28,12 @@ import {
 import { MilestoneIcon } from "@/components/milestone-icon";
 import { ProjectIcon } from "@/components/project-icon";
 import { useProjectParams } from "@/hooks/use-project-params";
+import { useUser } from "@/hooks/use-user";
 import { queryClient, trpc } from "@/utils/trpc";
 
 export const ProjectsList = () => {
 	const router = useRouter();
+	const user = useUser();
 	const { setParams } = useProjectParams();
 	const { data, isLoading } = useInfiniteQuery(
 		trpc.projects.get.infiniteQueryOptions(
@@ -113,7 +115,7 @@ export const ProjectsList = () => {
 									trpc.projects.getById.queryKey({ id: project.id }),
 									project,
 								);
-								router.push(`/dashboard/projects/${project.id}/detail`);
+								router.push(`${user?.basePath}/projects/${project.id}/detail`);
 							}}
 						>
 							<div className="flex items-center gap-2">
@@ -126,7 +128,7 @@ export const ProjectsList = () => {
 										onClick={(e) => {
 											e.stopPropagation();
 											router.push(
-												`/dashboard/projects/${project.id}/tasks?mId=${project.milestone?.id}`,
+												`${user?.basePath}/projects/${project.id}/tasks?mId=${project.milestone?.id}`,
 											);
 										}}
 										className="ml-2 flex items-center gap-1 text-xs opacity-70 transition-opacity hover:opacity-100"

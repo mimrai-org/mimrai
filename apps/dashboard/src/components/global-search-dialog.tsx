@@ -28,6 +28,7 @@ import { useMemo, useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
 import { useProjectParams } from "@/hooks/use-project-params";
 import { useTaskParams } from "@/hooks/use-task-params";
+import { useUser } from "@/hooks/use-user";
 import { trpc } from "@/utils/trpc";
 
 export type GlobalSearchItem = {
@@ -83,6 +84,7 @@ export const GlobalSearchDialog = ({
 	defaultState?: GlobalSearchItem[];
 }) => {
 	const router = useRouter();
+	const user = useUser();
 	const [search, setSearch] = useState(defaultValues?.search || "");
 	const [debouncedSearch] = useDebounceValue(search, 300);
 	const { setParams: setTaskParams } = useTaskParams();
@@ -164,12 +166,12 @@ export const GlobalSearchDialog = ({
 			switch (item.id) {
 				case "action:view-board": {
 					// navigate to board view
-					router.push("/dashboard/board");
+					router.push(`${user?.basePath}/board`);
 					return;
 				}
 				case "action:view-projects": {
 					// navigate to projects view
-					router.push("/dashboard/projects");
+					router.push(`${user?.basePath}/projects`);
 					return;
 				}
 				case "action:create-task": {
@@ -195,13 +197,13 @@ export const GlobalSearchDialog = ({
 			}
 			case "project": {
 				// navigate to project
-				router.push(`/dashboard/projects/${item.id}/detail`);
+				router.push(`${user?.basePath}/projects/${item.id}/detail`);
 				break;
 			}
 			case "milestone": {
 				// navigate to milestone
 				router.push(
-					`/dashboard/projects/${item.parentId}/tasks?mId=${item.id}`,
+					`${user?.basePath}/projects/${item.parentId}/tasks?mId=${item.id}`,
 				);
 				break;
 			}

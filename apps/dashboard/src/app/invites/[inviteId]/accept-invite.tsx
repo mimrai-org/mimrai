@@ -28,7 +28,7 @@ export const TeamInvite = ({
 			await authClient.refreshToken({
 				providerId: "email",
 			});
-			router.push("/dashboard");
+			router.push("/team");
 		} catch (error) {
 			setLoading(false);
 		}

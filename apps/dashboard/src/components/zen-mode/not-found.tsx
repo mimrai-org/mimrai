@@ -1,8 +1,11 @@
+"use client";
 import { Button } from "@ui/components/ui/button";
 import { ChevronLeftIcon, CircleQuestionMarkIcon } from "lucide-react";
 import Link from "next/link";
+import { useUser } from "@/hooks/use-user";
 
 export const ZenModeNotFound = () => {
+	const user = useUser();
 	return (
 		<div className="flex h-screen items-center justify-center">
 			<div className="space-y-4 text-center">
@@ -11,7 +14,7 @@ export const ZenModeNotFound = () => {
 				<p className="max-w-sm text-muted-foreground">
 					The task you are looking for is not assigned to you or does not exist.
 				</p>
-				<Link href="/dashboard/board">
+				<Link href={`${user?.basePath}/board`}>
 					<Button>
 						<ChevronLeftIcon />
 						Go Back to Board

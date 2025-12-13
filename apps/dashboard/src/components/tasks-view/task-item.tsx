@@ -3,6 +3,7 @@ import type { RouterOutputs } from "@api/trpc/routers";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useTaskParams } from "@/hooks/use-task-params";
+import { useUser } from "@/hooks/use-user";
 import { cn } from "@/lib/utils";
 import { queryClient, trpc } from "@/utils/trpc";
 import { TaskProperties } from "./task-properties";
@@ -24,6 +25,7 @@ export const TaskItem = ({
 	disableEvent?: boolean;
 }) => {
 	const router = useRouter();
+	const user = useUser();
 	const { setParams } = useTaskParams();
 
 	return (
@@ -54,7 +56,7 @@ export const TaskItem = ({
 				if (dialog) {
 					setParams({ taskId: task.id });
 				} else {
-					router.push(`/dashboard/workstation/${task.id}`);
+					router.push(`${user?.basePath}/workstation/${task.id}`);
 				}
 			}}
 		>

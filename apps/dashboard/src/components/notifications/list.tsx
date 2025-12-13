@@ -13,11 +13,13 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { useNotificationFilterParams } from "@/hooks/use-notification-filter-params";
+import { useUser } from "@/hooks/use-user";
 import { trpc } from "@/utils/trpc";
 import { NotificationItem, type NotificationItemProps } from "./item";
 import { useNotificationStore } from "./store";
 
 export const NotificationList = () => {
+	const user = useUser();
 	const { selectedIds, toggleSelection, clearSelection } =
 		useNotificationStore();
 	const { setParams, ...params } = useNotificationFilterParams();
@@ -58,7 +60,7 @@ export const NotificationList = () => {
 	return (
 		<div className="flex flex-col gap-2">
 			{items.map((activity) => {
-				const props = getNotificationItemProps(activity);
+				const props = getNotificationItemProps({ activity, user });
 				if (!props) return null;
 				if (props.title === "undefined") return null;
 				return (
@@ -83,10 +85,12 @@ export const NotificationList = () => {
 };
 
 export const getNotificationItemProps = ({
-	type,
-	metadata,
-	...activity
-}: RouterOutputs["activities"]["get"]["data"][number]): NotificationItemProps | null => {
+	activity: { type, metadata, ...activity },
+	user,
+}: {
+	activity: RouterOutputs["activities"]["get"]["data"][number];
+	user: ReturnType<typeof useUser>;
+}): NotificationItemProps | null => {
 	if (!metadata) return null;
 
 	const commonProps = {
@@ -101,7 +105,7 @@ export const getNotificationItemProps = ({
 				title: `${metadata.title}`,
 				description: "A new task has been created.",
 				icon: LayersIcon,
-				href: `/dashboard/workstation/${activity.groupId}`,
+				href: `${user?.basePath}/workstation/${activity.groupId}`,
 				...commonProps,
 			};
 		case "task_completed":
@@ -109,7 +113,7 @@ export const getNotificationItemProps = ({
 				title: `${metadata.title}`,
 				description: "A task has been completed.",
 				icon: CircleCheckIcon,
-				href: `/dashboard/workstation/${activity.groupId}`,
+				href: `${user?.basePath}/workstation/${activity.groupId}`,
 				...commonProps,
 			};
 		case "task_updated":
@@ -117,7 +121,7 @@ export const getNotificationItemProps = ({
 				title: `${metadata.title}`,
 				description: "A task has been updated.",
 				icon: SquarePenIcon,
-				href: `/dashboard/workstation/${activity.groupId}`,
+				href: `${user?.basePath}/workstation/${activity.groupId}`,
 				...commonProps,
 			};
 		case "task_assigned":
@@ -125,7 +129,7 @@ export const getNotificationItemProps = ({
 				title: `${metadata.title}`,
 				description: "You have been assigned to this task.",
 				icon: CirclePlusIcon,
-				href: `/dashboard/workstation/${activity.groupId}`,
+				href: `${user?.basePath}/workstation/${activity.groupId}`,
 				...commonProps,
 			};
 		case "checklist_item_created":
@@ -133,7 +137,7 @@ export const getNotificationItemProps = ({
 				title: `${metadata.title}`,
 				description: "Checklist item added",
 				icon: SquarePlusIcon,
-				href: `/dashboard/workstation/${activity.groupId}`,
+				href: `${user?.basePath}/workstation/${activity.groupId}`,
 				...commonProps,
 			};
 		case "task_column_changed":
@@ -141,7 +145,7 @@ export const getNotificationItemProps = ({
 				title: `${metadata.title}`,
 				description: `Task moved to ${metadata.toColumnName}`,
 				icon: CircleDashedIcon,
-				href: `/dashboard/workstation/${activity.groupId}`,
+				href: `${user?.basePath}/workstation/${activity.groupId}`,
 				...commonProps,
 			};
 		case "checklist_item_completed":
@@ -149,7 +153,7 @@ export const getNotificationItemProps = ({
 				title: `${metadata.title}`,
 				description: "Checklist item completed",
 				icon: SquareCheckIcon,
-				href: `/dashboard/workstation/${activity.groupId}`,
+				href: `${user?.basePath}/workstation/${activity.groupId}`,
 				...commonProps,
 			};
 		case "mention":

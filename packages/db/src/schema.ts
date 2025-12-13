@@ -102,6 +102,7 @@ export const users = pgTable(
 		image: text("image"),
 		locale: text("locale"),
 		teamId: text("team_id"),
+		teamSlug: text("team_slug"),
 		isMentionable: boolean("is_mentionable").default(true).notNull(),
 		color: text("color").$defaultFn(() => randomColor()),
 		isSystemUser: boolean("is_system_user").default(false).notNull(),

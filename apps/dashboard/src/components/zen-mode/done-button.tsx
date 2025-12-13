@@ -13,6 +13,7 @@ import { CheckIcon, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { useUser } from "@/hooks/use-user";
 import { trpc } from "@/utils/trpc";
 import { StatusIcon } from "../status-icon";
 import type { ZenModeTask } from "./view";
@@ -25,6 +26,7 @@ export const ZenModeDoneButton = ({
 	handleNext: () => void;
 }) => {
 	const router = useRouter();
+	const user = useUser();
 	const [dialogOpen, setDialogOpen] = useState(false);
 
 	const { data: statuses } = useQuery(
@@ -57,8 +59,8 @@ export const ZenModeDoneButton = ({
 			setDialogOpen(false);
 			return;
 		}
-		router.push("/dashboard/board");
-	}, [dialogOpen, router]);
+		router.push(`${user?.basePath}/board`);
+	}, [dialogOpen, router, user]);
 
 	useHotkeys(
 		"esc",

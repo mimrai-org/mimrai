@@ -38,76 +38,76 @@ const data: {
 	navMain: [
 		{
 			title: "Overview",
-			url: "/dashboard/overview",
+			url: "/team/{team}/overview",
 			icon: LayoutDashboardIcon,
 		},
 		{
 			title: "Tasks",
-			url: "/dashboard/board",
+			url: "/team/{team}/board",
 			icon: LayersIcon,
 			items: [
 				{
 					title: "Board",
-					url: "/dashboard/board",
+					url: "/team/{team}/board",
 				},
 				{
 					title: "Backlog",
-					url: "/dashboard/backlog",
+					url: "/team/{team}/backlog",
 				},
 				{
 					title: "Recurring",
-					url: "/dashboard/recurring",
+					url: "/team/{team}/recurring",
 				},
 				{
 					title: "Done",
-					url: "/dashboard/done",
+					url: "/team/{team}/done",
 				},
 			],
 		},
 		{
 			title: "Projects",
-			url: "/dashboard/projects",
+			url: "/team/{team}/projects",
 			icon: BoxIcon,
 			items: [
 				{
 					title: "Timeline",
-					url: "/dashboard/projects/timeline",
+					url: "/team/{team}/projects/timeline",
 				},
 			],
 		},
 		{
 			title: "Settings",
-			url: "/dashboard/settings",
+			url: "/team/{team}/settings",
 			icon: Settings2,
 			items: [
 				{
 					title: "General",
-					url: "/dashboard/settings/general",
+					url: "/team/{team}/settings/general",
 				},
 				{
 					title: "Billing",
-					url: "/dashboard/settings/billing",
+					url: "/team/{team}/settings/billing",
 					scopes: ["team:write"],
 				},
 				{
 					title: "Members",
-					url: "/dashboard/settings/members",
+					url: "/team/{team}/settings/members",
 				},
 				{
 					title: "Labels",
-					url: "/dashboard/settings/labels",
+					url: "/team/{team}/settings/labels",
 				},
 				{
 					title: "Statuses",
-					url: "/dashboard/settings/statuses",
+					url: "/team/{team}/settings/statuses",
 				},
 				{
 					title: "Notifications",
-					url: "/dashboard/settings/notifications",
+					url: "/team/{team}/settings/notifications",
 				},
 				{
 					title: "Integrations",
-					url: "/dashboard/settings/integrations",
+					url: "/team/{team}/settings/integrations",
 				},
 			],
 		},

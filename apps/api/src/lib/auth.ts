@@ -1,19 +1,11 @@
 import { db } from "@db/index";
-import {
-	account,
-	newsletter,
-	session,
-	userInvites,
-	users,
-	verification,
-} from "@mimir/db/schema";
+import { account, session, users, verification } from "@mimir/db/schema";
 import { EmailVerificationEmail } from "@mimir/email/emails/email-verification";
 import { ResetPasswordEmail } from "@mimir/email/emails/reset-password";
-import { getAppUrl, getEmailFrom, getWebsiteUrl } from "@mimir/utils/envs";
+import { getAppUrl, getEmailFrom } from "@mimir/utils/envs";
 import { type BetterAuthOptions, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { APIError, createAuthMiddleware } from "better-auth/api";
-import { eq } from "drizzle-orm";
+import { customSession } from "better-auth/plugins";
 import { resend } from "./resend";
 
 export const auth = betterAuth<BetterAuthOptions>({
@@ -26,36 +18,6 @@ export const auth = betterAuth<BetterAuthOptions>({
 			users,
 		},
 	}),
-	hooks: {
-		before: createAuthMiddleware(async (ctx) => {
-			if (!ctx.path.startsWith("/sign-up")) {
-				return;
-			}
-
-			const [waitlistEntry] = await db
-				.select()
-				.from(newsletter)
-				.where(eq(newsletter.email, ctx.body.email))
-				.limit(1);
-
-			const [invitationEntry] = await db
-				.select()
-				.from(userInvites)
-				.where(eq(userInvites.email, ctx.body.email))
-				.limit(1);
-
-			// If the user is not on the waitlist or not authorized, and has no invitation, block sign up
-			if (!waitlistEntry || !waitlistEntry.authorized) {
-				if (!invitationEntry) {
-					throw new APIError(
-						403,
-						"Sign up is currently by invitation only. Please join our waitlist at " +
-							getWebsiteUrl(),
-					);
-				}
-			}
-		}),
-	},
 	trustedOrigins: (process.env.ALLOWED_API_ORIGINS || "").split(","),
 	emailVerification: {
 		async sendVerificationEmail({ user, url }, request) {
@@ -118,6 +80,13 @@ export const auth = betterAuth<BetterAuthOptions>({
 				input: false,
 				fieldName: "teamId",
 			},
+			teamSlug: {
+				type: "string",
+				required: false,
+				returned: true,
+				input: false,
+				fieldName: "teamSlug",
+			},
 		},
 	},
 	advanced: {
@@ -127,5 +96,16 @@ export const auth = betterAuth<BetterAuthOptions>({
 			domain: process.env.BETTER_AUTH_DOMAIN || "localhost",
 		},
 	},
-	plugins: [],
+	plugins: [
+		customSession(async ({ user, session }) => {
+			return {
+				user: {
+					...user,
+					teamId: ((user as any).teamId as string) || null,
+					teamSlug: ((user as any).teamSlug as string) || null,
+				},
+				session,
+			};
+		}),
+	],
 });

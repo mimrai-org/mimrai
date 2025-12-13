@@ -57,7 +57,9 @@ export const handleWhatsappMessage = async ({
 	if (!user.teamId) {
 		const availableTeams = await getAvailableTeams(associetedUser.userId);
 		if (availableTeams.length > 0) {
-			await switchTeam(associetedUser.userId, availableTeams[0]!.id);
+			await switchTeam(associetedUser.userId, {
+				teamId: availableTeams[0]!.id,
+			});
 			user.teamId = availableTeams[0]!.id;
 		}
 	}

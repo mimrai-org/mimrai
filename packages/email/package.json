@@ -28,8 +28,8 @@
   },
   "devDependencies": {
     "@react-email/preview-server": "5.0.4",
-    "@types/react": "~19.1.10",
-    "@types/react-dom": "^19",
+    "@types/react": "19.2.1",
+    "@types/react-dom": "19.2.1",
     "react": "19.2.1",
     "react-dom": "19.2.1",
     "typescript": "^5.9.2"

@@ -6,11 +6,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@mimir/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useIntegrationParams } from "@/hooks/use-integration-params";
-import { useScopes } from "@/hooks/use-user";
+import { useScopes, useUser } from "@/hooks/use-user";
 import { getSlackInstallUrl } from "@/lib/integrations";
 import { trpc } from "@/utils/trpc";
 
 export const IntegrationsList = () => {
+	const user = useUser();
 	const { setParams } = useIntegrationParams();
 	const { data } = useQuery(trpc.integrations.get.queryOptions());
 	const canWriteTeam = useScopes(["team:write"]);
@@ -40,7 +41,7 @@ export const IntegrationsList = () => {
 											<div className="flex items-center gap-4">
 												<span className="text-muted-foreground">Installed</span>
 												<Link
-													href={`/dashboard/settings/integrations/${integration.type}`}
+													href={`${user?.basePath}/settings/integrations/${integration.type}`}
 												>
 													<Button size={"sm"} variant="outline">
 														Configure

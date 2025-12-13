@@ -19,7 +19,12 @@ export const useUser = () => {
 		});
 	}, [data]);
 
-	return data;
+	if (!data) return null;
+
+	return {
+		...data,
+		basePath: data?.team ? `/team/${data.team.slug}` : "",
+	};
 };
 
 export const useScopes = (scopes: Scope[]) => {

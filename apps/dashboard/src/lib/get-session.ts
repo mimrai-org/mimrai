@@ -11,5 +11,15 @@ export const getSession = async () => {
 		},
 	});
 
-	return session;
+	const teamId = (session?.user as any)?.teamId as string | undefined;
+	const teamSlug = (session?.user as any)?.teamSlug as string | undefined;
+
+	return {
+		...session,
+		user: {
+			...session?.user,
+			teamId: teamId || null,
+			teamSlug: teamSlug || null,
+		},
+	};
 };

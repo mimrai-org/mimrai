@@ -32,6 +32,7 @@ export const getCurrentUser = async (userId: string, teamId?: string) => {
 				id: teams.id,
 				name: teams.name,
 				role: usersOnTeams.role,
+				slug: teams.slug,
 				locale: teams.locale,
 				timezone: teams.timezone,
 			})
@@ -96,17 +97,37 @@ export const getUsers = async ({
 	};
 };
 
-export const switchTeam = async (userId: string, teamId: string) => {
+export const switchTeam = async (
+	userId: string,
+	{
+		slug,
+		teamId,
+	}: {
+		slug?: string;
+		teamId?: string;
+	},
+) => {
+	const whereClause: SQL[] = [eq(usersOnTeams.userId, userId)];
+	if (slug) {
+		whereClause.push(eq(teams.slug, slug));
+	}
+	if (teamId) {
+		whereClause.push(eq(teams.id, teamId));
+	}
+
+	if (!slug && !teamId) {
+		throw new Error("Either slug or teamId must be provided");
+	}
+
 	const [newTeam] = await db
 		.select({
 			id: teams.id,
 			name: teams.name,
+			slug: teams.slug,
 		})
 		.from(usersOnTeams)
 		.innerJoin(teams, eq(teams.id, usersOnTeams.teamId))
-		.where(
-			and(eq(usersOnTeams.userId, userId), eq(usersOnTeams.teamId, teamId)),
-		)
+		.where(and(...whereClause))
 		.limit(1);
 
 	if (!newTeam) {
@@ -115,7 +136,7 @@ export const switchTeam = async (userId: string, teamId: string) => {
 
 	const [user] = await db
 		.update(users)
-		.set({ teamId: teamId })
+		.set({ teamId: newTeam.id, teamSlug: newTeam.slug, updatedAt: new Date() })
 		.where(eq(users.id, userId))
 		.returning();
 
@@ -130,6 +151,7 @@ export const getAvailableTeams = async (userId: string) => {
 		.select({
 			id: teams.id,
 			name: teams.name,
+			slug: teams.slug,
 			plan: teams.plan,
 			role: usersOnTeams.role,
 		})

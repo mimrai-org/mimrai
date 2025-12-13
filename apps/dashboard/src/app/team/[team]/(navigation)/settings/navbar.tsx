@@ -9,44 +9,56 @@ import { cn } from "@/lib/utils";
 export const SettingsNavbar = () => {
 	const user = useUser();
 	const pathname = usePathname();
+
+	const addTeamToUrl = (url: string) => {
+		if (!user?.team) return url;
+		return `${user.basePath}${url}`;
+	};
+
 	const settingsLinks = useMemo(() => {
 		return [
 			{
-				to: "/dashboard/settings/general",
+				to: addTeamToUrl("/settings/general"),
 				label: t("settings.sidebar.general"),
 			},
 			{
-				to: "/dashboard/settings/profile",
+				to: addTeamToUrl("/settings/profile"),
 				label: t("settings.sidebar.profile"),
 			},
 			{
-				to: "/dashboard/settings/billing",
+				to: addTeamToUrl("/settings/billing"),
 				label: t("settings.sidebar.billing"),
 				scopes: ["team:write"],
 			},
 			{
-				to: "/dashboard/settings/members",
+				to: addTeamToUrl("/settings/members"),
 				label: t("settings.sidebar.members"),
 			},
-			{ to: "/dashboard/settings/labels", label: t("settings.sidebar.labels") },
 			{
-				to: "/dashboard/settings/statuses",
+				to: addTeamToUrl("/settings/labels"),
+				label: t("settings.sidebar.labels"),
+			},
+			{
+				to: addTeamToUrl("/settings/statuses"),
 				label: t("settings.sidebar.statuses"),
 			},
 			{
-				to: "/dashboard/settings/notifications",
+				to: addTeamToUrl("/settings/notifications"),
 				label: t("settings.sidebar.notifications"),
 			},
 			{
-				to: "/dashboard/settings/autopilot",
+				to: addTeamToUrl("/settings/autopilot"),
 				label: "Autopilot",
 				scopes: ["team:write"],
 			},
 			{
-				to: "/dashboard/settings/integrations",
+				to: addTeamToUrl("/settings/integrations"),
 				label: t("settings.sidebar.integrations"),
 			},
-			{ to: "/dashboard/settings/import", label: t("settings.sidebar.import") },
+			{
+				to: addTeamToUrl("/settings/import"),
+				label: t("settings.sidebar.import"),
+			},
 		];
 	}, []);
 

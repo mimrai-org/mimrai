@@ -59,16 +59,16 @@ export const ZenModeView = ({ taskId }: { taskId: string }) => {
 			tasks.data.findIndex((task) => task.id === currentTask!.id) + 1;
 		if (nextTaskIndex < tasks.data.length) {
 			const nextTask = tasks.data[nextTaskIndex]!;
-			router.push(`/dashboard/zen/${nextTask.id}`);
+			router.push(`${user?.basePath}/zen/${nextTask.id}`);
 		} else {
-			router.push("/dashboard/board");
+			router.push(`${user?.basePath}/board`);
 		}
 	};
 
 	if (!currentTask) {
 		if (tasks.data.length > 0) {
 			// If the current task is not found, redirect to the first task in the list
-			return redirect(`/dashboard/zen/${tasks.data[0]!.id}`);
+			return redirect(`${user?.basePath}/zen/${tasks.data[0]!.id}`);
 		}
 
 		if (!currentTask) return <ZenModeNotFound />;
@@ -141,9 +141,10 @@ export const ZenModeView = ({ taskId }: { taskId: string }) => {
 
 export const ZenModeClose = () => {
 	const router = useRouter();
+	const user = useUser();
 
 	const handleExit = () => {
-		router.push("/dashboard/board");
+		router.push(`${user?.basePath}/board`);
 	};
 
 	return (
