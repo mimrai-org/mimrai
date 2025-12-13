@@ -5,7 +5,7 @@ import {
 	CardDescription,
 	CardHeader,
 } from "@ui/components/ui/card";
-import { AssigneeAvatar } from "@/components/kanban/asignee-avatar";
+import { AssigneeAvatar } from "@/components/asignee-avatar";
 import { trpc } from "@/utils/trpc";
 import { Progress } from "../../projects-list";
 

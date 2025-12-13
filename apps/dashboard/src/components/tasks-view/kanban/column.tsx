@@ -9,9 +9,9 @@ import type { GenericGroup } from "@/components/tasks-view/tasks-group";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { cn } from "@/lib/utils";
 import { queryClient, trpc } from "@/utils/trpc";
+import { TaskContextMenu } from "../../task-context-menu";
 // Local Components
-import { KanbanTask } from "../kanban-task/kanban-task";
-import { TaskContextMenu } from "./../task-context-menu";
+import { KanbanTask } from "./kanban-task";
 import { type Task, useKanbanStore } from "./use-kanban-board";
 
 interface BoardColumnProps {

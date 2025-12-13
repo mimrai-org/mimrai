@@ -4,14 +4,11 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { createContext, useContext, useMemo, useState } from "react";
 import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";
 import { trpc } from "@/utils/trpc";
-import { TasksBoard } from "../kanban/board/board";
-import type { propertiesComponents } from "./task-properties-components";
-import {
-	TasksFilters,
-	type TasksFiltersProps,
-} from "./tasks-filters/tasks-filters";
+import { TasksFilters, type TasksFiltersProps } from "./filters/tasks-filters";
+import { TasksBoard } from "./kanban/kanban";
+import { TasksList } from "./list/tasks-list";
+import type { propertiesComponents } from "./properties/task-properties-components";
 import type { TasksGroupBy } from "./tasks-group";
-import { TasksList } from "./tasks-list";
 
 export type TasksViewType = "board" | "list";
 export type TasksViewContextFilters = Exclude<

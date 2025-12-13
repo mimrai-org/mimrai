@@ -14,10 +14,10 @@ import {
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { queryClient, trpc } from "@/utils/trpc";
-import { Assignee, AssigneeAvatar } from "../asignee-avatar";
-import type { KanbanTask } from "./kanban-task";
+import { Assignee, AssigneeAvatar } from "../../asignee-avatar";
+import type { KanbanTask } from "../kanban/kanban-task";
 
-export const KanbanAssignee = ({ task }: { task: KanbanTask }) => {
+export const TaskPropertyAssignee = ({ task }: { task: KanbanTask }) => {
 	const { data, isLoading } = useQuery(trpc.teams.getMembers.queryOptions());
 
 	const coworkers = useMemo(() => {

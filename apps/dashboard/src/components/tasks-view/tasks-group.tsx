@@ -2,7 +2,7 @@ import type { RouterOutputs } from "@api/trpc/routers";
 import { type UseQueryOptions, useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { trpc } from "@/utils/trpc";
-import { AssigneeAvatar } from "../kanban/asignee-avatar";
+import { AssigneeAvatar } from "../asignee-avatar";
 import { MilestoneIcon } from "../milestone-icon";
 import { ProjectIcon } from "../project-icon";
 import { StatusIcon } from "../status-icon";
@@ -13,7 +13,12 @@ export type Status = RouterOutputs["statuses"]["get"]["data"][number];
 export type TeamMember = RouterOutputs["teams"]["getMembers"][number];
 export type Project = RouterOutputs["projects"]["get"]["data"][number];
 export type Milestone = RouterOutputs["milestones"]["get"]["data"][number];
-export type TasksGroupBy = "status" | "assignee" | "project" | "milestone";
+export type TasksGroupBy =
+	| "none"
+	| "status"
+	| "assignee"
+	| "project"
+	| "milestone";
 
 export type GenericGroup<O = any> = {
 	id: string | null;
@@ -142,6 +147,20 @@ export const tasksGroupByOptions: Record<TasksGroupBy, GroupByOption> = {
 			},
 		),
 	} as GroupByOption<Milestone>,
+	none: {
+		label: "None",
+		updateKey: "order",
+		getGroupName: () => "All Tasks",
+		getData: () => null,
+		updateData: () => {},
+		select: (tasks) => tasks,
+		queryOptions: {
+			queryKey: ["tasks", "groupBy", "none"],
+			queryFn: async () => {
+				return [];
+			},
+		},
+	} as GroupByOption<null>,
 };
 export const tasksGroupByItems = Object.entries(tasksGroupByOptions).map(
 	([value, option]) => ({

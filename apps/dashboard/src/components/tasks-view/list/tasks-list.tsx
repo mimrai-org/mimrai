@@ -1,11 +1,11 @@
 import { Button } from "@ui/components/ui/button";
 import { ListPlusIcon } from "lucide-react";
 import { AnimatePresence } from "motion/react";
-import { TaskContextMenu } from "../kanban/task-context-menu";
-import Loader from "../loader";
+import Loader from "../../loader";
+import { TaskContextMenu } from "../../task-context-menu";
+import { useTasksGrouped } from "../tasks-group";
+import { useTasksViewContext } from "../tasks-view";
 import { TaskItem } from "./task-item";
-import { useTasksGrouped } from "./tasks-group";
-import { useTasksViewContext } from "./tasks-view";
 
 export const TasksList = () => {
 	const { fetchNextPage, hasNextPage, isLoading } = useTasksViewContext();

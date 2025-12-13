@@ -1,6 +1,6 @@
 import { getContrast } from "@mimir/utils/random";
 import { TagsIcon, UserIcon } from "lucide-react";
-import { AssigneeAvatar } from "@/components/kanban/asignee-avatar";
+import { AssigneeAvatar } from "@/components/asignee-avatar";
 import { MilestoneIcon } from "@/components/milestone-icon";
 import { ProjectIcon } from "@/components/project-icon";
 import { trpc } from "@/utils/trpc";

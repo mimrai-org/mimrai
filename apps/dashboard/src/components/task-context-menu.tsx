@@ -29,14 +29,14 @@ import { toast } from "sonner";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useUser } from "@/hooks/use-user";
 import { queryClient, trpc } from "@/utils/trpc";
-import { useChatContext } from "../chat/chat-context/store";
-import { useChatWidget } from "../chat/chat-widget";
-import Loader from "../loader";
-import { MilestoneIcon } from "../milestone-icon";
-import { ProjectIcon } from "../project-icon";
-import { StatusIcon } from "../status-icon";
 import { Assignee, AssigneeAvatar } from "./asignee-avatar";
-import { PriorityItem } from "./priority";
+import { useChatContext } from "./chat/chat-context/store";
+import { useChatWidget } from "./chat/chat-widget";
+import Loader from "./loader";
+import { MilestoneIcon } from "./milestone-icon";
+import { ProjectIcon } from "./project-icon";
+import { StatusIcon } from "./status-icon";
+import { PriorityItem } from "./tasks-view/properties/priority";
 
 export const TaskContextMenu = ({
 	task,

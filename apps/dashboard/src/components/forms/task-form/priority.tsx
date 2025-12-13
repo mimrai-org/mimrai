@@ -12,7 +12,7 @@ import {
 	SelectTrigger,
 } from "@ui/components/ui/select";
 import { useFormContext } from "react-hook-form";
-import { Priority as PriorityItem } from "@/components/kanban/priority";
+import { Priority as PriorityItem } from "@/components/tasks-view/properties/priority";
 
 export const Priority = () => {
 	const form = useFormContext();

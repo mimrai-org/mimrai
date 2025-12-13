@@ -11,7 +11,7 @@ import {
 } from "@mimir/ui/dropdown-menu";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { EllipsisIcon } from "lucide-react";
-import { AssigneeAvatar } from "@/components/kanban/asignee-avatar";
+import { AssigneeAvatar } from "@/components/asignee-avatar";
 import { useMemberParams } from "@/hooks/use-member-params";
 import { useScopes, useUser } from "@/hooks/use-user";
 import { queryClient, trpc } from "@/utils/trpc";

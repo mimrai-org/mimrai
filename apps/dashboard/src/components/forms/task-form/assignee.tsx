@@ -4,7 +4,7 @@ import { useFormContext } from "react-hook-form";
 import {
 	AssigneeAvatar,
 	Assignee as AssigneeItem,
-} from "@/components/kanban/asignee-avatar";
+} from "@/components/asignee-avatar";
 import { trpc } from "@/utils/trpc";
 
 export const Assignee = () => {

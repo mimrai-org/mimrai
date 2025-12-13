@@ -19,7 +19,7 @@ import { useDebounceValue } from "usehooks-ts";
 import { useTaskDependencyParams } from "@/hooks/use-task-dependency-params";
 import { queryClient, trpc } from "@/utils/trpc";
 import { DependencyIcon } from "../dependency-icon";
-import { propertiesComponents } from "../tasks-view/task-properties-components";
+import { propertiesComponents } from "../tasks-view/properties/task-properties-components";
 
 const labels = {
 	blocks: {

@@ -14,6 +14,8 @@ import {
 	LayersIcon,
 	LayoutDashboardIcon,
 	type LucideIcon,
+	ScanFaceIcon,
+	ScanIcon,
 	Settings2,
 } from "lucide-react";
 import type * as React from "react";
@@ -40,6 +42,11 @@ const data: {
 			title: "Overview",
 			url: "/team/{team}/overview",
 			icon: LayoutDashboardIcon,
+		},
+		{
+			title: "My Tasks",
+			url: "/team/{team}/my-tasks",
+			icon: ScanIcon,
 		},
 		{
 			title: "Tasks",

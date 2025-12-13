@@ -14,7 +14,7 @@ import dynamic from "next/dynamic";
 import { Dropdown } from "react-day-picker";
 import { useFormContext } from "react-hook-form";
 import { DependencyIcon } from "@/components/dependency-icon";
-import { propertiesComponents } from "@/components/tasks-view/task-properties-components";
+import { propertiesComponents } from "@/components/tasks-view/properties/task-properties-components";
 import { useTaskDependencyParams } from "@/hooks/use-task-dependency-params";
 import { queryClient, trpc } from "@/utils/trpc";
 import type { TaskFormValues } from "./form-type";

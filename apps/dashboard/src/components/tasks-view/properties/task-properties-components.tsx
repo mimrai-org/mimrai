@@ -3,13 +3,13 @@ import { LabelBadge } from "@ui/components/ui/label-badge";
 import { cn } from "@ui/lib/utils";
 import { CheckSquareIcon } from "lucide-react";
 import { useMemo } from "react";
-import { DependencyIcon } from "../dependency-icon";
-import { KanbanAssignee } from "../kanban/kanban-task/assignee";
-import { Priority } from "../kanban/priority";
-import { MilestoneIcon } from "../milestone-icon";
-import { ProjectIcon } from "../project-icon";
-import { StatusIcon } from "../status-icon";
+import { DependencyIcon } from "../../dependency-icon";
+import { MilestoneIcon } from "../../milestone-icon";
+import { ProjectIcon } from "../../project-icon";
+import { StatusIcon } from "../../status-icon";
+import { TaskPropertyAssignee } from "./assignee";
 import { TaskPropertyDueDate } from "./due-date";
+import { Priority } from "./priority";
 
 export type Task = RouterOutputs["tasks"]["get"]["data"][number];
 export const propertiesComponents = {
@@ -119,5 +119,5 @@ export const propertiesComponents = {
 				{task.milestone.name}
 			</span>
 		),
-	assignee: (task: Task) => <KanbanAssignee task={task} />,
+	assignee: (task: Task) => <TaskPropertyAssignee task={task} />,
 };

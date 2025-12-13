@@ -12,7 +12,7 @@ import type { TasksViewType } from "@/components/tasks-view/tasks-view";
 
 // async import properties list to avoid circular dependency
 const { propertiesList } = await import(
-	"../components/tasks-view/task-properties"
+	"../components/tasks-view/properties/task-properties"
 );
 
 export const tasksFilterParams = {
@@ -28,7 +28,7 @@ export const tasksFilterParams = {
 		"status",
 		"milestone",
 		"project",
-	]).withDefault("status"),
+	]),
 	viewType: parseAsStringLiteral<TasksViewType>(["board", "list"]),
 	properties: parseAsArrayOf(parseAsStringLiteral(propertiesList)),
 	recurring: parseAsBoolean,

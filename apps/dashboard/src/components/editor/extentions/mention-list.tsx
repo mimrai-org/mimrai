@@ -1,7 +1,7 @@
 import type { RouterOutputs } from "@api/trpc/routers";
 import type { SuggestionProps } from "@tiptap/suggestion";
 import { useEffect, useImperativeHandle, useMemo, useState } from "react";
-import { AssigneeAvatar } from "@/components/kanban/asignee-avatar";
+import { AssigneeAvatar } from "@/components/asignee-avatar";
 import { cn } from "@/lib/utils";
 
 type Member = RouterOutputs["teams"]["getMembers"][0];

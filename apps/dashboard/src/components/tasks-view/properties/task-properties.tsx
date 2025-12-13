@@ -1,8 +1,8 @@
 "use client";
 import type { RouterOutputs } from "@api/trpc/routers";
 import { memo } from "react";
+import { useTasksViewContext } from "../tasks-view";
 import { propertiesComponents } from "./task-properties-components";
-import { useTasksViewContext } from "./tasks-view";
 
 export type Task = RouterOutputs["tasks"]["get"]["data"][number];
 export const propertiesList = Object.keys(propertiesComponents) as Array<

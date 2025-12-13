@@ -10,7 +10,7 @@ import { useTaskParams } from "@/hooks/use-task-params";
 import { useUser } from "@/hooks/use-user";
 import { trpc } from "@/utils/trpc";
 import { Response } from "../chat/response";
-import { PriorityIcon } from "../kanban/priority";
+import { PriorityIcon } from "../tasks-view/properties/priority";
 import { ZenModeAttachments } from "./attachments";
 import { ZenModeChecklist } from "./checklists";
 import { ZenModeDoneButton } from "./done-button";

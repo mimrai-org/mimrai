@@ -8,8 +8,8 @@ import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { useUser } from "@/hooks/use-user";
 import { queryClient, trpc } from "@/utils/trpc";
+import { AssigneeAvatar } from "../asignee-avatar";
 import { Response } from "../chat/response";
-import { AssigneeAvatar } from "../kanban/asignee-avatar";
 import type { ZenModeTask } from "./view";
 
 export const ZenModeChecklist = ({ task }: { task: ZenModeTask }) => {

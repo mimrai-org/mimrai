@@ -13,7 +13,7 @@ import { cn } from "@ui/lib/utils";
 import { EyeIcon, KanbanIcon, ListIcon, SearchIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
-import { propertiesComponents } from "../task-properties-components";
+import { propertiesComponents } from "../properties/task-properties-components";
 import { type TasksGroupBy, tasksGroupByItems } from "../tasks-group";
 import { useTasksViewContext } from "../tasks-view";
 import { TasksFiltersDropdown } from "./tasks-filters-dropdown";
