@@ -66,6 +66,7 @@ const defaultFilters: TasksViewContextFilters = {
 		"assignee",
 		"priority",
 		"dependencies",
+		"status",
 		"dueDate",
 		"labels",
 		"milestone",

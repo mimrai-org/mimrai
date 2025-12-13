@@ -3,6 +3,7 @@ import { differenceInDays } from "date-fns";
 import { motion } from "motion/react";
 import { TaskProperty } from "@/components/tasks-view/task-properties";
 import { useTaskParams } from "@/hooks/use-task-params";
+import { useUser } from "@/hooks/use-user";
 import { cn } from "@/lib/utils";
 import { queryClient, trpc } from "@/utils/trpc";
 
@@ -18,6 +19,7 @@ export const KanbanTask = ({
 	task: KanbanTask;
 	ref?: React.Ref<HTMLDivElement>;
 }) => {
+	const user = useUser();
 	const { setParams } = useTaskParams();
 
 	return (
@@ -49,20 +51,21 @@ export const KanbanTask = ({
 						<div className={"flex items-center gap-1 text-xs"}>
 							{task.sequence !== null && (
 								<span className="mr-2 text-muted-foreground tabular-nums">
-									{task.sequence}
+									{user?.team?.prefix}-{task.sequence}
 								</span>
 							)}
 						</div>
 						<TaskProperty property="assignee" task={task} />
 					</div>
-					<div className="flex items-center gap-2">
+					<div className="flex items-start gap-2">
+						<TaskProperty property="status" task={task} />
 						<div className="break-words font-medium text-sm">{task.title}</div>
 					</div>
 
 					<div className="mt-2 flex flex-wrap items-center gap-1.5">
 						<TaskProperty property="priority" task={task} />
 						<TaskProperty property="dependencies" task={task} />
-						<TaskProperty property="status" task={task} />
+
 						<TaskProperty property="labels" task={task} />
 						<TaskProperty property="project" task={task} />
 						<TaskProperty property="milestone" task={task} />

@@ -29,7 +29,7 @@ export const CreateButton = () => {
 				<DropdownMenuTrigger asChild>
 					<Button
 						type="button"
-						className="w-full justify-between group-data-[collapsible=icon]:h-7! group-data-[collapsible=icon]:p-2!"
+						className="w-full justify-between overflow-hidden group-data-[collapsible=icon]:h-7! group-data-[collapsible=icon]:p-2.5!"
 					>
 						<div className="flex items-center gap-2">
 							<PlusIcon />

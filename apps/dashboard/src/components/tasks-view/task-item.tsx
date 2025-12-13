@@ -6,7 +6,7 @@ import { useTaskParams } from "@/hooks/use-task-params";
 import { useUser } from "@/hooks/use-user";
 import { cn } from "@/lib/utils";
 import { queryClient, trpc } from "@/utils/trpc";
-import { TaskProperties } from "./task-properties";
+import { TaskProperties, TaskProperty } from "./task-properties";
 import type { propertiesComponents } from "./task-properties-components";
 
 type Property = keyof typeof propertiesComponents;
@@ -61,13 +61,21 @@ export const TaskItem = ({
 			}}
 		>
 			<div className="flex items-center gap-2 text-start text-sm">
-				{task.sequence && (
-					<span className="text-muted-foreground">{task.sequence}</span>
+				<TaskProperty property="priority" task={task} />
+				{task.sequence !== null && (
+					<span className="text-muted-foreground text-xs tabular-nums">
+						{user?.team?.prefix}-{task.sequence}
+					</span>
 				)}
+				<TaskProperty property="status" task={task} />
 				<h3 className="font-medium">{task.title}</h3>
 			</div>
 			<div className="hidden flex-wrap items-center justify-end gap-2 md:flex">
-				<TaskProperties task={task} />
+				<TaskProperty property="dependencies" task={task} />
+				<TaskProperty property="dueDate" task={task} />
+				<TaskProperty property="project" task={task} />
+				<TaskProperty property="milestone" task={task} />
+				<TaskProperty property="assignee" task={task} />
 			</div>
 		</motion.button>
 	);

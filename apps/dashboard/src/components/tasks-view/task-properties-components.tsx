@@ -14,7 +14,11 @@ import { TaskPropertyDueDate } from "./due-date";
 export type Task = RouterOutputs["tasks"]["get"]["data"][number];
 export const propertiesComponents = {
 	priority: (task: Pick<Task, "priority">) =>
-		task.priority && <Priority value={task.priority} />,
+		task.priority && (
+			<div className="flex size-5.5 items-center justify-center rounded-sm px-2 text-xs">
+				<Priority value={task.priority} />
+			</div>
+		),
 	dependencies: (task: Pick<Task, "dependencies" | "id">) => {
 		const group = useMemo(() => {
 			if (!task.dependencies) return {};
@@ -64,9 +68,9 @@ export const propertiesComponents = {
 	},
 	status: (task: Pick<Task, "status">) =>
 		task.status && (
-			<time className="flex h-5.5 items-center rounded-sm bg-secondary px-2 text-xs tabular-nums">
+			<time className="flex h-5.5 items-center rounded-sm text-xs">
 				<StatusIcon {...task.status} className="size-3.5" />
-				<span className="ml-1">{task.status.name}</span>
+				<span className="sr-only">{task.status.name}</span>
 			</time>
 		),
 	labels: (task: Pick<Task, "labels">) => {

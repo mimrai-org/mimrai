@@ -67,9 +67,16 @@ export const generateTeamSuggestionsJob = schemaTask({
 			.limit(1);
 
 		if (!settings || !settings.enabled) {
-			logger.info(
-				`Autopilot settings disabled for team ID ${payload.teamId}. Exiting.`,
-			);
+			if (process.env.NODE_ENV === "development") {
+				logger.info(
+					`Autopilot settings not found or disabled for team ID ${payload.teamId}. Continuing in development mode.`,
+				);
+			} else {
+				logger.info(
+					`Autopilot settings disabled for team ID ${payload.teamId}. Exiting.`,
+				);
+				return;
+			}
 			return;
 		}
 
