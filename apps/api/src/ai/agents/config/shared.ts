@@ -80,6 +80,7 @@ export interface AppContext {
 	timezone: string;
 	chatId: string;
 	teamId: string;
+	teamSlug: string;
 	artifactSupport?: boolean;
 	additionalContext: string;
 	integrationType: "web" | "slack" | "whatsapp" | "mattermost";
@@ -110,6 +111,7 @@ export function buildAppContext(
 		timezone:
 			context.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
 		teamId: context.teamId,
+		teamSlug: context.teamSlug,
 		artifactSupport: context.artifactSupport ?? false,
 		additionalContext: context.additionalContext ?? "",
 		integrationType: context.integrationType,

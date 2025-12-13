@@ -19,9 +19,9 @@ export default async function Page({ params }: Props) {
 	}
 
 	// switch to the task team
-	await trpcClient.users.switchTeam.mutate({
+	const newTeam = await trpcClient.users.switchTeam.mutate({
 		teamId: task.teamId,
 	});
 
-	return redirect(`/team/workstation/${task.id}`);
+	return redirect(`/team/${newTeam.slug}/workstation/${task.id}`);
 }

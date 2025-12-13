@@ -43,6 +43,7 @@ export async function getUserContext({
 	const context: ChatUserContext = {
 		userId,
 		teamId,
+		teamSlug: team.slug,
 		teamName: team.name,
 		teamDescription: team.description,
 		fullName: user.name,

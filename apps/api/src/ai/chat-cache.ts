@@ -9,6 +9,7 @@ const isDevelopment = process.env.NODE_ENV === "development";
 export interface ChatUserContext {
 	userId: string;
 	teamId: string;
+	teamSlug: string;
 	teamName?: string | null;
 	teamDescription?: string | null;
 	fullName?: string | null;

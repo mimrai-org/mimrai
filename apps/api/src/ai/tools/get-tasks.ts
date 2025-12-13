@@ -20,7 +20,7 @@ export const getTasksTool = tool({
 		executionOptions,
 	) {
 		try {
-			const { userId, teamId } =
+			const { userId, teamId, teamSlug } =
 				executionOptions.experimental_context as AppContext;
 
 			yield { text: "Fetching tasks...", status: "loading" };
@@ -57,7 +57,7 @@ export const getTasksTool = tool({
 			}));
 
 			yield {
-				boardUrl: `${getAppUrl()}/dashboard`,
+				boardUrl: `${getAppUrl()}/team/${teamSlug}/board`,
 				data: mappedData,
 			};
 		} catch (error) {
