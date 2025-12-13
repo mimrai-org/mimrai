@@ -1,9 +1,27 @@
+import { generateTeamPrefix, generateTeamSlug } from "@mimir/utils/teams";
 import { and, eq, ilike, isNull, ne, not, or, type SQL } from "drizzle-orm";
 import { db } from "..";
 import { type plansEnum, teams, users, usersOnTeams } from "../schema";
-import { createDefaultStatuses } from "./columns";
-import { createDefaultLabels } from "./labels";
-import { createDefaultTasks } from "./tasks";
+
+export const checkSlugExists = async (slug: string) => {
+	const [team] = await db
+		.select()
+		.from(teams)
+		.where(eq(teams.slug, slug))
+		.limit(1);
+
+	return !!team;
+};
+
+export const generateUniqueTeamSlug = async (name: string) => {
+	let prefix = generateTeamSlug(name);
+	let attempt = 0;
+	while (await checkSlugExists(prefix)) {
+		attempt++;
+		prefix = `${generateTeamSlug(name)}${attempt}`;
+	}
+	return prefix;
+};
 
 export const getTeamById = async (teamId: string) => {
 	const [team] = await db
@@ -17,6 +35,7 @@ export const getTeamById = async (teamId: string) => {
 
 export const createTeam = async ({
 	name,
+	slug,
 	email,
 	description,
 	userId,
@@ -24,16 +43,24 @@ export const createTeam = async ({
 	locale,
 }: {
 	name: string;
+	slug?: string;
 	email: string;
 	description?: string;
 	userId: string;
 	timezone?: string;
 	locale?: string;
 }) => {
+	if (!slug) {
+		slug = await generateUniqueTeamSlug(name);
+	}
+	const prefix = generateTeamPrefix(name);
+
 	const [team] = await db
 		.insert(teams)
 		.values({
 			name,
+			slug,
+			prefix,
 			email,
 			description,
 			timezone,

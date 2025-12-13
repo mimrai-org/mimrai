@@ -29,6 +29,7 @@ import {
 	SelectValue,
 } from "@mimir/ui/select";
 import { Textarea } from "@mimir/ui/textarea";
+import { generateTeamSlug } from "@mimir/utils/teams";
 import { PopoverClose } from "@radix-ui/react-popover";
 import { useMutation } from "@tanstack/react-query";
 import { ChevronDown, Loader2 } from "lucide-react";
@@ -47,6 +48,10 @@ export const teamFormSchema = z.object({
 		.string()
 		.min(2, "Team name must be at least 2 characters")
 		.max(50, "Team name must be at most 50 characters"),
+	slug: z
+		.string()
+		.min(2, "Slug must be at least 2 characters")
+		.max(30, "Slug must be at most 30 characters"),
 	email: z.string().email("Invalid email address"),
 	description: z
 		.string()
@@ -72,11 +77,21 @@ export const TeamForm = ({
 			name: "",
 			email: user?.email || "",
 			description: "",
+			slug: "",
 			locale: DEFAULT_LOCALE,
 			...defaultValues,
 		},
 		disabled: !canWriteTeam && !!defaultValues?.id,
 	});
+
+	const name = form.watch("name");
+
+	useEffect(() => {
+		if (!defaultValues?.id) {
+			const slug = generateTeamSlug(name || "");
+			form.setValue("slug", slug);
+		}
+	}, [name]);
 
 	useEffect(() => {
 		form.setValue("email", user?.email || "");
@@ -140,6 +155,35 @@ export const TeamForm = ({
 							</FormItem>
 						)}
 					/>
+
+					{!defaultValues?.id && (
+						<FormField
+							control={form.control}
+							name="slug"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>URL</FormLabel>
+									<FormControl>
+										<div className="relative">
+											<div className="pointer-events-none absolute top-0 left-0 flex h-full items-center pl-3 text-muted-foreground text-sm">
+												https://mimrai.com/
+											</div>
+											<Input
+												placeholder="acme"
+												{...field}
+												value={field.value || ""}
+												className="pl-[141px]"
+											/>
+										</div>
+									</FormControl>
+									<FormDescription>
+										{t("forms.teamForm.slug.description")}
+									</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					)}
 
 					<FormField
 						control={form.control}

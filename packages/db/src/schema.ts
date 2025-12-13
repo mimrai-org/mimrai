@@ -78,6 +78,8 @@ export const teams = pgTable("teams", {
 		.$defaultFn(() => randomUUID())
 		.primaryKey(),
 	name: text("name").notNull(),
+	slug: text("slug").notNull().unique(),
+	prefix: text("prefix").notNull(),
 	description: text("description"),
 	email: text("email").notNull(),
 	plan: plansEnum("plan"),

@@ -23,8 +23,10 @@ import {
 } from "@mimir/billing";
 import {
 	changeOwner,
+	checkSlugExists,
 	createTeam,
 	deleteTeam,
+	generateUniqueTeamSlug,
 	getMemberById,
 	getMembers,
 	getTeamById,
@@ -44,6 +46,7 @@ import {
 import { getAvailableTeams } from "@mimir/db/queries/users";
 import { InviteEmail } from "@mimir/email/emails/invite";
 import { TRPCError } from "@trpc/server";
+import z from "zod";
 
 export const teamsRouter = router({
 	getAvailable: protectedProcedure
@@ -335,5 +338,19 @@ export const teamsRouter = router({
 			}
 
 			return team;
+		}),
+
+	checkSlug: protectedProcedure
+		.meta({
+			team: false,
+		})
+		.input(z.object({ slug: z.string() }))
+		.query(async ({ input }) => {
+			const available = await checkSlugExists(input.slug);
+			if (!available) {
+				const alternative = `${input.slug}-${Math.floor(Math.random() * 1000)}`;
+				return { available: false, alternative };
+			}
+			return { available: true };
 		}),
 });
