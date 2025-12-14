@@ -34,7 +34,7 @@ export const suggestionIcon = {
 const suggestionContainerVariant = {
 	initial: { scale: 1 },
 	hover: { scale: 1.02 },
-	exit: { scale: 0 },
+	exit: { scale: 0.8, opacity: 0 },
 };
 
 const suggestionActionsVariant = {
@@ -57,10 +57,12 @@ const transition = {
 export const SuggestionCard = ({
 	suggestion,
 	className,
+	showActions = true,
 	style,
 }: {
 	suggestion: RouterOutputs["tasksSuggestions"]["get"][0];
 	className?: string;
+	showActions?: boolean;
 	style?: MotionStyle;
 }) => {
 	const { setParams: setTasksParams } = useTaskParams();
@@ -81,7 +83,10 @@ export const SuggestionCard = ({
 				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
 				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
 				queryClient.setQueryData(
-					trpc.tasksSuggestions.get.queryKey(),
+					trpc.tasksSuggestions.get.queryKey({
+						status: ["pending"],
+						pageSize: 5,
+					}),
 					(oldData) => {
 						return oldData?.filter((suggestion) => suggestion.id !== data?.id);
 					},
@@ -162,7 +167,9 @@ export const SuggestionCard = ({
 			<motion.div
 				variants={suggestionActionsVariant}
 				transition={transition}
-				className="flex items-end justify-end gap-2 overflow-hidden"
+				className={cn("flex items-end justify-end gap-2 overflow-hidden", {
+					hidden: !showActions,
+				})}
 			>
 				<div className="mt-4 flex gap-2">
 					<Button

@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/ui/button";
 import { Card, CardContent } from "@ui/components/ui/card";
 import { SparklesIcon } from "lucide-react";
+import { AnimatePresence } from "motion/react";
 import Link from "next/link";
 import { useUser } from "@/hooks/use-user";
 import { trpc } from "@/utils/trpc";
@@ -16,7 +17,7 @@ export const SuggestionsWidget = () => {
 
 	const { data } = useQuery(
 		trpc.tasksSuggestions.get.queryOptions({
-			pageSize: 20,
+			pageSize: 5,
 			status: ["pending"],
 		}),
 	);
@@ -24,19 +25,22 @@ export const SuggestionsWidget = () => {
 	return (
 		<Card className="h-full border-0">
 			<CardContent className="relative h-full">
-				{data?.map((suggestion, index) => (
-					<SuggestionCard
-						key={suggestion.id}
-						suggestion={suggestion}
-						className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 size-full transform rounded-md border bg-background p-4 text-sm shadow-md"
-						style={{
-							rotateZ:
-								index === data.length - 1
-									? "0deg"
-									: `${5 * (index % 2 === 0 ? 1 : -1)}deg`,
-						}}
-					/>
-				))}
+				<AnimatePresence mode="popLayout">
+					{data?.map((suggestion, index) => (
+						<SuggestionCard
+							key={suggestion.id}
+							suggestion={suggestion}
+							className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 size-full transform rounded-md border bg-background p-4 text-sm shadow-md"
+							showActions={index === data.length - 1}
+							style={{
+								rotateZ:
+									index === data.length - 1
+										? "0deg"
+										: `${8 * (index % 2 === 0 ? 1 : -1)}deg`,
+							}}
+						/>
+					))}
+				</AnimatePresence>
 				{data?.length === 0 && autopilotSettings?.enabled && (
 					<div className="flex h-full flex-col items-center justify-center">
 						<p className="text-center text-muted-foreground text-sm">
