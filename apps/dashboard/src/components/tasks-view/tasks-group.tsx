@@ -6,6 +6,7 @@ import { AssigneeAvatar } from "../asignee-avatar";
 import { MilestoneIcon } from "../milestone-icon";
 import { ProjectIcon } from "../project-icon";
 import { StatusIcon } from "../status-icon";
+import { Priority } from "./properties/priority";
 import { useTasksViewContext } from "./tasks-view";
 
 export type Task = RouterOutputs["tasks"]["get"]["data"][number];
@@ -17,6 +18,7 @@ export type TasksGroupBy =
 	| "none"
 	| "status"
 	| "assignee"
+	| "priority"
 	| "project"
 	| "milestone";
 
@@ -41,6 +43,20 @@ export type GroupByOption<O = any, D = GenericGroup<O>, DD = Array<D>> = {
 
 // Group By Options
 export const tasksGroupByOptions: Record<TasksGroupBy, GroupByOption> = {
+	none: {
+		label: "None",
+		updateKey: "order",
+		getGroupName: () => "All Tasks",
+		getData: () => null,
+		updateData: () => {},
+		select: (tasks) => tasks,
+		queryOptions: {
+			queryKey: ["tasks", "groupBy", "none"],
+			queryFn: async () => {
+				return [];
+			},
+		},
+	} as GroupByOption<null>,
 	status: {
 		label: "Status",
 		updateKey: "statusId",
@@ -95,6 +111,35 @@ export const tasksGroupByOptions: Record<TasksGroupBy, GroupByOption> = {
 			},
 		),
 	} as GroupByOption<TeamMember>,
+	priority: {
+		label: "Priority",
+		updateKey: "priority",
+		getGroupName: (item) =>
+			item.priority
+				? item.priority.charAt(0).toUpperCase() + item.priority.slice(1)
+				: "No Priority",
+		getData: (item) => item.priority,
+		updateData: (item, data) => {
+			item.priority = data;
+		},
+		select: (tasks, group) =>
+			tasks.filter((t) => t.priority === group.toLowerCase()),
+
+		queryOptions: {
+			queryKey: ["tasks", "groupBy", "priority"],
+			queryFn: async () => {
+				const priorities = ["Urgent", "High", "Medium", "Low"];
+				return priorities.map((priority) => ({
+					id: priority.toLowerCase(),
+					name: priority,
+					type: "priority" as const,
+					icon: <Priority value={priority.toLowerCase() as any} />,
+					data: priority.toLowerCase(),
+					original: priority.toLowerCase(),
+				}));
+			},
+		},
+	} as GroupByOption<string>,
 	project: {
 		label: "Project",
 		updateKey: "projectId",
@@ -147,20 +192,6 @@ export const tasksGroupByOptions: Record<TasksGroupBy, GroupByOption> = {
 			},
 		),
 	} as GroupByOption<Milestone>,
-	none: {
-		label: "None",
-		updateKey: "order",
-		getGroupName: () => "All Tasks",
-		getData: () => null,
-		updateData: () => {},
-		select: (tasks) => tasks,
-		queryOptions: {
-			queryKey: ["tasks", "groupBy", "none"],
-			queryFn: async () => {
-				return [];
-			},
-		},
-	} as GroupByOption<null>,
 };
 export const tasksGroupByItems = Object.entries(tasksGroupByOptions).map(
 	([value, option]) => ({
