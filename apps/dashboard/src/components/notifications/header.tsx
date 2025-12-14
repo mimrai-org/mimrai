@@ -55,8 +55,8 @@ export const NotificationHeader = () => {
 
 	return (
 		<div>
-			<div className="flex items-center justify-between">
-				<div className="flex items-center gap-4 px-2">
+			<div className="flex items-center justify-between px-4">
+				<div className="flex items-center gap-4">
 					<Checkbox
 						checked={
 							selectedCount === 0

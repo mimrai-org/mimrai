@@ -40,11 +40,11 @@ export const TasksBurnupWidget = () => {
 	);
 
 	return (
-		<Card className="border-0 bg-transparent">
-			<CardContent className="px-0">
+		<Card className="">
+			<CardContent>
 				<ChartContainer
 					config={chartConfig}
-					className="aspect-auto h-[250px] w-full"
+					className="aspect-auto h-[200px] w-full"
 				>
 					<AreaChart accessibilityLayer data={data || []}>
 						<XAxis

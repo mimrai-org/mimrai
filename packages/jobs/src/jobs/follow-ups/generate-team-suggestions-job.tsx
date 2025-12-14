@@ -77,7 +77,6 @@ export const generateTeamSuggestionsJob = schemaTask({
 				);
 				return;
 			}
-			return;
 		}
 
 		// Find tasks that have been in the same status for more than 7 days
