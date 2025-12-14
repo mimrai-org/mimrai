@@ -6,6 +6,10 @@ import { useUser } from "@/hooks/use-user";
 export default function Page() {
 	const user = useUser();
 
+	if (!user) {
+		return null;
+	}
+
 	return (
 		<TasksView
 			assigneeId={[user?.id!]}
