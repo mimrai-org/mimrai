@@ -1,84 +1,31 @@
 "use client";
-import type { RouterOutputs } from "@api/trpc/routers";
-import { useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/ui/button";
 import { motion } from "framer-motion";
 import { PencilIcon, QuoteIcon, SkipForwardIcon, XIcon } from "lucide-react";
-import { redirect, useRouter } from "next/navigation";
-import { useRef } from "react";
+import { useRouter } from "next/navigation";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useUser } from "@/hooks/use-user";
-import { trpc } from "@/utils/trpc";
 import { Response } from "../chat/response";
 import { PriorityIcon } from "../tasks-view/properties/priority";
 import { ZenModeAttachments } from "./attachments";
 import { ZenModeChecklist } from "./checklists";
 import { ZenModeDoneButton } from "./done-button";
 import { ZenModeLabels } from "./labels";
-import { ZenModeLoading } from "./loading";
-import { ZenModeNotFound } from "./not-found";
 import { ZenModeQueue } from "./queue";
 import { ZenModeScrollSpy } from "./scroll-spy";
+import { useZenMode } from "./use-zen-mode";
 import { ZenModeWhyButton } from "./why-button";
-
-export type ZenModeTasks = RouterOutputs["tasks"]["get"]["data"];
-export type ZenModeTask = ZenModeTasks[number];
 
 export const ZenModeView = ({ taskId }: { taskId: string }) => {
 	const { setParams } = useTaskParams();
-	const contentRef = useRef<HTMLDivElement>(null);
-	const router = useRouter();
-	const user = useUser();
 
-	const { data: tasks, isLoading } = useQuery(
-		trpc.tasks.get.queryOptions(
-			{
-				assigneeId: [user?.id || ""],
-				statusType: ["to_do", "in_progress"],
-				view: "board",
-				pageSize: 10,
-			},
-			{ enabled: !!user?.id },
-		),
-	);
-
-	// Handle loading state
-	if (isLoading) {
-		return <ZenModeLoading />;
-	}
-
-	if (!tasks || tasks.data.length === 0) {
-		return <ZenModeNotFound />;
-	}
-
-	const currentTask = tasks.data.find((task) => task.id === taskId);
-
-	const handleNext = () => {
-		if (!currentTask) return;
-		const nextTaskIndex =
-			tasks.data.findIndex((task) => task.id === currentTask!.id) + 1;
-		if (nextTaskIndex < tasks.data.length) {
-			const nextTask = tasks.data[nextTaskIndex]!;
-			router.push(`${user?.basePath}/zen/${nextTask.id}`);
-		} else {
-			router.push(`${user?.basePath}/board`);
-		}
-	};
-
-	if (!currentTask) {
-		if (tasks.data.length > 0) {
-			// If the current task is not found, redirect to the first task in the list
-			return redirect(`${user?.basePath}/zen/${tasks.data[0]!.id}`);
-		}
-
-		if (!currentTask) return <ZenModeNotFound />;
-	}
+	const { contentRef, currentTask, next } = useZenMode();
 
 	return (
 		<>
 			<ZenModeClose />
-			<ZenModeQueue currentTaskId={taskId} tasks={tasks.data} />
-			<ZenModeScrollSpy task={currentTask} contentRef={contentRef} />
+			<ZenModeQueue />
+			<ZenModeScrollSpy />
 			<motion.div
 				initial={{ opacity: 0, scale: 0.95, filter: "blur(8px)" }}
 				animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
@@ -106,8 +53,8 @@ export const ZenModeView = ({ taskId }: { taskId: string }) => {
 					</div>
 					<Response>{currentTask.description}</Response>
 				</div>
-				<ZenModeAttachments task={currentTask} />
-				<ZenModeChecklist task={currentTask} />
+				<ZenModeAttachments />
+				<ZenModeChecklist />
 				<div className="mt-8 flex flex-col items-center gap-4 sm:flex-row">
 					<Button
 						className="size-10 rounded-full"
@@ -124,15 +71,15 @@ export const ZenModeView = ({ taskId }: { taskId: string }) => {
 						variant={"outline"}
 						className="rounded-full bg-transparent text-sm hover:scale-105 sm:text-base dark:bg-transparent"
 						size={"xl"}
-						onClick={handleNext}
+						onClick={next}
 					>
 						<SkipForwardIcon />
 						Skip
 					</Button>
-					<ZenModeDoneButton task={currentTask} handleNext={handleNext} />
+					<ZenModeDoneButton />
 				</div>
 				<div className="mt-4">
-					<ZenModeWhyButton task={currentTask} />
+					<ZenModeWhyButton />
 				</div>
 			</motion.div>
 		</>

@@ -10,6 +10,7 @@ import { StatusIcon } from "../../status-icon";
 import { TaskPropertyAssignee } from "./assignee";
 import { TaskPropertyDueDate } from "./due-date";
 import { Priority } from "./priority";
+import { TaskPropertyStatus } from "./status";
 
 export type Task = RouterOutputs["tasks"]["get"]["data"][number];
 export const propertiesComponents = {
@@ -66,13 +67,9 @@ export const propertiesComponents = {
 			</div>
 		);
 	},
-	status: (task: Pick<Task, "status">) =>
-		task.status && (
-			<time className="flex h-5.5 items-center rounded-sm text-xs">
-				<StatusIcon {...task.status} className="size-3.5" />
-				<span className="sr-only">{task.status.name}</span>
-			</time>
-		),
+	status: (task: Pick<Task, "status" | "id">) => (
+		<TaskPropertyStatus status={task.status} id={task.id} />
+	),
 	labels: (task: Pick<Task, "labels">) => {
 		if (!task.labels || task.labels.length === 0) return null;
 		return (

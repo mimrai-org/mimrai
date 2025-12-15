@@ -474,6 +474,7 @@ export const updateTask = async ({
 	statusId?: string;
 	teamId?: string;
 	order?: number;
+	focusOrder?: number | null;
 	priority?: "low" | "medium" | "high" | "urgent";
 	repositoryName?: string;
 	branchName?: string;

@@ -10,11 +10,12 @@ import { useUser } from "@/hooks/use-user";
 import { queryClient, trpc } from "@/utils/trpc";
 import { AssigneeAvatar } from "../asignee-avatar";
 import { Response } from "../chat/response";
-import type { ZenModeTask } from "./view";
+import { useZenMode } from "./use-zen-mode";
 
-export const ZenModeChecklist = ({ task }: { task: ZenModeTask }) => {
+export const ZenModeChecklist = () => {
 	const [showAll, setShowAll] = useState(false);
 	const user = useUser();
+	const { currentTask: task } = useZenMode();
 	const { data: checklist } = useQuery(
 		trpc.checklists.get.queryOptions({
 			taskId: task.id,

@@ -181,6 +181,7 @@ const Item = ({
 
 			<div className="ml-auto flex items-center gap-2">
 				{propertiesComponents.status({
+					id: dependency.task.id,
 					status: dependency.status,
 				})}
 				<DropdownMenu>

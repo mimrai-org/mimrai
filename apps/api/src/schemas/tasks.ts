@@ -62,6 +62,7 @@ export const updateTaskSchema = z.object({
 	priority: z.enum(priorityEnum.enumValues).nullable().optional(),
 	dueDate: z.string().nullable().optional(),
 	order: z.number().nullable().optional(),
+	focusOrder: z.number().nullable().optional(),
 	statusId: z.string().optional(),
 	milestoneId: z.string().nullable().optional(),
 	labels: z.array(z.string()).nullable().optional(),

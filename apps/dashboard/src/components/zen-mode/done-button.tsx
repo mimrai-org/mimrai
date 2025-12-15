@@ -1,4 +1,3 @@
-import type { RouterOutputs } from "@api/trpc/routers";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/ui/button";
 import {
@@ -6,25 +5,19 @@ import {
 	DialogContent,
 	DialogDescription,
 	DialogHeader,
-	DialogOverlay,
 	DialogTitle,
 } from "@ui/components/ui/dialog";
-import { CheckIcon, ChevronRight } from "lucide-react";
+import { CheckIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useUser } from "@/hooks/use-user";
 import { trpc } from "@/utils/trpc";
 import { StatusIcon } from "../status-icon";
-import type { ZenModeTask } from "./view";
+import { useZenMode } from "./use-zen-mode";
 
-export const ZenModeDoneButton = ({
-	task,
-	handleNext,
-}: {
-	task: ZenModeTask;
-	handleNext: () => void;
-}) => {
+export const ZenModeDoneButton = () => {
+	const { currentTask: task, next: handleNext } = useZenMode();
 	const router = useRouter();
 	const user = useUser();
 	const [dialogOpen, setDialogOpen] = useState(false);
@@ -67,6 +60,14 @@ export const ZenModeDoneButton = ({
 		(e) => {
 			e.preventDefault();
 			e.stopPropagation();
+
+			// check if there is a dialog open
+			const dialogs = document.querySelectorAll("[role='dialog']");
+			if (dialogs.length > 0) {
+				// do nothing
+				return;
+			}
+
 			handleExit();
 		},
 		[dialogOpen],

@@ -1,16 +1,11 @@
 import { motion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
-import type { ZenModeTask } from "./view";
+import { useZenMode } from "./use-zen-mode";
 
-export const ZenModeScrollSpy = ({
-	task,
-	contentRef,
-}: {
-	task: ZenModeTask;
-	contentRef: React.RefObject<HTMLElement | null>;
-}) => {
+export const ZenModeScrollSpy = () => {
 	const [contentRendered, setContentRendered] = useState(false);
-	const content = task.description;
+	const { currentTask, contentRef } = useZenMode();
+	const content = currentTask.description;
 
 	const elements = useMemo(() => {
 		if (!content) return [];

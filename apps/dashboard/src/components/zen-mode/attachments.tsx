@@ -1,17 +1,17 @@
-import type { RouterOutputs } from "@api/trpc/routers";
 import { FileIcon } from "lucide-react";
 import Image from "next/image";
+import { useZenMode } from "./use-zen-mode";
 
-type Task = RouterOutputs["tasks"]["getById"];
+export const ZenModeAttachments = () => {
+	const { currentTask } = useZenMode();
 
-export const ZenModeAttachments = ({ task }: { task: Task }) => {
-	if (!task?.attachments || task?.attachments.length === 0) {
+	if (!currentTask?.attachments || currentTask?.attachments.length === 0) {
 		return null;
 	}
 
 	return (
 		<div className="flex flex-wrap gap-4">
-			{task.attachments.map((attachment) => (
+			{currentTask.attachments.map((attachment) => (
 				<div
 					key={attachment}
 					className="size-16 overflow-hidden rounded-md border border-border/50"

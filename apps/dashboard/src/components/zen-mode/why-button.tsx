@@ -6,10 +6,12 @@ import {
 	PopoverTrigger,
 } from "@ui/components/ui/popover";
 import { CircleQuestionMarkIcon, SparklesIcon } from "lucide-react";
+import { useZenMode } from "./use-zen-mode";
 
 type Task = RouterOutputs["tasks"]["get"]["data"][number];
 
-export const ZenModeWhyButton = ({ task }: { task: Task }) => {
+export const ZenModeWhyButton = () => {
+	const { currentTask: task } = useZenMode();
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
