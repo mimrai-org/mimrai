@@ -59,7 +59,9 @@ export const KanbanTask = ({
 					</div>
 					<div className="flex items-start gap-2">
 						<TaskProperty property="status" task={task} />
-						<div className="break-words font-medium text-sm">{task.title}</div>
+						<div className="line-clamp-3 break-words font-medium text-sm">
+							{task.title}
+						</div>
 					</div>
 
 					<div className="mt-2 flex flex-wrap items-center gap-1.5">
