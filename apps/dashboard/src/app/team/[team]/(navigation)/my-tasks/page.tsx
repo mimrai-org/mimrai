@@ -15,6 +15,7 @@ export default function Page() {
 			assigneeId={[user?.id!]}
 			viewType="list"
 			groupBy="none"
+			statusType={["to_do", "in_progress"]}
 			showEmptyColumns={false}
 		/>
 	);
