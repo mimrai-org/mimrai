@@ -140,7 +140,7 @@ const ZenModeQueueSheet = ({
 						see fit.
 					</DialogDescription>
 				</DialogHeader>
-				<div className="flex flex-col">
+				<div className="flex max-h-[70vh flex-col overflow-y-auto">
 					<DndContext onDragEnd={handleDragEnd}>
 						{tasks.map((task) => (
 							<ZenModeQueueItem key={task.id} task={task} />
