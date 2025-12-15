@@ -52,7 +52,7 @@ export function Editor({
 			shouldInsertImage,
 		}),
 		content: value,
-		immediatelyRender: false,
+		immediatelyRender: true,
 		onBlur,
 		onFocus,
 		autofocus: autoFocus,

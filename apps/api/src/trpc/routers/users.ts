@@ -34,7 +34,7 @@ export const usersRouter = router({
 		.input(switchTeamSchema)
 		.mutation(async ({ ctx, input }) => {
 			// check if we really need to switch
-			if ("slug" in input && ctx.team.slug === input.slug) {
+			if ("slug" in input && ctx.user.teamSlug === input.slug) {
 				// no switch needed
 				return {
 					user: ctx.user,
@@ -42,11 +42,11 @@ export const usersRouter = router({
 				};
 			}
 
-			if ("teamId" in input && ctx.team.id === input.teamId) {
+			if ("teamId" in input && ctx.user.teamId === input.teamId) {
 				// no switch needed
 				return {
 					user: ctx.user,
-					slug: ctx.team.slug,
+					slug: ctx.user.teamSlug,
 				};
 			}
 

@@ -42,8 +42,6 @@ export const TaskActivitiesList = ({ taskId }: { taskId: string }) => {
 							initial={{ opacity: 0, y: -10 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ duration: 0.2 }}
-							layout
-							layoutId={`activity-${activity.id}`}
 						>
 							<ActivityItem activity={activity} />
 						</motion.li>
