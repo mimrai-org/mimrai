@@ -4,13 +4,16 @@ import { BoldIcon, ItalicIcon, StrikethroughIcon } from "lucide-react";
 import { useState } from "react";
 import type { Props as TippyOptions } from "tippy.js";
 import { BubbleMenuItem } from "./bubble-item";
+import { InlineCommentItem } from "./inline-comment-item";
 import { LinkItem } from "./link-item";
 
 export function BubbleMenu({
 	editor,
+	taskId,
 	tippyOptions,
 }: {
 	editor: Editor;
+	taskId?: string;
 	tippyOptions?: TippyOptions;
 }) {
 	const [openLink, setOpenLink] = useState(false);
@@ -21,8 +24,8 @@ export function BubbleMenu({
 
 	return (
 		<div>
-			<TiptapBubbleMenu editor={editor} >
-				<div className="flex w-fit h-9 max-w-[90vw] overflow-hidden rounded-full border border-border bg-background font-regular text-mono">
+			<TiptapBubbleMenu editor={editor}>
+				<div className="flex h-9 w-fit max-w-[90vw] overflow-hidden rounded-full border border-border bg-background font-regular text-mono">
 					<BubbleMenuItem
 						editor={editor}
 						action={() => editor.chain().focus().toggleBold().run()}
@@ -51,6 +54,7 @@ export function BubbleMenu({
 					</BubbleMenuItem>
 
 					<LinkItem editor={editor} open={openLink} setOpen={setOpenLink} />
+					{taskId && <InlineCommentItem editor={editor} taskId={taskId} />}
 				</div>
 			</TiptapBubbleMenu>
 		</div>

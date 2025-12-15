@@ -254,6 +254,7 @@ export const CommentActivityItem = ({
 							<Button
 								variant={"ghost"}
 								size={"sm"}
+								type="button"
 								className="h-6 text-xs"
 								onClick={() => {
 									setReplying(true);

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useUser } from "@/hooks/use-user";
 import { Response } from "../chat/response";
+import { Editor } from "../editor";
 import { PriorityIcon } from "../tasks-view/properties/priority";
 import { ZenModeAttachments } from "./attachments";
 import { ZenModeChecklist } from "./checklists";
@@ -45,13 +46,17 @@ export const ZenModeView = ({ taskId }: { taskId: string }) => {
 				</div>
 				<div className="my-6 h-px w-full bg-gradient-to-r from-transparent via-muted to-transparent" />
 				<div
-					className="relative self-start px-2 text-start text-muted-foreground text-sm leading-6 sm:px-4 sm:text-lg sm:leading-7"
+					className="relative self-start px-2 text-start text-foreground text-sm leading-6 sm:px-4 sm:text-lg sm:leading-7"
 					ref={contentRef}
 				>
 					<div className="-left-12 absolute top-0 hidden text-zinc-800 md:block">
 						<QuoteIcon className="h-8 w-8 opacity-20" />
 					</div>
-					<Response>{currentTask.description}</Response>
+					<Editor
+						className="editor-xl"
+						taskId={currentTask.id}
+						value={currentTask.description || ""}
+					/>
 				</div>
 				<ZenModeAttachments />
 				<ZenModeChecklist />

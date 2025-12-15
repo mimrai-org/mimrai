@@ -130,7 +130,7 @@ const ZenModeQueueSheet = ({
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent
-				overlayClassName="dark:bg-black/95"
+				overlayClassName="dark:bg-background/99 bg-background/99"
 				className="-translate-y-1/2 top-1/2 w-auto bg-transparent sm:max-w-3xl"
 			>
 				<DialogHeader>

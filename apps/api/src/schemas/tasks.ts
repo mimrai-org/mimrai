@@ -92,6 +92,23 @@ export const commentTaskSchema = z.object({
 	comment: z.string().min(1).max(5000),
 	replyTo: z.string().nullable().optional(),
 	mentions: z.array(z.string()).nullable().optional(),
+	metadata: z
+		.record(z.string(), z.number().or(z.string()).or(z.boolean()))
+		.refine((arg) => {
+			const keys = Object.keys(arg);
+			for (const key of keys) {
+				const value = arg[key];
+				// prevent long values
+				if (typeof value === "string" && value.length > 1000) {
+					return false;
+				}
+			}
+
+			//prevent abuse by limiting number of keys
+			return keys.length <= 10;
+		})
+		.nullable()
+		.optional(),
 });
 
 export const deleteTaskCommentSchema = z.object({

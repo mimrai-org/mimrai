@@ -6,55 +6,48 @@
 
 .tiptap {
 	@apply text-sm leading-relaxed;
-}
-
-.tiptap h1 {
-	@apply text-lg;
 	@apply font-sans;
-	margin-bottom: 0.5rem;
-}
 
-.tiptap h2 {
-	@apply text-base;
-	@apply font-sans;
-	margin-bottom: 0.5rem;
-}
+	h1 {
+		@apply text-lg;
+		margin-bottom: 0.5rem;
+	}
 
-.tiptap a {
-	@apply underline;
-}
+	h2 {
+		@apply text-base;
+		margin-bottom: 0.5rem;
+	}
 
-.tiptap .bubble-menu {
-	@apply flex gap-2;
-}
+	a {
+		@apply underline;
+	}
 
-.tiptap p {
-	@apply mb-1;
-}
+	p {
+		@apply mb-1;
+	}
 
-.tiptap hr {
-	@apply my-4;
-}
+	hr {
+		@apply my-4;
+	}
 
-.tiptap p.is-empty::before {
-	color: #404040;
-	content: attr(data-placeholder);
-	float: left;
-	height: 0;
-	pointer-events: none;
-}
+	p.is-empty::before {
+		color: #404040;
+		content: attr(data-placeholder);
+		float: left;
+		height: 0;
+		pointer-events: none;
+	}
 
-.tiptap ul {
-	list-style: disc;
-	margin-left: 1rem;
-}
+	ul {
+		list-style: disc;
+		margin-left: 1rem;
+	}
 
-.tiptap ol {
-	list-style: decimal;
-	margin-left: 1rem;
-}
+	ol {
+		list-style: decimal;
+		margin-left: 1rem;
+	}
 
-.tiptap {
 	pre {
 		@apply border p-2 my-2;
 
@@ -80,4 +73,22 @@
 			outline: 3px solid var(--purple);
 		}
 	}
+}
+
+.editor-xl {
+	.tiptap {
+		@apply text-lg;
+
+		h1 {
+			@apply text-2xl;
+		}
+
+		h2 {
+			@apply text-xl;
+		}
+	}
+}
+
+.tiptap .bubble-menu {
+	@apply flex gap-2;
 }

@@ -185,6 +185,7 @@ export const tasksRouter = router({
 				userId: ctx.user.id,
 				teamId: ctx.user.teamId!,
 				mentions: input.mentions,
+				metadata: input.metadata,
 			});
 
 			// Try to handle the comment with AI integration

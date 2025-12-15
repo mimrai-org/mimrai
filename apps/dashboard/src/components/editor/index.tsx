@@ -21,9 +21,13 @@ type EditorProps = {
 	onBlur?: () => void;
 	onFocus?: () => void;
 	onUpload?: (fileUrl: string) => Promise<void>;
+
 	ref?: React.Ref<EditorInstance>;
 	className?: string;
 	tabIndex?: number;
+
+	//** Only provide if this editor is associated with a specific task */
+	taskId?: string;
 };
 
 export function Editor({
@@ -39,6 +43,7 @@ export function Editor({
 	autoFocus,
 	className,
 	tabIndex,
+	taskId,
 }: EditorProps) {
 	const editor = useEditor({
 		extensions: registerExtensions({
@@ -69,7 +74,7 @@ export function Editor({
 				tabIndex={tabIndex}
 				autoFocus={autoFocus}
 			/>
-			<BubbleMenu editor={editor} />
+			<BubbleMenu editor={editor} taskId={taskId} />
 		</>
 	);
 }

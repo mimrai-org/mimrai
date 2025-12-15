@@ -9,6 +9,7 @@ export const Description = ({
 	editorRef: React.Ref<EditorInstance>;
 }) => {
 	const form = useFormContext();
+	const id = form.watch("id");
 
 	return (
 		<FormField
@@ -18,8 +19,9 @@ export const Description = ({
 				<FormItem>
 					<FormControl>
 						<Editor
-							className="[&_div]:min-h-[100px]"
+							className="[&_.tiptap]:min-h-[100px]"
 							placeholder="Add description..."
+							taskId={id}
 							value={field.value ?? ""}
 							onChange={(value) => {
 								field.onChange(value);

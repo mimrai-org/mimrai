@@ -17,6 +17,7 @@ import {
 } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Markdown } from "tiptap-markdown";
+import { CommentMark } from "./comment-mark";
 import { suggestionsOptions } from "./suggestions";
 
 const updatePosition = (editor: Editor, element: HTMLElement) => {
@@ -150,6 +151,7 @@ const extensions = ({
 			},
 		})),
 	}),
+	CommentMark,
 
 	FileHandler.configure({
 		onDrop: async (currentEditor, files, pos) => {
@@ -181,19 +183,6 @@ const extensions = ({
 				}
 
 				onUpload?.(url);
-				// fileReader.readAsDataURL(file);
-				// fileReader.onload = () => {
-				//   currentEditor
-				//     .chain()
-				//     .insertContentAt(pos, {
-				//       type: "image",
-				//       attrs: {
-				//         src: fileReader.result,
-				//       },
-				//     })
-				//     .focus()
-				//     .run();
-				// };
 			}
 		},
 		onPaste: async (currentEditor, files, htmlContent) => {
@@ -231,22 +220,6 @@ const extensions = ({
 				}
 
 				onUpload?.(url);
-
-				// const fileReader = new FileReader();
-
-				// fileReader.readAsDataURL(file);
-				// fileReader.onload = () => {
-				//   currentEditor
-				//     .chain()
-				//     .insertContentAt(currentEditor.state.selection.anchor, {
-				//       type: "image",
-				//       attrs: {
-				//         src: fileReader.result,
-				//       },
-				//     })
-				//     .focus()
-				//     .run();
-				// };
 			}
 		},
 	}),

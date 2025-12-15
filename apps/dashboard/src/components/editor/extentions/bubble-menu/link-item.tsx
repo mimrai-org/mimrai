@@ -36,10 +36,14 @@ export function LinkItem({ editor, open, setOpen }: LinkItemProps) {
 	};
 
 	return (
-		<Popover modal={false} open={open} onOpenChange={setOpen}>
+		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
-				<div>
-					<BubbleMenuButton isActive={isActive} action={() => setOpen(true)}>
+				<div className="h-9">
+					<BubbleMenuButton
+						isActive={isActive}
+						action={() => setOpen(true)}
+						className="h-full"
+					>
 						{linkValue ? (
 							<Link2OffIcon className="size-4" />
 						) : (

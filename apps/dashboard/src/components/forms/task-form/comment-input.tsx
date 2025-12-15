@@ -1,6 +1,7 @@
 import { Textarea } from "@mimir/ui/textarea";
 import { useMutation } from "@tanstack/react-query";
 import type { Editor as EditorInstance } from "@tiptap/react";
+import { cn } from "@ui/lib/utils";
 import { useRef, useState } from "react";
 import { Editor } from "@/components/editor";
 import { queryClient, trpc } from "@/utils/trpc";
@@ -9,10 +10,16 @@ export const CommentInput = ({
 	taskId,
 	replyTo,
 	autoFocus = false,
+	onSubmit,
+	className,
+	metadata,
 }: {
 	taskId: string;
 	replyTo?: string;
 	autoFocus?: boolean;
+	className?: string;
+	onSubmit?: (commentId: string) => void;
+	metadata?: Record<string, string | number | boolean>;
 }) => {
 	const editorRef = useRef<EditorInstance | null>(null);
 	const [comment, setComment] = useState("");
@@ -20,6 +27,8 @@ export const CommentInput = ({
 	const { mutate: commentTask } = useMutation(
 		trpc.tasks.comment.mutationOptions({
 			onSuccess: (newComment) => {
+				if (!newComment) return;
+				onSubmit?.(newComment.id);
 				queryClient.invalidateQueries(
 					trpc.activities.get.queryOptions({ groupId: replyTo ?? taskId }),
 				);
@@ -44,7 +53,8 @@ export const CommentInput = ({
 	const handleSubmit = (e: React.KeyboardEvent<HTMLDivElement>) => {
 		if (comment.trim().length === 0) return;
 		const mentions = parseMentions(editorRef.current?.getJSON() || {});
-		commentTask({ id: taskId, comment, mentions, replyTo });
+		commentTask({ id: taskId, comment, mentions, replyTo, metadata });
+
 		setComment("");
 		editorRef.current?.commands.clearContent();
 		editorRef.current?.commands.focus();
@@ -73,7 +83,10 @@ export const CommentInput = ({
 				autoFocus={autoFocus}
 				onChange={(e) => setComment(e)}
 				placeholder="Leave a comment..."
-				className="rounded-sm border border-input bg-input px-4 py-2 dark:bg-input/30 [&_div]:min-h-[60px]"
+				className={cn(
+					"rounded-sm border border-input bg-input px-4 py-2 dark:bg-input/30 [&_div]:min-h-[60px]",
+					className,
+				)}
 			/>
 		</div>
 	);

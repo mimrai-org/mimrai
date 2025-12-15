@@ -749,12 +749,14 @@ export const createTaskComment = async ({
 	teamId,
 	comment,
 	mentions = [],
+	metadata,
 }: {
 	taskId: string;
 	userId?: string;
 	teamId?: string;
 	replyTo?: string;
 	comment: string;
+	metadata?: Record<string, any>;
 	mentions?: string[];
 }) => {
 	const whereClause: SQL[] = [eq(tasks.id, taskId)];
@@ -788,7 +790,12 @@ export const createTaskComment = async ({
 		teamId: task.teamId,
 		type: "task_comment",
 		groupId: replyTo ?? task.id,
-		metadata: { comment, title: task.title, subscribers: newTask.subscribers },
+		metadata: {
+			comment,
+			title: task.title,
+			subscribers: newTask.subscribers,
+			...metadata,
+		},
 	});
 
 	return activity;
