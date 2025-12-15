@@ -54,6 +54,7 @@ export const ZenModeView = ({ taskId }: { taskId: string }) => {
 					</div>
 					<Editor
 						className="editor-xl"
+						autoFocus={false}
 						taskId={currentTask.id}
 						value={currentTask.description || ""}
 					/>
