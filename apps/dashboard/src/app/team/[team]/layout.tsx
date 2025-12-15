@@ -19,10 +19,6 @@ export default async function Layout({ children, params }: Props) {
 		return redirect("/sign-in");
 	}
 
-	if (!session.user.teamSlug) {
-		return redirect("/team");
-	}
-
 	// switch to the team in the URL
 	try {
 		if (session.user.teamSlug !== team) {
