@@ -201,6 +201,26 @@ export const createDefaultStatuses = async (teamId: string) => {
 	return data;
 };
 
+export const reorderStatuses = async ({
+	items,
+	teamId,
+}: {
+	items: Array<{ id: string; order: number }>;
+	teamId: string;
+}) => {
+	const results = await Promise.all(
+		items.map((item) =>
+			db
+				.update(statuses)
+				.set({ order: item.order })
+				.where(and(eq(statuses.id, item.id), eq(statuses.teamId, teamId)))
+				.returning(),
+		),
+	);
+
+	return results.flat();
+};
+
 export const getBacklogStatus = async ({ teamId }: { teamId: string }) => {
 	const [existing] = await db
 		.select()

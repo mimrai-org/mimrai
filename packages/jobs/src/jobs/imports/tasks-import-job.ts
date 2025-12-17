@@ -1,7 +1,7 @@
 import { createAdminClient } from "@jobs/utils/supabase";
-import { getBacklogStatus } from "@mimir/db/queries/columns";
 import { getImportById, updateImportStatus } from "@mimir/db/queries/imports";
 import { createLabel, getLabelByName } from "@mimir/db/queries/labels";
+import { getBacklogStatus } from "@mimir/db/queries/statuses";
 import { createTask, getTaskByTitle } from "@mimir/db/queries/tasks";
 import { getMemberByEmail } from "@mimir/db/queries/teams";
 import { randomColor } from "@mimir/utils/random";

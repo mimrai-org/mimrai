@@ -36,7 +36,7 @@ export function ChatStatusIndicators({
 
 			{((agentStatus && !getStatusMessage(agentStatus)) ||
 				(status === "submitted" && !agentStatus && !currentToolCall)) && (
-				<Loader />
+				<Loader className="size-4" />
 			)}
 		</div>
 	);

@@ -1,3 +1,4 @@
+import { statusTypeEnum } from "@db/schema";
 import { getTasks } from "@mimir/db/queries/tasks";
 import { getAppUrl } from "@mimir/utils/envs";
 import { getTaskPermalink } from "@mimir/utils/tasks";
@@ -7,7 +8,11 @@ import type { AppContext } from "../agents/config/shared";
 
 export const getTasksToolSchema = z.object({
 	search: z.string().optional().describe("Search query"),
-	assigneeId: z.array(z.string()).optional().describe("Users IDs"),
+	assigneeId: z.array(z.string()).optional().describe("Users IDs (uuid)"),
+	statusType: z
+		.array(z.enum(statusTypeEnum.enumValues))
+		.optional()
+		.describe("Status type"),
 	cursor: z.string().optional().describe("Pagination cursor"),
 	pageSize: z.number().min(1).max(100).default(10).describe("Page size"),
 });
@@ -16,7 +21,7 @@ export const getTasksTool = tool({
 	description: "Retrieve a list of tasks",
 	inputSchema: getTasksToolSchema,
 	execute: async function* (
-		{ search, cursor, pageSize, assigneeId },
+		{ search, cursor, pageSize, assigneeId, statusType },
 		executionOptions,
 	) {
 		try {
@@ -28,6 +33,7 @@ export const getTasksTool = tool({
 			const result = await getTasks({
 				teamId: teamId,
 				assigneeId: assigneeId,
+				statusType,
 				view: "board",
 				cursor,
 				pageSize,
@@ -42,7 +48,6 @@ export const getTasksTool = tool({
 			const mappedData = result.data.map((task) => ({
 				id: task.id,
 				title: task.title,
-				description: task.description,
 				priority: task.priority,
 				status: task.status,
 				statusId: task.statusId,

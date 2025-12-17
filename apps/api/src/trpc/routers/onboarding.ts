@@ -4,8 +4,8 @@ import {
 	stringifyWorkflow,
 	workflowSuggestion,
 } from "@api/utils/workflow";
-import { createStatus } from "@db/queries/columns";
 import { createLabel } from "@db/queries/labels";
+import { createStatus } from "@db/queries/statuses";
 import { updateTeam } from "@db/queries/teams";
 import z from "zod";
 
@@ -20,8 +20,7 @@ export const onboardingRouter = router({
 		)
 		.mutation(async ({ ctx, input }) => {
 			return generateWorkflow({
-				whatYourTeamDoes: input.whatYourTeamDoes,
-				howIsYourWorkflow: input.howIsYourWorkflow,
+				...input,
 			});
 		}),
 	confirmWorkflow: protectedProcedure

@@ -21,11 +21,11 @@ import {
 	tasks,
 	users,
 } from "../schema";
-import { getStatusById } from "./columns";
 import {
 	notificationChannels,
 	shouldSendNotification,
 } from "./notification-settings";
+import { getStatusById } from "./statuses";
 import { getMemberById } from "./teams";
 import { getSystemUser } from "./users";
 

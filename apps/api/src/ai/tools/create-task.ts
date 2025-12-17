@@ -1,6 +1,6 @@
 import { openai } from "@ai-sdk/openai";
-import { getStatuses } from "@db/queries/columns";
 import { getLabels } from "@db/queries/labels";
+import { getStatuses } from "@db/queries/statuses";
 import { createTask } from "@db/queries/tasks";
 import { getMembers } from "@db/queries/teams";
 import { trackTaskCreated } from "@mimir/events/server";

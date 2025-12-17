@@ -41,6 +41,7 @@ export const tasksAgent = createAgent({
 - When creating checklist items, ensure they are specific, actionable, and relevant to the associated task
 - When creating tasks, ensure to assign them to the appropriate team members based on their roles and expertise
 - When creating tasks, keep the title concise yet descriptive to clearly convey the task's purpose
+- If the user asks about their pending tasks, only consider tasks assigned to them that are not marked as done
 </agent-specific-rules>
 
 - IMPORTANT: If the messages seems like a feature request, bug report, or to-do related, prioritize creating a new task using the createTask tool.

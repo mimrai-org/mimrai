@@ -6,6 +6,10 @@ import { useUser } from "@/hooks/use-user";
 
 export const ZenModeNotFound = () => {
 	const user = useUser();
+	if (!user) {
+		return null;
+	}
+
 	return (
 		<div className="flex h-screen items-center justify-center">
 			<div className="space-y-4 text-center">

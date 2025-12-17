@@ -3,6 +3,7 @@ import {
 	deleteColumnSchema,
 	getColumnByIdSchema,
 	getColumnsSchema,
+	reorderColumnSchema,
 	updateColumnSchema,
 } from "@api/schemas/columns";
 import { protectedProcedure, router } from "@api/trpc/init";
@@ -12,8 +13,9 @@ import {
 	getBacklogStatus,
 	getStatusById,
 	getStatuses,
+	reorderStatuses,
 	updateStatus,
-} from "@mimir/db/queries/columns";
+} from "@mimir/db/queries/statuses";
 
 export const statusesRouter = router({
 	get: protectedProcedure
@@ -60,6 +62,14 @@ export const statusesRouter = router({
 		.mutation(async ({ ctx, input }) => {
 			return deleteStatus({
 				...input,
+				teamId: ctx.user.teamId!,
+			});
+		}),
+	reorder: protectedProcedure
+		.input(reorderColumnSchema)
+		.mutation(async ({ ctx, input }) => {
+			return reorderStatuses({
+				items: input.items,
 				teamId: ctx.user.teamId!,
 			});
 		}),

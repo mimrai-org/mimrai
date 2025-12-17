@@ -10,8 +10,8 @@ export const generateWorkflow = async ({
 	howIsYourWorkflow,
 }: {
 	whatYourTeamDoes: string;
-	currentTool: string;
-	howIsYourWorkflow: string;
+	currentTool?: string;
+	howIsYourWorkflow?: string;
 }) => {
 	const response = await generateObject({
 		model: openai("gpt-5-mini"),

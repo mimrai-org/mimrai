@@ -14,6 +14,8 @@ import { titleInstructions } from "./title-instructions";
 
 export function formatContextForLLM(context: AppContext): string {
 	return `<team-info>
+<user-name>${context.fullName}</user-name>
+<user-id>${context.userId}</user-id>
 <current-date>${context.currentDateTime}</current-date>
 <timezone>${context.timezone}</timezone>
 <team-name>${context.teamName}</team-name>

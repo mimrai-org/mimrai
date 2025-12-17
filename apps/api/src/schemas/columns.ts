@@ -35,6 +35,16 @@ export const getColumnByIdSchema = z.object({
 	id: z.string(),
 });
 
+export const reorderColumnSchema = z.object({
+	items: z.array(
+		z.object({
+			id: z.string(),
+			order: z.number(),
+		}),
+	),
+});
+export type ReorderColumnInput = z.infer<typeof reorderColumnSchema>;
+
 export const updateConnectedRepositorySchema = z.object({
 	id: z.string(),
 	branches: z.array(z.string()).optional(),
