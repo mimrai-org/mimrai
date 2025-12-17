@@ -17,7 +17,7 @@ export default async function Layout({ children, params }: Props) {
 
 	console.log("Layout team:", team);
 
-	if (!session?.user.teamSlug) {
+	if (!session?.user.id) {
 		return redirect("/sign-in");
 	}
 
@@ -29,6 +29,9 @@ export default async function Layout({ children, params }: Props) {
 			});
 		}
 	} catch (error) {
+		if (!session.user.teamSlug) {
+			return redirect("/team");
+		}
 		return redirect(`/team/${session.user.teamSlug}/onboarding`);
 	}
 

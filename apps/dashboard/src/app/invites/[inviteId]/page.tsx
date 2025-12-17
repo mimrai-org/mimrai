@@ -19,7 +19,7 @@ export default async function Page({ params, searchParams }: Props) {
 
 	const session = await getSession();
 
-	if (!session?.user) {
+	if (!session?.user?.id) {
 		return redirect(`/sign-in?callbackUrl=/invites/${inviteId}&email=${email}`);
 	}
 

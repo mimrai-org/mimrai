@@ -10,8 +10,19 @@ type Props = {
 
 export default async function Page({ searchParams }: Props) {
 	const session = await getSession();
-	if (!session?.user) {
+	console.log("Session in team page:", session);
+	if (!session?.user.id) {
 		return redirect("/sign-in");
+	}
+
+	if (!session.user.teamSlug) {
+		// get user teams
+		const userTeams = await trpcClient.teams.getAvailable.query();
+		if (userTeams.length > 0) {
+			return redirect(`/team/${userTeams[0]!.slug}/onboarding`);
+		}
+
+		return redirect("/create-team");
 	}
 
 	const team = await trpcClient.teams.getCurrent.query();

@@ -14,7 +14,7 @@ type Props = {
 export default async function Page({ searchParams, params }: Props) {
 	const { path } = await params;
 	const session = await getSession();
-	if (!session) {
+	if (!session?.user?.id) {
 		return redirect("/sign-in");
 	}
 
