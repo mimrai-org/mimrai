@@ -22,7 +22,6 @@ export const SmartInput = () => {
 	const [explanation, setExplanation] = useState("");
 	const [value, setValue] = useState("");
 	const lastCompletedValue = useRef("");
-	const [debouncedValue] = useDebounceValue(value, 1000);
 
 	const inputRef = useRef<HTMLTextAreaElement>(null);
 	const { mutate, isPending } = useMutation(
@@ -58,7 +57,7 @@ export const SmartInput = () => {
 		}),
 	);
 
-	const debouncedMutate = useDebounceCallback(mutate, 800);
+	const debouncedMutate = useDebounceCallback(mutate, 1400);
 
 	useEffect(() => {
 		// check if the length of the value is not too long to used it as title
@@ -67,14 +66,14 @@ export const SmartInput = () => {
 		}
 
 		// compare last completed value to debounced value to determine if there is sufficient new context to trigger a new completion
-		const nonWhitespaceCharacters = debouncedValue.replace(/\s/g, "");
+		const nonWhitespaceCharacters = value.replace(/\s/g, "");
 		const lastCharactersDifference = Math.abs(
 			nonWhitespaceCharacters.length - lastCompletedValue.current.length,
 		);
 
 		if (lastCharactersDifference >= 3) {
 			lastCompletedValue.current = nonWhitespaceCharacters;
-			debouncedMutate({ prompt: debouncedValue });
+			debouncedMutate({ prompt: value });
 		}
 	}, [value]);
 	const title = form.watch("title");

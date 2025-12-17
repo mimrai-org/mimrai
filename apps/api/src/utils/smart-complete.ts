@@ -30,6 +30,7 @@ export const buildSmartCompletePrompt = async ({
 - If the user prompt lacks clarity, use the context to fill in the gaps.
 - Be careful when assigning projects; only assign if the user prompt specifies it.
 - If the user prompt is less than 4 words, use it as the title and do not generate a description unless there is relevant context.
+- return dates in UTC ISO 8601 format.
 </rules>
 
 <user-context>
