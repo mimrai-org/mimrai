@@ -7,6 +7,7 @@ export const getActivitiesSchema = z.object({
 	pageSize: z.number().min(1).max(100).optional(),
 	priority: z.tuple([z.number(), z.number()]).optional(),
 	status: z.array(z.enum(activityStatusEnum.enumValues).optional()).optional(),
+	nStatus: z.array(z.enum(activityStatusEnum.enumValues).optional()).optional(),
 	type: z.array(z.enum(activityTypeEnum.enumValues)).optional(),
 	search: z.string().optional(),
 

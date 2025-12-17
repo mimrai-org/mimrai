@@ -1,4 +1,9 @@
-import { priorityEnum, shareablePolicyEnum, statusTypeEnum } from "@db/schema";
+import {
+	activityStatusEnum,
+	priorityEnum,
+	shareablePolicyEnum,
+	statusTypeEnum,
+} from "@db/schema";
 import z from "zod";
 import { mention } from "../../../../packages/notifications/src/types";
 import { paginationSchema } from "./base";
@@ -113,6 +118,14 @@ export const commentTaskSchema = z.object({
 
 export const deleteTaskCommentSchema = z.object({
 	id: z.string(),
+});
+
+export const updateTaskCommentSchema = z.object({
+	id: z.string(),
+	comment: z.string().min(1).max(5000).optional(),
+	taskId: z.string(),
+	mentions: z.array(z.string()).nullable().optional(),
+	status: z.enum(activityStatusEnum.enumValues).optional(),
 });
 
 export const smartCompleteSchema = z.object({

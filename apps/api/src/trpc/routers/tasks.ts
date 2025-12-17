@@ -12,6 +12,7 @@ import {
 	smartCompleteSchema,
 	subscribeTaskSchema,
 	unsubscribeTaskSchema,
+	updateTaskCommentSchema,
 	updateTaskSchema,
 } from "@api/schemas/tasks";
 import { protectedProcedure, router } from "@api/trpc/init";
@@ -35,6 +36,7 @@ import {
 	subscribeUserToTask,
 	unsubscribeUserFromTask,
 	updateTask,
+	updateTaskComment,
 	updateTaskRecurringJob,
 } from "@mimir/db/queries/tasks";
 import { getDuplicateTaskEmbedding } from "@mimir/db/queries/tasks-embeddings";
@@ -204,6 +206,17 @@ export const tasksRouter = router({
 		.mutation(async ({ ctx, input }) => {
 			return deleteTaskComment({
 				commentId: input.id,
+				teamId: ctx.user.teamId!,
+			});
+		}),
+	updateComment: protectedProcedure
+		.input(updateTaskCommentSchema)
+		.mutation(async ({ ctx, input }) => {
+			return updateTaskComment({
+				...input,
+				commentId: input.id,
+				taskId: input.taskId,
+				userId: ctx.user.id,
 				teamId: ctx.user.teamId!,
 			});
 		}),

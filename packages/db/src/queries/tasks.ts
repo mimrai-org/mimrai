@@ -18,6 +18,8 @@ import { alias } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 import { db } from "..";
 import {
+	activities,
+	type activityStatusEnum,
 	checklistItems,
 	labels,
 	labelsOnTasks,
@@ -38,6 +40,7 @@ import {
 	createActivity,
 	createTaskUpdateActivity,
 	deleteActivity,
+	updateActivity,
 } from "./activities";
 import { upsertTaskEmbedding } from "./tasks-embeddings";
 import { getMembers } from "./teams";
@@ -538,10 +541,13 @@ export const updateTask = async ({
 		throw new Error("Failed to update task");
 	}
 
-	await upsertTaskEmbedding({
-		task,
-		teamId: task.teamId,
-	});
+	// Update task embedding if title has changed
+	if (task.title !== oldTask.title) {
+		upsertTaskEmbedding({
+			task,
+			teamId: task.teamId,
+		});
+	}
 
 	createTaskUpdateActivity({
 		oldTask,
@@ -811,6 +817,69 @@ export const deleteTaskComment = async ({
 	return deleteActivity({
 		id: commentId,
 		teamId,
+	});
+};
+
+export const updateTaskComment = async ({
+	taskId,
+	userId,
+	teamId,
+	commentId,
+	status,
+	comment,
+	mentions = [],
+}: {
+	taskId: string;
+	userId?: string;
+	teamId?: string;
+	commentId: string;
+	status?: (typeof activityStatusEnum.enumValues)[number];
+	comment?: string;
+	mentions?: string[];
+}) => {
+	const whereClause: SQL[] = [eq(tasks.id, taskId)];
+
+	if (teamId) whereClause.push(eq(tasks.teamId, teamId));
+
+	const [task] = await db
+		.select()
+		.from(tasks)
+		.where(and(...whereClause))
+		.limit(1);
+
+	if (!task) {
+		throw new Error("Task not found");
+	}
+
+	await db
+		.update(tasks)
+		.set({
+			subscribers: unionArray(task.subscribers, [userId, ...mentions]),
+		})
+		.where(and(...whereClause))
+		.returning();
+
+	const [existingActivity] = await db
+		.select()
+		.from(activities)
+		.where(
+			and(eq(activities.id, commentId), eq(activities.type, "task_comment")),
+		)
+		.limit(1);
+
+	if (!existingActivity) {
+		throw new Error("Comment not found");
+	}
+
+	return updateActivity({
+		id: commentId,
+		teamId,
+		status,
+		metadata: {
+			...existingActivity.metadata,
+			comment,
+			title: task.title,
+		},
 	});
 };
 

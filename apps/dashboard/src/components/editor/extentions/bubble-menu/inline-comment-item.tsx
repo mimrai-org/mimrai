@@ -7,17 +7,20 @@ import {
 import { MessageCircleIcon } from "lucide-react";
 import { useState } from "react";
 import { CommentInput } from "@/components/forms/task-form/comment-input";
+import Loader from "@/components/loader";
 import { BubbleMenuButton } from "./bubble-menu-button";
 
 export const InlineCommentItem = ({
 	editor,
 	taskId,
+	isActive,
 }: {
 	editor: Editor;
 	taskId: string;
+	isActive: boolean;
 }) => {
 	const [open, setOpen] = useState(false);
-	const isActive = editor.isActive("comment");
+	const [loading, setLoading] = useState(false);
 	const currentSelection = editor.state.selection;
 
 	const handleSubmit = (commentId: string) => {
@@ -27,7 +30,11 @@ export const InlineCommentItem = ({
 			.extendMarkRange("comment")
 			.setMark("comment", { "data-id": commentId })
 			.run();
+		setLoading(false);
+		setOpen(false);
 	};
+
+	if (isActive) return null;
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -40,14 +47,25 @@ export const InlineCommentItem = ({
 						}}
 						className="flex h-full items-center gap-2 text-sm!"
 					>
-						<MessageCircleIcon className="size-4" />
+						{loading ? (
+							<Loader className="size-4" />
+						) : (
+							<MessageCircleIcon className="size-4" />
+						)}
 						Comment
 					</BubbleMenuButton>
 				</div>
 			</PopoverTrigger>
-			<PopoverContent align="end" className="w-92 border-0 p-0" sideOffset={10}>
+			<PopoverContent align="start" className="w-92 p-0" sideOffset={10}>
 				<div className="w-full">
-					<CommentInput autoFocus taskId={taskId} onSubmit={handleSubmit} />
+					<CommentInput
+						autoFocus
+						taskId={taskId}
+						onSubmit={handleSubmit}
+						onMutate={() => setLoading(true)}
+						onBlur={() => setOpen(false)}
+						className="border-0 dark:bg-background"
+					/>
 				</div>
 			</PopoverContent>
 		</Popover>

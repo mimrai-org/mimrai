@@ -10,7 +10,7 @@ export default async function Page({ params }: Props) {
 	return (
 		<ZenModeProvider taskId={taskId}>
 			<div className="h-screen overflow-y-auto bg-background px-4 py-12">
-				<div className="mx-auto my-auto max-w-4xl">
+				<div className="relative mx-auto my-auto max-w-4xl">
 					<ZenModeView taskId={taskId} />
 				</div>
 			</div>

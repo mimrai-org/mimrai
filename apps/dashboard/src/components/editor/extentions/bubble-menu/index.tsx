@@ -1,5 +1,6 @@
-import type { Editor } from "@tiptap/react";
+import { type Editor, useEditorState } from "@tiptap/react";
 import { BubbleMenu as TiptapBubbleMenu } from "@tiptap/react/menus";
+import eq from "lodash/eq";
 import { BoldIcon, ItalicIcon, StrikethroughIcon } from "lucide-react";
 import { useState } from "react";
 import type { Props as TippyOptions } from "tippy.js";
@@ -18,6 +19,20 @@ export function BubbleMenu({
 }) {
 	const [openLink, setOpenLink] = useState(false);
 
+	const state = useEditorState({
+		editor,
+		selector: (ctx) => ({
+			isBold: ctx.editor.isActive("bold"),
+			isItalic: ctx.editor.isActive("italic"),
+			isStrike: ctx.editor.isActive("strike"),
+			isComment: ctx.editor.isActive("comment"),
+		}),
+		equalityFn: (prev, next) => {
+			if (!next) return false;
+			return eq(prev, next);
+		},
+	});
+
 	if (!editor) {
 		return null;
 	}
@@ -29,7 +44,7 @@ export function BubbleMenu({
 					<BubbleMenuItem
 						editor={editor}
 						action={() => editor.chain().focus().toggleBold().run()}
-						isActive={editor.isActive("bold")}
+						isActive={state.isBold}
 					>
 						<BoldIcon className="size-4" />
 						<span className="sr-only">Bold</span>
@@ -38,7 +53,7 @@ export function BubbleMenu({
 					<BubbleMenuItem
 						editor={editor}
 						action={() => editor.chain().focus().toggleItalic().run()}
-						isActive={editor.isActive("italic")}
+						isActive={state.isItalic}
 					>
 						<ItalicIcon className="size-4" />
 						<span className="sr-only">Italic</span>
@@ -47,14 +62,20 @@ export function BubbleMenu({
 					<BubbleMenuItem
 						editor={editor}
 						action={() => editor.chain().focus().toggleStrike().run()}
-						isActive={editor.isActive("strike")}
+						isActive={state.isStrike}
 					>
 						<StrikethroughIcon className="size-4" />
 						<span className="sr-only">Strike</span>
 					</BubbleMenuItem>
 
 					<LinkItem editor={editor} open={openLink} setOpen={setOpenLink} />
-					{taskId && <InlineCommentItem editor={editor} taskId={taskId} />}
+					{taskId && (
+						<InlineCommentItem
+							editor={editor}
+							taskId={taskId}
+							isActive={state.isComment}
+						/>
+					)}
 				</div>
 			</TiptapBubbleMenu>
 		</div>

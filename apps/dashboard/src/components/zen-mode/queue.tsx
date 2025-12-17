@@ -56,7 +56,7 @@ export const ZenModeQueue = () => {
 		<>
 			<button
 				type="button"
-				className="group absolute top-4 right-4 flex items-center gap-4 text-xs"
+				className="group fixed top-4 right-4 flex items-center gap-4 text-xs"
 				onClick={() => setOpen(true)}
 			>
 				<div className="flex items-center gap-2">

@@ -23,6 +23,7 @@ export const TaskActivitiesList = ({ taskId }: { taskId: string }) => {
 	const { data } = useQuery(
 		trpc.activities.get.queryOptions({
 			groupId: taskId,
+			nStatus: ["archived"],
 			pageSize: 100,
 		}),
 	);

@@ -7,6 +7,7 @@ import {
 	type InferSelectModel,
 	inArray,
 	lte,
+	notInArray,
 	type SQL,
 	sql,
 } from "drizzle-orm";
@@ -311,6 +312,7 @@ export const getActivities = async ({
 	groupId,
 	priority,
 	status,
+	nStatus,
 	pageSize = 20,
 }: {
 	teamId?: string;
@@ -320,6 +322,7 @@ export const getActivities = async ({
 	userId?: string;
 	priority?: [number, number];
 	status?: (typeof activityStatusEnum.enumValues)[number][];
+	nStatus?: (typeof activityStatusEnum.enumValues)[number][];
 	cursor?: string;
 	pageSize?: number;
 }) => {
@@ -337,6 +340,7 @@ export const getActivities = async ({
 			)!,
 		);
 	status && whereClause.push(inArray(activities.status, status));
+	nStatus && whereClause.push(notInArray(activities.status, nStatus));
 	userId && whereClause.push(eq(activities.userId, userId));
 	search &&
 		whereClause.push(sql`activities.metadata->>'title' ILIKE ${`%${search}%`}`);
@@ -566,4 +570,32 @@ export const hasNewActivities = async ({
 		.limit(1);
 
 	return !!record;
+};
+
+export const updateActivity = async ({
+	id,
+	status,
+	userId,
+	teamId,
+	metadata,
+}: {
+	id: string;
+	status?: (typeof activityStatusEnum.enumValues)[number];
+	userId?: string;
+	teamId?: string;
+	metadata?: Record<string, any>;
+}) => {
+	const whereClause: SQL[] = [eq(activities.id, id)];
+
+	userId && whereClause.push(eq(activities.userId, userId));
+	teamId && whereClause.push(eq(activities.teamId, teamId));
+	const [data] = await db
+		.update(activities)
+		.set({
+			metadata,
+			status,
+		})
+		.where(and(...whereClause))
+		.returning();
+	return data;
 };

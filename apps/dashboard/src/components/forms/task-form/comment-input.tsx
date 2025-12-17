@@ -11,6 +11,8 @@ export const CommentInput = ({
 	replyTo,
 	autoFocus = false,
 	onSubmit,
+	onMutate,
+	onBlur,
 	className,
 	metadata,
 }: {
@@ -19,6 +21,8 @@ export const CommentInput = ({
 	autoFocus?: boolean;
 	className?: string;
 	onSubmit?: (commentId: string) => void;
+	onMutate?: () => void;
+	onBlur?: () => void;
 	metadata?: Record<string, string | number | boolean>;
 }) => {
 	const editorRef = useRef<EditorInstance | null>(null);
@@ -26,7 +30,10 @@ export const CommentInput = ({
 
 	const { mutate: commentTask } = useMutation(
 		trpc.tasks.comment.mutationOptions({
-			onSuccess: (newComment) => {
+			onMutate: () => {
+				onMutate?.();
+			},
+			onSettled: (newComment) => {
 				if (!newComment) return;
 				onSubmit?.(newComment.id);
 				queryClient.invalidateQueries(
@@ -82,6 +89,7 @@ export const CommentInput = ({
 				ref={editorRef}
 				autoFocus={autoFocus}
 				onChange={(e) => setComment(e)}
+				onBlur={onBlur}
 				placeholder="Leave a comment..."
 				className={cn(
 					"rounded-sm border border-input bg-input px-4 py-2 dark:bg-input/30 [&_div]:min-h-[60px]",

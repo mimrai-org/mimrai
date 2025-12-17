@@ -1,6 +1,11 @@
 "use client";
-import type { RouterOutputs } from "@api/trpc/routers";
-import { useQuery } from "@tanstack/react-query";
+import type { RouterInputs, RouterOutputs } from "@api/trpc/routers";
+import {
+	type UseMutateFunction,
+	useMutation,
+	useQuery,
+} from "@tanstack/react-query";
+import type { Editor as EditorInstance } from "@tiptap/react";
 import { redirect, useRouter } from "next/navigation";
 import { createContext, useContext, useRef } from "react";
 import { useUser } from "@/hooks/use-user";
@@ -16,6 +21,13 @@ interface ZenModeState {
 	next: () => void;
 	tasks: Task[];
 	contentRef: React.RefObject<HTMLDivElement | null>;
+	editorRef: React.RefObject<EditorInstance | null>;
+	updateTask: UseMutateFunction<
+		RouterOutputs["tasks"]["update"],
+		unknown,
+		RouterInputs["tasks"]["update"],
+		unknown
+	>;
 }
 
 export const ZenModeContext = createContext<ZenModeState | null>(null);
@@ -30,9 +42,18 @@ export const ZenModeProvider = ({
 	const user = useUser();
 	const router = useRouter();
 	const contentRef = useRef<HTMLDivElement>(null);
+	const editorRef = useRef<EditorInstance | null>(null);
 
 	const { data: tasks, isLoading } = useQuery(
-		trpc.tasks.getZenModeQueue.queryOptions(),
+		trpc.tasks.getZenModeQueue.queryOptions(undefined, {
+			enabled: !!user,
+			refetchOnWindowFocus: false,
+			refetchOnMount: false,
+		}),
+	);
+
+	const { mutate: updateTask } = useMutation(
+		trpc.tasks.update.mutationOptions(),
 	);
 
 	if (isLoading) {
@@ -84,7 +105,9 @@ export const ZenModeProvider = ({
 				currentTask,
 				setCurrentTask: handleSetCurrentTask,
 				next: handleNext,
+				updateTask,
 				contentRef,
+				editorRef,
 			}}
 		>
 			{children}
