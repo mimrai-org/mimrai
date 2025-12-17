@@ -2,6 +2,7 @@ import NotificationEmail from "@mimir/email/emails/notification";
 import { getAppUrl } from "@mimir/utils/envs";
 import { getTaskMarkdownLink } from "@mimir/utils/tasks";
 import type { NotificationHandler } from "@notifications/base";
+import { convert } from "html-to-text";
 
 export const taskComment: NotificationHandler = {
 	createNotification: (data, user) => {
@@ -11,7 +12,7 @@ export const taskComment: NotificationHandler = {
 				data.groupId!,
 				data.metadata?.title,
 				data.teamId,
-			)}**:\n\n>${data.metadata?.comment}`,
+			)}**:\n\n>${convert(data.metadata?.comment)}`,
 			type: "customer",
 			additionalRecipients: data.metadata?.subscribers ?? [],
 		};
@@ -20,7 +21,7 @@ export const taskComment: NotificationHandler = {
 		return {
 			subject: `New Comment on Task: ${data.metadata?.title}`,
 			react: NotificationEmail({
-				message: `${user.name} commented on task "${data.metadata?.title}": ${data.metadata?.comment}`,
+				message: `${user.name} commented on task "${data.metadata?.title}": ${convert(data.metadata?.comment)}`,
 				teamName: team.name,
 				title: "New Comment on Task",
 				ctaLink: `${getAppUrl()}`,
@@ -32,7 +33,7 @@ export const taskComment: NotificationHandler = {
 	},
 	createWhatsappNotification: (data, user) => {
 		return {
-			message: `*${user.name}* commented on task *${data.metadata?.title}*:\n\n${data.metadata?.comment}`,
+			message: `*${user.name}* commented on task *${data.metadata?.title}*:\n\n${convert(data.metadata?.comment)}`,
 			type: "customer",
 			additionalRecipients: data.metadata?.subscribers ?? [],
 		};
