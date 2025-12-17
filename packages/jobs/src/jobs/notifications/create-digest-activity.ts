@@ -8,10 +8,10 @@ import {
 	projects,
 	statuses,
 	tasks,
+	tasksDependencies,
 	teams,
 } from "@mimir/db/schema";
 import { getAppUrl } from "@mimir/utils/envs";
-import { getTaskPermalink } from "@mimir/utils/tasks";
 import { logger, schemaTask } from "@trigger.dev/sdk";
 import { generateObject } from "ai";
 import { format } from "date-fns";
@@ -19,7 +19,6 @@ import {
 	and,
 	arrayContains,
 	asc,
-	count,
 	desc,
 	eq,
 	inArray,
@@ -89,6 +88,13 @@ export const createDigestActivityJob = schemaTask({
 			.innerJoin(statuses, eq(statuses.id, tasks.statusId))
 			.leftJoin(projects, eq(projects.id, tasks.projectId))
 			.leftJoin(milestones, eq(milestones.id, tasks.milestoneId))
+			.leftJoin(
+				tasksDependencies,
+				and(
+					eq(tasksDependencies.taskId, tasks.id),
+					eq(tasksDependencies.type, "blocks"),
+				),
+			)
 			.limit(5)
 			.orderBy(
 				asc(sql`CASE ${statuses.type} WHEN 'in_progress' THEN 1 ELSE 2 END`),
@@ -99,10 +105,31 @@ export const createDigestActivityJob = schemaTask({
 				desc(tasks.createdAt),
 			);
 
-		const tasksProjectsIds = topPriorities
+		const groupByTaskId: Record<
+			string,
+			Omit<(typeof topPriorities)[0], "tasks_dependencies"> & {
+				taskDependencies: (typeof topPriorities)[0]["tasks_dependencies"][];
+			}
+		> = {};
+		topPriorities.forEach((tp) => {
+			if (!groupByTaskId[tp.tasks.id]) {
+				groupByTaskId[tp.tasks.id] = {
+					...tp,
+					taskDependencies: [],
+				};
+			}
+			if (tp.tasks_dependencies) {
+				groupByTaskId[tp.tasks.id].taskDependencies!.push(
+					tp.tasks_dependencies,
+				);
+			}
+		});
+		const uniqueTopPriorities = Object.values(groupByTaskId);
+
+		const tasksProjectsIds = uniqueTopPriorities
 			.map((tp) => tp.tasks.projectId)
 			.filter((id): id is string => typeof id === "string");
-		const tasksMilestonesIds = topPriorities
+		const tasksMilestonesIds = uniqueTopPriorities
 			.map((tp) => tp.tasks.milestoneId)
 			.filter((id): id is string => typeof id === "string");
 
@@ -174,16 +201,32 @@ You are Mimir, an AI productivity companion that helps users stay focused on the
 
 The user has the following top priority tasks:
 <top-priorities>
-	${topPriorities
+	${uniqueTopPriorities
 		.map(
 			(task) =>
-				`- Task ID: ${task.tasks.id}, Title: "${task.tasks.title}", Status: ${task.statuses.type} Priority: ${task.tasks.priority}, Due Date: ${
-					task.tasks.dueDate
-						? format(new Date(task.tasks.dueDate), "yyyy-MM-dd")
-						: "None"
-				}, Updated At: ${task.tasks.updatedAt ? format(new Date(task.tasks.updatedAt), "yyyy-MM-dd") : "None"}, Project: ${task.projects?.name || "None"}, Milestone: ${
-					task.milestones?.name || "None"
-				}`,
+				`<task> 
+	Task ID: ${task.tasks.id}
+	Title: "${task.tasks.title}"
+	Status: ${task.statuses.type} 
+	Priority: ${task.tasks.priority}
+	Due Date: ${
+		task.tasks.dueDate
+			? format(new Date(task.tasks.dueDate), "yyyy-MM-dd")
+			: "None"
+	}
+	Updated At: ${task.tasks.updatedAt ? format(new Date(task.tasks.updatedAt), "yyyy-MM-dd") : "None"}
+	Project: ${task.projects?.name || "None"}
+	Milestone: ${task.milestones?.name || "None"}
+	<blocks>
+		${
+			task.taskDependencies && task.taskDependencies.length > 0
+				? task.taskDependencies
+						.map((dep) => `- Blocks Task ID: ${dep.dependsOnTaskId}`)
+						.join("\n")
+				: "- None"
+		}
+	</blocks>
+</task>`,
 		)
 		.join("\n")}
 </top-priorities>
@@ -263,7 +306,7 @@ ${recommendation.topPriorities
 ✨ Suggested focus for today
 ${recommendation.focusMessage}
 
-Enter Zen Mode to tackle your top priority tasks: ${getAppUrl()}/team/${team.slug}/zen?teamId=${teamId}
+Enter Zen Mode to tackle your top priority tasks: ${getAppUrl()}/team/${team.slug}/zen
 `;
 
 		logger.info(content);

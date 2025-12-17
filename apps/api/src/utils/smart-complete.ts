@@ -29,10 +29,12 @@ export const buildSmartCompletePrompt = async ({
 - The description should provide enough detail for someone to understand the task without further clarification.
 - If the user prompt lacks clarity, use the context to fill in the gaps.
 - Be careful when assigning projects; only assign if the user prompt specifies it.
-- If the user prompt is short you can use it as title but make sure it is self explanatory.
+- If the user prompt is less than 4 words, use it as the title and do not generate a description unless there is relevant context.
 </rules>
 
 <user-context>
+user name: ${userContext.fullName}
+user ID: ${userContext.userId}
 locale: ${userContext.locale}
 current date: ${new TZDate(new Date(), userContext.timezone).toISOString()}
 team description: "${userContext.teamDescription}"

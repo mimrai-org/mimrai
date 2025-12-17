@@ -2,7 +2,7 @@
 import { Button } from "@mimir/ui/button";
 import { Form } from "@mimir/ui/form";
 import { getTaskPermalink } from "@mimir/utils/tasks";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Editor as EditorInstance } from "@tiptap/react";
 import { format } from "date-fns";
 import { Link2Icon, Loader2, SparklesIcon } from "lucide-react";
@@ -13,6 +13,7 @@ import type z from "zod";
 import { useChatContext } from "@/components/chat/chat-context/store";
 import { useChatWidget } from "@/components/chat/chat-widget";
 import { useTaskParams } from "@/hooks/use-task-params";
+import { useUser } from "@/hooks/use-user";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { trpc } from "@/utils/trpc";
 import { ActionsMenu } from "./actions-menu";
@@ -40,6 +41,8 @@ export const TaskForm = ({
 		status: "pending" | "completed" | "canceled" | "processing";
 	} | null;
 }) => {
+	const user = useUser();
+
 	const { setItems } = useChatContext();
 	const { toggle } = useChatWidget();
 	const editorRef = useRef<EditorInstance | null>(null);
@@ -54,7 +57,7 @@ export const TaskForm = ({
 			priority: "low",
 			labels: [],
 			showSmartInput: !defaultValues?.id,
-			assigneeId: null,
+			assigneeId: user?.id || null,
 			...defaultValues,
 		},
 	});

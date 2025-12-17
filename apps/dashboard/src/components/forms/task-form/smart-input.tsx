@@ -9,7 +9,8 @@ import {
 import { CheckIcon, Loader2Icon, SparklesIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { useDebounceValue } from "usehooks-ts";
+import { useDebounceCallback, useDebounceValue } from "usehooks-ts";
+import Loader from "@/components/loader";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/utils/trpc";
 import { TaskDuplicated } from "./duplicated";
@@ -57,18 +58,25 @@ export const SmartInput = () => {
 		}),
 	);
 
+	const debouncedMutate = useDebounceCallback(mutate, 800);
+
 	useEffect(() => {
+		// check if the length of the value is not too long to used it as title
+		if (value.length <= 20) {
+			form.setValue("title", value);
+		}
+
 		// compare last completed value to debounced value to determine if there is sufficient new context to trigger a new completion
 		const nonWhitespaceCharacters = debouncedValue.replace(/\s/g, "");
 		const lastCharactersDifference = Math.abs(
 			nonWhitespaceCharacters.length - lastCompletedValue.current.length,
 		);
 
-		if (lastCharactersDifference >= 5) {
+		if (lastCharactersDifference >= 3) {
 			lastCompletedValue.current = nonWhitespaceCharacters;
-			mutate({ prompt: debouncedValue });
+			debouncedMutate({ prompt: debouncedValue });
 		}
-	}, [debouncedValue, mutate]);
+	}, [value]);
 	const title = form.watch("title");
 
 	const handleCancel = () => {
@@ -105,12 +113,16 @@ export const SmartInput = () => {
 				<div>
 					<TaskDuplicated title={value} />
 					<div className={cn("opacity-50")}>
-						{title && (
+						{(title || value) && (
 							<Tooltip>
 								<TooltipTrigger asChild>
 									<div className="flex w-fit items-center gap-2 text-sm">
-										<SparklesIcon className="size-4" />
-										{title}
+										{isPending ? (
+											<Loader className="size-4" />
+										) : (
+											<SparklesIcon className="size-4" />
+										)}
+										{title || value}
 									</div>
 								</TooltipTrigger>
 								<TooltipContent className="max-w-lg">
@@ -132,17 +144,8 @@ export const SmartInput = () => {
 					>
 						use form
 					</Button>
-					<Button
-						type="submit"
-						size={"sm"}
-						disabled={isPending}
-						className="size-8"
-					>
-						{isPending ? (
-							<Loader2Icon className="size-4 animate-spin" />
-						) : (
-							<CheckIcon />
-						)}
+					<Button type="submit" size={"sm"} className="size-8">
+						<CheckIcon />
 					</Button>
 				</div>
 			</div>
