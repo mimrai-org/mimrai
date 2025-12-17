@@ -44,6 +44,6 @@ This project is licensed under the **[AGPL-3.0](https://opensource.org/licenses/
 ### Commercial Use
 
 For commercial use or deployments requiring a setup fee, please contact us
-for a commercial license at [ilpadronexd@gmail.com](mailto:ilpadronexd@gmail.com).
+for a commercial license at [founders@mimrai.com](mailto:founders@mimrai.com).
 
 By using this software, you agree to the terms of the license.
