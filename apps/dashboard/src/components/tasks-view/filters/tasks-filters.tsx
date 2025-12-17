@@ -10,7 +10,13 @@ import {
 } from "@ui/components/ui/popover";
 import { RadioGroup, RadioGroupItem } from "@ui/components/ui/radio-group";
 import { cn } from "@ui/lib/utils";
-import { EyeIcon, KanbanIcon, ListIcon, SearchIcon } from "lucide-react";
+import {
+	CalendarIcon,
+	EyeIcon,
+	KanbanIcon,
+	ListIcon,
+	SearchIcon,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 import { propertiesComponents } from "../properties/task-properties-components";
@@ -126,7 +132,7 @@ export const TasksFilters = ({
 							<hr />
 							<div className="space-y-2">
 								<div className="text-muted-foreground text-xs">View As</div>
-								<div className="grid h-16 grid-cols-2 gap-2">
+								<div className="grid h-16 grid-cols-3 gap-2">
 									<button
 										type="button"
 										className={cn(
@@ -160,6 +166,23 @@ export const TasksFilters = ({
 										}}
 									>
 										<KanbanIcon className="size-4" />
+									</button>
+									<button
+										type="button"
+										className={cn(
+											"flex h-full items-center justify-center rounded-md border p-2 hover:bg-accent/80",
+											{
+												"bg-accent": filters.viewType === "calendar",
+											},
+										)}
+										onClick={() => {
+											setFilters({
+												...filters,
+												viewType: "calendar",
+											});
+										}}
+									>
+										<CalendarIcon className="size-4" />
 									</button>
 								</div>
 							</div>

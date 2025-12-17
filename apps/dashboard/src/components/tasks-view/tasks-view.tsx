@@ -4,13 +4,14 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { createContext, useContext, useMemo, useState } from "react";
 import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";
 import { trpc } from "@/utils/trpc";
+import { TasksCalendar } from "./calendar/calendar";
 import { TasksFilters, type TasksFiltersProps } from "./filters/tasks-filters";
 import { TasksBoard } from "./kanban/kanban";
 import { TasksList } from "./list/tasks-list";
 import type { propertiesComponents } from "./properties/task-properties-components";
 import type { TasksGroupBy } from "./tasks-group";
 
-export type TasksViewType = "board" | "list";
+export type TasksViewType = "board" | "list" | "calendar";
 export type TasksViewContextFilters = Exclude<
 	RouterInputs["tasks"]["get"],
 	void | undefined
@@ -91,7 +92,8 @@ export const TasksView = ({
 		trpc.tasks.get.infiniteQueryOptions(
 			{
 				...filters,
-				view: filters.viewType,
+				// Calendar view uses the same data as list view
+				view: filters.viewType === "calendar" ? "list" : filters.viewType,
 			},
 			{
 				placeholderData: (prev) => prev,
@@ -120,6 +122,7 @@ export const TasksView = ({
 			<TasksFilters showFilters={showFilters} />
 			{filters.viewType === "board" && <TasksBoard />}
 			{filters.viewType === "list" && <TasksList />}
+			{filters.viewType === "calendar" && <TasksCalendar />}
 		</TasksViewProvider>
 	);
 };

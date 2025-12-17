@@ -29,7 +29,7 @@ export const tasksFilterParams = {
 		"milestone",
 		"project",
 	]),
-	viewType: parseAsStringLiteral<TasksViewType>(["board", "list"]),
+	viewType: parseAsStringLiteral<TasksViewType>(["board", "list", "calendar"]),
 	properties: parseAsArrayOf(parseAsStringLiteral(propertiesList)),
 	recurring: parseAsBoolean,
 };
