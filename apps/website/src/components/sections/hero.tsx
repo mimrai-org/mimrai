@@ -1,7 +1,10 @@
 "use client";
+
+import { getAppUrl } from "@mimir/utils/envs";
+import { Badge } from "@ui/components/ui/badge";
 import { Button } from "@ui/components/ui/button";
 import { motion } from "framer-motion";
-import { ArrowRight, GithubIcon } from "lucide-react";
+import { ArrowRight, ChevronRight, Github, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type React from "react";
@@ -14,14 +17,30 @@ export const Hero: React.FC = () => {
 			<AbstractSphere />
 
 			<div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center px-6 text-center">
+				<motion.div
+					initial={{ opacity: 0, y: 20 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.6, ease: "easeOut" }}
+					className="mb-8"
+				>
+					<Badge
+						variant="outline"
+						className="gap-2 rounded-full border-white/10 bg-white/5 py-1 pr-3 pl-2 font-medium text-zinc-300"
+					>
+						<span className="h-2 w-2 animate-pulse rounded-full bg-indigo-500" />
+						Introducing Mimir • Your AI Companion
+						<ChevronRight size={12} className="ml-1 text-zinc-500" />
+					</Badge>
+				</motion.div>
+
 				<motion.h1
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
 					className="mb-6 font-light text-5xl text-white leading-[1.1] tracking-tight md:text-7xl"
 				>
-					Task clarity at the <br />
-					<span className="text-white">speed of focus.</span>
+					Rethink how you <br />
+					<span className="text-zinc-400">interact with work.</span>
 				</motion.h1>
 
 				<motion.p
@@ -30,8 +49,9 @@ export const Hero: React.FC = () => {
 					transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
 					className="mb-10 max-w-2xl font-light text-lg text-zinc-400 leading-relaxed md:text-xl"
 				>
-					A smart companion that organizes your workflow, prioritizes tasks, and
-					keeps your team aligned without the chaos.
+					More than a project manager. Mimrai is an intelligent companion that
+					understands your team's rhythm, filters operational noise, and guides
+					you through complexity with calm and focus.
 				</motion.p>
 
 				<motion.div
@@ -40,25 +60,29 @@ export const Hero: React.FC = () => {
 					transition={{ duration: 0.6, ease: "easeOut", delay: 0.3 }}
 					className="flex w-full flex-col items-center gap-4 sm:w-auto sm:flex-row"
 				>
-					<Button variant="default" className="w-full min-w-[160px] sm:w-auto">
-						Get Started <ArrowRight size={16} />
-					</Button>
-					<Link
-						href="https://github.com/mimrai-org/mimrai"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
+					<Link href={`${getAppUrl()}/sign-in`}>
 						<Button
-							variant="secondary"
-							className="w-full min-w-[160px] sm:w-auto"
+							size="lg"
+							className="w-full min-w-[160px] gap-2 rounded-full sm:w-auto"
 						>
-							<GithubIcon size={16} />
-							Star on GitHub
+							Meet Mimir <ArrowRight size={16} />
 						</Button>
 					</Link>
+
+					<Button
+						variant="secondary"
+						size="lg"
+						className="w-full min-w-[160px] gap-2 rounded-full sm:w-auto"
+						onClick={() =>
+							window.open("https://github.com/mimrai-org/mimrai", "_blank")
+						}
+					>
+						<Github size={16} />
+						Star on GitHub
+					</Button>
 				</motion.div>
 
-				{/* Floating UI Card visual - Abstract Representation of "Smart Task" */}
+				{/* Floating UI Card visual - Mimir Interaction */}
 				<motion.div
 					initial={{ opacity: 0, y: 40 }}
 					animate={{ opacity: 1, y: 0 }}
@@ -72,7 +96,7 @@ export const Hero: React.FC = () => {
 							duration: 6,
 							ease: "easeInOut",
 						}}
-						className="relative overflow-hidden bg-background p-1"
+						className="relative overflow-hidden rounded-xl border border-white/10 bg-surfaceHighlight p-1 shadow-2xl"
 					>
 						<Image
 							src={"/images/board4.png"}

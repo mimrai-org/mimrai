@@ -12,11 +12,14 @@ export const Showcase: React.FC = () => {
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true }}
 					transition={{ duration: 0.6 }}
-					className="mb-12 font-light text-4xl text-white"
+					className="mb-4 font-light text-4xl text-white"
 				>
-					Total visibility. <br />
-					<span className="text-zinc-500">Zero clutter.</span>
+					Total visibility. <span className="text-zinc-500">Zero anxiety.</span>
 				</motion.h2>
+				<p className="mx-auto mb-12 max-w-2xl font-light text-zinc-400">
+					Your Smart Daily Digest serves you tasks one by one, prioritized by
+					Mimir based on your team's real-time blockers and deadlines.
+				</p>
 
 				<motion.div
 					initial={{ opacity: 0, scale: 0.95, y: 20 }}

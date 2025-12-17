@@ -3,11 +3,15 @@ import { motion } from "framer-motion";
 import {
 	Activity,
 	Bell,
+	BrainCircuit,
+	CalendarClock,
 	GitMerge,
+	ListTodo,
 	Maximize2,
 	Moon,
 	Sun,
 	Users,
+	Wind,
 } from "lucide-react";
 import type React from "react";
 
@@ -40,39 +44,40 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
 export const FeaturesGrid: React.FC = () => {
 	const features = [
 		{
+			icon: CalendarClock,
+			title: "Project Management",
+			description:
+				"Manage milestones, deadlines, and timelines with clarity. Keep the big picture in view without losing the details.",
+		},
+		{
+			icon: ListTodo,
+			title: "Task Management",
+			description:
+				"Smart checklists, clear assignments, and due dates. Organize execution without the clutter of traditional tools.",
+		},
+		{
+			icon: BrainCircuit,
+			title: "Mimir AI Assistant",
+			description:
+				"Your smart companion. Automated follow-ups on stale tasks and proactive suggestions to unblock your team.",
+		},
+		{
+			icon: Wind,
+			title: "Zen Mode",
+			description:
+				"A calm environment that filters noise. Focus only on what's important right now, organized automatically by Mimir.",
+		},
+		{
 			icon: Sun,
 			title: "Smart Daily Digest",
 			description:
-				"Start your day with an AI-curated list of what actually matters.",
-		},
-		{
-			icon: Maximize2,
-			title: "Zen Mode",
-			description:
-				"Minimize distractions with a focus-driven interface that adapts to your workflow.",
+				"Start your day with a curated focus order. Mimir analyzes dependencies to tell you exactly where to start.",
 		},
 		{
 			icon: Moon,
-			title: "End-of-Day Summary",
+			title: "End of Day Summary",
 			description:
-				"Auto-generated reports of what was accomplished and what's blocked.",
-		},
-		{
-			icon: GitMerge,
-			title: "Auto-Prioritization",
-			description:
-				"Dynamic sorting of tasks based on dependencies and deadlines.",
-		},
-		{
-			icon: Users,
-			title: "Team Awareness",
-			description: "Know who is working on what without sending a single DM.",
-		},
-		{
-			icon: Bell,
-			title: "Context Notifications",
-			description:
-				"Alerts that understand context and only ping you when necessary.",
+				"Close loops effortlessly. Get auto-generated reports on progress and blockers before you sign off.",
 		},
 	];
 
@@ -87,7 +92,7 @@ export const FeaturesGrid: React.FC = () => {
 						transition={{ duration: 0.5 }}
 						className="mb-4 font-light text-3xl text-white"
 					>
-						Engineered for flow state
+						A new category of tool.
 					</motion.h2>
 					<motion.p
 						initial={{ opacity: 0, y: 10 }}
@@ -96,7 +101,7 @@ export const FeaturesGrid: React.FC = () => {
 						transition={{ duration: 0.5, delay: 0.1 }}
 						className="text-zinc-400"
 					>
-						Everything you need, nothing you don't.
+						Designed to help you work better, not just organize more.
 					</motion.p>
 				</div>
 				<motion.div
