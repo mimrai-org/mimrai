@@ -8,16 +8,18 @@ import { Client4, type WebSocketMessage } from "@mattermost/client";
 import type { UserProfile } from "@mattermost/types/users";
 import { checkPlanFeatures } from "@mimir/billing";
 import { integrationsCache } from "@mimir/cache/integrations-cache";
+import { db } from "@mimir/db/client";
 import { getChatById, saveChatMessage } from "@mimir/db/queries/chats";
 import {
 	getIntegrationByType,
 	getLinkedUserByExternalId,
 } from "@mimir/db/queries/integrations";
-import type { integrations } from "@mimir/db/schema";
+import { integrations } from "@mimir/db/schema";
 import { trackMessage } from "@mimir/events/server";
 import { getApiUrl } from "@mimir/utils/envs";
 import type { UIMessage } from "ai";
 import { fetch } from "bun";
+import { eq } from "drizzle-orm";
 import WebSocket from "ws";
 import { log } from "../logger";
 
@@ -27,7 +29,10 @@ if (!globalThis.WebSocket) {
 }
 
 export const initMattermost = async () => {
-	const data = await getIntegrationByType({ type: "mattermost" });
+	const data = await db
+		.select()
+		.from(integrations)
+		.where(eq(integrations.type, "mattermost"));
 	for (const integration of data) {
 		// Initialize Mattermost integration with the config
 		await initMattermostSingle(integration);

@@ -8,6 +8,7 @@ import {
 	validateIntegrationSchema,
 } from "@api/schemas/integrations";
 import { protectedProcedure, router } from "@api/trpc/init";
+import { getCurrentUser } from "@db/queries/users";
 import {
 	getIntegrationById,
 	getIntegrationByType,
@@ -22,22 +23,32 @@ import {
 	integrationsRegistry,
 } from "@mimir/integration/registry";
 import { validateIntegration } from "@mimir/integration/validate";
+import z from "zod";
 
 export const integrationsRouter = router({
 	get: protectedProcedure.query(async ({ ctx }) => {
 		const installedIntegrations = await getIntegrations({
 			teamId: ctx.user.teamId!,
 		});
+		const installedUserIntegration = await getLinkedUsers({
+			teamId: ctx.user.teamId!,
+			userId: ctx.user.id,
+		});
 
 		return Object.values(integrationsRegistry).map((integration) => {
-			const installed = installedIntegrations.find(
+			const installedOnTeam = installedIntegrations.find(
 				(inst) => inst.type === integration.type,
 			);
+			const installedOnUser = installedUserIntegration.data.find(
+				(inst) => inst.integrationType === integration.type,
+			);
+
 			return {
 				...integration,
 				configSchema: integration.configSchema._def,
-				id: installed?.id,
-				isInstalled: Boolean(installed),
+				id: installedOnTeam?.id,
+				isInstalledOnTeam: Boolean(installedOnTeam),
+				isInstalledOnUser: Boolean(installedOnUser),
 			};
 		});
 	}),
@@ -50,11 +61,18 @@ export const integrationsRouter = router({
 				type: input.type,
 				teamId: ctx.user.teamId!,
 			});
+			const installedUserIntegration = await getLinkedUsers({
+				teamId: ctx.user.teamId!,
+				userId: ctx.user.id,
+				integrationType: input.type,
+			});
 
 			return {
 				...integration,
 				configSchema: integration.configSchema._def,
 				isInstalled: !!installedIntegration,
+				isInstalledForUser: installedUserIntegration.data.length > 0,
+				installedUserIntegration: installedUserIntegration.data[0] || null,
 				installedIntegration,
 			};
 		}),

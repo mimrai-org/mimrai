@@ -97,17 +97,18 @@ export const getIntegrationByType = async ({
 }: {
 	type: IntegrationName;
 	externalTeamId?: string;
-	teamId?: string;
+	teamId: string;
 }) => {
 	const whereClause: SQL[] = [eq(integrations.type, type)];
 	if (externalTeamId)
 		whereClause.push(eq(integrations.externalTeamId, externalTeamId));
 	if (teamId) whereClause.push(eq(integrations.teamId, teamId));
 
-	return await db
+	const [integration] = await db
 		.select()
 		.from(integrations)
 		.where(and(...whereClause));
+	return integration;
 };
 
 export const getIntegrationById = async ({
@@ -237,19 +238,26 @@ export const updateIntegration = async ({
 
 export const getLinkedUsers = async ({
 	integrationId,
+	integrationType,
+	userId,
 	teamId,
 	cursor,
 	pageSize = 20,
 }: {
-	integrationId: string;
+	integrationId?: string;
+	integrationType?: IntegrationName;
+	userId?: string;
 	teamId?: string;
 	cursor?: string;
 	pageSize?: number;
 }) => {
-	const whereClause: SQL[] = [
-		eq(integrationUserLink.integrationId, integrationId),
-	];
+	const whereClause: SQL[] = [];
 
+	if (integrationType)
+		whereClause.push(eq(integrationUserLink.integrationType, integrationType));
+	if (integrationId)
+		whereClause.push(eq(integrationUserLink.integrationId, integrationId));
+	if (userId) whereClause.push(eq(integrationUserLink.userId, userId));
 	if (teamId) whereClause.push(eq(integrations.teamId, teamId));
 
 	const query = db
@@ -263,8 +271,13 @@ export const getLinkedUsers = async ({
 				email: users.email,
 			},
 			integrationId: integrations.id,
+			integrationType: integrations.type,
+			integrationConfig: integrations.config,
+			accessToken: integrationUserLink.accessToken,
+			refreshToken: integrationUserLink.refreshToken,
 			type: integrations.type,
 			name: integrations.name,
+			teamId: integrations.teamId,
 			createdAt: integrationUserLink.createdAt,
 		})
 		.from(integrationUserLink)
@@ -358,6 +371,8 @@ export const getLinkedUserByUserId = async ({
 	const [link] = await db
 		.select({
 			id: integrationUserLink.id,
+			accessToken: integrationUserLink.accessToken,
+			refreshToken: integrationUserLink.refreshToken,
 			externalUserId: integrationUserLink.externalUserId,
 			externalUserName: integrationUserLink.externalUserName,
 		})
@@ -368,6 +383,39 @@ export const getLinkedUserByUserId = async ({
 			eq(integrationUserLink.integrationId, integrations.id),
 		)
 		.limit(1);
+
+	return link;
+};
+
+export const linkUserToIntegration = async ({
+	...input
+}: {
+	integrationId: string;
+	integrationType: IntegrationName;
+	userId: string;
+	externalUserId: string;
+	externalUserName: string;
+	accessToken?: string;
+	refreshToken?: string;
+}) => {
+	const [link] = await db
+		.insert(integrationUserLink)
+		.values({
+			...input,
+		})
+		.onConflictDoUpdate({
+			target: [
+				integrationUserLink.integrationId,
+				integrationUserLink.userId,
+				integrationUserLink.externalUserId,
+			],
+			set: {
+				externalUserName: input.externalUserName,
+				accessToken: input.accessToken,
+				refreshToken: input.refreshToken,
+			},
+		})
+		.returning();
 
 	return link;
 };

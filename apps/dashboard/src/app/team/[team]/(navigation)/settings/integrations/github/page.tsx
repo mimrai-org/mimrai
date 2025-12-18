@@ -6,8 +6,8 @@ import {
 	CardTitle,
 } from "@mimir/ui/card";
 import { notFound } from "next/navigation";
-import { IntegrationConfigForm } from "@/components/forms/integration-config-form";
-import { queryClient, trpc } from "@/utils/trpc";
+import { IntegrationForm } from "@/components/integrations/components";
+import { queryClient, trpc, trpcClient } from "@/utils/trpc";
 import { LogsList } from "../logs-list";
 import { RepositoriesList } from "./repositories-list";
 
@@ -20,7 +20,7 @@ export default async function Page() {
 		}),
 	);
 
-	const integration = integrationInfo.installedIntegration[0];
+	const integration = integrationInfo.installedIntegration;
 
 	if (!integration) {
 		return notFound();
@@ -35,12 +35,12 @@ export default async function Page() {
 					<CardTitle>Settings</CardTitle>
 				</CardHeader>
 				<CardContent>
-					{integration.config.token ? (
+					{integrationInfo.isInstalledForUser ? (
 						<p className="mb-4 text-muted-foreground text-sm">
 							GitHub App is installed and configured.
 						</p>
 					) : (
-						<IntegrationConfigForm
+						<IntegrationForm
 							id={id}
 							type={integration.type}
 							defaultValues={integration.config}

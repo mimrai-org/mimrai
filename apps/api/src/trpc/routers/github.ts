@@ -1,4 +1,3 @@
-import { experimental_createMCPClient } from "@ai-sdk/mcp";
 import {
 	getColumnsSchema,
 	removeTaskFromPullRequestPlanSchema,
@@ -22,23 +21,89 @@ import {
 import {
 	getIntegrationById,
 	getIntegrationByType,
+	getLinkedUserByUserId,
+	getLinkedUsers,
+	installIntegration,
+	linkUserToIntegration,
 } from "@mimir/db/queries/integrations";
-import { generateObject, generateText, stepCountIs } from "ai";
 import { Octokit } from "octokit";
-import z from "zod";
 
 export const githubRouter = router({
+	install: protectedProcedure.mutation(async ({ ctx }) => {
+		// Check if integration already exists
+		let integration = await getIntegrationByType({
+			type: "github",
+			teamId: ctx.user.teamId!,
+		});
+		const linkedUsers = await getLinkedUsers({
+			integrationType: "github",
+			userId: ctx.user.id,
+		});
+
+		// Integration exists, check if the current user is linked
+		if (integration) {
+			const currentIntegrationLink = linkedUsers.data.find(
+				(link) => link.teamId === integration.teamId,
+			);
+
+			if (currentIntegrationLink) {
+				// User is already linked for this team, return existing integration
+				return {
+					integration: integration,
+					redirect: false,
+					message: "User already linked to existing integration",
+				};
+			}
+		}
+
+		// If user is already linked on another team, use that link to create the new link on this team
+		if (linkedUsers.data.length > 0) {
+			const existingLink = linkedUsers.data[0];
+
+			// The integration not existing on this team, create a new one
+			if (!integration) {
+				integration = await installIntegration({
+					type: "github",
+					config: existingLink.integrationConfig,
+					teamId: ctx.user.teamId!,
+				});
+			}
+
+			await linkUserToIntegration({
+				userId: ctx.user.id,
+				integrationId: integration.id,
+				integrationType: "github",
+				externalUserId: existingLink.externalUserId,
+				externalUserName: existingLink.externalUserName,
+				accessToken: existingLink.accessToken,
+				refreshToken: existingLink.refreshToken,
+			});
+			return {
+				integration: integration,
+				redirect: false,
+				message: "User linked to existing integration",
+			};
+		}
+
+		// Install the app for the team
+		return {
+			redirect: true,
+			message: "Redirecting to GitHub App installation",
+		};
+	}),
 	getRemoteRepositories: protectedProcedure
 		.input(getRemoteRepositoriesSchema.optional())
 		.query(async ({ ctx, input }) => {
-			const integration = await getIntegrationByType({
-				type: "github",
-				teamId: ctx.user.teamId!,
+			const link = await getLinkedUserByUserId({
+				integrationType: "github",
+				userId: ctx.user.id,
 			});
-			if (!integration || integration.length === 0) {
+			if (!link) {
 				throw new Error("GitHub integration not found");
 			}
-			const token = integration[0].config.token;
+
+			console.log(link);
+			const token = link.accessToken;
 			const octokit = new Octokit({ auth: token });
 			const repos = await octokit.paginate(
 				octokit.rest.repos.listForAuthenticatedUser,
@@ -50,14 +115,14 @@ export const githubRouter = router({
 	getRemoteRepositoryBranches: protectedProcedure
 		.input(getRemoteRepositoryBranchesSchema)
 		.query(async ({ ctx, input }) => {
-			const integration = await getIntegrationByType({
-				type: "github",
-				teamId: ctx.user.teamId!,
+			const link = await getLinkedUserByUserId({
+				integrationType: "github",
+				userId: ctx.user.id,
 			});
-			if (!integration || integration.length === 0) {
+			if (!link) {
 				throw new Error("GitHub integration not found");
 			}
-			const token = integration[0].config.token;
+			const token = link.accessToken;
 			const octokit = new Octokit({ auth: token });
 
 			const connectedRepository = await getConnectedRepositoryByRepoId({

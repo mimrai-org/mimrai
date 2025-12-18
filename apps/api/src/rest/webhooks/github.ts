@@ -1,10 +1,15 @@
+import { db } from "@db/index";
 import {
 	getConnectedRepositoryByInstallationId,
 	getPullRequestPlanByHead,
 	updatePullRequestPlanStatus,
 } from "@db/queries/github";
-import { installIntegration } from "@db/queries/integrations";
+import {
+	installIntegration,
+	linkUserToIntegration,
+} from "@db/queries/integrations";
 import { updateTask } from "@db/queries/tasks";
+import { integrationUserLink } from "@db/schema";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { log } from "@mimir/integration/logger";
 import { getAppUrl } from "@mimir/utils/envs";
@@ -354,6 +359,20 @@ app.get("/setup", ...protectedMiddleware, async (c) => {
 	});
 
 	const data = (await response.json()) as { access_token: string };
+	const accessToken = data.access_token;
+
+	// Get user info
+	const userResponse = await fetch("https://api.github.com/user", {
+		headers: {
+			Authorization: `Bearer ${accessToken}`,
+			Accept: "application/vnd.github.v3+json",
+		},
+	});
+	const userData: {
+		name: string;
+		login: string;
+		id: number;
+	} = await userResponse.json();
 
 	console.log("GitHub access token response:", data);
 
@@ -365,6 +384,16 @@ app.get("/setup", ...protectedMiddleware, async (c) => {
 			token: data.access_token,
 			installationId,
 		},
+	});
+
+	await linkUserToIntegration({
+		integrationId: integration.id,
+		userId: session!.userId,
+		externalUserId: userData.id.toString(),
+		externalUserName: userData.login,
+		accessToken: data.access_token,
+		refreshToken: "",
+		integrationType: "github",
 	});
 
 	return c.redirect(

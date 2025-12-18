@@ -540,6 +540,8 @@ export const integrationUserLink = pgTable(
 		externalUserName: text("external_user_name"),
 		integrationId: text("integration_id"),
 		integrationType: text("integration_type").$type<IntegrationName>(),
+		accessToken: text("access_token"),
+		refreshToken: text("refresh_token"),
 		createdAt: timestamp("created_at", {
 			withTimezone: true,
 			mode: "string",

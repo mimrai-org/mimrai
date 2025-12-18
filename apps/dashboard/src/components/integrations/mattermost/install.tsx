@@ -1,3 +1,4 @@
+"use client";
 import { Alert, AlertDescription, AlertTitle } from "@mimir/ui/alert";
 import { Button } from "@mimir/ui/button";
 import {
@@ -9,9 +10,12 @@ import {
 	FormMessage,
 } from "@mimir/ui/form";
 import { Input } from "@mimir/ui/input";
+import { useMutation } from "@tanstack/react-query";
 import { CheckCircle2Icon, Loader2Icon, XCircleIcon } from "lucide-react";
+import { useState } from "react";
 import z from "zod";
 import { useZodForm } from "@/hooks/use-zod-form";
+import { queryClient, trpc } from "@/utils/trpc";
 
 const schema = z.object({
 	token: z.string().min(1, "Token ID is required"),
@@ -19,18 +23,14 @@ const schema = z.object({
 });
 
 export const IntegrationMattermostForm = ({
-	integrationId,
-	onSubmit,
+	id,
 	defaultValues,
-	isValid,
-	error,
 }: {
-	integrationId: string;
-	onSubmit: (data: z.infer<typeof schema>) => void;
+	id?: string;
 	defaultValues?: Partial<z.infer<typeof schema>>;
-	isValid: boolean;
-	error: string | null;
 }) => {
+	const [error, setError] = useState<string | null>(null);
+	const [isValid, setIsValid] = useState(false);
 	const form = useZodForm(schema, {
 		defaultValues: {
 			token: "",
@@ -39,8 +39,42 @@ export const IntegrationMattermostForm = ({
 		},
 	});
 
+	const { mutateAsync: installIntegration } = useMutation(
+		trpc.integrations.install.mutationOptions(),
+	);
+
+	const { mutateAsync: validateIntegration } = useMutation(
+		trpc.integrations.validate.mutationOptions(),
+	);
+
+	const { mutateAsync: updateIntegration } = useMutation(
+		trpc.integrations.update.mutationOptions(),
+	);
+
 	const handleSubmit = async (data: z.infer<typeof schema>) => {
-		onSubmit(data);
+		setError(null);
+
+		if (isValid) {
+			if (id) {
+				// If we have an ID, we are updating an existing integration
+				await updateIntegration({ id, config: data });
+			} else {
+				// Install the integration
+				await installIntegration({ type: "mattermost", config: data });
+			}
+			queryClient.invalidateQueries(trpc.integrations.get.queryOptions());
+		} else {
+			// Validate the configuration
+			const result = await validateIntegration({
+				type: "mattermost",
+				config: data,
+			});
+			if (result) {
+				setIsValid(true);
+			} else {
+				setError("Please check your configuration.");
+			}
+		}
 	};
 
 	return (
@@ -96,7 +130,7 @@ export const IntegrationMattermostForm = ({
 						{form.formState.isSubmitting && (
 							<Loader2Icon className="size-4 animate-spin" />
 						)}
-						{isValid ? (integrationId ? "Update" : "Install") : "Validate"}
+						{isValid ? (id ? "Update" : "Install") : "Validate"}
 					</Button>
 				</div>
 			</form>

@@ -35,9 +35,9 @@ export const IntegrationsList = () => {
 								</p>
 							</div>
 							<div>
-								{canWriteTeam && (
-									<div>
-										{integration.isInstalled ? (
+								<div>
+									{integration.isInstalledOnTeam ? (
+										integration.isInstalledOnUser ? (
 											<div className="flex items-center gap-4">
 												<span className="text-muted-foreground">Installed</span>
 												<Link
@@ -48,28 +48,40 @@ export const IntegrationsList = () => {
 													</Button>
 												</Link>
 											</div>
-										) : integration.type === "whatsapp" ? (
-											<Link target="_blank" href={"https://wa.me/+18634347933"}>
-												<Button size="sm" variant={"outline"}>
-													Chat
-												</Button>
-											</Link>
-										) : integration.type === "slack" ? (
-											<Link href={getSlackInstallUrl()} target="_blank">
-												<Button size="sm">Install</Button>
-											</Link>
 										) : (
 											<Button
 												size={"sm"}
 												onClick={() =>
-													setParams({ installType: integration.type })
+													setParams({
+														installType: integration.type,
+														linkUser: true,
+													})
 												}
 											>
-												Install
+												Link Account
 											</Button>
-										)}
-									</div>
-								)}
+										)
+									) : integration.type === "whatsapp" ? (
+										<Link target="_blank" href={"https://wa.me/+18634347933"}>
+											<Button size="sm" variant={"outline"}>
+												Chat
+											</Button>
+										</Link>
+									) : integration.type === "slack" && canWriteTeam ? (
+										<Link href={getSlackInstallUrl()} target="_blank">
+											<Button size="sm">Install</Button>
+										</Link>
+									) : canWriteTeam ? (
+										<Button
+											size={"sm"}
+											onClick={() =>
+												setParams({ installType: integration.type })
+											}
+										>
+											Install
+										</Button>
+									) : null}
+								</div>
 							</div>
 						</li>
 					))}
