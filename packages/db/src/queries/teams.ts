@@ -84,7 +84,10 @@ export const createTeam = async ({
 
 	if (userTeams.length === 1) {
 		// This is the first team, set it as the user's current team
-		await db.update(users).set({ teamId: team.id }).where(eq(users.id, userId));
+		await db
+			.update(users)
+			.set({ teamId: team.id, teamSlug: team.slug })
+			.where(eq(users.id, userId));
 	}
 
 	// Create default labels

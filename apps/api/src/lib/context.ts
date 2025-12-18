@@ -35,12 +35,15 @@ export async function createContext({ context }: CreateContextOptions) {
 		| Awaited<ReturnType<typeof getAvailableTeams>>[number]
 		| undefined;
 
-	if (!user.teamId) {
+	if (!user.teamId || !user.teamSlug) {
 		// try to set teamId from existing teams
 		const teams = await getAvailableTeams(user.id);
 		if (teams.length > 0) {
 			user.teamId = teams[0].id;
-			await switchTeam(user.id, {});
+			user.teamSlug = teams[0].slug;
+			await switchTeam(user.id, {
+				teamId: teams[0].id,
+			});
 			currentTeam = teams[0];
 		}
 	} else {

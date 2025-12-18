@@ -8,10 +8,11 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@mimir/ui/dropdown-menu";
+import { getAppUrl } from "@mimir/utils/envs";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { EllipsisIcon } from "lucide-react";
-import { toast } from "sonner";
+import { CopyIcon, EllipsisIcon } from "lucide-react";
+import { Toaster, toast } from "sonner";
 import { useScopes } from "@/hooks/use-user";
 import { queryClient, trpc } from "@/utils/trpc";
 
@@ -67,6 +68,17 @@ export const MembersInvitesList = () => {
 										</DropdownMenuTrigger>
 
 										<DropdownMenuContent className="w-56" align="end">
+											<DropdownMenuItem
+												onSelect={() => {
+													navigator.clipboard.writeText(
+														`${getAppUrl()}/invites/${invite.id}?email=${invite.email}`,
+													);
+													toast.success("Invite link copied to clipboard");
+												}}
+											>
+												<CopyIcon />
+												Copy Link
+											</DropdownMenuItem>
 											{canWriteTeam && (
 												<DropdownMenuItem
 													onClick={() => deleteInvite({ inviteId: invite.id })}
