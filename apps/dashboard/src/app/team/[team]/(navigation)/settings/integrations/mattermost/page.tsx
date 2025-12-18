@@ -6,7 +6,7 @@ import {
 	CardTitle,
 } from "@mimir/ui/card";
 import { notFound } from "next/navigation";
-import { IntegrationConfigForm } from "@/components/forms/integration-config-form";
+import { IntegrationForm } from "@/components/integrations/components";
 import { queryClient, trpc } from "@/utils/trpc";
 import { LogsList } from "../logs-list";
 import { LinkedUsersList } from "./linked-users-list";
@@ -19,7 +19,7 @@ export default async function Page() {
 		}),
 	);
 
-	const integration = integrationInfo.installedIntegration[0];
+	const integration = integrationInfo.installedIntegration;
 
 	if (!integration) {
 		return notFound();
@@ -35,7 +35,7 @@ export default async function Page() {
 				</CardHeader>
 				<CardContent>
 					{integration && (
-						<IntegrationConfigForm
+						<IntegrationForm
 							id={id}
 							type={integration.type}
 							defaultValues={integration.config}
