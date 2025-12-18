@@ -260,6 +260,7 @@ export const initMattermostSingle = async (
 											},
 										],
 									};
+									previousMessages.push(userMessage);
 
 									const unsavedMessages: {
 										message: UIChatMessage;
