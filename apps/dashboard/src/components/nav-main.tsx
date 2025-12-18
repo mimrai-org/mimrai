@@ -15,28 +15,15 @@ import {
 	SidebarMenuSubButton,
 	SidebarMenuSubItem,
 } from "@ui/components/ui/sidebar";
-import { ChevronRight, type LucideIcon } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUser } from "@/hooks/use-user";
 import { cn } from "@/lib/utils";
+import type { NavItem } from "./app-sidebar";
 import { CreateButton } from "./create-button";
 
-export function NavMain({
-	items,
-}: {
-	items: {
-		title: string;
-		url: string;
-		icon: LucideIcon;
-		scopes?: string[];
-		items?: {
-			title: string;
-			url: string;
-			scopes?: string[];
-		}[];
-	}[];
-}) {
+export function NavMain({ items }: { items: NavItem[] }) {
 	const user = useUser();
 	const pathname = usePathname();
 
@@ -53,11 +40,34 @@ export function NavMain({
 				<SidebarMenuItem className="mb-2">
 					<CreateButton />
 				</SidebarMenuItem>
-				{items.map((item) => {
+				{items.map((item, index) => {
+					if ("header" in item) {
+						return (
+							<SidebarMenuItem key={item.header} className="mt-4 px-2">
+								<span className="text-muted-foreground text-xs">
+									{item.header}
+								</span>
+							</SidebarMenuItem>
+						);
+					}
+
+					if ("spacing" in item) {
+						return (
+							<SidebarMenuItem
+								key={`spacing-${index}`}
+								style={{
+									marginTop: item.spacing,
+								}}
+							/>
+						);
+					}
+
 					const isActive =
 						pathname.startsWith(addTeamToUrl(item.url)) ||
-						item.items?.some((subItem) =>
-							pathname.startsWith(addTeamToUrl(subItem.url)),
+						item.items?.some(
+							(subItem) =>
+								"url" in subItem &&
+								pathname.startsWith(addTeamToUrl(subItem.url as string)),
 						);
 
 					if (

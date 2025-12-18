@@ -5,37 +5,57 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from "@ui/components/ui/sidebar";
-import type { LucideIcon } from "lucide-react";
+import { cn } from "@ui/lib/utils";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import type * as React from "react";
+import { useUser } from "@/hooks/use-user";
+import type { NavItem } from "./app-sidebar";
 
 export function NavSecondary({
 	items,
 	...props
 }: {
-	items: {
-		title: string;
-		url: string;
-		icon: LucideIcon;
-	}[];
+	items: NavItem[];
 } & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
+	const pathname = usePathname();
+	const user = useUser();
+
+	const addTeamToUrl = (url: string) => {
+		if (url.includes("{team}")) {
+			return url.replace("{team}", user?.team?.slug || "");
+		}
+		return url;
+	};
+
 	return (
 		<SidebarGroup {...props}>
 			<SidebarGroupContent>
 				<SidebarMenu>
-					{items.map((item) => (
-						<SidebarMenuItem key={item.title}>
-							<SidebarMenuButton
-								asChild
-								size="sm"
-								className="flex items-center border border-transparent py-2 hover:border-input"
-							>
-								<a href={item.url}>
-									<item.icon />
-									<span>{item.title}</span>
-								</a>
-							</SidebarMenuButton>
-						</SidebarMenuItem>
-					))}
+					{items.map((item) => {
+						if ("title" in item === false) return null;
+
+						const isActive = pathname.startsWith(addTeamToUrl(item.url));
+
+						return (
+							<SidebarMenuItem key={item.title}>
+								<SidebarMenuButton asChild size="sm">
+									<Link
+										href={addTeamToUrl(item.url)}
+										className={cn(
+											"flex h-8 items-center border border-transparent text-sm!",
+											{
+												"bg-accent": isActive,
+											},
+										)}
+									>
+										<item.icon className="size-4! text-muted-foreground" />
+										<span>{item.title}</span>
+									</Link>
+								</SidebarMenuButton>
+							</SidebarMenuItem>
+						);
+					})}
 				</SidebarMenu>
 			</SidebarGroupContent>
 		</SidebarGroup>
