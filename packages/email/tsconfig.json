@@ -1,7 +1,7 @@
 {
 	"extends": "@mimir/tsconfig/base.json",
 	"include": ["emails", "components"],
-	"exclude": ["node_modules"],
+	"exclude": ["node_modules", ".react-email"],
 	"compilerOptions": {
 		"baseUrl": ".",
 		"module": "NodeNext",

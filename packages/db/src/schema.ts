@@ -728,6 +728,9 @@ export const githubRepositoryConnected = pgTable(
 	],
 );
 
+/**
+ * @deprecated going to be removed
+ */
 export const pullRequestPlanStatus = pgEnum("pull_request_plan_status", [
 	"pending",
 	"completed",
@@ -735,6 +738,9 @@ export const pullRequestPlanStatus = pgEnum("pull_request_plan_status", [
 	"error",
 ]);
 
+/**
+ * @deprecated going to be removed
+ */
 export const pullRequestPlan = pgTable("pull_request_plans", {
 	id: text("id")
 		.$defaultFn(() => randomUUID())
@@ -1107,6 +1113,65 @@ export const milestones = pgTable(
 			foreignColumns: [projects.id],
 			name: "milestones_project_id_fkey",
 		}).onDelete("cascade"),
+	],
+);
+
+export const prReviews = pgTable(
+	"pr_reviews",
+	{
+		id: text("id")
+			.$defaultFn(() => randomUUID())
+			.primaryKey()
+			.notNull(),
+		teamId: text("team_id").notNull(),
+		connectedRepoId: text("connected_repo_id").notNull(),
+		externalId: bigint("external_id", {
+			mode: "number",
+		}).notNull(),
+		repoId: bigint("repo_id", {
+			mode: "number",
+		}).notNull(),
+		prNumber: bigint("pr_number", {
+			mode: "number",
+		}).notNull(),
+		assigneeName: text("assignee_name"),
+		assigneeAvatarUrl: text("assignee_avatar_url"),
+		assigneeUserId: text("assignee_user_id"),
+		reviewers: jsonb("reviewers")
+			.$type<
+				{
+					name: string;
+					avatarUrl: string;
+					userId?: string;
+				}[]
+			>()
+			.default([]),
+		title: text("title").notNull(),
+		body: text("body").notNull(),
+		state: text("state").notNull(),
+		prUrl: text("pr_url").notNull(),
+		createdAt: timestamp("created_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
+	},
+	(table) => [
+		foreignKey({
+			columns: [table.teamId],
+			foreignColumns: [teams.id],
+			name: "pull_request_reviews_team_id_fkey",
+		}).onDelete("cascade"),
+		foreignKey({
+			columns: [table.assigneeUserId],
+			foreignColumns: [users.id],
+			name: "pull_request_reviews_assignee_user_id_fkey",
+		}),
+		foreignKey({
+			columns: [table.connectedRepoId],
+			foreignColumns: [githubRepositoryConnected.id],
+			name: "pull_request_reviews_connected_repo_id_fkey",
+		}),
+		unique("unique_pr_review_per_team").on(table.externalId),
 	],
 );
 

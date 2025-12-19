@@ -1,6 +1,11 @@
 {
 	"extends": "@mimir/tsconfig/base.json",
-	"include": ["src"],
+	"include": [
+		"src",
+		"../../apps/api/src/ai",
+		"../integration/src/registry.ts",
+		"../jobs/src/jobs/notifications/send-notification-job.ts"
+	],
 	"exclude": ["node_modules"],
 	"compilerOptions": {
 		"baseUrl": ".",

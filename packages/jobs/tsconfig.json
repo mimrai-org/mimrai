@@ -1,6 +1,6 @@
 {
 	"extends": "@mimir/tsconfig/base.json",
-	"include": ["src", "../../types"],
+	"include": ["src"],
 	"exclude": ["node_modules"],
 	"compilerOptions": {
 		"baseUrl": ".",
