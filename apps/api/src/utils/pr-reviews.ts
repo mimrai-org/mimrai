@@ -48,7 +48,7 @@ export const transformPr = async ({
 			.filter((a): a is NonNullable<typeof a> => a !== null) || [];
 
 	return {
-		body: pr.body,
+		body: pr.body ?? "",
 		externalId: pr.id,
 		prNumber: pr.number,
 		prUrl: pr.html_url,

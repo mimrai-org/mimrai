@@ -403,8 +403,6 @@ app.get("/setup", ...protectedMiddleware, async (c) => {
 		id: number;
 	} = await userResponse.json();
 
-	console.log("GitHub access token response:", data);
-
 	// Create the integration with the access token
 	const integration = await installIntegration({
 		type: "github",

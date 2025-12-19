@@ -98,7 +98,7 @@ export const syncTeamPrReviewsJob = schemaTask({
 					})) || [];
 
 				return syncPrReview({
-					body: pr.body,
+					body: pr.body ?? "",
 					externalId: pr.id,
 					prNumber: pr.number,
 					prUrl: pr.html_url,
