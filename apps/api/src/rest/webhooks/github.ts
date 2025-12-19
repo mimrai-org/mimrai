@@ -4,6 +4,7 @@ import {
 	updatePullRequestPlanStatus,
 } from "@db/queries/github";
 import {
+	getLinkedUserByUserId,
 	installIntegration,
 	linkUserToIntegration,
 } from "@db/queries/integrations";
@@ -20,6 +21,7 @@ import type {
 } from "@octokit/webhooks-types";
 import crypto from "crypto";
 import type { MiddlewareHandler } from "hono";
+import { Octokit } from "octokit";
 import { protectedMiddleware } from "../middleware";
 import type { Context } from "../types";
 
@@ -178,13 +180,27 @@ app.post(validateGithubWebhook, async (c) => {
 			}
 			const teamId = connectedRepository.teamId;
 
+			const link = await getLinkedUserByUserId({
+				teamId,
+				userId: connectedRepository.connectedByUserId,
+			});
+
+			if (!link) {
+				console.log("No linked user found for the connected repository");
+				break;
+			}
+
+			const octokit = new Octokit({
+				auth: link.accessToken,
+			});
+
 			console.log("Processing pull request event for PR #", pr.number);
 
 			const onlyUserAssignees = pr.assignees?.filter((a) => "login" in a) || [];
 			const onlyUserReviewers =
 				pr.requested_reviewers?.filter((r) => "login" in r) || [];
 
-			await syncPrReview({
+			const syncResult = await syncPrReview({
 				...pr,
 				teamId,
 				externalId: pr.id,
@@ -193,6 +209,26 @@ app.post(validateGithubWebhook, async (c) => {
 				assignees: onlyUserAssignees,
 				requested_reviewers: onlyUserReviewers,
 			});
+
+			if (syncResult?.magicActions.length > 0) {
+				// Comment on the PR about the detected magic actions
+				octokit.rest.issues.createComment({
+					owner: payload.repository.owner.login,
+					repo: payload.repository.name,
+					issue_number: pr.number,
+					body: `${syncResult.magicActions
+						.map(
+							(action) =>
+								`- ${action.magicWord} [${action.prefix}-${action.sequence}](${action.taskUrl})`,
+						)
+						.join("\n")}
+					`,
+				});
+
+				console.log(
+					`Commented on PR #${pr.number} about detected magic task actions.`,
+				);
+			}
 
 			//       const branches = connectedRepository.branches || [];
 			//       if (!branches.includes(targetBranchName)) {

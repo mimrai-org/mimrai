@@ -28,6 +28,7 @@
     "./tasks": "./src/tasks.ts",
     "./recurrence": "./src/recurrence.ts",
     "./shareable": "./src/shareable.ts",
+    "./pr-reviews": "./src/pr-reviews.ts",
     "./teams": "./src/teams.ts"
   }
 }

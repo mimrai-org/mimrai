@@ -1,4 +1,6 @@
 import type { DeleteTaskInput } from "@api/schemas/tasks";
+import type { MagicTaskAction } from "@mimir/utils/pr-reviews";
+import { getTaskPermalink } from "@mimir/utils/tasks";
 import { subDays } from "date-fns";
 import {
 	and,
@@ -42,6 +44,7 @@ import {
 	deleteActivity,
 	updateActivity,
 } from "./activities";
+import { getStatuses } from "./statuses";
 import { upsertTaskEmbedding } from "./tasks-embeddings";
 import { getMembers } from "./teams";
 
@@ -487,6 +490,7 @@ export const updateTask = async ({
 	userId?: string;
 	projectId?: string | null;
 	milestoneId?: string | null;
+	prReviewId?: string;
 	recurring?: {
 		startDate?: string;
 		frequency: "daily" | "weekly" | "monthly" | "yearly";
@@ -1112,4 +1116,92 @@ export const getSmartCompleteContext = async ({
 		members: membersList,
 		projects: projectsList,
 	};
+};
+
+export const executeMagicTaskActions = async ({
+	actions,
+	teamId,
+	prReviewId,
+}: {
+	actions: MagicTaskAction[];
+	teamId: string;
+	prReviewId: string;
+}) => {
+	if (actions.length === 0) {
+		return [];
+	}
+
+	// Get all team statuses once
+	const teamStatuses = await getStatuses({ pageSize: 100, teamId });
+	const executedMagicActions: ((typeof actions)[number] & {
+		taskUrl: string;
+	})[] = [];
+
+	for (const action of actions) {
+		// Find the task in the action
+		const [task] = await db
+			.select({
+				id: tasks.id,
+				title: tasks.title,
+				statusId: tasks.statusId,
+				teamId: tasks.teamId,
+				prReviewId: tasks.prReviewId,
+				status: {
+					id: statuses.id,
+					name: statuses.name,
+					description: statuses.description,
+					order: statuses.order,
+					type: statuses.type,
+				},
+				permalinkId: tasks.permalinkId,
+			})
+			.from(tasks)
+			.innerJoin(statuses, eq(tasks.statusId, statuses.id))
+			.where(and(eq(tasks.sequence, action.sequence), eq(tasks.teamId, teamId)))
+			.limit(1);
+
+		if (!task) {
+			console.warn(`Task with sequence ${action.sequence} not found.`);
+			continue;
+		}
+
+		// If the task is already in progress, skip
+		if (task.status.type === action.status && task.prReviewId === prReviewId) {
+			console.info(
+				`Task with sequence ${action.sequence} is already in status ${action.status}.`,
+			);
+			continue;
+		}
+
+		let newStatus = teamStatuses.data.find((s) => s.type === action.status);
+
+		if (!newStatus && action.status === "review") {
+			// try to find a "in_progress" status as a fallback
+			const fallbackStatus = teamStatuses.data.find(
+				(s) => s.type === "in_progress",
+			);
+			newStatus = fallbackStatus;
+			console.warn(
+				`Status "review" not found for team ${teamId}. Falling back to ${fallbackStatus?.type} status.`,
+			);
+		}
+
+		// Update task status to in_progress
+		await updateTask({
+			id: task.id,
+			statusId: newStatus?.id,
+			teamId: task.teamId,
+			prReviewId,
+		});
+
+		console.info(
+			`Task with sequence ${action.sequence} updated to status ${newStatus?.type}.`,
+		);
+
+		executedMagicActions.push({
+			...action,
+			taskUrl: getTaskPermalink(task.permalinkId),
+		});
+	}
+	return executedMagicActions;
 };

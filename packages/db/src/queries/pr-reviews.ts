@@ -1,3 +1,4 @@
+import { extractMagicTaskActions } from "@mimir/utils/pr-reviews";
 import {
 	and,
 	arrayContains,
@@ -11,6 +12,7 @@ import {
 import { db } from "../index";
 import { type prReviewStatusEnum, prReviews } from "../schema";
 import { getLinkedUsers } from "./integrations";
+import { executeMagicTaskActions } from "./tasks";
 
 type SyncPrPreviewInput = {
 	teamId: string;
@@ -63,7 +65,7 @@ export const syncPrReview = async ({
 					eq(prReviews.externalId, input.externalId),
 				),
 			);
-		return;
+		return null;
 	}
 
 	const linkedUsers = await getLinkedUsers({
@@ -110,7 +112,7 @@ export const syncPrReview = async ({
 
 	insertData.status = getPrPreviewStatus(insertData);
 
-	return db
+	const [prReview] = await db
 		.insert(prReviews)
 		.values(insertData)
 		.onConflictDoUpdate({
@@ -118,6 +120,28 @@ export const syncPrReview = async ({
 			set: insertData,
 		})
 		.returning();
+
+	if (!prReview) {
+		throw new Error("Failed to sync PR review");
+	}
+
+	// get magic actions
+	const magicActions = extractMagicTaskActions(prReview);
+	let executedMagicActions: ((typeof magicActions)[number] & {
+		taskUrl: string;
+	})[] = [];
+	if (magicActions.length > 0) {
+		executedMagicActions = await executeMagicTaskActions({
+			teamId: input.teamId,
+			actions: magicActions,
+			prReviewId: prReview.id,
+		});
+	}
+
+	return {
+		prReview,
+		magicActions: executedMagicActions,
+	};
 };
 
 export const getPrReviews = async ({

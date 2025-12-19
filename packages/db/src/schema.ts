@@ -236,6 +236,8 @@ export const tasks = pgTable(
 		projectId: text("project_id"),
 		milestoneId: text("milestone_id"),
 
+		prReviewId: text("pr_review_id"),
+
 		focusOrder: smallint("focus_order"),
 		focusReason: text("focus_reason"),
 
@@ -292,6 +294,11 @@ export const tasks = pgTable(
 			foreignColumns: [milestones.id],
 			name: "tasks_milestone_id_fkey",
 		}),
+		foreignKey({
+			columns: [table.prReviewId],
+			foreignColumns: [prReviews.id],
+			name: "tasks_pr_review_id_fkey",
+		}).onDelete("set null"),
 	],
 );
 
