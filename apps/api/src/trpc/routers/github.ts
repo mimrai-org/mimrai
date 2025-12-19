@@ -6,6 +6,7 @@ import {
 } from "@api/schemas/github";
 import {
 	getColumnsSchema,
+	getPrReviewsCountSchema,
 	getPrReviewsSchema,
 	removeTaskFromPullRequestPlanSchema,
 	updateConnectedRepositorySchema,
@@ -27,7 +28,7 @@ import {
 	installIntegration,
 	linkUserToIntegration,
 } from "@mimir/db/queries/integrations";
-import { getPrReviews } from "@mimir/db/queries/pr-reviews";
+import { getPrReviews, getPrReviewsCount } from "@mimir/db/queries/pr-reviews";
 import { syncTeamPrReviewsJob } from "@mimir/jobs/pull-request-reviews/sync-team-pr-reviews-job";
 import { Octokit } from "octokit";
 
@@ -219,5 +220,16 @@ export const githubRouter = router({
 				...input,
 				teamId: ctx.user.teamId!,
 			});
+		}),
+
+	getPrreviewsCount: protectedProcedure
+		.input(getPrReviewsCountSchema)
+		.query(async ({ ctx, input }) => {
+			const count = await getPrReviewsCount({
+				...input,
+				teamId: ctx.user.teamId!,
+				userId: ctx.user.id,
+			});
+			return count;
 		}),
 });

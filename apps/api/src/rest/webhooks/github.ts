@@ -1,5 +1,3 @@
-import { transformPr } from "@api/utils/pr-reviews";
-import { db } from "@db/index";
 import {
 	getConnectedRepositoryByInstallationId,
 	getPullRequestPlanByHead,
@@ -11,7 +9,6 @@ import {
 } from "@db/queries/integrations";
 import { syncPrReview } from "@db/queries/pr-reviews";
 import { updateTask } from "@db/queries/tasks";
-import { integrationUserLink } from "@db/schema";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { log } from "@mimir/integration/logger";
 import { getAppUrl } from "@mimir/utils/envs";
@@ -183,12 +180,18 @@ app.post(validateGithubWebhook, async (c) => {
 
 			console.log("Processing pull request event for PR #", pr.number);
 
+			const onlyUserAssignees = pr.assignees?.filter((a) => "login" in a) || [];
+			const onlyUserReviewers =
+				pr.requested_reviewers?.filter((r) => "login" in r) || [];
+
 			await syncPrReview({
-				...(await transformPr({
-					pr,
-					teamId,
-					repoId: connectedRepository.id,
-				})),
+				...pr,
+				teamId,
+				externalId: pr.id,
+				connectedRepoId: connectedRepository.id,
+				merged: pr.merged,
+				assignees: onlyUserAssignees,
+				requested_reviewers: onlyUserReviewers,
 			});
 
 			//       const branches = connectedRepository.branches || [];

@@ -3,7 +3,7 @@ import { ExternalLinkIcon } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { Response } from "../chat/response";
-import { PrReviewStateIcon } from "./state-icon";
+import { PrReviewStateIcon } from "./status";
 import { usePrReviews } from "./use-pr-reviews";
 
 export const PrReviewsOverview = () => {

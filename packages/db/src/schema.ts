@@ -1122,6 +1122,15 @@ export const milestones = pgTable(
 	],
 );
 
+export const prReviewStatusEnum = pgEnum("pr_review_status", [
+	"pending",
+	"closed",
+	"approved",
+	"changes_requested",
+	"reviewed",
+	"review_requested",
+]);
+
 export const prReviews = pgTable(
 	"pr_reviews",
 	{
@@ -1134,12 +1143,10 @@ export const prReviews = pgTable(
 		externalId: bigint("external_id", {
 			mode: "number",
 		}).notNull(),
-		repoId: bigint("repo_id", {
-			mode: "number",
-		}).notNull(),
 		prNumber: bigint("pr_number", {
 			mode: "number",
 		}).notNull(),
+		status: prReviewStatusEnum("status").default("pending").notNull(),
 		assignees: jsonb("assignees")
 			.$type<
 				{
@@ -1192,6 +1199,43 @@ export const prReviews = pgTable(
 			name: "pull_request_reviews_connected_repo_id_fkey",
 		}).onDelete("cascade"),
 		unique("unique_pr_review_per_team").on(table.externalId),
+	],
+);
+
+export const navbarSettings = pgTable(
+	"navbar_settings",
+	{
+		id: text()
+			.$defaultFn(() => randomUUID())
+			.primaryKey()
+			.notNull(),
+		userId: text("user_id").notNull(),
+		teamId: text("team_id").notNull(),
+		items: jsonb("items")
+			.$type<string[]>()
+			.default(["overview", "my-tasks", "tasks", "projects", "settings"]),
+		createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+			.defaultNow()
+			.notNull(),
+		updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+			.defaultNow()
+			.notNull(),
+	},
+	(table) => [
+		unique("unique_navbar_settings_per_user_team").on(
+			table.userId,
+			table.teamId,
+		),
+		foreignKey({
+			columns: [table.userId],
+			foreignColumns: [users.id],
+			name: "navbar_settings_user_id_fkey",
+		}).onDelete("cascade"),
+		foreignKey({
+			columns: [table.teamId],
+			foreignColumns: [teams.id],
+			name: "navbar_settings_team_id_fkey",
+		}).onDelete("cascade"),
 	],
 );
 

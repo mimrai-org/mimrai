@@ -4,6 +4,8 @@ import {
 	GitPullRequestDraft,
 	GitPullRequestIcon,
 } from "lucide-react";
+import { useUser } from "@/hooks/use-user";
+import type { PrReview } from "./use-pr-reviews";
 
 const prReviewsStateIcons = {
 	open: (c: string) => (
@@ -43,4 +45,30 @@ export const PrReviewStateIcon = ({
 
 	const IconComponent = prReviewsStateIcons[stateKey];
 	return IconComponent ? IconComponent(className || "") : null;
+};
+
+export const PrReviewStatusText = ({ pr }: { pr: PrReview }) => {
+	const user = useUser();
+
+	if (pr.merged) {
+		return "Merged";
+	}
+
+	if (pr.draft) {
+		return "Draft";
+	}
+
+	if (pr.state === "closed") {
+		return "Closed";
+	}
+
+	if (pr.assigneesUserIds?.includes(user?.id || "")) {
+		return "Pending review";
+	}
+
+	if (pr.reviewersUserIds?.includes(user?.id || "")) {
+		return "Review requested";
+	}
+
+	return "Open";
 };

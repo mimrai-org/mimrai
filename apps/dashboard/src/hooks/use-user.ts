@@ -5,7 +5,12 @@ import { useEffect } from "react";
 import { trpc } from "@/utils/trpc";
 
 export const useUser = () => {
-	const { data } = useQuery(trpc.users.getCurrent.queryOptions());
+	const { data } = useQuery(
+		trpc.users.getCurrent.queryOptions(undefined, {
+			refetchOnMount: false,
+			refetchOnWindowFocus: false,
+		}),
+	);
 	const { identify } = useOpenPanel();
 	useEffect(() => {
 		if (!data || !data.id) return;

@@ -78,46 +78,11 @@ export const syncTeamPrReviewsJob = schemaTask({
 			);
 
 			const syncPromises = pullRequests.map(async (pr) => {
-				const reviewers = pr.requested_reviewers.map((reviewer) => ({
-					name: reviewer.login,
-					avatarUrl: reviewer.avatar_url,
-					userId:
-						linkedUsers.data.find(
-							(link) => link.externalUserName === reviewer.login,
-						)?.userId || null,
-				}));
-
-				const assignees =
-					pr.assignees?.map((assignee) => ({
-						name: assignee.login,
-						avatarUrl: assignee.avatar_url,
-						userId:
-							linkedUsers.data.find(
-								(link) => link.externalUserName === assignee.login,
-							)?.userId || null,
-					})) || [];
-
 				return syncPrReview({
-					body: pr.body ?? "",
-					externalId: pr.id,
-					prNumber: pr.number,
-					prUrl: pr.html_url,
-					repoId: pr.base.repo.id,
-					connectedRepoId: repo.id,
-					title: pr.title,
-					state: pr.state,
-					draft: pr.draft,
-					merged: pr.merged_at !== null,
-					reviewers,
-					assignees,
-					assigneesUserIds: assignees
-						.map((a) => a.userId)
-						.filter((id): id is string => id !== null),
-					reviewersUserIds: reviewers
-						.map((r) => r.userId)
-						.filter((id): id is string => id !== null),
+					...pr,
 					teamId,
-					createdAt: new Date(pr.created_at).toISOString(),
+					externalId: pr.id,
+					connectedRepoId: repo.id,
 				});
 			});
 

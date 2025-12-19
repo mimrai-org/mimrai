@@ -1,6 +1,7 @@
 import {
 	and,
 	arrayContains,
+	count,
 	desc,
 	eq,
 	type InferInsertModel,
@@ -8,22 +9,113 @@ import {
 	or,
 } from "drizzle-orm";
 import { db } from "../index";
-import { prReviews } from "../schema";
+import { type prReviewStatusEnum, prReviews } from "../schema";
+import { getLinkedUsers } from "./integrations";
+
+type SyncPrPreviewInput = {
+	teamId: string;
+	externalId: number;
+	title: string;
+	html_url: string;
+	body?: string;
+	connectedRepoId: string;
+	number: number;
+	state: string;
+	assignees?: {
+		login: string;
+		avatar_url: string;
+	}[];
+	requested_reviewers?: {
+		login: string;
+		avatar_url: string;
+	}[];
+	draft?: boolean;
+	merged?: boolean;
+};
+
+const getPrPreviewStatus = (
+	input: Omit<InferInsertModel<typeof prReviews>, "status">,
+): (typeof prReviewStatusEnum.enumValues)[number] => {
+	if (input.merged) return "approved";
+	if (input.state === "closed") return "closed";
+	if (input.draft) return "pending";
+	if (input.reviewersUserIds && input.reviewersUserIds.length > 0)
+		return "review_requested";
+
+	return "pending";
+};
 
 export const syncPrReview = async ({
+	assignees,
+	requested_reviewers,
+	html_url,
+	number,
+	body,
 	...input
-}: InferInsertModel<typeof prReviews>) => {
+}: SyncPrPreviewInput) => {
+	if (input.state === "closed" && !input.merged) {
+		// Delete closed and unmerged PR reviews
+		await db
+			.delete(prReviews)
+			.where(
+				and(
+					eq(prReviews.teamId, input.teamId),
+					eq(prReviews.externalId, input.externalId),
+				),
+			);
+		return;
+	}
+
+	const linkedUsers = await getLinkedUsers({
+		teamId: input.teamId,
+		integrationType: "github",
+	});
+
+	const assigneesWithUserIds =
+		assignees?.map((assignee) => ({
+			name: assignee.login,
+			avatarUrl: assignee.avatar_url,
+			userId:
+				linkedUsers.data.find(
+					(link) => link.externalUserName === assignee.login,
+				)?.userId || undefined,
+		})) ?? [];
+
+	const reviewersWithUserIds =
+		requested_reviewers?.map((reviewer) => ({
+			name: reviewer.login,
+			avatarUrl: reviewer.avatar_url,
+			userId:
+				linkedUsers.data.find(
+					(link) => link.externalUserName === reviewer.login,
+				)?.userId || undefined,
+		})) ?? [];
+
+	const insertData: InferInsertModel<typeof prReviews> = {
+		...input,
+		prUrl: html_url,
+		prNumber: number,
+		assigneesUserIds: assigneesWithUserIds
+			.map((a) => a.userId)
+			.filter((id): id is string => id !== null),
+		reviewersUserIds: reviewersWithUserIds
+			.map((r) => r.userId)
+			.filter((id): id is string => id !== null),
+		assignees: assigneesWithUserIds,
+		reviewers: reviewersWithUserIds,
+		body: body || "",
+		updatedAt: new Date().toISOString(),
+		createdAt: new Date().toISOString(),
+	};
+
+	insertData.status = getPrPreviewStatus(insertData);
+
 	return db
 		.insert(prReviews)
-		.values({
-			...input,
-		})
+		.values(insertData)
 		.onConflictDoUpdate({
 			target: prReviews.externalId,
-			set: {
-				...input,
-				updatedAt: new Date().toISOString(),
-			},
+			set: insertData,
 		})
 		.returning();
 };
@@ -88,4 +180,34 @@ export const getPrReviews = async ({
 		},
 		data,
 	};
+};
+
+export const getPrReviewsCount = async ({
+	teamId,
+	state,
+	userId,
+}: {
+	teamId: string;
+	state?: ("open" | "closed")[];
+	userId?: string;
+}) => {
+	const whereClasuses = [eq(prReviews.teamId, teamId)];
+
+	if (state) whereClasuses.push(inArray(prReviews.state, state));
+	if (userId)
+		whereClasuses.push(
+			or(
+				arrayContains(prReviews.assigneesUserIds, [userId]),
+				arrayContains(prReviews.reviewersUserIds, [userId]),
+			)!,
+		);
+	const [c] = await db
+		.select({
+			count: count(prReviews.id),
+		})
+		.from(prReviews)
+		.where(and(...whereClasuses))
+		.limit(1);
+
+	return Number(c?.count ?? 0);
 };

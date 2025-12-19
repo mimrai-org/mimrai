@@ -3,7 +3,7 @@
 import { Avatar, AvatarImage } from "@ui/components/ui/avatar";
 import { cn } from "@ui/lib/utils";
 import { formatRelative } from "date-fns";
-import { PrReviewStateIcon } from "./state-icon";
+import { PrReviewStateIcon, PrReviewStatusText } from "./status";
 import { type PrReview, usePrReviews } from "./use-pr-reviews";
 
 export const PrReviewItem = ({ review }: { review: PrReview }) => {
@@ -47,7 +47,7 @@ export const PrReviewItem = ({ review }: { review: PrReview }) => {
 						merged={review.merged}
 						className="size-4"
 					/>
-					{review.state}
+					<PrReviewStatusText pr={review} />
 				</div>
 
 				<div className="text-muted-foreground text-xs">

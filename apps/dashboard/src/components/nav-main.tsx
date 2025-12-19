@@ -85,18 +85,22 @@ export function NavMain({ items }: { items: NavItem[] }) {
 									tooltip={item.title}
 									isActive={isActive}
 								>
-									<Link
-										href={addTeamToUrl(item.url)}
-										className={cn(
-											"flex h-8 items-center border border-transparent text-sm!",
-											{
-												"bg-accent": isActive,
-											},
-										)}
-									>
-										<item.icon className="size-4! text-muted-foreground" />
-										<span>{item.title}</span>
-									</Link>
+									{item.customComponent ? (
+										<item.customComponent item={item} isActive={isActive} />
+									) : (
+										<Link
+											href={addTeamToUrl(item.url)}
+											className={cn(
+												"flex h-8 items-center border border-transparent text-sm!",
+												{
+													"bg-accent": isActive,
+												},
+											)}
+										>
+											<item.icon className="size-4! text-muted-foreground" />
+											<span>{item.title}</span>
+										</Link>
+									)}
 								</SidebarMenuButton>
 								{item.items?.length ? (
 									<>

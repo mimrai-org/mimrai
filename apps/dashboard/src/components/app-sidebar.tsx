@@ -20,6 +20,7 @@ import {
 import type * as React from "react";
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
+import { PrReviewsNavItem } from "./sidebar/pr-reviews-item";
 import { SidebarSubscriptionStatus } from "./sidebar-subscription-status";
 import { TeamSwitcher } from "./team-switcher";
 
@@ -27,7 +28,12 @@ export type NavItem =
 	| {
 			title: string;
 			url: string;
+			key: string;
 			icon: LucideIcon;
+			customComponent?: React.ComponentType<{
+				item: NavItem;
+				isActive?: boolean;
+			}>;
 			items?: {
 				title: string;
 				url: string;
@@ -50,24 +56,29 @@ const data: {
 	navMain: [
 		{
 			title: "Overview",
+			key: "overview",
 			url: "/team/{team}/overview",
 			icon: LayoutDashboardIcon,
 		},
 		{
 			title: "My Tasks",
+			key: "my-tasks",
 			url: "/team/{team}/my-tasks",
 			icon: ScanIcon,
 		},
 		{
 			title: "Reviews",
+			key: "reviews",
 			url: "/team/{team}/pr-reviews",
 			icon: GitPullRequestIcon,
+			customComponent: PrReviewsNavItem,
 		},
 		{
 			header: "Workspace",
 		},
 		{
 			title: "Tasks",
+			key: "tasks",
 			url: "/team/{team}/board",
 			icon: LayersIcon,
 			items: [
@@ -91,6 +102,7 @@ const data: {
 		},
 		{
 			title: "Projects",
+			key: "projects",
 			url: "/team/{team}/projects",
 			icon: BoxIcon,
 			items: [
@@ -104,6 +116,7 @@ const data: {
 	navSecondary: [
 		{
 			title: "Settings",
+			key: "settings",
 			url: "/team/{team}/settings",
 			icon: Settings2,
 		},

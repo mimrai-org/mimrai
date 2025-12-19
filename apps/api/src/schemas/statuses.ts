@@ -62,3 +62,7 @@ export const getPrReviewsSchema = z.object({
 	assigneeId: z.string().optional(),
 	includeIds: z.array(z.string()).optional(),
 });
+
+export const getPrReviewsCountSchema = z.object({
+	state: z.array(z.enum(["open", "closed"])).optional(),
+});

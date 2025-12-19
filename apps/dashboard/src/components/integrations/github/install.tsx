@@ -2,7 +2,9 @@
 import { Button } from "@mimir/ui/button";
 import { Form } from "@mimir/ui/form";
 import { getApiUrl } from "@mimir/utils/envs";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Alert, AlertDescription } from "@ui/components/ui/alert";
+import { Switch } from "@ui/components/ui/switch";
 import { useState } from "react";
 import { toast } from "sonner";
 import z from "zod";
@@ -63,9 +65,19 @@ export const InstallIntegrationGithubForm = ({
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(handleInstall)} className="space-y-4">
-				<Button type="button" onClick={handleInstall}>
-					Install
-				</Button>
+				{id && (
+					<Alert>
+						<AlertDescription>
+							GitHub Integration is installed.
+						</AlertDescription>
+					</Alert>
+				)}
+
+				{!id && (
+					<Button type="button" onClick={handleInstall}>
+						Install
+					</Button>
+				)}
 			</form>
 		</Form>
 	);
