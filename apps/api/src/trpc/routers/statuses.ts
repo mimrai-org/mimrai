@@ -5,7 +5,7 @@ import {
 	getColumnsSchema,
 	reorderColumnSchema,
 	updateColumnSchema,
-} from "@api/schemas/columns";
+} from "@api/schemas/statuses";
 import { protectedProcedure, router } from "@api/trpc/init";
 import {
 	createStatus,

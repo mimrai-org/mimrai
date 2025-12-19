@@ -706,6 +706,7 @@ export const githubRepositoryConnected = pgTable(
 		repositoryName: text("repository_name").notNull(),
 		integrationId: text("integration_id").notNull(),
 		branches: jsonb("branches").$type<string[]>().default(sql`'[]'::jsonb`),
+		connectedByUserId: text("connected_by_user_id").notNull(),
 		createdAt: timestamp("created_at", {
 			withTimezone: true,
 			mode: "string",
@@ -725,6 +726,11 @@ export const githubRepositoryConnected = pgTable(
 		})
 			.onDelete("cascade")
 			.onUpdate("cascade"),
+		foreignKey({
+			columns: [table.connectedByUserId],
+			foreignColumns: [users.id],
+			name: "github_repository_connected_connected_by_user_id_fkey",
+		}).onDelete("cascade"),
 	],
 );
 
@@ -1134,9 +1140,17 @@ export const prReviews = pgTable(
 		prNumber: bigint("pr_number", {
 			mode: "number",
 		}).notNull(),
-		assigneeName: text("assignee_name"),
-		assigneeAvatarUrl: text("assignee_avatar_url"),
-		assigneeUserId: text("assignee_user_id"),
+		assignees: jsonb("assignees")
+			.$type<
+				{
+					name: string;
+					avatarUrl: string;
+					userId?: string;
+				}[]
+			>()
+			.default([]),
+		assigneesUserIds: text("assignees_user_ids").array().default([]).notNull(),
+
 		reviewers: jsonb("reviewers")
 			.$type<
 				{
@@ -1146,14 +1160,25 @@ export const prReviews = pgTable(
 				}[]
 			>()
 			.default([]),
+		reviewersUserIds: text("reviewers_user_ids").array().default([]).notNull(),
 		title: text("title").notNull(),
 		body: text("body").notNull(),
 		state: text("state").notNull(),
 		prUrl: text("pr_url").notNull(),
+		draft: boolean("draft").default(false).notNull(),
+		merged: boolean("merged").default(false).notNull(),
 		createdAt: timestamp("created_at", {
 			withTimezone: true,
 			mode: "string",
-		}).defaultNow(),
+		})
+			.notNull()
+			.defaultNow(),
+		updatedAt: timestamp("updated_at", {
+			withTimezone: true,
+			mode: "string",
+		})
+			.notNull()
+			.defaultNow(),
 	},
 	(table) => [
 		foreignKey({
@@ -1162,15 +1187,10 @@ export const prReviews = pgTable(
 			name: "pull_request_reviews_team_id_fkey",
 		}).onDelete("cascade"),
 		foreignKey({
-			columns: [table.assigneeUserId],
-			foreignColumns: [users.id],
-			name: "pull_request_reviews_assignee_user_id_fkey",
-		}),
-		foreignKey({
 			columns: [table.connectedRepoId],
 			foreignColumns: [githubRepositoryConnected.id],
 			name: "pull_request_reviews_connected_repo_id_fkey",
-		}),
+		}).onDelete("cascade"),
 		unique("unique_pr_review_per_team").on(table.externalId),
 	],
 );

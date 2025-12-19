@@ -1,3 +1,4 @@
+import { transformPr } from "@api/utils/pr-reviews";
 import { db } from "@db/index";
 import {
 	getConnectedRepositoryByInstallationId,
@@ -8,12 +9,18 @@ import {
 	installIntegration,
 	linkUserToIntegration,
 } from "@db/queries/integrations";
+import { syncPrReview } from "@db/queries/pr-reviews";
 import { updateTask } from "@db/queries/tasks";
 import { integrationUserLink } from "@db/schema";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { log } from "@mimir/integration/logger";
 import { getAppUrl } from "@mimir/utils/envs";
-import type { PushEvent, WebhookEventName } from "@octokit/webhooks-types";
+import type {
+	PullRequest,
+	PullRequestEvent,
+	PushEvent,
+	WebhookEventName,
+} from "@octokit/webhooks-types";
 import crypto from "crypto";
 import type { MiddlewareHandler } from "hono";
 import { protectedMiddleware } from "../middleware";
@@ -49,6 +56,8 @@ const validateGithubWebhook: MiddlewareHandler = async (c, next) => {
 app.post(validateGithubWebhook, async (c) => {
 	const event = c.req.header("X-GitHub-Event") as WebhookEventName;
 	const body = await c.req.json();
+	console.log(`Received GitHub webhook event: ${event}`);
+
 	switch (event) {
 		case "push": {
 			const payload = body as PushEvent;
@@ -124,43 +133,63 @@ app.post(validateGithubWebhook, async (c) => {
 		}
 
 		case "pull_request": {
-			//       const payload = body as PullRequestEvent;
-			//       const action = payload.action;
-			//       const repositoryId = payload.repository.id;
-			//       const installationId = payload.installation?.id;
+			const payload = body as PullRequestEvent;
+			const action = payload.action;
+			const repositoryId = payload.repository.id;
+			const installationId = payload.installation?.id;
 			//       console.log("Received pull_request event:", action, repositoryId);
 
-			//       const allowedActions: (typeof payload.action)[] = [
-			//         "opened",
-			//         "reopened",
-			//         "synchronize",
-			//       ];
-			//       if (!allowedActions.includes(action)) {
-			//         console.log(`Ignoring pull_request action: ${action}`);
-			//         break;
-			//       }
+			if (!installationId) {
+				console.log("No installation ID found in the payload");
+				break;
+			}
 
-			//       const pr = payload.pull_request as PullRequest;
+			const allowedActions: (typeof payload.action)[] = [
+				"opened",
+				"reopened",
+				"synchronize",
+				"edited",
+				"closed",
+				"assigned",
+				"unassigned",
+				"review_requested",
+				"review_request_removed",
+				"labeled",
+				"unlabeled",
+				"ready_for_review",
+				"converted_to_draft",
+			];
+			if (!allowedActions.includes(action)) {
+				console.log(`Ignoring pull_request action: ${action}`);
+				break;
+			}
+
+			const pr = payload.pull_request as PullRequest;
 
 			//       const title = pr.title;
 			//       const prBody = pr.body || "";
 			//       const targetBranchName = pr.base.ref.split("/").pop() || "";
 
-			//       if (!installationId) {
-			//         console.log("No installation ID found in the payload");
-			//         break;
-			//       }
+			const connectedRepository = await getConnectedRepositoryByInstallationId({
+				installationId: installationId,
+				repoId: repositoryId,
+			});
 
-			//       const connectedRepository = await getConnectedRepositoryByInstallationId({
-			//         installationId: installationId,
-			//         repoId: repositoryId,
-			//       });
+			if (!connectedRepository) {
+				console.log("Repository not connected");
+				break;
+			}
+			const teamId = connectedRepository.teamId;
 
-			//       if (!connectedRepository) {
-			//         console.log("Repository not connected");
-			//         break;
-			//       }
-			//       const teamId = connectedRepository.teamId;
+			console.log("Processing pull request event for PR #", pr.number);
+
+			await syncPrReview({
+				...(await transformPr({
+					pr,
+					teamId,
+					repoId: connectedRepository.id,
+				})),
+			});
 
 			//       const branches = connectedRepository.branches || [];
 			//       if (!branches.includes(targetBranchName)) {

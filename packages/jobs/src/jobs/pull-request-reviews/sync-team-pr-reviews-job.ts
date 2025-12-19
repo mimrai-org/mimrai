@@ -12,8 +12,9 @@ export const syncTeamPrReviewsJob = schemaTask({
 	id: "sync-team-pr-reviews",
 	schema: z.object({
 		teamId: z.string(),
+		repoId: z.string().optional(),
 	}),
-	run: async ({ teamId }, ctx) => {
+	run: async ({ teamId, repoId }, ctx) => {
 		const integration = await getIntegrationByType({
 			type: "github",
 			teamId: teamId,
@@ -45,11 +46,15 @@ export const syncTeamPrReviewsJob = schemaTask({
 		);
 
 		for (const repo of connectedRepositories) {
+			if (repoId && repo.id !== repoId) {
+				continue;
+			}
+
 			const owner = repo.repositoryName.split("/")[0];
 			const repository = repo.repositoryName.split("/")[1];
 
 			const link = linkedUsers.data.find(
-				(link) => link.externalUserName === owner,
+				(link) => link.userId === repo.connectedByUserId,
 			);
 
 			if (!link) {
@@ -64,7 +69,7 @@ export const syncTeamPrReviewsJob = schemaTask({
 				owner,
 				repo: repository,
 				per_page: 100,
-				sort: "created",
+				sort: "updated",
 				direction: "desc",
 			});
 
@@ -73,10 +78,6 @@ export const syncTeamPrReviewsJob = schemaTask({
 			);
 
 			const syncPromises = pullRequests.map(async (pr) => {
-				const assigneeLink = linkedUsers.data.find(
-					(link) => link.externalUserName === pr.assignee?.login,
-				);
-
 				const reviewers = pr.requested_reviewers.map((reviewer) => ({
 					name: reviewer.login,
 					avatarUrl: reviewer.avatar_url,
@@ -86,9 +87,17 @@ export const syncTeamPrReviewsJob = schemaTask({
 						)?.userId || null,
 				}));
 
+				const assignees =
+					pr.assignees?.map((assignee) => ({
+						name: assignee.login,
+						avatarUrl: assignee.avatar_url,
+						userId:
+							linkedUsers.data.find(
+								(link) => link.externalUserName === assignee.login,
+							)?.userId || null,
+					})) || [];
+
 				return syncPrReview({
-					assigneeName: pr.assignee ? pr.assignee.login : null,
-					assigneeUserId: assigneeLink ? assigneeLink.userId : null,
 					body: pr.body,
 					externalId: pr.id,
 					prNumber: pr.number,
@@ -97,7 +106,16 @@ export const syncTeamPrReviewsJob = schemaTask({
 					connectedRepoId: repo.id,
 					title: pr.title,
 					state: pr.state,
+					draft: pr.draft,
+					merged: pr.merged_at !== null,
 					reviewers,
+					assignees,
+					assigneesUserIds: assignees
+						.map((a) => a.userId)
+						.filter((id): id is string => id !== null),
+					reviewersUserIds: reviewers
+						.map((r) => r.userId)
+						.filter((id): id is string => id !== null),
 					teamId,
 					createdAt: new Date(pr.created_at).toISOString(),
 				});

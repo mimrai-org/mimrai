@@ -53,3 +53,12 @@ export const updateConnectedRepositorySchema = z.object({
 export const removeTaskFromPullRequestPlanSchema = z.object({
 	taskIds: z.array(z.string()),
 });
+
+export const getPrReviewsSchema = z.object({
+	pageSize: z.number().min(1).max(100).optional(),
+	cursor: z.string().optional(),
+	state: z.array(z.enum(["open", "closed"])).optional(),
+	reviewerId: z.string().optional(),
+	assigneeId: z.string().optional(),
+	includeIds: z.array(z.string()).optional(),
+});

@@ -1,0 +1,46 @@
+import { cn } from "@ui/lib/utils";
+import {
+	GitPullRequestClosedIcon,
+	GitPullRequestDraft,
+	GitPullRequestIcon,
+} from "lucide-react";
+
+const prReviewsStateIcons = {
+	open: (c: string) => (
+		<GitPullRequestIcon key="open" className={cn("text-green-600", c)} />
+	),
+	closed: (c: string) => (
+		<GitPullRequestClosedIcon key="closed" className={cn("text-red-600", c)} />
+	),
+	draft: (c: string) => (
+		<GitPullRequestDraft key="draft" className={cn("text-zinc-400", c)} />
+	),
+	merged: (c: string) => (
+		<GitPullRequestIcon key="merged" className={cn("text-purple-600", c)} />
+	),
+};
+
+export const PrReviewStateIcon = ({
+	state,
+	draft,
+	merged,
+	className,
+}: {
+	state: string;
+	draft?: boolean;
+	merged?: boolean;
+	className?: string;
+}) => {
+	if (state in prReviewsStateIcons === false) {
+		return null;
+	}
+
+	const stateKey = draft
+		? "draft"
+		: merged
+			? "merged"
+			: (state as keyof typeof prReviewsStateIcons);
+
+	const IconComponent = prReviewsStateIcons[stateKey];
+	return IconComponent ? IconComponent(className || "") : null;
+};

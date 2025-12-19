@@ -45,12 +45,14 @@ export const getConnectedRepositoryByRepoId = async ({
 
 export const connectRepository = async ({
 	teamId,
+	userId,
 	installationId,
 	repositoryId,
 	repositoryName,
 	integrationId,
 }: {
 	teamId: string;
+	userId: string;
 	installationId: number;
 	repositoryId: number;
 	repositoryName: string;
@@ -78,6 +80,7 @@ export const connectRepository = async ({
 			repositoryName,
 			integrationId,
 			installationId,
+			connectedByUserId: userId,
 		})
 		.returning();
 

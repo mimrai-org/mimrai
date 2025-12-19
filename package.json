@@ -18,9 +18,9 @@
     "db:push": "turbo -F @mimir/db db:push"
   },
   "devDependencies": {
-    "@mimir/tsconfig": "workspace:*",
     "@biomejs/biome": "^2.2.0",
-    "turbo": "2.5.6",
+    "@mimir/tsconfig": "workspace:*",
+    "turbo": "2.6.3",
     "typescript": "^5.9.2"
   },
   "packageManager": "bun@1.2.21",

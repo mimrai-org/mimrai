@@ -10,6 +10,7 @@ import {
 } from "@ui/components/ui/sidebar";
 import {
 	BoxIcon,
+	GitPullRequestIcon,
 	LayersIcon,
 	LayoutDashboardIcon,
 	type LucideIcon,
@@ -56,6 +57,11 @@ const data: {
 			title: "My Tasks",
 			url: "/team/{team}/my-tasks",
 			icon: ScanIcon,
+		},
+		{
+			title: "Reviews",
+			url: "/team/{team}/pr-reviews",
+			icon: GitPullRequestIcon,
 		},
 		{
 			header: "Workspace",

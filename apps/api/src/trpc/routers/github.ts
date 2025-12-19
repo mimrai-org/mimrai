@@ -1,14 +1,15 @@
 import {
-	getColumnsSchema,
-	removeTaskFromPullRequestPlanSchema,
-	updateConnectedRepositorySchema,
-} from "@api/schemas/columns";
-import {
 	connectRepositorySchema,
 	disconnectRepositorySchema,
 	getRemoteRepositoriesSchema,
 	getRemoteRepositoryBranchesSchema,
 } from "@api/schemas/github";
+import {
+	getColumnsSchema,
+	getPrReviewsSchema,
+	removeTaskFromPullRequestPlanSchema,
+	updateConnectedRepositorySchema,
+} from "@api/schemas/statuses";
 import { protectedProcedure, router } from "@api/trpc/init";
 import {
 	connectRepository,
@@ -26,6 +27,8 @@ import {
 	installIntegration,
 	linkUserToIntegration,
 } from "@mimir/db/queries/integrations";
+import { getPrReviews } from "@mimir/db/queries/pr-reviews";
+import { syncTeamPrReviewsJob } from "@mimir/jobs/pull-request-reviews/sync-team-pr-reviews-job";
 import { Octokit } from "octokit";
 
 export const githubRouter = router({
@@ -165,13 +168,21 @@ export const githubRouter = router({
 				throw new Error("Integration not found");
 			}
 
-			return connectRepository({
+			const connected = await connectRepository({
 				repositoryId: input.repositoryId,
 				integrationId: input.integrationId,
 				repositoryName: input.repositoryName,
 				installationId: integration.config.installationId,
 				teamId: ctx.user.teamId!,
+				userId: ctx.user.id,
 			});
+
+			await syncTeamPrReviewsJob.trigger({
+				teamId: ctx.user.teamId!,
+				repoId: connected.id,
+			});
+
+			return connected;
 		}),
 
 	disconnectRepository: protectedProcedure
@@ -201,5 +212,12 @@ export const githubRouter = router({
 			});
 		}),
 
-	getPendingPullRequest: protectedProcedure.query(async ({ ctx }) => {}),
+	getPrReviews: protectedProcedure
+		.input(getPrReviewsSchema.optional())
+		.query(async ({ ctx, input }) => {
+			return getPrReviews({
+				...input,
+				teamId: ctx.user.teamId!,
+			});
+		}),
 });
