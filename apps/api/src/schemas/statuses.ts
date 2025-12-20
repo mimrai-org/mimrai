@@ -65,4 +65,6 @@ export const getPrReviewsSchema = z.object({
 
 export const getPrReviewsCountSchema = z.object({
 	state: z.array(z.enum(["open", "closed"])).optional(),
+	draft: z.boolean().optional(),
+	merged: z.boolean().optional(),
 });

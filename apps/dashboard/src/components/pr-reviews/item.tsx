@@ -3,6 +3,7 @@
 import { Avatar, AvatarImage } from "@ui/components/ui/avatar";
 import { cn } from "@ui/lib/utils";
 import { formatRelative } from "date-fns";
+import { DotIcon, LayersIcon } from "lucide-react";
 import { PrReviewStateIcon, PrReviewStatusText } from "./status";
 import { type PrReview, usePrReviews } from "./use-pr-reviews";
 
@@ -45,13 +46,19 @@ export const PrReviewItem = ({ review }: { review: PrReview }) => {
 						state={review.state as any}
 						draft={review.draft}
 						merged={review.merged}
-						className="size-4"
+						className="size-3.5"
 					/>
 					<PrReviewStatusText pr={review} />
 				</div>
 
-				<div className="text-muted-foreground text-xs">
+				<div className="flex items-center gap-2 text-muted-foreground text-xs">
 					{formatRelative(new Date(review.updatedAt), new Date())}
+					{review.tasks?.length > 0 && (
+						<div className="flex items-center gap-1">
+							<LayersIcon className="size-3.5" />
+							{review.tasks.length}
+						</div>
+					)}
 				</div>
 			</div>
 		</button>

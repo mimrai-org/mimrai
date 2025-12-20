@@ -33,6 +33,8 @@ export const PrReviewsNavItem = ({
 		trpc.github.getPrreviewsCount.queryOptions(
 			{
 				state: ["open"],
+				merged: false,
+				draft: false,
 			},
 			{
 				enabled: isInstalled === true && !!user?.id,

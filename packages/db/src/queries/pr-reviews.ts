@@ -5,12 +5,14 @@ import {
 	count,
 	desc,
 	eq,
+	getTableColumns,
 	type InferInsertModel,
 	inArray,
 	or,
 } from "drizzle-orm";
 import { db } from "../index";
-import { type prReviewStatusEnum, prReviews } from "../schema";
+import { type prReviewStatusEnum, prReviews, tasks } from "../schema";
+import { jsonAggBuildObject } from "../utils/drizzle";
 import { getLinkedUsers } from "./integrations";
 import { executeMagicTaskActions } from "./tasks";
 
@@ -170,8 +172,16 @@ export const getPrReviews = async ({
 		whereClasuses.push(arrayContains(prReviews.reviewersUserIds, [reviewerId]));
 
 	const query = db
-		.select()
+		.select({
+			...getTableColumns(prReviews),
+			tasks: jsonAggBuildObject({
+				id: tasks.id,
+				title: tasks.title,
+				sequence: tasks.sequence,
+			}),
+		})
 		.from(prReviews)
+		.leftJoin(tasks, eq(prReviews.id, tasks.prReviewId))
 		.where(
 			or(
 				and(...whereClasuses),
@@ -181,6 +191,7 @@ export const getPrReviews = async ({
 				),
 			),
 		)
+		.groupBy(prReviews.id)
 		.orderBy(desc(prReviews.createdAt));
 
 	// Apply pagination
@@ -202,7 +213,10 @@ export const getPrReviews = async ({
 			hasPreviousPage: offset > 0,
 			hasNextPage: data && data.length === pageSize,
 		},
-		data,
+		data: data.map((d) => ({
+			...d,
+			tasks: d.tasks.filter((t) => t.id !== null),
+		})),
 	};
 };
 
@@ -210,14 +224,20 @@ export const getPrReviewsCount = async ({
 	teamId,
 	state,
 	userId,
+	draft,
+	merged,
 }: {
 	teamId: string;
 	state?: ("open" | "closed")[];
 	userId?: string;
+	draft?: boolean;
+	merged?: boolean;
 }) => {
 	const whereClasuses = [eq(prReviews.teamId, teamId)];
 
 	if (state) whereClasuses.push(inArray(prReviews.state, state));
+	if (draft !== undefined) whereClasuses.push(eq(prReviews.draft, draft));
+	if (merged !== undefined) whereClasuses.push(eq(prReviews.merged, merged));
 	if (userId)
 		whereClasuses.push(
 			or(
