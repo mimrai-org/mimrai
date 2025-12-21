@@ -94,6 +94,14 @@ export const tasksRouter = router({
 				});
 			}
 
+			if (task.dueDate) {
+				// Sync the calendar event
+				syncGoogleCalendarTaskEvent({
+					taskId: task.id,
+					teamId: ctx.user.teamId!,
+				});
+			}
+
 			return task;
 		}),
 
