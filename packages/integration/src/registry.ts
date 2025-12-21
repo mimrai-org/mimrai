@@ -33,6 +33,12 @@ export const integrationsRegistry = {
 			accessToken: z.string(),
 		}),
 	},
+	"google-calendar": {
+		name: "Google Calendar",
+		type: "google-calendar" as const,
+		description: "Google Calendar integration",
+		configSchema: z.object({}),
+	},
 } as const;
 
 export type IntegrationName = keyof typeof integrationsRegistry;

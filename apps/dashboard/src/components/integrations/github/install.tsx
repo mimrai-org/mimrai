@@ -16,17 +16,17 @@ import type { IntegrationConfigFormProps } from "../components";
 const schema = z.object({});
 
 export const InstallIntegrationGithubForm = ({
-	id,
-	defaultValues,
+	integration,
 }: IntegrationConfigFormProps) => {
 	const [error, setError] = useState<string | null>(null);
 	const [isValid, setIsValid] = useState(false);
 	const user = useUser();
 	const form = useZodForm(schema, {
 		defaultValues: {
-			...defaultValues,
+			...integration?.installedIntegration?.config,
 		},
 	});
+	const id = integration?.installedIntegration?.id;
 
 	const { mutate: install } = useMutation(
 		trpc.github.install.mutationOptions({

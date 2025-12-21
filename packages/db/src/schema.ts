@@ -39,6 +39,7 @@ export const session = pgTable("session", {
 	updatedAt: timestamp("updated_at").notNull(),
 	ipAddress: text("ip_address"),
 	userAgent: text("user_agent"),
+	metadata: jsonb("metadata").$type<Record<string, any>>(),
 	userId: text("user_id")
 		.notNull()
 		.references(() => users.id, { onDelete: "cascade" }),
@@ -549,6 +550,7 @@ export const integrationUserLink = pgTable(
 		integrationType: text("integration_type").$type<IntegrationName>(),
 		accessToken: text("access_token"),
 		refreshToken: text("refresh_token"),
+		config: jsonb("config").$type<Record<string, any>>(),
 		createdAt: timestamp("created_at", {
 			withTimezone: true,
 			mode: "string",

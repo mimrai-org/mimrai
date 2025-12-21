@@ -73,3 +73,10 @@ export const getLinkedUsersSchema = z.object({
 	cursor: z.string().optional(),
 	pageSize: z.number().min(1).max(100).optional(),
 });
+
+export const updateLinkedUserSchema = z.object({
+	integrationType: z.string(),
+	accessToken: z.string().optional(),
+	refreshToken: z.string().optional(),
+	config: z.record(z.string(), z.any()).optional(),
+});

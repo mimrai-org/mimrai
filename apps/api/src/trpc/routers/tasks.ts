@@ -41,6 +41,7 @@ import {
 } from "@mimir/db/queries/tasks";
 import { getDuplicateTaskEmbedding } from "@mimir/db/queries/tasks-embeddings";
 import { trackMessage, trackTaskCreated } from "@mimir/events/server";
+import { syncGoogleCalendarTaskEvent } from "@mimir/integration/google-calendar";
 import { handleTaskComment } from "@mimir/integration/task-comments";
 import { createRecurringTaskJob } from "@mimir/jobs/tasks/create-recurring-task-job";
 import { runs } from "@trigger.dev/sdk";
@@ -153,6 +154,18 @@ export const tasksRouter = router({
 				await updateTaskRecurringJob({
 					jobId: null,
 					taskId: task.id,
+				});
+			}
+
+			if (
+				oldTask.dueDate !== task.dueDate ||
+				oldTask.subscribers !== task.subscribers
+			) {
+				// Due date or subscribers changed, sync the calendar event
+				syncGoogleCalendarTaskEvent({
+					taskId: task.id,
+					teamId: ctx.user.teamId!,
+					oldSubscribers: oldTask.subscribers,
 				});
 			}
 

@@ -16,24 +16,26 @@
     "./mattermost": "./src/mattermost/index.ts",
     "./task-comments": "./src/task-comments/index.ts",
     "./slack": "./src/slack/index.ts",
-    "./whatsapp": "./src/whatsapp/index.ts"
+    "./whatsapp": "./src/whatsapp/index.ts",
+    "./google-calendar": "./src/google-calendar/index.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "2.0.62",
     "@mattermost/client": "^10.12.0",
+    "@mimir/billing": "workspace:*",
     "@mimir/cache": "workspace:*",
     "@mimir/db": "workspace:*",
     "@mimir/events": "workspace:*",
     "@mimir/utils": "workspace:*",
-    "@mimir/billing": "workspace:*",
     "@slack/bolt": "^4.6.0",
     "ai": "5.0.87",
     "drizzle-orm": "0.44.6",
+    "googleapis": "^169.0.0",
     "mime-types": "^3.0.1",
     "redis": "^5.8.2",
     "twilio": "^5.10.6",
     "ws": "^8.18.3",
-    "zod": "^4.1.11"
+    "zod": "4.1.10"
   },
   "devDependencies": {
     "@mattermost/types": "^10.12.0",

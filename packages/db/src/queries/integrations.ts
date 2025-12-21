@@ -375,6 +375,7 @@ export const getLinkedUserByUserId = async ({
 			refreshToken: integrationUserLink.refreshToken,
 			externalUserId: integrationUserLink.externalUserId,
 			externalUserName: integrationUserLink.externalUserName,
+			config: integrationUserLink.config,
 		})
 		.from(integrationUserLink)
 		.where(and(...whereClause))
@@ -397,6 +398,7 @@ export const linkUserToIntegration = async ({
 	externalUserName: string;
 	accessToken?: string;
 	refreshToken?: string;
+	config?: Record<string, any>;
 }) => {
 	const [link] = await db
 		.insert(integrationUserLink)
@@ -413,9 +415,51 @@ export const linkUserToIntegration = async ({
 				externalUserName: input.externalUserName,
 				accessToken: input.accessToken,
 				refreshToken: input.refreshToken,
+				config: input.config,
 			},
 		})
 		.returning();
 
 	return link;
+};
+
+export const updateLinkedUser = async ({
+	userId,
+	teamId,
+	integrationType,
+	...input
+}: {
+	userId: string;
+	teamId: string;
+	integrationType: IntegrationName;
+	accessToken?: string;
+	refreshToken?: string;
+	config?: Record<string, any>;
+}) => {
+	const whereClause: SQL[] = [eq(integrationUserLink.userId, userId)];
+	if (teamId) whereClause.push(eq(integrations.teamId, teamId));
+	if (integrationType)
+		whereClause.push(eq(integrationUserLink.integrationType, integrationType));
+
+	const [existing] = await db
+		.select()
+		.from(integrationUserLink)
+		.innerJoin(
+			integrations,
+			eq(integrationUserLink.integrationId, integrations.id),
+		)
+		.where(and(...whereClause))
+		.limit(1);
+
+	if (!existing) {
+		throw new Error("Linked user not found");
+	}
+
+	const [updated] = await db
+		.update(integrationUserLink)
+		.set({ ...input })
+		.where(eq(integrationUserLink.id, existing.integration_user_link.id))
+		.returning();
+
+	return updated;
 };

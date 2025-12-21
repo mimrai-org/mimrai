@@ -16,6 +16,7 @@ import { useState } from "react";
 import z from "zod";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { queryClient, trpc } from "@/utils/trpc";
+import type { IntegrationConfigFormProps } from "../components";
 
 const schema = z.object({
 	token: z.string().min(1, "Token ID is required"),
@@ -23,19 +24,17 @@ const schema = z.object({
 });
 
 export const IntegrationMattermostForm = ({
-	id,
-	defaultValues,
-}: {
-	id?: string;
-	defaultValues?: Partial<z.infer<typeof schema>>;
-}) => {
+	type,
+	integration,
+}: IntegrationConfigFormProps) => {
 	const [error, setError] = useState<string | null>(null);
 	const [isValid, setIsValid] = useState(false);
+	const id = integration?.installedIntegration?.id;
 	const form = useZodForm(schema, {
 		defaultValues: {
 			token: "",
 			url: "",
-			...defaultValues,
+			...integration?.installedIntegration?.config,
 		},
 	});
 

@@ -5,6 +5,7 @@ import {
 	getLinkedUsersSchema,
 	installIntegrationSchema,
 	updateIntegrationSchema,
+	updateLinkedUserSchema,
 	validateIntegrationSchema,
 } from "@api/schemas/integrations";
 import { protectedProcedure, router } from "@api/trpc/init";
@@ -17,6 +18,7 @@ import {
 	getLinkedUsers,
 	installIntegration,
 	updateIntegration,
+	updateLinkedUser,
 } from "@mimir/db/queries/integrations";
 import {
 	type IntegrationName,
@@ -130,6 +132,16 @@ export const integrationsRouter = router({
 			return getLinkedUsers({
 				...input,
 				teamId: ctx.user.teamId!,
+			});
+		}),
+
+	updateLinkedUser: protectedProcedure
+		.input(updateLinkedUserSchema)
+		.mutation(async ({ ctx, input }) => {
+			return updateLinkedUser({
+				teamId: ctx.user.teamId!,
+				userId: ctx.user.id,
+				...input,
 			});
 		}),
 });

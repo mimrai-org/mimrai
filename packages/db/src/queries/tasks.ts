@@ -242,6 +242,7 @@ export const getTasks = async ({
 			projectId: tasks.projectId,
 			permalinkId: tasks.permalinkId,
 			milestoneId: tasks.milestoneId,
+			subscribers: tasks.subscribers,
 			milestone: {
 				id: milestones.id,
 				name: milestones.name,
@@ -636,6 +637,7 @@ export const getTaskById = async (id: string, userId?: string) => {
 			assigneeId: tasks.assigneeId,
 			sequence: tasks.sequence,
 			projectId: tasks.projectId,
+			subscribers: tasks.subscribers,
 			project: {
 				id: projects.id,
 				name: projects.name,

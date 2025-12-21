@@ -1,14 +1,21 @@
+"use client";
+import type { RouterOutputs } from "@api/trpc/routers";
 import type { IntegrationName } from "@mimir/integration/registry";
+import { useQuery } from "@tanstack/react-query";
+import { Alert, AlertDescription } from "@ui/components/ui/alert";
+import { trpc } from "@/utils/trpc";
 import { InstallIntegrationGithubForm } from "./github/install";
+import { ConfigIntegrationGoogleCalendarForm } from "./google-calendar/config";
+import { InstallIntegrationGoogleCalendarForm } from "./google-calendar/install";
 import { IntegrationMattermostForm } from "./mattermost/install";
 import { LinkIntegrationMattermostForm } from "./mattermost/link";
 import { InstallIntegrationWhatsappForm } from "./whatsapp/install";
 
+export type IntegrationType = RouterOutputs["integrations"]["getByType"];
+
 export interface IntegrationConfigFormProps {
 	type: IntegrationName;
-	id?: string;
-	linkUser?: boolean;
-	defaultValues?: any;
+	integration: IntegrationType;
 }
 
 export const integrationInstallForms: Partial<
@@ -17,6 +24,7 @@ export const integrationInstallForms: Partial<
 	github: InstallIntegrationGithubForm,
 	mattermost: IntegrationMattermostForm,
 	whatsapp: InstallIntegrationWhatsappForm,
+	"google-calendar": InstallIntegrationGoogleCalendarForm,
 };
 
 export const integrationLinkUserForms: Partial<
@@ -24,28 +32,50 @@ export const integrationLinkUserForms: Partial<
 > = {
 	github: InstallIntegrationGithubForm,
 	mattermost: LinkIntegrationMattermostForm,
+	"google-calendar": InstallIntegrationGoogleCalendarForm,
 };
 
-export const IntegrationForm = ({
-	type,
-	id,
-	linkUser,
-	defaultValues,
-}: IntegrationConfigFormProps) => {
-	const FormComponent = linkUser
-		? integrationLinkUserForms[type]
-		: integrationInstallForms[type];
+export const integrationConfigForms: Partial<
+	Record<IntegrationName, React.ComponentType<IntegrationConfigFormProps>>
+> = {
+	"google-calendar": ConfigIntegrationGoogleCalendarForm,
+	github: InstallIntegrationGithubForm,
+};
 
-	if (!FormComponent) {
-		return <p>Integration form not found for type: {type}</p>;
+export const IntegrationForm = ({ type }: { type: IntegrationName }) => {
+	const { data: integration, isLoading } = useQuery(
+		trpc.integrations.getByType.queryOptions({
+			type,
+		}),
+	);
+
+	if (isLoading) {
+		return <p className="text-muted-foreground">Loading...</p>;
 	}
 
-	return (
-		<FormComponent
-			id={id}
-			defaultValues={defaultValues}
-			type={type}
-			linkUser={linkUser}
-		/>
-	);
+	if (!integration) {
+		return (
+			<Alert>
+				<AlertDescription>Integration {type} not found.</AlertDescription>
+			</Alert>
+		);
+	}
+
+	const FormComponent = !integration?.installedIntegration
+		? integrationInstallForms[type]
+		: !integration?.installedUserIntegration
+			? integrationLinkUserForms[type]
+			: integrationConfigForms[type];
+
+	if (!FormComponent) {
+		return (
+			<Alert>
+				<AlertDescription>
+					No configuration available for this integration.
+				</AlertDescription>
+			</Alert>
+		);
+	}
+
+	return <FormComponent type={type} integration={integration} />;
 };
