@@ -1,3 +1,4 @@
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { GlobalSheets } from "@/components/sheets/global-sheets";
@@ -40,6 +41,10 @@ export default async function Layout({ children, params }: Props) {
 			{children}
 			<Suspense>
 				<GlobalSheets />
+
+				{process.env.NODE_ENV === "development" && (
+					<ReactQueryDevtools buttonPosition="bottom-left" />
+				)}
 			</Suspense>
 		</>
 	);

@@ -1,7 +1,7 @@
 import type { Scope } from "@mimir/api/scopes";
 import { useOpenPanel } from "@mimir/events/client";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { trpc } from "@/utils/trpc";
 
 export const useUser = () => {
@@ -11,10 +11,13 @@ export const useUser = () => {
 			refetchOnWindowFocus: false,
 		}),
 	);
+	const identified = useRef(false);
+
 	const { identify } = useOpenPanel();
 	useEffect(() => {
 		if (!data || !data.id) return;
 		if (process.env.NODE_ENV === "development") return;
+		if (identified.current) return;
 		identify({
 			profileId: data.id!,
 			avatar: data.image || "",
@@ -22,6 +25,7 @@ export const useUser = () => {
 			lastName: data.name?.split(" ")?.[1] || "",
 			email: data.email || "",
 		});
+		identified.current = true;
 	}, [data]);
 
 	if (!data) return null;

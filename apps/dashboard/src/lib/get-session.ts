@@ -8,6 +8,15 @@ export const getSession = async () => {
 				cookie: (await headers()).get("cookie") || "",
 			},
 			credentials: "include",
+			cache: "force-cache",
+
+			// For measuring performance of getSession, temporary
+			onRequest: () => {
+				console.time("getSession");
+			},
+			onResponse: () => {
+				console.timeEnd("getSession");
+			},
 		},
 	});
 

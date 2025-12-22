@@ -10,6 +10,11 @@ import {
 import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
 
 export const queryClient = new QueryClient({
+	defaultOptions: {
+		queries: {
+			staleTime: 60 * 1000, // 1 minute
+		},
+	},
 	queryCache: new QueryCache({
 		onError: (error) => {
 			const safeError = error as { data?: { httpStatus?: number } };
