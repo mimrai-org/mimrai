@@ -23,8 +23,15 @@ export function TasksBoard() {
 		);
 	}, [boardData]);
 
+	const columnsArray = useMemo(() => {
+		if (!boardData) return [];
+		return Object.entries(boardData).map(([columnName, { column, tasks }]) => {
+			return { name: columnName, column, tasks };
+		});
+	}, [formattedBoardData]);
+
 	return (
-		<div className="flex h-full grow-1 flex-col">
+		<div className="flex h-full grow-1 flex-col p-2">
 			<Kanban.Root
 				value={formattedBoardData}
 				getItemValue={(item) => item.id}
@@ -77,18 +84,16 @@ export function TasksBoard() {
 			>
 				<AnimatePresence mode="popLayout">
 					<Kanban.Board className="flex items-stretch gap-4 overflow-x-auto p-2">
-						{Object.entries(boardData).map(
-							([columnName, { column, tasks }]) => {
-								return (
-									<BoardColumn
-										key={columnName}
-										column={column}
-										columnName={columnName}
-										tasks={tasks}
-									/>
-								);
-							},
-						)}
+						{columnsArray.map(({ name: columnName, column, tasks }) => {
+							return (
+								<BoardColumn
+									key={columnName}
+									column={column}
+									columnName={columnName}
+									tasks={tasks}
+								/>
+							);
+						})}
 					</Kanban.Board>
 				</AnimatePresence>
 

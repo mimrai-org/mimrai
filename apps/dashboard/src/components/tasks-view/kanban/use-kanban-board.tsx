@@ -2,6 +2,7 @@
 
 import type { RouterOutputs } from "@mimir/api/trpc";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { create } from "zustand";
 import {
 	type GenericGroup,
@@ -28,16 +29,33 @@ export type KanbanData = Record<
 export type KanbanStore = {
 	overColumnName?: string;
 	activeTaskId?: string;
+	hiddenColumns: (string | undefined)[];
 	setOverColumnName: (name?: string) => void;
 	setActiveTaskId: (id?: string) => void;
+	toggleColumnHide: (name: string) => void;
 };
 
 // Zustand store for kanban drag state
 export const useKanbanStore = create<KanbanStore>((set) => ({
 	overColumnName: undefined,
 	activeTaskId: undefined,
+	hiddenColumns: [],
 	setOverColumnName: (name) => set({ overColumnName: name }),
 	setActiveTaskId: (id) => set({ activeTaskId: id }),
+	toggleColumnHide: (name) =>
+		set((state) => {
+			const isOpen = state.hiddenColumns.includes(name);
+			let newOpenColumns: (string | undefined)[];
+			if (isOpen) {
+				newOpenColumns = state.hiddenColumns.filter((col) => col !== name);
+			} else {
+				newOpenColumns = [...state.hiddenColumns, name];
+				if (newOpenColumns.length > 3) {
+					newOpenColumns.shift(); // Keep only last three opened columns
+				}
+			}
+			return { hiddenColumns: newOpenColumns };
+		}),
 }));
 
 const MIN_ORDER = 0;

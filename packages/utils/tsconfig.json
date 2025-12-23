@@ -1,5 +1,11 @@
 {
 	"extends": "@mimir/tsconfig/base.json",
+	"compilerOptions": {
+		"baseUrl": ".",
+		"verbatimModuleSyntax": true,
+		"module": "esnext",
+		"moduleResolution": "bundler"
+	},
 	"include": ["src"],
 	"exclude": ["node_modules"]
 }

@@ -7,6 +7,7 @@ import {
 	CircleDashedIcon,
 	CirclePlusIcon,
 	LayersIcon,
+	MessageCircleIcon,
 	SquareCheckIcon,
 	SquarePenIcon,
 	SquarePlusIcon,
@@ -160,6 +161,13 @@ export const getNotificationItemProps = ({
 			return {
 				title: `You were mentioned in ${metadata.contextType}`,
 				description: `${metadata.contextSnippet}`,
+				...commonProps,
+			};
+		case "follow_up":
+			return {
+				title: `Follow up: ${metadata.message.slice(0, 40)}...`,
+				description: `It's time to follow up on this task.`,
+				icon: MessageCircleIcon,
 				...commonProps,
 			};
 		default:

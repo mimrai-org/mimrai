@@ -34,16 +34,8 @@ export const TasksTodoWidget = ({ className }: { className?: string }) => {
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
-				<Table>
-					<TableHeader>
-						<TableRow>
-							<TableHead>Title</TableHead>
-							<TableHead>Status</TableHead>
-							<TableHead className="text-end">Due Date</TableHead>
-							<TableHead className="text-end">Assigned</TableHead>
-						</TableRow>
-					</TableHeader>
-					<TableBody>
+				<Table className="p-0">
+					<TableBody className="p-0">
 						{data?.map((task) => (
 							<TableRow
 								key={task.id}
@@ -54,25 +46,11 @@ export const TasksTodoWidget = ({ className }: { className?: string }) => {
 								<TableCell className="max-w-48">
 									<div className="flex w-full items-center gap-2">
 										<Priority value={task.priority} />
-										<div className="truncate">{task.title}</div>
-									</div>
-								</TableCell>
-								<TableCell>
-									<div className="flex items-center justify-start gap-2">
 										<StatusIcon {...task.status} className="size-3.5" />
-										{task.status.name}
-									</div>
-								</TableCell>
-								<TableCell className="text-end">
-									{task.dueDate ? (
-										<span>{format(new Date(task.dueDate), "PPP")}</span>
-									) : (
-										<span className="text-center text-muted-foreground">-</span>
-									)}
-								</TableCell>
-								<TableCell>
-									<div className="flex w-full justify-end">
-										<AssigneeAvatar {...task.assignee} />
+										<div className="truncate">{task.title}</div>
+										<div className="ml-auto">
+											<AssigneeAvatar {...task.assignee} />
+										</div>
 									</div>
 								</TableCell>
 							</TableRow>

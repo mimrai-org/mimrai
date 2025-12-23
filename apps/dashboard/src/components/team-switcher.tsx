@@ -8,6 +8,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@mimir/ui/dropdown-menu";
+import { Kbd, KbdGroup } from "@mimir/ui/kbd";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ChevronsUpDownIcon, PlusIcon } from "lucide-react";
 import { useEffect } from "react";
@@ -46,6 +47,31 @@ export const TeamSwitcher = () => {
 		}
 	}, [user?.team]);
 
+	// Register keyboard to switch teams (Cmd + Ctrl + { index })
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.metaKey && e.ctrlKey && e.key.length === 1) {
+				const pressedKey = Number.parseInt(e.key, 10);
+				if (
+					!Number.isNaN(pressedKey) &&
+					pressedKey > 0 &&
+					pressedKey <= teams!.length
+				) {
+					const team = teams![pressedKey - 1];
+					if (!team) return;
+					switchTeam({
+						slug: team.slug,
+					});
+				}
+			}
+		};
+
+		window.addEventListener("keydown", handleKeyDown);
+		return () => {
+			window.removeEventListener("keydown", handleKeyDown);
+		};
+	}, [teams]);
+
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
@@ -80,7 +106,7 @@ export const TeamSwitcher = () => {
 				align="start"
 				sideOffset={10}
 			>
-				{teams?.map((team) => (
+				{teams?.map((team, index) => (
 					<DropdownMenuItem
 						key={team.id}
 						onClick={() =>
@@ -95,6 +121,9 @@ export const TeamSwitcher = () => {
 							</AvatarFallback>
 						</Avatar>
 						{team.name}
+						<KbdGroup className="ml-auto">
+							<Kbd>⌘ + Ctrl + {index + 1}</Kbd>
+						</KbdGroup>
 					</DropdownMenuItem>
 				))}
 				<DropdownMenuSeparator />

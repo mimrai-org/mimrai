@@ -1,3 +1,4 @@
+import { ActivityWidget } from "@/components/widgets/activity-widget";
 import { SuggestionsWidget } from "@/components/widgets/suggestions-widget";
 import { TasksBurnupWidget } from "@/components/widgets/tasks-burnup-widget";
 import { TasksByStatusWidget } from "@/components/widgets/tasks-by-status-widget";
@@ -6,20 +7,17 @@ import { TasksTodoWidget } from "@/components/widgets/tasks-todo-widget";
 
 export default function Page() {
 	return (
-		<div className="flex flex-col gap-8 p-4">
-			<div className="grid gap-6 md:grid-cols-4">
-				<div>
-					<SuggestionsWidget />
-				</div>
-				<div className="col-span-3">
-					<TasksBurnupWidget />
-				</div>
+		<div className="grid gap-6 p-6 md:grid-cols-4">
+			<div className="">
+				<SuggestionsWidget />
 			</div>
-			<div className="grid w-full grid-cols-1 items-stretch gap-6 md:grid-cols-4">
-				<TasksByStatusWidget />
-				<TasksCompletionRate />
-				<TasksTodoWidget className="md:col-span-2" />
+			<div className="col-span-2">
+				<TasksBurnupWidget />
 			</div>
+			<ActivityWidget className="md:col-span-1 md:row-span-2" />
+			<TasksByStatusWidget />
+			<TasksCompletionRate />
+			<TasksTodoWidget className="md:col-span-1" />
 		</div>
 	);
 }

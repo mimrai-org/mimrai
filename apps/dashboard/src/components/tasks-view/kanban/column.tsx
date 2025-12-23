@@ -3,7 +3,7 @@
 import { Button } from "@mimir/ui/button";
 import * as Kanban from "@mimir/ui/kanban";
 import { Badge } from "@ui/components/ui/badge";
-import { PlusIcon } from "lucide-react";
+import { Minimize2Icon, PlusIcon } from "lucide-react";
 import type { GenericGroup } from "@/components/tasks-view/tasks-group";
 // UI & Logic
 import { useTaskParams } from "@/hooks/use-task-params";
@@ -21,12 +21,42 @@ interface BoardColumnProps {
 }
 
 export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
+	const { hiddenColumns, toggleColumnHide } = useKanbanStore();
+
 	const { overColumnName, activeTaskId } = useKanbanStore();
 	const { setParams: setTaskParams } = useTaskParams();
 
+	const open = !hiddenColumns.includes(columnName);
+	const isHovered = overColumnName === columnName && Boolean(activeTaskId);
+
+	if (!open) {
+		return (
+			<Kanban.Column
+				value={columnName}
+				className={cn(
+					"w-12 rounded-full bg-gradient-to-b from-secondary/3 via-transparent to-transparent pt-4 transition-colors duration-300 hover:from-secondary/40",
+					{
+						"from-accent/80": isHovered,
+					},
+				)}
+				onClick={() => {
+					toggleColumnHide(columnName);
+				}}
+			>
+				<div className="flex flex-col items-center gap-2">
+					{column.icon}
+					<span className="text-muted-foreground text-sm">{tasks.length}</span>
+				</div>
+				<div className="max-h-[calc(100vh-220px)] grow-1 overflow-y-auto px-2" />
+			</Kanban.Column>
+		);
+	}
+
 	return (
 		<Kanban.Column
-			className="min-h-[200px] min-w-86 max-w-86 grow-1 rounded-sm bg-gradient-to-b from-secondary/3 to-transparent"
+			className={cn(
+				"min-h-[200px] min-w-86 max-w-86 grow-1 rounded-sm bg-gradient-to-b from-secondary/3 to-transparent",
+			)}
 			value={columnName}
 		>
 			<div className="flex items-center justify-between">
@@ -47,6 +77,15 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 				</div>
 
 				<div className="flex items-center gap-2">
+					<Button
+						size="sm"
+						variant="ghost"
+						onClick={() => {
+							toggleColumnHide(columnName);
+						}}
+					>
+						<Minimize2Icon />
+					</Button>
 					<Button
 						size="sm"
 						variant="ghost"
@@ -105,10 +144,9 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 					{/* Drag overlay */}
 					<div
 						className={cn(
-							"pointer-events-none absolute inset-0 flex items-center justify-center rounded-sm border bg-black/80 opacity-0 backdrop-blur-none transition-opacity duration-200",
+							"pointer-events-none absolute inset-0 flex items-center justify-center rounded-sm bg-black/80 opacity-0 backdrop-blur-none transition-opacity duration-200",
 							{
-								"opacity-100":
-									overColumnName === columnName && Boolean(activeTaskId),
+								"bg-accent/80 opacity-100": isHovered,
 							},
 						)}
 					>
