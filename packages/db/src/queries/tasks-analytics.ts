@@ -184,7 +184,7 @@ export const getTasksTodo = async ({ teamId }: { teamId: string }) => {
 				not(inArray(statuses.type, ["done", "backlog"])),
 			),
 		)
-		.limit(4)
+		.limit(5)
 		.orderBy(
 			asc(
 				sql`CASE ${tasks.priority} WHEN 'urgent' THEN 1 WHEN 'high' THEN 2 WHEN 'medium' THEN 3 WHEN 'low' THEN 4 END`,

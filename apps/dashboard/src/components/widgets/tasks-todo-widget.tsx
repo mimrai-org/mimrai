@@ -7,15 +7,6 @@ import {
 	CardDescription,
 	CardHeader,
 } from "@ui/components/ui/card";
-import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from "@ui/components/ui/table";
-import { format } from "date-fns";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { trpc } from "@/utils/trpc";
 import { AssigneeAvatar } from "../asignee-avatar";
@@ -34,29 +25,24 @@ export const TasksTodoWidget = ({ className }: { className?: string }) => {
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
-				<Table className="p-0">
-					<TableBody className="p-0">
-						{data?.map((task) => (
-							<TableRow
-								key={task.id}
-								onClick={() => {
-									setParams({ taskId: task.id });
-								}}
-							>
-								<TableCell className="max-w-48">
-									<div className="flex w-full items-center gap-2">
-										<Priority value={task.priority} />
-										<StatusIcon {...task.status} className="size-3.5" />
-										<div className="truncate">{task.title}</div>
-										<div className="ml-auto">
-											<AssigneeAvatar {...task.assignee} />
-										</div>
-									</div>
-								</TableCell>
-							</TableRow>
-						))}
-					</TableBody>
-				</Table>
+				<ul className="space-y-2">
+					{data?.map((task) => (
+						<li
+							key={task.id}
+							onClick={() => {
+								setParams({ taskId: task.id });
+							}}
+							className="grid cursor-pointer grid-cols-[calc(var(--spacing)*4)_calc(var(--spacing)*4)_1fr_calc(var(--spacing)*4)] items-center gap-2 border-b pb-2 last:border-0"
+						>
+							<Priority value={task.priority} />
+							<StatusIcon {...task.status} className="size-3.5" />
+							<div className="truncate text-sm">{task.title}</div>
+							<div className="ml-auto">
+								<AssigneeAvatar {...task.assignee} className="size-4" />
+							</div>
+						</li>
+					))}
+				</ul>
 			</CardContent>
 		</Card>
 	);
