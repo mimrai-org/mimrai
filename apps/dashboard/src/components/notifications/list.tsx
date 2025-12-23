@@ -163,9 +163,10 @@ export const getNotificationItemProps = ({
 				description: `${metadata.contextSnippet}`,
 				...commonProps,
 			};
+
 		case "follow_up":
 			return {
-				title: `Follow up: ${metadata.message.slice(0, 40)}...`,
+				title: `Follow up: ${metadata.message}`,
 				description: `It's time to follow up on this task.`,
 				icon: MessageCircleIcon,
 				...commonProps,

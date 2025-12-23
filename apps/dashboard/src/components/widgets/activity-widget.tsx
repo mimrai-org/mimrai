@@ -7,6 +7,11 @@ import {
 	CardDescription,
 	CardHeader,
 } from "@ui/components/ui/card";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@ui/components/ui/tooltip";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useUser } from "@/hooks/use-user";
 import { trpc } from "@/utils/trpc";
@@ -45,7 +50,14 @@ export const ActivityWidget = ({ className }: { className?: string }) => {
 							>
 								{Icon && <Icon className="size-4 text-muted-foreground" />}
 								<div className="truncate text-xs">
-									<div className="truncate">{props.title}</div>
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<div className="truncate">{props.title}</div>
+										</TooltipTrigger>
+										<TooltipContent className="max-w-sm">
+											{props.title}
+										</TooltipContent>
+									</Tooltip>
 									<div className="truncate text-muted-foreground text-xs">
 										{props.description}
 									</div>

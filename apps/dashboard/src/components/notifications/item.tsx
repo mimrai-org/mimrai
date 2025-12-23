@@ -63,9 +63,11 @@ export const NotificationItem = ({
 					>
 						{Icon && <Icon className="size-4" />}
 					</div>
-					<div>
-						<h2 className="text-sm">{title}</h2>
-						<p className="text-muted-foreground text-xs">{description}</p>
+					<div className="truncate">
+						<h2 className="max-w-md truncate text-sm">{title}</h2>
+						<p className="truncate text-muted-foreground text-xs">
+							{description}
+						</p>
 					</div>
 				</Link>
 			</div>
