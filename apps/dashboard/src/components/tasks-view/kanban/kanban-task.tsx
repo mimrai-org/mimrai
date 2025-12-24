@@ -29,7 +29,7 @@ export const KanbanTask = ({
 	return (
 		<motion.div
 			className={cn(
-				"relative flex min-h-14 cursor-pointer flex-col rounded-sm border bg-card transition-colors hover:bg-accent/80",
+				"relative flex min-h-14 cursor-pointer flex-col rounded-sm border-0 bg-card transition-colors hover:bg-card/80",
 				{
 					"opacity-50!": task.status?.type === "done",
 				},

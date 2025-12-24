@@ -34,7 +34,7 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 			<Kanban.Column
 				value={columnName}
 				className={cn(
-					"w-12 rounded-full bg-gradient-to-b from-secondary/20 via-transparent to-transparent pt-4 transition-colors duration-300 hover:from-secondary/40",
+					"w-12 rounded-full bg-gradient-to-b from-secondary/3 via-transparent to-transparent pt-4 transition-colors duration-300 hover:from-secondary/40",
 					{
 						"from-accent/80": isHovered,
 					},
@@ -55,7 +55,7 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 	return (
 		<Kanban.Column
 			className={cn(
-				"min-h-[200px] min-w-86 max-w-86 grow-1 rounded-sm bg-gradient-to-b from-secondary/20 to-transparent",
+				"min-h-[200px] min-w-86 max-w-86 grow-1 rounded-sm bg-gradient-to-b from-secondary/3 to-transparent",
 			)}
 			value={columnName}
 		>
