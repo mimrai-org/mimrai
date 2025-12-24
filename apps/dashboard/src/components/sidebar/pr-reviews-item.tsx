@@ -63,7 +63,7 @@ export const PrReviewsNavItem = ({
 			className={cn(
 				"flex h-8 items-center border border-transparent text-sm!",
 				{
-					"bg-accent": isActive,
+					"bg-sidebar-accent text-sidebar-accent-foreground": isActive,
 				},
 				className,
 			)}

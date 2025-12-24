@@ -78,10 +78,10 @@ export const TasksBurnupWidget = () => {
 							>
 								<stop
 									offset="5%"
-									stopColor="var(--chart-4)"
+									stopColor="var(--chart-2)"
 									stopOpacity={0.8}
 								/>
-								<stop offset="95%" stopColor="var(--chart-4)" stopOpacity={0} />
+								<stop offset="95%" stopColor="var(--chart-2)" stopOpacity={0} />
 							</linearGradient>
 						</defs>
 						<ChartTooltip
@@ -99,7 +99,7 @@ export const TasksBurnupWidget = () => {
 							dataKey={"taskCreatedCount"}
 							type={"monotone"}
 							fill="url(#fillTaskCreatedCount)"
-							stroke="var(--chart-4)"
+							stroke="var(--chart-2)"
 							stackId={"b"}
 						/>
 					</AreaChart>

@@ -26,8 +26,8 @@ const PriorityTooltip = ({
 export const PriorityIcon = {
 	low: <SignalLowIcon className="mb-1 size-4 text-muted-foreground" />,
 	medium: <SignalMediumIcon className="mb-1 size-4" />,
-	high: <SignalHighIcon className="mb-1 size-4 text-yellow-600" />,
-	urgent: <TriangleAlertIcon className="size-4 text-red-600" />,
+	high: <SignalHighIcon className="mb-1 size-4 text-yellow-400" />,
+	urgent: <TriangleAlertIcon className="size-4 text-red-400" />,
 };
 
 export const Priority = ({

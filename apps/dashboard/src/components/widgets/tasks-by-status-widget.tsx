@@ -67,7 +67,7 @@ export const TasksByStatusWidget = () => {
 							cursor={false}
 							content={<ChartTooltipContent hideLabel />}
 						/>
-						<Bar dataKey={"taskCount"} fill="var(--chart-2)" />
+						<Bar dataKey={"taskCount"} fill="var(--chart-1)" />
 					</BarChart>
 				</ChartContainer>
 			</CardContent>

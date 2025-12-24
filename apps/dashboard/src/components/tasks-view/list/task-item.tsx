@@ -1,13 +1,12 @@
 "use client";
 import type { RouterOutputs } from "@api/trpc/routers";
-import { Checkbox } from "@ui/components/ui/checkbox";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useUser } from "@/hooks/use-user";
 import { cn } from "@/lib/utils";
 import { queryClient, trpc } from "@/utils/trpc";
-import { TaskProperties, TaskProperty } from "../properties/task-properties";
+import { TaskProperty } from "../properties/task-properties";
 import type { propertiesComponents } from "../properties/task-properties-components";
 
 type Property = keyof typeof propertiesComponents;
@@ -30,7 +29,7 @@ export const TaskItem = ({
 	const { setParams } = useTaskParams();
 
 	return (
-		<div className="flex items-center gap-2 transition-colors hover:bg-card/80">
+		<div className="flex items-center gap-2 transition-colors hover:bg-card">
 			{/* <Checkbox /> */}
 			<motion.button
 				type="button"

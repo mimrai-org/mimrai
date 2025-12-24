@@ -19,13 +19,13 @@ export const StatusIcon = ({
 		case "backlog":
 			return <CircleDotIcon className={className} />;
 		case "in_progress":
-			return <CircleGaugeIcon className={cn(className, "text-amber-500")} />;
+			return <CircleGaugeIcon className={cn(className, "text-yellow-400")} />;
 		case "review":
 			return <CircleStarIcon className={cn(className)} />;
 		case "to_do":
 			return <CircleDashedIcon className={className} />;
 		case "done":
-			return <CircleCheckIcon className={cn(className, "text-emerald-500")} />;
+			return <CircleCheckIcon className={cn(className, "text-green-400")} />;
 		default:
 			return null;
 	}

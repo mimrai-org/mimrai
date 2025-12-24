@@ -28,9 +28,9 @@ export const PrReviewsOverview = () => {
 				opacity: 1,
 			}}
 			transition={{ duration: 0.2 }}
-			className="border-l p-4"
+			className="m-4 rounded-md bg-card p-4"
 		>
-			<div className="flex items-start justify-between gap-4 rounded-sm bg-card px-4 py-2">
+			<div className="flex items-start justify-between gap-4 rounded-sm bg-secondary/50 px-4 py-2">
 				<div className="flex flex-col gap-1">
 					<h2 className="flex items-start gap-2 text-base">
 						<span className="text-muted-foreground">#{currentPr.prNumber}</span>

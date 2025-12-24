@@ -30,13 +30,11 @@ export const SuggestionsWidget = () => {
 						<SuggestionCard
 							key={suggestion.id}
 							suggestion={suggestion}
-							className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 min-h-[200px] w-full transform rounded-lg border bg-card p-4 text-sm shadow-lg"
+							className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 min-h-[200px] w-full transform rounded-lg bg-card p-4 text-sm shadow-lg"
 							showActions={index === data.length - 1}
 							style={{
-								rotateZ:
-									index === data.length - 1
-										? "0deg"
-										: `${6 * (index % 2 === 0 ? 1 : -1)}deg`,
+								filter: `contrast(${100 + (data.length - index - 1) * 3}%)`,
+								rotateZ: `${4 * (index % 2 === 0 ? 1 : -1)}deg`,
 							}}
 						/>
 					))}

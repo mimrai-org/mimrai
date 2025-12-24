@@ -7,7 +7,6 @@ import {
 	CheckIcon,
 	CircleDashedIcon,
 	ExternalLinkIcon,
-	EyeIcon,
 	MessageSquareIcon,
 	SparklesIcon,
 	UserIcon,
@@ -156,7 +155,7 @@ export const SuggestionCard = ({
 				>
 					<div className="mb-2">
 						<span className="text-muted-foreground text-xs">
-							<SparklesIcon className="mr-2 inline-block size-3" />
+							<SparklesIcon className="mr-2 inline-block size-3 text-chart-2" />
 							Suggested{" "}
 							{formatRelative(new Date(suggestion.createdAt!), new Date())}
 						</span>

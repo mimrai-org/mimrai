@@ -64,7 +64,7 @@ export const TasksCompletionRate = () => {
 						<Line
 							type="monotone"
 							dataKey="completedCount"
-							stroke="var(--chart-2)"
+							stroke="var(--chart-1)"
 							strokeWidth={2}
 							dot={false}
 							activeDot={{ r: 6 }}
