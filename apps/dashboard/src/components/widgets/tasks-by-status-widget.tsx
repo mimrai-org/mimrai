@@ -35,7 +35,7 @@ export const TasksByStatusWidget = () => {
 	);
 
 	return (
-		<Card className="flex flex-col justify-between border bg-transparent">
+		<Card className="flex flex-col justify-between">
 			<CardHeader>
 				<CardDescription>
 					Determine the distribution of tasks across different statuses

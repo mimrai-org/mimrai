@@ -34,7 +34,7 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 			<Kanban.Column
 				value={columnName}
 				className={cn(
-					"w-12 rounded-full bg-gradient-to-b from-secondary/3 via-transparent to-transparent pt-4 transition-colors duration-300 hover:from-secondary/40",
+					"w-12 rounded-full bg-gradient-to-b from-secondary/20 via-transparent to-transparent pt-4 transition-colors duration-300 hover:from-secondary/40",
 					{
 						"from-accent/80": isHovered,
 					},
@@ -55,7 +55,7 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 	return (
 		<Kanban.Column
 			className={cn(
-				"min-h-[200px] min-w-86 max-w-86 grow-1 rounded-sm bg-gradient-to-b from-secondary/3 to-transparent",
+				"min-h-[200px] min-w-86 max-w-86 grow-1 rounded-sm border-0 bg-card/20 shadow-none",
 			)}
 			value={columnName}
 		>
@@ -100,7 +100,7 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 					</Button>
 				</div>
 			</div>
-			<div className="max-h-[calc(100vh-220px)] grow-1 overflow-y-auto px-2">
+			<div className="max-h-[calc(100vh-250px)] grow-1 overflow-y-auto px-2">
 				<div className="relative h-full space-y-2">
 					{tasks.map((task) => (
 						<TaskContextMenu task={task} key={task.id}>
@@ -146,7 +146,7 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 						className={cn(
 							"pointer-events-none absolute inset-0 flex items-center justify-center rounded-sm bg-black/80 opacity-0 backdrop-blur-none transition-opacity duration-200",
 							{
-								"bg-accent/80 opacity-100": isHovered,
+								"bg-black/40 opacity-100": isHovered,
 							},
 						)}
 					>

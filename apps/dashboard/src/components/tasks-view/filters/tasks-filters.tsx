@@ -52,7 +52,7 @@ export const TasksFilters = ({
 	}, [search]);
 
 	return (
-		<div className="flex w-full items-center justify-between gap-4 border-b p-2">
+		<div className="mt-2 flex items-center justify-between gap-4 rounded-md p-2">
 			<div className="flex items-center gap-2 px-2">
 				<TasksFiltersDropdown />
 				<div className="relative flex items-center">
@@ -70,7 +70,7 @@ export const TasksFilters = ({
 			<div className="flex gap-4">
 				<Popover>
 					<PopoverTrigger asChild>
-						<Button variant={"outline"} size="sm">
+						<Button variant={"ghost"} size="sm">
 							<EyeIcon />
 							Display
 						</Button>

@@ -71,7 +71,7 @@ export const PrReviewsNavItem = ({
 			<item.icon className="size-4! text-muted-foreground" />
 			<span>{item.title}</span>
 
-			<span className="ml-auto flex size-5 items-center justify-center rounded-sm bg-accent text-xs">
+			<span className="ml-auto flex size-5 items-center justify-center rounded-sm bg-red-400 text-white text-xs">
 				{prReviewsCount}
 			</span>
 		</Link>

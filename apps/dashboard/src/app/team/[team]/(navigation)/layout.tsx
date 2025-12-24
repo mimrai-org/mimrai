@@ -16,9 +16,11 @@ export default function DashboardLayout({
 			<Suspense>
 				<SidebarProvider>
 					<AppSidebar collapsible="icon" />
-					<SidebarInset className="overflow-x-hidden">
+					<SidebarInset className="overflow-x-hidden bg-transparent">
 						<Header />
-						<div className="flex flex-1 flex-col">{children}</div>
+						<div className="flex flex-1 flex-col rounded-lg border bg-background dark:border-none">
+							{children}
+						</div>
 						<ChatWidget />
 
 						{/* Add a noise background */}

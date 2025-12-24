@@ -23,14 +23,14 @@ export const SuggestionsWidget = () => {
 	);
 
 	return (
-		<Card className="h-full border-0">
+		<Card className="h-full border-0 bg-transparent shadow-none">
 			<CardContent className="relative h-full">
 				<AnimatePresence mode="popLayout">
 					{data?.map((suggestion, index) => (
 						<SuggestionCard
 							key={suggestion.id}
 							suggestion={suggestion}
-							className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 min-h-[200px] w-full transform rounded-md border bg-background p-4 text-sm shadow-md"
+							className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 min-h-[200px] w-full transform rounded-lg border bg-card p-4 text-sm shadow-lg"
 							showActions={index === data.length - 1}
 							style={{
 								rotateZ:
