@@ -133,7 +133,7 @@ export const syncGoogleCalendarTaskEvent = async ({
 					},
 					source: {
 						title: `Task in ${task.teams.name}`,
-						url: `${getAppUrl()}/team/${task.teams.slug}/workstation/${task.tasks.id}`,
+						url: `${getAppUrl()}/team/${task.teams.slug}/tasks/${task.tasks.id}`,
 					},
 				},
 			};

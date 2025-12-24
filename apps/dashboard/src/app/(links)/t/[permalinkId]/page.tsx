@@ -23,5 +23,5 @@ export default async function Page({ params }: Props) {
 		teamId: task.teamId,
 	});
 
-	return redirect(`/team/${newTeam.slug}/workstation/${task.id}`);
+	return redirect(`/team/${newTeam.slug}/tasks/${task.id}`);
 }

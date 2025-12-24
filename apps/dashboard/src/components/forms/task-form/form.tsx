@@ -242,12 +242,12 @@ export const TaskForm = ({
 										</div>
 									)}
 								</div>
-
+								<div className="mx-4 mb-4">
+									<TaskFormProperties />
+								</div>
 								<div className="gap-4 px-4">
 									<div className="space-y-4">
 										<Description editorRef={editorRef} />
-
-										<TaskFormProperties />
 
 										<hr className="my-6" />
 										<div className="flex flex-col justify-between sm:flex-row">

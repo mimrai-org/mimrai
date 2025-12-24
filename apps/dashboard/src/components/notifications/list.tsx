@@ -106,7 +106,7 @@ export const getNotificationItemProps = ({
 				title: `${metadata.title}`,
 				description: "A new task has been created.",
 				icon: LayersIcon,
-				href: `${user?.basePath}/workstation/${activity.groupId}`,
+				href: `${user?.basePath}/tasks/${activity.groupId}`,
 				...commonProps,
 			};
 		case "task_completed":
@@ -114,7 +114,7 @@ export const getNotificationItemProps = ({
 				title: `${metadata.title}`,
 				description: "A task has been completed.",
 				icon: CircleCheckIcon,
-				href: `${user?.basePath}/workstation/${activity.groupId}`,
+				href: `${user?.basePath}/tasks/${activity.groupId}`,
 				...commonProps,
 			};
 		case "task_updated":
@@ -122,7 +122,7 @@ export const getNotificationItemProps = ({
 				title: `${metadata.title}`,
 				description: "A task has been updated.",
 				icon: SquarePenIcon,
-				href: `${user?.basePath}/workstation/${activity.groupId}`,
+				href: `${user?.basePath}/tasks/${activity.groupId}`,
 				...commonProps,
 			};
 		case "task_assigned":
@@ -130,7 +130,7 @@ export const getNotificationItemProps = ({
 				title: `${metadata.title}`,
 				description: "You have been assigned to this task.",
 				icon: CirclePlusIcon,
-				href: `${user?.basePath}/workstation/${activity.groupId}`,
+				href: `${user?.basePath}/tasks/${activity.groupId}`,
 				...commonProps,
 			};
 		case "checklist_item_created":
@@ -138,7 +138,7 @@ export const getNotificationItemProps = ({
 				title: `${metadata.title}`,
 				description: "Checklist item added",
 				icon: SquarePlusIcon,
-				href: `${user?.basePath}/workstation/${activity.groupId}`,
+				href: `${user?.basePath}/tasks/${activity.groupId}`,
 				...commonProps,
 			};
 		case "task_column_changed":
@@ -146,7 +146,7 @@ export const getNotificationItemProps = ({
 				title: `${metadata.title}`,
 				description: `Task moved to ${metadata.toColumnName}`,
 				icon: CircleDashedIcon,
-				href: `${user?.basePath}/workstation/${activity.groupId}`,
+				href: `${user?.basePath}/tasks/${activity.groupId}`,
 				...commonProps,
 			};
 		case "checklist_item_completed":
@@ -154,7 +154,7 @@ export const getNotificationItemProps = ({
 				title: `${metadata.title}`,
 				description: "Checklist item completed",
 				icon: SquareCheckIcon,
-				href: `${user?.basePath}/workstation/${activity.groupId}`,
+				href: `${user?.basePath}/tasks/${activity.groupId}`,
 				...commonProps,
 			};
 		case "mention":

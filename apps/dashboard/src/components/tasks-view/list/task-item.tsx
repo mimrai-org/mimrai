@@ -59,7 +59,7 @@ export const TaskItem = ({
 					if (dialog) {
 						setParams({ taskId: task.id });
 					} else {
-						router.push(`${user?.basePath}/workstation/${task.id}`);
+						router.push(`${user?.basePath}/tasks/${task.id}`);
 					}
 				}}
 			>

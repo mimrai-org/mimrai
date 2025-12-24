@@ -18,6 +18,11 @@
 		margin-bottom: 0.5rem;
 	}
 
+	h3 {
+		@apply text-base;
+		margin-bottom: 0.5rem;
+	}
+
 	a {
 		@apply underline;
 	}
@@ -77,7 +82,7 @@
 
 .editor-xl {
 	.tiptap {
-		@apply text-lg;
+		@apply text-base;
 
 		h1 {
 			@apply text-2xl;
@@ -85,6 +90,10 @@
 
 		h2 {
 			@apply text-xl;
+		}
+
+		h3 {
+			@apply text-lg;
 		}
 	}
 }

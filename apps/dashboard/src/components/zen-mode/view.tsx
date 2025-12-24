@@ -1,17 +1,15 @@
 "use client";
 import { Button } from "@ui/components/ui/button";
 import { motion } from "framer-motion";
-import { PencilIcon, QuoteIcon, SkipForwardIcon, XIcon } from "lucide-react";
+import { PencilIcon, SkipForwardIcon, XIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useUser } from "@/hooks/use-user";
-import { Editor } from "../editor";
 import { PriorityIcon } from "../tasks-view/properties/priority";
 import { ZenModeAttachments } from "./attachments";
 import { ZenModeChecklist } from "./checklists";
 import { ZenModeContent } from "./content";
 import { ZenModeDoneButton } from "./done-button";
-import { ZenModeInlineCommentList } from "./inline-comments/list";
 import { ZenModeLabels } from "./labels";
 import { ZenModeQueue } from "./queue";
 import { ZenModeScrollSpy } from "./scroll-spy";

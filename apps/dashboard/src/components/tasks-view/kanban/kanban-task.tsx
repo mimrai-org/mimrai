@@ -1,6 +1,7 @@
 import type { RouterOutputs } from "@mimir/api/trpc";
 import { differenceInDays } from "date-fns";
 import { motion } from "motion/react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { TaskProperty } from "@/components/tasks-view/properties/task-properties";
 import { useTaskParams } from "@/hooks/use-task-params";
@@ -28,7 +29,7 @@ export const KanbanTask = ({
 	return (
 		<motion.div
 			className={cn(
-				"relative flex min-h-14 cursor-pointer flex-col rounded-sm border bg-card transition-colors hover:bg-card/80 dark:border-0",
+				"relative flex min-h-14 cursor-pointer flex-col rounded-sm border bg-card transition-colors hover:bg-accent/80",
 				{
 					"opacity-50!": task.status?.type === "done",
 				},
@@ -45,11 +46,11 @@ export const KanbanTask = ({
 					task,
 				);
 				setParams({ taskId: task.id });
+				// router.push(`${user?.basePath}/tasks/${task.id}`);
 			}}
 			{...props}
 		>
-			{/* Too much visual noise */}
-			{/* <KanbanTaskStamp task={task} /> */}
+			{/* <Link href={`${user?.basePath}/tasks/${task.id}`} prefetch={true}> */}
 			<div className="p-3">
 				<div className="flex h-full grow-1 flex-col justify-between gap-0.5">
 					<div className="flex items-center justify-between gap-2">
@@ -81,6 +82,9 @@ export const KanbanTask = ({
 					</div>
 				</div>
 			</div>
+			{/* </Link> */}
+			{/* Too much visual noise */}
+			{/* <KanbanTaskStamp task={task} /> */}
 		</motion.div>
 	);
 };

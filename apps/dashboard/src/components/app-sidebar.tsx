@@ -125,7 +125,7 @@ const data: {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	return (
-		<Sidebar variant="inset" {...props}>
+		<Sidebar variant="sidebar" {...props}>
 			<SidebarHeader className="flex h-[65px] flex-col items-center justify-center">
 				<SidebarMenu>
 					<SidebarMenuItem>

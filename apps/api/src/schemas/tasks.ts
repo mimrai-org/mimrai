@@ -5,7 +5,6 @@ import {
 	statusTypeEnum,
 } from "@db/schema";
 import z from "zod";
-import { mention } from "../../../../packages/notifications/src/types";
 import { paginationSchema } from "./base";
 
 export enum TaskView {
@@ -154,3 +153,5 @@ export const shareTaskSchema = z.object({
 	authorizedEmails: z.array(z.string().email()).optional(),
 	policy: z.enum(shareablePolicyEnum.enumValues),
 });
+
+export const getZenModeQueueSchema = z.object({});

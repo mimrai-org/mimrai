@@ -19,7 +19,7 @@ export const Description = ({
 				<FormItem>
 					<FormControl>
 						<Editor
-							className="[&_.tiptap]:min-h-[100px]"
+							className="editor-xl [&_.tiptap]:min-h-[100px]"
 							placeholder="Add description..."
 							taskId={id}
 							value={field.value ?? ""}
