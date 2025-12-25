@@ -22,6 +22,7 @@ import { useUser } from "@/hooks/use-user";
 import { cn } from "@/lib/utils";
 import type { NavItem } from "./app-sidebar";
 import { CreateButton } from "./create-button";
+import { NavProjects } from "./sidebar/nav-projects";
 
 export function NavMain({ items }: { items: NavItem[] }) {
 	const user = useUser();
@@ -44,7 +45,7 @@ export function NavMain({ items }: { items: NavItem[] }) {
 					if ("header" in item) {
 						return (
 							<SidebarMenuItem key={item.header} className="mt-4 px-2">
-								<span className="text-muted-foreground text-xs">
+								<span className="text-muted-foreground text-xs group-data-[collapsible=icon]:hidden">
 									{item.header}
 								</span>
 							</SidebarMenuItem>

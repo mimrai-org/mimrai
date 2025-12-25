@@ -20,6 +20,8 @@ import {
 import type * as React from "react";
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
+import { NavProjects } from "./sidebar/nav-projects";
+import { NavWorkspace } from "./sidebar/nav-workspace";
 import { PrReviewsNavItem } from "./sidebar/pr-reviews-item";
 import { SidebarSubscriptionStatus } from "./sidebar-subscription-status";
 import { TeamSwitcher } from "./team-switcher";
@@ -73,45 +75,6 @@ const data: {
 			icon: GitPullRequestIcon,
 			customComponent: PrReviewsNavItem,
 		},
-		{
-			header: "Workspace",
-		},
-		{
-			title: "Tasks",
-			key: "tasks",
-			url: "/team/{team}/board",
-			icon: LayersIcon,
-			items: [
-				{
-					title: "Board",
-					url: "/team/{team}/board",
-				},
-				{
-					title: "Backlog",
-					url: "/team/{team}/backlog",
-				},
-				{
-					title: "Recurring",
-					url: "/team/{team}/recurring",
-				},
-				{
-					title: "Done",
-					url: "/team/{team}/done",
-				},
-			],
-		},
-		{
-			title: "Projects",
-			key: "projects",
-			url: "/team/{team}/projects",
-			icon: BoxIcon,
-			items: [
-				{
-					title: "Timeline",
-					url: "/team/{team}/projects/timeline",
-				},
-			],
-		},
 	],
 	navSecondary: [
 		{
@@ -139,6 +102,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			</SidebarHeader>
 			<SidebarContent>
 				<NavMain items={data.navMain} />
+				<NavWorkspace />
 				<div className="mt-auto mb-2 flex flex-col space-y-2">
 					<NavSecondary items={data.navSecondary} />
 					<SidebarSubscriptionStatus />

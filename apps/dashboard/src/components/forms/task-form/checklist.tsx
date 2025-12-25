@@ -363,12 +363,12 @@ export const TaskChecklistItemForm = ({
 	};
 
 	return (
-		<div className="rounded-sm border bg-input px-4 py-2 dark:bg-input/30">
+		<div className="rounded-sm border px-4 py-2">
 			<Form {...form}>
 				<form
 					id="checklist-form"
 					onSubmit={form.handleSubmit(handleSubmit)}
-					className="space-y-1"
+					className="flex items-center space-y-1"
 					onClick={(e) => {
 						e.stopPropagation();
 					}}
@@ -377,14 +377,13 @@ export const TaskChecklistItemForm = ({
 						control={form.control}
 						name="description"
 						render={({ field }) => (
-							<FormItem>
+							<FormItem className="mb-0! flex w-full flex-1 items-center">
 								<FormControl>
 									<Editor
 										value={field.value}
 										onChange={field.onChange}
-										className="py-2"
+										className="w-full"
 										autoFocus
-										// className="border border-input p-2 text-accent-foreground placeholder:text-accent-foreground dark:bg-input/30"
 										placeholder="Enter a description..."
 										onUpload={async (url) => {
 											const currentValue = form.getValues("attachments") ?? [];
@@ -412,44 +411,49 @@ export const TaskChecklistItemForm = ({
 							/>
 						</div>
 					)}
-					<div className="flex items-center justify-end gap-2">
-						<div className="flex gap-2">
-							<FormField
-								control={form.control}
-								name="assigneeId"
-								render={({ field }) => (
-									<FormItem className="w-48">
-										<FormControl>
-											<DataSelectInput
-												placeholder="Assignee"
-												queryOptions={trpc.teams.getMembers.queryOptions()}
-												value={field.value || null}
-												onChange={(value) => field.onChange(value || undefined)}
-												getValue={(item) => item.id}
-												getLabel={(item) =>
-													item?.name || item?.email || "Unassigned"
-												}
-												clearable
-												renderClear={() => (
-													<div className="flex items-center gap-2">
-														<AssigneeAvatar />
-														Unassigned
-													</div>
-												)}
-												size="sm"
-												variant={"ghost"}
-												renderItem={(item) => <Assignee {...item} />}
-											/>
-										</FormControl>
-									</FormItem>
-								)}
-							/>
+					<div className="flex items-center justify-end gap-2 self-end">
+						<FormField
+							control={form.control}
+							name="assigneeId"
+							render={({ field }) => (
+								<FormItem className="w-48">
+									<FormControl>
+										<DataSelectInput
+											placeholder="Assignee"
+											queryOptions={trpc.teams.getMembers.queryOptions()}
+											value={field.value || null}
+											onChange={(value) => field.onChange(value || undefined)}
+											getValue={(item) => item.id}
+											getLabel={(item) =>
+												item?.name || item?.email || "Unassigned"
+											}
+											clearable
+											renderClear={() => (
+												<div className="flex items-center gap-2">
+													<AssigneeAvatar />
+													Unassigned
+												</div>
+											)}
+											size="sm"
+											variant={"ghost"}
+											renderItem={(item) => <Assignee {...item} />}
+										/>
+									</FormControl>
+								</FormItem>
+							)}
+						/>
 
-							<Button type="submit" size={"sm"} variant={"secondary"}>
-								<SaveIcon />
-								Save
-							</Button>
-						</div>
+						<Button
+							type="submit"
+							size={"sm"}
+							variant={"ghost"}
+							className="size-6 rounded-full"
+						>
+							<PlusIcon />
+							<span className="sr-only">
+								{defaultValues?.id ? "Update Item" : "Add Item"}
+							</span>
+						</Button>
 					</div>
 				</form>
 			</Form>

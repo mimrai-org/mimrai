@@ -71,7 +71,7 @@ export const TaskMentionList = (props: SuggestionProps<Task>) => {
 		<div className="relative overflow-auto border bg-popover">
 			{items.length === 0 ? (
 				<div className="px-4 py-2 text-muted-foreground text-sm">
-					No members found
+					No tasks found
 				</div>
 			) : (
 				<div className="w-full">

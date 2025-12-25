@@ -1,5 +1,5 @@
-import type { Editor, ReactRenderer } from "@tiptap/react";
-import type { SuggestionOptions, SuggestionProps } from "@tiptap/suggestion";
+import type { Editor } from "@tiptap/react";
+import type { SuggestionProps } from "@tiptap/suggestion";
 import type React from "react";
 import { queryClient, trpc } from "@/utils/trpc";
 import { MentionList } from "./mention-list";

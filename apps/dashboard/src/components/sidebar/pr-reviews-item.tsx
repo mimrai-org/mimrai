@@ -21,8 +21,7 @@ export const PrReviewsNavItem = ({
 				type: "github",
 			},
 			{
-				refetchOnMount: false,
-				refetchOnWindowFocus: false,
+				staleTime: Number.POSITIVE_INFINITY,
 			},
 		),
 	);

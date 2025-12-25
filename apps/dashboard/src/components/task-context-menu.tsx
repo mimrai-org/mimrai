@@ -24,6 +24,7 @@ import {
 	TrashIcon,
 	UserIcon,
 } from "lucide-react";
+import ms from "ms";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useTaskParams } from "@/hooks/use-task-params";
@@ -123,16 +124,14 @@ export const TaskContextMenu = ({
 
 	const { data: members } = useQuery(
 		trpc.teams.getMembers.queryOptions(undefined, {
-			refetchOnMount: false,
-			refetchOnWindowFocus: false,
+			staleTime: ms("5 minutes"),
 		}),
 	);
 	const { data: statuses } = useQuery(
 		trpc.statuses.get.queryOptions(
 			{},
 			{
-				refetchOnMount: false,
-				refetchOnWindowFocus: false,
+				staleTime: ms("10 minutes"),
 			},
 		),
 	);
@@ -140,8 +139,7 @@ export const TaskContextMenu = ({
 		trpc.labels.get.queryOptions(
 			{},
 			{
-				refetchOnMount: false,
-				refetchOnWindowFocus: false,
+				staleTime: ms("10 minutes"),
 			},
 		),
 	);
@@ -150,8 +148,7 @@ export const TaskContextMenu = ({
 		trpc.projects.get.queryOptions(
 			{},
 			{
-				refetchOnMount: false,
-				refetchOnWindowFocus: false,
+				staleTime: ms("10 minutes"),
 			},
 		),
 	);
@@ -164,8 +161,7 @@ export const TaskContextMenu = ({
 			},
 			{
 				enabled: !!task.projectId,
-				refetchOnMount: false,
-				refetchOnWindowFocus: false,
+				staleTime: ms("10 minutes"),
 			},
 		),
 	);

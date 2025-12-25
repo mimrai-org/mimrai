@@ -95,7 +95,9 @@ const TasksFiltersCurrentItem = ({
 					<DropdownMenuTrigger asChild>
 						<button type="button" className="flex items-center gap-1">
 							<div className="text-muted-foreground">{option.label}</div>
-							any of
+							{Array.isArray(displayValue) && displayValue.length > 1
+								? "any of"
+								: " is"}
 							<div className="flex items-center gap-2">
 								{Array.isArray(displayValue) ? (
 									displayValue.length > 1 ? (

@@ -68,7 +68,7 @@ export const MentionList = (props: SuggestionProps<Member>) => {
 	}));
 
 	return (
-		<div className="relative overflow-auto border bg-popover">
+		<div className="relative overflow-auto rounded-md border bg-popover shadow-md">
 			{items.length === 0 ? (
 				<div className="px-4 py-2 text-muted-foreground text-sm">
 					No members found

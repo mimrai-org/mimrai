@@ -9,14 +9,6 @@ export const getSession = async () => {
 			},
 			credentials: "include",
 			cache: "force-cache",
-
-			// For measuring performance of getSession, temporary
-			onRequest: () => {
-				console.time("getSession");
-			},
-			onResponse: () => {
-				console.timeEnd("getSession");
-			},
 		},
 	});
 

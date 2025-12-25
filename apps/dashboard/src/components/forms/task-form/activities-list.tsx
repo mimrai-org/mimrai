@@ -38,14 +38,9 @@ export const TaskActivitiesList = ({ taskId }: { taskId: string }) => {
 			<AnimatePresence>
 				{reversedData.map((activity) => {
 					return (
-						<motion.li
-							key={activity.id}
-							initial={{ opacity: 0, y: -10 }}
-							animate={{ opacity: 1, y: 0 }}
-							transition={{ duration: 0.2 }}
-						>
+						<li key={activity.id}>
 							<ActivityItem activity={activity} />
-						</motion.li>
+						</li>
 					);
 				})}
 			</AnimatePresence>

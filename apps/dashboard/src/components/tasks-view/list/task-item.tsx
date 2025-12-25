@@ -29,7 +29,7 @@ export const TaskItem = ({
 	const { setParams } = useTaskParams();
 
 	return (
-		<div className="flex items-center gap-2 transition-colors hover:bg-card">
+		<div className="flex items-center gap-2 transition-colors hover:bg-accent">
 			{/* <Checkbox /> */}
 			<motion.button
 				type="button"

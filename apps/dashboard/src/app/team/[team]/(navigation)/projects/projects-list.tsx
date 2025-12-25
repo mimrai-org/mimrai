@@ -108,7 +108,7 @@ export const ProjectsList = () => {
 				<ContextMenu key={project.id}>
 					<ContextMenuTrigger asChild>
 						<button
-							className="flex w-full flex-wrap justify-between px-4 py-4 text-sm transition-colors last:border-0 hover:bg-card/80"
+							className="flex w-full flex-wrap justify-between px-4 py-4 text-sm transition-colors last:border-0 hover:bg-accent"
 							type="button"
 							onClick={() => {
 								queryClient.setQueryData(

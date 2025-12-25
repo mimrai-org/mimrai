@@ -92,7 +92,7 @@ export const CommentInput = ({
 				onBlur={onBlur}
 				placeholder="Leave a comment..."
 				className={cn(
-					"rounded-sm border border-input bg-input px-4 py-2 dark:bg-input/30 [&_div]:min-h-[60px]",
+					"rounded-sm border border-input px-4 py-2 [&_div]:min-h-[60px]",
 					className,
 				)}
 			/>
