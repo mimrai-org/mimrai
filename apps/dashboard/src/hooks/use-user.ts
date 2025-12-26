@@ -4,11 +4,18 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { trpc } from "@/utils/trpc";
 
-export const useUser = () => {
+export const useUser = (
+	params: { refetchOnMount?: boolean; refetchOnWindowFocus?: boolean } = {
+		refetchOnMount: false,
+		refetchOnWindowFocus: false,
+	},
+) => {
+	const { refetchOnMount, refetchOnWindowFocus } = params;
+
 	const { data } = useQuery(
 		trpc.users.getCurrent.queryOptions(undefined, {
-			refetchOnMount: false,
-			refetchOnWindowFocus: false,
+			refetchOnMount,
+			refetchOnWindowFocus,
 		}),
 	);
 	const identified = useRef(false);

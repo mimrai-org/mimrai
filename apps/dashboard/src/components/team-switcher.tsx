@@ -101,7 +101,7 @@ export const TeamSwitcher = () => {
 				</button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent
-				className="w-62"
+				className="w-72"
 				side="right"
 				align="start"
 				sideOffset={10}
@@ -120,7 +120,7 @@ export const TeamSwitcher = () => {
 								{team.name.charAt(0).toUpperCase()}
 							</AvatarFallback>
 						</Avatar>
-						{team.name}
+						<span className="flex-1 truncate">{team.name}</span>
 						<KbdGroup className="ml-auto">
 							<Kbd>⌘ + Ctrl + {index + 1}</Kbd>
 						</KbdGroup>

@@ -55,7 +55,9 @@ const toolsList = [
 
 export default function Page() {
 	const router = useRouter();
-	const user = useUser();
+	const user = useUser({
+		refetchOnMount: true,
+	});
 	const form = useZodForm(schema, {
 		defaultValues: {
 			whatYourTeamDoes: "",

@@ -1,14 +1,20 @@
 import { headers } from "next/headers";
 import { authClient } from "./auth-client";
 
-export const getSession = async () => {
+export const getSession = async (
+	params: { cache?: RequestCache } = {
+		cache: "default",
+	},
+) => {
+	const { cache } = params;
+
 	const { data: session } = await authClient.getSession({
 		fetchOptions: {
 			headers: {
 				cookie: (await headers()).get("cookie") || "",
 			},
 			credentials: "include",
-			cache: "force-cache",
+			cache,
 		},
 	});
 

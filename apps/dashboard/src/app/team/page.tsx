@@ -9,8 +9,10 @@ type Props = {
 };
 
 export default async function Page({ searchParams }: Props) {
-	const session = await getSession();
-	console.log("Session in team page:", session);
+	const session = await getSession({
+		cache: "no-cache",
+	});
+
 	if (!session?.user.id) {
 		return redirect("/sign-in");
 	}

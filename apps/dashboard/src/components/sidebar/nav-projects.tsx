@@ -65,25 +65,25 @@ export const NavProjects = () => {
 									href={`/team/${user?.team?.slug}/projects/${project.id}/detail`}
 								>
 									<div className="flex items-center space-x-2">
-										<ProjectIcon {...project} className="size-4" />
+										<CircularProgress
+											size={16}
+											thickness={2}
+											value={progress}
+											min={0}
+											max={100}
+										>
+											<CircularProgressIndicator>
+												<CircularProgressTrack />
+												<CircularProgressRange
+													style={{
+														color: project.color || undefined,
+													}}
+												/>
+											</CircularProgressIndicator>
+										</CircularProgress>
+										{/* <ProjectIcon {...project} className="size-4" /> */}
 										<span className="truncate">{project.name}</span>
 									</div>
-									<CircularProgress
-										size={16}
-										thickness={2}
-										value={progress}
-										min={0}
-										max={100}
-									>
-										<CircularProgressIndicator>
-											<CircularProgressTrack />
-											<CircularProgressRange
-												style={{
-													color: project.color || undefined,
-												}}
-											/>
-										</CircularProgressIndicator>
-									</CircularProgress>
 								</Link>
 							</SidebarMenuSubButton>
 						</SidebarMenuSubItem>

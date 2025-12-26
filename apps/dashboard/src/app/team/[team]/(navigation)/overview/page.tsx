@@ -16,8 +16,7 @@ export default function Page() {
 			</div>
 			<ActivityWidget className="md:col-span-1 md:row-span-2" />
 			<TasksByStatusWidget />
-			<TasksCompletionRate />
-			<TasksTodoWidget className="md:col-span-1" />
+			<TasksTodoWidget className="md:col-span-2" />
 		</div>
 	);
 }
