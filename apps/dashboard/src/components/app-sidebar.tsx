@@ -8,21 +8,11 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from "@ui/components/ui/sidebar";
-import {
-	BoxIcon,
-	GitPullRequestIcon,
-	LayersIcon,
-	LayoutDashboardIcon,
-	type LucideIcon,
-	ScanIcon,
-	Settings2,
-} from "lucide-react";
+import { type LucideIcon, Settings2 } from "lucide-react";
 import type * as React from "react";
-import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
-import { NavProjects } from "./sidebar/nav-projects";
+import { NavMainGroup } from "./sidebar/nav-main-group";
 import { NavWorkspace } from "./sidebar/nav-workspace";
-import { PrReviewsNavItem } from "./sidebar/pr-reviews-item";
 import { SidebarSubscriptionStatus } from "./sidebar-subscription-status";
 import { TeamSwitcher } from "./team-switcher";
 
@@ -55,27 +45,7 @@ const data: {
 	navMain: NavItem[];
 	navSecondary: NavItem[];
 } = {
-	navMain: [
-		{
-			title: "Overview",
-			key: "overview",
-			url: "/team/{team}/overview",
-			icon: LayoutDashboardIcon,
-		},
-		{
-			title: "My Tasks",
-			key: "my-tasks",
-			url: "/team/{team}/my-tasks",
-			icon: ScanIcon,
-		},
-		{
-			title: "Reviews",
-			key: "reviews",
-			url: "/team/{team}/pr-reviews",
-			icon: GitPullRequestIcon,
-			customComponent: PrReviewsNavItem,
-		},
-	],
+	navMain: [],
 	navSecondary: [
 		{
 			title: "Settings",
@@ -101,7 +71,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				</SidebarMenu>
 			</SidebarHeader>
 			<SidebarContent>
-				<NavMain items={data.navMain} />
+				<NavMainGroup />
 				<NavWorkspace />
 				<div className="mt-auto mb-2 flex flex-col space-y-2">
 					<NavSecondary items={data.navSecondary} />

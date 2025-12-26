@@ -60,7 +60,7 @@ export const SettingsNavbar = () => {
 				label: t("settings.sidebar.import"),
 			},
 		];
-	}, []);
+	}, [user]);
 
 	if (!user) return null;
 
