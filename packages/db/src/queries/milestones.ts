@@ -52,7 +52,11 @@ export const getMilestones = async ({
 		.from(milestones)
 		.leftJoin(progressSubquery, eq(milestones.id, progressSubquery.milestoneId))
 		.where(and(...whereClause))
-		.orderBy(asc(milestones.dueDate), desc(milestones.createdAt));
+		.orderBy(
+			asc(sql`CASE WHEN ${progressSubquery.inProgress} = 0 THEN 1 ELSE 0 END`),
+			asc(milestones.dueDate),
+			desc(milestones.createdAt),
+		);
 
 	// Apply pagination
 	const offset = cursor ? Number.parseInt(cursor, 10) : 0;

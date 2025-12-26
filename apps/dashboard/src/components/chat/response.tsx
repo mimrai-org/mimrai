@@ -68,7 +68,7 @@ export const Response = memo(
 	({ className, ...props }: ResponseProps) => (
 		<Streamdown
 			className={cn(
-				"size-full space-y-4 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0",
+				"size-full space-y-2 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0",
 				className,
 			)}
 			components={{

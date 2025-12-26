@@ -6,6 +6,7 @@ import { LabelUpdateSheet } from "./label-update-sheet";
 import { MemberUpdateSheet } from "./member-update-sheet";
 import { PlanSelectSheet } from "./plan-select-sheet";
 import { ProjectCreateSheet } from "./project-create-sheet";
+import { ProjectHealthUpdateDialog } from "./project-health-update-dialog";
 import { ProjectUpdateSheet } from "./project-update-sheet";
 import { ShareableCreateSheet } from "./shareable-create-sheet.tsx";
 import { StatusCreateSheet } from "./status-create-sheet";
@@ -29,6 +30,7 @@ export const GlobalSheets = () => {
 			<IntegrationInstallSheet />
 			<ProjectCreateSheet />
 			<ProjectUpdateSheet />
+			<ProjectHealthUpdateDialog />
 			<ShareableCreateSheet />
 			<PlanSelectSheet />
 			<TasksSuggestions />

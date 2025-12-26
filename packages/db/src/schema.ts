@@ -938,6 +938,13 @@ export const checklistItems = pgTable(
 	],
 );
 
+export const projectStatusEnum = pgEnum("project_status", [
+	"planning",
+	"in_progress",
+	"completed",
+	"on_hold",
+]);
+
 export const projects = pgTable(
 	"projects",
 	{
@@ -959,6 +966,9 @@ export const projects = pgTable(
 			withTimezone: true,
 			mode: "string",
 		}),
+
+		status: projectStatusEnum("status").default("planning").notNull(),
+
 		createdAt: timestamp("created_at", {
 			withTimezone: true,
 			mode: "string",
@@ -975,6 +985,71 @@ export const projects = pgTable(
 			foreignColumns: [teams.id],
 			name: "projects_team_id_fkey",
 		}).onDelete("cascade"),
+	],
+);
+
+export const projectHealthEnum = pgEnum("project_health", [
+	"on_track",
+	"at_risk",
+	"off_track",
+]);
+
+export interface ProjectHealthSnapshot {
+	progress: {
+		milestones: {
+			id: string;
+			name: string;
+			dueDate: string | null;
+			progress: {
+				openTasks: number;
+				completedTasks: number;
+			};
+		}[];
+		tasks: {
+			total: number;
+			completed: number;
+			open: number;
+		};
+	};
+}
+
+export const projectHealthUpdates = pgTable(
+	"project_health_updates",
+	{
+		id: text("id")
+			.$defaultFn(() => randomUUID())
+			.primaryKey()
+			.notNull(),
+		projectId: text("project_id").notNull(),
+		teamId: text("team_id").notNull(),
+		health: projectHealthEnum("health").notNull(),
+		summary: text("summary"),
+
+		snapshot: jsonb("snapshot").$type<ProjectHealthSnapshot>().notNull(),
+
+		createdBy: text("created_by").notNull(),
+		createdAt: timestamp("created_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
+	},
+	(table) => [
+		index("project_health_updates_team_id_index").on(table.teamId),
+		foreignKey({
+			columns: [table.projectId],
+			foreignColumns: [projects.id],
+			name: "project_health_updates_project_id_fkey",
+		}).onDelete("cascade"),
+		foreignKey({
+			columns: [table.teamId],
+			foreignColumns: [teams.id],
+			name: "project_health_updates_team_id_fkey",
+		}).onDelete("cascade"),
+		foreignKey({
+			columns: [table.createdBy],
+			foreignColumns: [users.id],
+			name: "project_health_updates_created_by_fkey",
+		}),
 	],
 );
 

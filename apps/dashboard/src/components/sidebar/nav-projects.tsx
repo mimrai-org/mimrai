@@ -52,7 +52,10 @@ export const NavProjects = () => {
 
 					const total =
 						project.progress.inProgress + project.progress.completed;
-					const progress = (project.progress.completed / total) * 100;
+					const progress =
+						total > 0
+							? Math.round((project.progress.completed / total) * 100)
+							: 0;
 
 					return (
 						<SidebarMenuSubItem key={project.id}>
@@ -68,7 +71,7 @@ export const NavProjects = () => {
 										<CircularProgress
 											size={16}
 											thickness={2}
-											value={progress}
+											value={progress ?? 0}
 											min={0}
 											max={100}
 										>

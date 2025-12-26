@@ -2,6 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { ProjectForm } from "@/components/forms/project-form/form";
 import { trpc } from "@/utils/trpc";
+import { LatestUpdate } from "./latest-update";
 import { MilestonesCard } from "./milestones-card";
 import { ProjectProgressCard } from "./progress-card";
 
@@ -24,6 +25,7 @@ export const ProjectDetail = ({ projectId }: { projectId: string }) => {
 					<div className="grid gap-6 md:grid-cols-2">
 						<MilestonesCard projectId={projectId} />
 						<ProjectProgressCard projectId={projectId} />
+						<LatestUpdate projectId={projectId} className="col-span-2" />
 					</div>
 				</div>
 			)}

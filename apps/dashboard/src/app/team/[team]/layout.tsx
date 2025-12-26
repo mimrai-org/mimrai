@@ -16,8 +16,6 @@ export default async function Layout({ children, params }: Props) {
 	const { team } = await params;
 	const session = await getSession();
 
-	console.log("Layout team:", team);
-
 	if (!session?.user.id) {
 		return redirect("/sign-in");
 	}

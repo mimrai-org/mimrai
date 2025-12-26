@@ -18,6 +18,11 @@ const nav = [
 		icon: NotepadTextIcon,
 	},
 	{
+		title: "Updates",
+		href: "updates",
+		icon: NotepadText,
+	},
+	{
 		title: "Tasks",
 		href: "tasks",
 		icon: LayersIcon,

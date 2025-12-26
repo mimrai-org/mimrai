@@ -16,6 +16,7 @@ import { milestonesRouter } from "./milestones";
 import { newsletterRouter } from "./newsletter";
 import { notificationSettingsRouter } from "./notification-settings";
 import { onboardingRouter } from "./onboarding";
+import { projectHealthUpdatesRouter } from "./project-health-updates";
 import { projectsRouter } from "./projects";
 import { shareableRouter } from "./shareable";
 import { statusesRouter } from "./statuses";
@@ -53,6 +54,7 @@ export const appRouter = router({
 	widgets: widgetsRouter,
 	checklists: checklistsRouter,
 	projects: projectsRouter,
+	projectHealthUpdates: projectHealthUpdatesRouter,
 	milestones: milestonesRouter,
 	newsletter: newsletterRouter,
 	chatFeedback: chatFeedbackRouter,
