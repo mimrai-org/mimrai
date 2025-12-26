@@ -15,6 +15,7 @@ import {
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useUser } from "@/hooks/use-user";
 import { trpc } from "@/utils/trpc";
+import { AssigneeAvatar } from "../asignee-avatar";
 import { getNotificationItemProps } from "../notifications/list";
 
 export const ActivityWidget = ({ className }: { className?: string }) => {
@@ -46,9 +47,8 @@ export const ActivityWidget = ({ className }: { className?: string }) => {
 						return (
 							<li
 								key={activity.id}
-								className="grid grid-cols-[0_1fr] items-center gap-2 border-b pb-2 last:border-0 has-[>svg]:grid-cols-[calc(var(--spacing)*4)_1fr]"
+								className="grid grid-cols-[1fr_calc(var(--spacing)*4)] items-center gap-3 border-b pb-2 last:border-0"
 							>
-								{Icon && <Icon className="size-4 text-muted-foreground" />}
 								<div className="truncate text-xs">
 									<Tooltip>
 										<TooltipTrigger asChild>
@@ -59,9 +59,13 @@ export const ActivityWidget = ({ className }: { className?: string }) => {
 										</TooltipContent>
 									</Tooltip>
 									<div className="truncate text-muted-foreground text-xs">
+										{Icon && (
+											<Icon className="mr-1 inline-block size-3.5 text-muted-foreground" />
+										)}
 										{props.description}
 									</div>
 								</div>
+								<AssigneeAvatar {...activity.user} className="size-5" />
 							</li>
 						);
 					})}

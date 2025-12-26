@@ -9,7 +9,7 @@ import {
 } from "@ui/components/ui/chart";
 import { sub } from "date-fns";
 import { useState } from "react";
-import { LabelList, Pie, PieChart } from "recharts";
+import { Pie, PieChart } from "recharts";
 import { trpc } from "@/utils/trpc";
 
 const chartConfig = {
@@ -43,6 +43,7 @@ export const TasksByStatusWidget = () => {
 					data.map((item) => ({
 						...item,
 						fill: statusColors[item.status.type] || "var(--color-chart-2)",
+						label: item.status.name,
 					})),
 			},
 		),

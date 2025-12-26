@@ -2,7 +2,6 @@ import { ActivityWidget } from "@/components/widgets/activity-widget";
 import { SuggestionsWidget } from "@/components/widgets/suggestions-widget";
 import { TasksBurnupWidget } from "@/components/widgets/tasks-burnup-widget";
 import { TasksByStatusWidget } from "@/components/widgets/tasks-by-status-widget";
-import { TasksCompletionRate } from "@/components/widgets/tasks-completion-rate-widget";
 import { TasksTodoWidget } from "@/components/widgets/tasks-todo-widget";
 
 export default function Page() {
