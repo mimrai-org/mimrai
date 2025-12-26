@@ -8,9 +8,10 @@ import {
 	ChartTooltipContent,
 } from "@mimir/ui/chart";
 import { useQuery } from "@tanstack/react-query";
+import { Skeleton } from "@ui/components/ui/skeleton";
 import { format, sub } from "date-fns";
 import { useState } from "react";
-import { Area, AreaChart, XAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { trpc } from "@/utils/trpc";
 
 const chartConfig = {
@@ -33,7 +34,7 @@ export const TasksBurnupWidget = () => {
 		endDate: new UTCDate(),
 	});
 
-	const { data } = useQuery(
+	const { data, isLoading } = useQuery(
 		trpc.widgets.tasksBurnup.queryOptions({
 			...dateRange,
 		}),
@@ -42,21 +43,20 @@ export const TasksBurnupWidget = () => {
 	return (
 		<Card className="h-full">
 			<CardContent>
-				<ChartContainer
-					config={chartConfig}
-					className="aspect-auto h-[200px] w-full"
-				>
-					<AreaChart accessibilityLayer data={data || []}>
+				<ChartContainer config={chartConfig} className="aspect-auto h-[200px]">
+					<AreaChart accessibilityLayer data={data}>
+						<CartesianGrid vertical={false} strokeDasharray="3 3" />
 						<XAxis
-							dataKey={"date"}
+							dataKey="date"
 							tickLine={false}
 							axisLine={false}
 							tickMargin={8}
 							tickFormatter={(value) => format(new UTCDate(value), "MMM dd")}
 						/>
+						<ChartTooltip cursor={false} content={<ChartTooltipContent />} />
 						<defs>
 							<linearGradient
-								id="fillTaskCompletedCount"
+								id="gradient-rounded-chart-completed"
 								x1="0"
 								y1="0"
 								x2="0"
@@ -64,13 +64,17 @@ export const TasksBurnupWidget = () => {
 							>
 								<stop
 									offset="5%"
-									stopColor="var(--chart-1)"
-									stopOpacity={0.8}
+									stopColor="var(--color-chart-2)"
+									stopOpacity={0.5}
 								/>
-								<stop offset="95%" stopColor="var(--chart-1)" stopOpacity={0} />
+								<stop
+									offset="95%"
+									stopColor="var(--color-chart-2)"
+									stopOpacity={0.1}
+								/>
 							</linearGradient>
 							<linearGradient
-								id="fillTaskCreatedCount"
+								id="gradient-rounded-chart-created"
 								x1="0"
 								y1="0"
 								x2="0"
@@ -78,29 +82,35 @@ export const TasksBurnupWidget = () => {
 							>
 								<stop
 									offset="5%"
-									stopColor="var(--chart-2)"
-									stopOpacity={0.8}
+									stopColor="var(--color-chart-1)"
+									stopOpacity={0.5}
 								/>
-								<stop offset="95%" stopColor="var(--chart-2)" stopOpacity={0} />
+								<stop
+									offset="95%"
+									stopColor="var(--color-chart-1)"
+									stopOpacity={0.1}
+								/>
 							</linearGradient>
 						</defs>
-						<ChartTooltip
-							cursor={false}
-							content={<ChartTooltipContent hideLabel />}
+						<Area
+							dataKey="taskCreatedCount"
+							type="monotone"
+							fill="url(#gradient-rounded-chart-created)"
+							fillOpacity={0.4}
+							stroke="var(--color-chart-1)"
+							stackId="a"
+							strokeWidth={0.8}
+							strokeDasharray={"3 3"}
 						/>
 						<Area
-							dataKey={"taskCompletedCount"}
-							type={"monotone"}
-							fill="url(#fillTaskCompletedCount)"
-							stroke="var(--chart-1)"
-							stackId={"a"}
-						/>
-						<Area
-							dataKey={"taskCreatedCount"}
-							type={"monotone"}
-							fill="url(#fillTaskCreatedCount)"
-							stroke="var(--chart-2)"
-							stackId={"b"}
+							dataKey="taskCompletedCount"
+							type="monotone"
+							fill="url(#gradient-rounded-chart-completed)"
+							fillOpacity={0.4}
+							stroke="var(--color-chart-2)"
+							stackId="a"
+							strokeWidth={0.8}
+							strokeDasharray={"3 3"}
 						/>
 					</AreaChart>
 				</ChartContainer>

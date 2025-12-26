@@ -9,7 +9,7 @@ import {
 } from "@ui/components/ui/chart";
 import { sub } from "date-fns";
 import { useState } from "react";
-import { Bar, BarChart, XAxis, YAxis } from "recharts";
+import { LabelList, Pie, PieChart } from "recharts";
 import { trpc } from "@/utils/trpc";
 
 const chartConfig = {
@@ -18,6 +18,11 @@ const chartConfig = {
 		color: "var(--chart-2)",
 	},
 } satisfies ChartConfig;
+
+const statusColors: Record<string, string> = {
+	in_progress: "var(--color-yellow-400)",
+	done: "var(--color-green-400)",
+};
 
 export const TasksByStatusWidget = () => {
 	const [dateRange, setDateRange] = useState<{
@@ -29,46 +34,52 @@ export const TasksByStatusWidget = () => {
 	});
 
 	const { data } = useQuery(
-		trpc.widgets.tasksByStatus.queryOptions({
-			...dateRange,
-		}),
+		trpc.widgets.tasksByStatus.queryOptions(
+			{
+				...dateRange,
+			},
+			{
+				select: (data) =>
+					data.map((item) => ({
+						...item,
+						fill: statusColors[item.status.type] || "var(--color-chart-2)",
+					})),
+			},
+		),
 	);
 
 	return (
-		<Card className="flex flex-col justify-between">
+		<Card>
 			<CardHeader>
-				<CardDescription>
-					Determine the distribution of tasks across different statuses
-				</CardDescription>
+				<CardDescription>Tasks by Status</CardDescription>
 			</CardHeader>
 			<CardContent>
-				<ChartContainer config={chartConfig}>
-					<BarChart
-						accessibilityLayer
-						data={data || []}
-						layout="horizontal"
-						margin={{ bottom: 5 }}
-					>
-						<YAxis type="number" dataKey={"taskCount"} hide />
-						<XAxis
-							type="category"
-							tickLine={false}
-							tickMargin={10}
-							axisLine={false}
-							dataKey="status.name"
-							tickFormatter={(value) =>
-								(value as string)
-									.split(" ")
-									.map((word) => word.slice(0, 4))
-									.join(" ")
-							}
-						/>
+				<ChartContainer
+					config={chartConfig}
+					className="mx-auto aspect-square max-h-[200px] [&_.recharts-text]:fill-background"
+				>
+					<PieChart>
 						<ChartTooltip
-							cursor={false}
-							content={<ChartTooltipContent hideLabel />}
+							content={<ChartTooltipContent nameKey="taskCount" hideLabel />}
 						/>
-						<Bar dataKey={"taskCount"} fill="var(--chart-1)" />
-					</BarChart>
+						<Pie
+							data={data}
+							innerRadius={30}
+							dataKey="taskCount"
+							radius={10}
+							cornerRadius={8}
+							paddingAngle={4}
+						>
+							{/* <LabelList
+								dataKey="status.name"
+								stroke="none"
+								fontSize={12}
+								fontWeight={500}
+								fill="currentColor"
+								formatter={(value: number) => value.toString()}
+							/> */}
+						</Pie>
+					</PieChart>
 				</ChartContainer>
 			</CardContent>
 		</Card>
