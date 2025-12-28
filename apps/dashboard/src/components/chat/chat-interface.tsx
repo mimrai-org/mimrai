@@ -1,8 +1,10 @@
 "use client";
 import { useChat } from "@ai-sdk-tools/store";
 import type { UIChatMessage } from "@mimir/api/ai/types";
+import { cn } from "@ui/lib/utils";
 import { DefaultChatTransport, generateId } from "ai";
 import { useMemo } from "react";
+import { ChatHistory } from "./chat-history";
 import { ChatInput, type ChatInputMessage } from "./chat-input";
 import { Messages } from "./chat-messages";
 import { ChatTitle } from "./chat-title";
@@ -73,8 +75,19 @@ export const ChatInterface = ({
 	});
 
 	return (
-		<div className="h-full">
-			<div className="flex h-full w-full flex-col overflow-hidden">
+		<div className="grid h-full grid-cols-[256px_1fr]">
+			<div
+				className={cn("h-full overflow-y-auto bg-sidebar", {
+					"opacity-0": !showMessages,
+				})}
+			>
+				<ChatHistory />
+			</div>
+			<div
+				className={cn(
+					"flex w-3xl flex-col justify-self-center overflow-hidden p-4 transition-all",
+				)}
+			>
 				{showMessages ? (
 					<Messages />
 				) : (

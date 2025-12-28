@@ -14,8 +14,8 @@ import { DotIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Response } from "@/components/ai-elements/response";
 import { AssigneeAvatar } from "@/components/asignee-avatar";
+import { Response } from "@/components/chat/response";
 import { queryClient, trpc } from "@/utils/trpc";
 import { CommentInput } from "./comment-input";
 

@@ -15,6 +15,7 @@ import { tasksAgent } from "./tasks";
 export const projectsAgent = createAgent({
 	name: "projects",
 	model: openai("gpt-4o-mini"),
+	temperature: 0,
 	instructions: (
 		ctx,
 	) => `You are a project management specialist for ${ctx.companyName}. Your goal is to help manage projects, track progress, and monitor deadlines. 
@@ -25,12 +26,6 @@ export const projectsAgent = createAgent({
 - Help users break down large initiatives into manageable projects and milestones.
 - Use the team context to provide relevant recommendations. Eg: if the team is a software development team, analyze projects from that perspective.
 
-<agent-specific-rules>
-- Lead with key information
-- Be proactive in suggesting project management best practices
-- Use data to support your recommendations
-- Highlight key insights from the data
-</agent-specific-rules>
 
 <background-data>
 ${formatContextForLLM(ctx)}

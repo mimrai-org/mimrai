@@ -12,7 +12,12 @@ import { useChatStatus } from "@/hooks/use-chat-status";
 import { useUser } from "@/hooks/use-user";
 import { Conversation, ConversationContent } from "../ai-elements/conversation";
 import { Message, MessageAvatar, MessageContent } from "../ai-elements/message";
-import { Response } from "../ai-elements/response";
+import {
+	Reasoning,
+	ReasoningContent,
+	ReasoningTrigger,
+} from "../ai-elements/reasoning";
+import { Response } from "../chat/response";
 import { FaviconStack } from "../favicon-stack";
 import { ChatContextList } from "./chat-context/chat-context";
 import type { ContextItem } from "./chat-context/store";
@@ -99,6 +104,13 @@ export const Messages = ({ isStreaming }: { isStreaming?: boolean }) => {
 							.map((part) => (part.type === "text" ? part.text : ""))
 							.join("");
 
+						const reasoningParts = message.parts.filter(
+							(part) => part.type === "reasoning",
+						);
+						const reasoningContent = reasoningParts
+							.map((part) => (part.type === "reasoning" ? part.text : ""))
+							.join("");
+
 						// Extract file parts
 						const fileParts = extractFileParts(message.parts);
 
@@ -135,6 +147,20 @@ export const Messages = ({ isStreaming }: { isStreaming?: boolean }) => {
 								animate={{ opacity: 1 }}
 								exit={{ opacity: 0, y: 10 }}
 							>
+								{reasoningParts.length > 0 && (
+									<Reasoning
+										className="w-full"
+										isStreaming={
+											status === "streaming" &&
+											index === message.parts.length - 1 &&
+											message.id === messages.at(-1)?.id
+										}
+									>
+										<ReasoningTrigger />
+										<ReasoningContent>{reasoningContent}</ReasoningContent>
+									</Reasoning>
+								)}
+
 								{/* Render file attachments */}
 								{fileParts.length > 0 && (
 									<Message from={message.role}>

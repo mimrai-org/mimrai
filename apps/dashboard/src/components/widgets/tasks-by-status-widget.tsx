@@ -8,7 +8,7 @@ import {
 	ChartTooltipContent,
 } from "@ui/components/ui/chart";
 import { sub } from "date-fns";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Pie, PieChart } from "recharts";
 import { trpc } from "@/utils/trpc";
 
@@ -49,6 +49,17 @@ export const TasksByStatusWidget = () => {
 		),
 	);
 
+	const chartConfig = useMemo<ChartConfig>(() => {
+		const config: ChartConfig = {};
+		for (const item of data || []) {
+			config[item.status.name] = {
+				label: item.status.name,
+				color: item.fill,
+			};
+		}
+		return config;
+	}, [data]);
+
 	return (
 		<Card>
 			<CardHeader>
@@ -61,7 +72,7 @@ export const TasksByStatusWidget = () => {
 				>
 					<PieChart>
 						<ChartTooltip
-							content={<ChartTooltipContent nameKey="taskCount" hideLabel />}
+							content={<ChartTooltipContent nameKey="label" hideLabel />}
 						/>
 						<Pie
 							data={data}

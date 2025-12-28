@@ -27,8 +27,6 @@ export interface ChatTitleData {
 
 export const ChatTitle = () => {
 	const { show, setChatId, title: loadedTitle } = useChatWidget();
-	const [search, setSearch] = useState("");
-	const [debouncedSearch] = useDebounceValue(search, 300);
 	const [data] = useDataPart<ChatTitleData>("chat-title", {
 		onData: (dataPart) => {
 			if (dataPart.data.title) {
@@ -37,22 +35,6 @@ export const ChatTitle = () => {
 		},
 	});
 	const chatTitle = data as ChatTitleData;
-
-	const { data: chatHistory } = useQuery(
-		trpc.chats.history.queryOptions(
-			{
-				search: debouncedSearch,
-			},
-			{
-				enabled: show,
-			},
-		),
-	);
-
-	const handleSelectChat = (chatId: string) => {
-		setChatId(chatId);
-		setSearch("");
-	};
 
 	return (
 		<AnimatePresence>
@@ -64,42 +46,11 @@ export const ChatTitle = () => {
 					transition={{ duration: 0.2 }}
 					className="w-fit"
 				>
-					<Popover>
-						<PopoverTrigger className="w-fit">
-							<div className="flex items-center gap-2 text-foreground text-xs">
-								<ChevronDown className="size-3" />
-								<div className="whitespace-nowrap">
-									{loadedTitle || chatTitle?.title || "New conversation"}
-								</div>
-							</div>
-						</PopoverTrigger>
-						<PopoverContent>
-							<Command shouldFilter={false}>
-								{chatHistory && chatHistory?.length > 6 && (
-									<CommandInput value={search} onValueChange={setSearch} />
-								)}
-
-								<CommandGroup heading="Chats">
-									{chatHistory?.map((chat, index) => (
-										<CommandItem
-											key={chat.id}
-											onSelect={() => handleSelectChat(chat.id)}
-										>
-											<div className="sr-only">Select chat {index + 1}</div>
-											{chat.title ?? "Untitled"}
-										</CommandItem>
-									))}
-								</CommandGroup>
-								<CommandSeparator />
-								<CommandGroup>
-									<CommandItem onSelect={() => handleSelectChat(generateId())}>
-										<PlusIcon className="size-4" />
-										New Conversation
-									</CommandItem>
-								</CommandGroup>
-							</Command>
-						</PopoverContent>
-					</Popover>
+					<div className="flex items-center gap-2 text-foreground text-xs">
+						<div className="whitespace-nowrap">
+							{loadedTitle || chatTitle?.title || "New conversation"}
+						</div>
+					</div>
 				</motion.div>
 			) : (
 				<div />

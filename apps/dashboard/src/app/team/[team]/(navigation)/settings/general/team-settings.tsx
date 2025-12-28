@@ -24,6 +24,7 @@ export const TeamSettings = () => {
 							email: team?.email || undefined,
 							locale: team?.locale || undefined,
 							timezone: team?.timezone || undefined,
+							slug: team?.slug || undefined,
 							id: team?.id || undefined,
 						}}
 					/>

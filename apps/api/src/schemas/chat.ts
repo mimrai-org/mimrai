@@ -143,4 +143,5 @@ export const getChatsHistorySchema = z.object({
 		description: "Search query to filter chat history",
 		example: "project update",
 	}),
+	pageSize: z.number().min(1).max(100).default(20),
 });

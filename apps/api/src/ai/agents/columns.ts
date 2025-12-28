@@ -4,7 +4,7 @@ import {
 	createAgent,
 	formatContextForLLM,
 } from "@api/ai/agents/config/shared";
-import { getColumnsTool } from "../tools/get-columns";
+import { getStatusesTool } from "../tools/get-statuses";
 
 export const columnsAgent = createAgent({
 	name: "columns",
@@ -25,7 +25,7 @@ ${COMMON_AGENT_RULES}
 - For direct queries: lead with results, add context
 </guidelines>`,
 	tools: {
-		getColumns: getColumnsTool,
+		getColumns: getStatusesTool,
 	},
 	maxTurns: 5,
 });

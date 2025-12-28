@@ -15,7 +15,7 @@ export const getStatusMessage = (status?: AgentStatus | null) => {
 	if (state === "executing") {
 		const messages: Record<AgentStatus["agent"], string> = {
 			triage: "Thinking...",
-			general: "Working on your request...",
+			planning: "Planning your next steps...",
 			tasks: "Managing your tasks...",
 			projects: "Organizing your projects...",
 		};
@@ -44,6 +44,10 @@ export const getToolMessage = (toolName: string | null) => {
 		createLabel: "Creating label...",
 		getLabels: "Fetching labels...",
 		getColumns: "Fetching columns...",
+		createMilestone: "Creating milestone...",
+		updateMilestone: "Updating milestone...",
+		getMilestones: "Fetching milestones...",
+		taskAutocomplete: "Autocompleting task details...",
 	};
 
 	return toolMessages[toolName];

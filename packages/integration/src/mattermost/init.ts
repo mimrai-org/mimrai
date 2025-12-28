@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { buildAppContext } from "@api/ai/agents/config/shared";
-import { mainAgent } from "@api/ai/agents/main";
+import { triageAgent } from "@api/ai/agents/triage";
 import type { UIChatMessage } from "@api/ai/types";
 import { getUserContext } from "@api/ai/utils/get-user-context";
 import { createAdminClient } from "@api/lib/supabase";
@@ -470,7 +470,7 @@ export const initMattermostSingle = async (
 
 									const systemMessage: UIChatMessage = await new Promise(
 										(resolve, reject) => {
-											const messageStream = mainAgent.toUIMessageStream({
+											const messageStream = triageAgent.toUIMessageStream({
 												message: userMessage,
 												strategy: "auto",
 												maxRounds: 5,

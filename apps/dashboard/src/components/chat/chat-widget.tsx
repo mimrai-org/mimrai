@@ -50,8 +50,9 @@ export const ChatWidget = () => {
 
 	const lastPathname = useRef<string>(pathname);
 	const containerRef = useRef<HTMLDivElement>(null);
-	const { show, toggle, chatId, setChatId, setTitle, setHover, hover } =
+	const { show, toggle, setChatId, setTitle, setHover, hover } =
 		useChatWidget();
+	const chatId = useChatWidget((state) => state.chatId);
 
 	const { scrollY } = useScroll();
 	const [scrollingDown, setScrollingDown] = useState(false);
@@ -141,11 +142,11 @@ export const ChatWidget = () => {
 		>
 			<div
 				className={cn("absolute inset-0 transition-all duration-300", {
-					"pointer-events-auto bg-background opacity-100": show,
+					"pointer-events-auto bg-sidebar opacity-100": show,
 					"pointer-events-none opacity-0": !show,
 				})}
 			>
-				<div className="absolute top-8 right-8">
+				<div className="absolute top-8 right-8 z-10">
 					<Button
 						type="button"
 						variant={"ghost"}
@@ -156,16 +157,17 @@ export const ChatWidget = () => {
 					</Button>
 				</div>
 			</div>
-			{!isFetching && (
+			{(!isFetching || initialMessages) && (
 				<Provider
 					initialMessages={(initialMessages?.messages as UIMessage[]) ?? []}
+					key={chatId}
 				>
 					<motion.div
 						ref={containerRef}
 						variants={{
 							show: {
 								height: "100vh",
-								translateY: -10,
+								translateY: 0,
 							},
 							overview: {
 								translateY: -10,
@@ -185,7 +187,7 @@ export const ChatWidget = () => {
 							stiffness: 300,
 							damping: 30,
 						}}
-						initial="default"
+						initial={show ? "show" : isOverviewPage ? "overview" : "default"}
 						animate={
 							show
 								? "show"
@@ -196,14 +198,11 @@ export const ChatWidget = () => {
 										: "default"
 						}
 						whileHover={show ? undefined : "hover"}
-						className={cn(
-							"-translate-x-1/2 pointer-events-none absolute bottom-0 left-1/2 h-screen pb-2",
-							{
-								"pointer-events-auto": show,
-							},
-						)}
+						className={cn("pointer-events-none absolute inset-0 size-screen", {
+							"pointer-events-auto": show,
+						})}
 					>
-						<div className="hidden h-full w-3xl bg-transparent md:block">
+						<div className="hidden h-full bg-transparent md:block">
 							{isFetched && <ChatInterface showMessages={show} id={chatId} />}
 						</div>
 					</motion.div>

@@ -29,10 +29,7 @@ VERT IMPORTANT: You are communicating with the user via ${context.integrationTyp
 
 ${
 	context.integrationType === "web"
-		? `
-	- When presenting repeated structured data (lists of items, multiple entries, time series), always use markdown tables
-	- Tables make data scannable and easier to compare - use them for any data with 2+ rows
-	`
+		? ""
 		: context.integrationType === "whatsapp"
 			? `
 	- Keep your responses concise and to the point, as WhatsApp messages have character limits.
@@ -56,16 +53,13 @@ Important: Use the current date/time above for time-sensitive operations. User-s
 
 export const COMMON_AGENT_RULES = `<behavior-rules>
 - Do not make up data, always use tools to retrieve information
-- Call tools immediately without explanatory text
 - Mutations (create, update, delete) should be done via tool calls only
 - Do not make up data - if unsure, use tools to retrieve information
 - Never send plain UUIDs to the user
-- When using tools, ensure paramaters named ID correspond to actual IDs from the system using tools
+- When using tools, ensure parameters named ID correspond to actual IDs from the system using tools
 - Always write in the team's preferred language as indicated by the locale
 - Use parallel tool calls when possible
 - Provide specific numbers and actionable insights
-- Explain your reasoning
-- Keep responses concise and relevant (under 500 words)
 - Lead with the most important information first
 </behavior-rules>`;
 
@@ -136,7 +130,7 @@ export const createAgent = (config: AgentConfig<AppContext>) => {
 			provider: memoryProvider,
 			history: {
 				enabled: true,
-				limit: 10,
+				limit: 20,
 			},
 			workingMemory: {
 				enabled: false,

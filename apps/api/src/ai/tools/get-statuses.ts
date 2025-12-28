@@ -5,16 +5,14 @@ import { eq } from "drizzle-orm";
 import z from "zod";
 import type { AppContext } from "../agents/config/shared";
 
-export const getColumnsToolSchema = z.object({});
+export const getStatusesToolSchema = z.object({});
 
-export const getColumnsTool = tool({
-	description: "Get columns from your task manager",
-	inputSchema: getColumnsToolSchema,
+export const getStatusesTool = tool({
+	description: "Get statuses from your task manager",
+	inputSchema: getStatusesToolSchema,
 	execute: async function* (input, executionOptions) {
 		const { userId, teamId } =
 			executionOptions.experimental_context as AppContext;
-
-		yield { text: "Retrieving columns..." };
 
 		const data = await db
 			.select({
@@ -25,7 +23,7 @@ export const getColumnsTool = tool({
 			.where(eq(statuses.teamId, teamId));
 
 		yield {
-			text: `Found ${data.length} columns.`,
+			text: `Found ${data.length} statuses.`,
 			data,
 		};
 	},

@@ -28,8 +28,6 @@ export const getTasksTool = tool({
 			const { userId, teamId, teamSlug } =
 				executionOptions.experimental_context as AppContext;
 
-			yield { text: "Fetching tasks...", status: "loading" };
-
 			const result = await getTasks({
 				teamId: teamId,
 				assigneeId: assigneeId,

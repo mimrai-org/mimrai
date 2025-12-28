@@ -9,6 +9,9 @@ export const chatRouter = router({
 	history: protectedProcedure
 		.input(getChatsHistorySchema)
 		.query(async ({ ctx, input }) => {
-			return getChatHistory(ctx.user.teamId!, input.search);
+			return getChatHistory({
+				teamId: ctx.user.teamId!,
+				...input,
+			});
 		}),
 });

@@ -8,7 +8,7 @@ import type {
  */
 export type AgentStatus = {
 	status: "routing" | "executing" | "completing";
-	agent: "triage" | "general" | "tasks" | "projects";
+	agent: "triage" | "planning" | "tasks" | "projects";
 };
 /**
  * Extended data parts interface with application-specific data

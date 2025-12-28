@@ -1,5 +1,5 @@
 import { buildAppContext } from "@api/ai/agents/config/shared";
-import { mainAgent } from "@api/ai/agents/main";
+import { triageAgent } from "@api/ai/agents/triage";
 import type { UIChatMessage } from "@api/ai/types";
 import { getUserContext } from "@api/ai/utils/get-user-context";
 import { db } from "@mimir/db/client";
@@ -163,7 +163,7 @@ export const handleTaskComment = async ({
 	);
 
 	const text: UIChatMessage = await new Promise((resolve, reject) => {
-		const messageStream = mainAgent.toUIMessageStream({
+		const messageStream = triageAgent.toUIMessageStream({
 			message: userMessage,
 			strategy: "auto",
 			maxRounds: 5,

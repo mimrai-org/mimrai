@@ -4,47 +4,40 @@ import {
 	createAgent,
 	formatContextForLLM,
 } from "@api/ai/agents/config/shared";
+import { task } from "@trigger.dev/sdk";
 import { createChecklistItemTool } from "../tools/create-checklist-item";
 import { createLabelTool } from "../tools/create-label";
 import { createTaskTool } from "../tools/create-task";
 import { createTaskPullRequestTool } from "../tools/create-task-pull-request";
 import { getChecklistItemsTool } from "../tools/get-checklist-item";
-import { getColumnsTool } from "../tools/get-columns";
 import { getLabelsTool } from "../tools/get-labels";
+import { getStatusesTool } from "../tools/get-statuses";
 import { getTasksTool } from "../tools/get-tasks";
+import { taskAutocompleteTool } from "../tools/task-autocomplete";
 import { updateChecklistItemTool } from "../tools/update-checklist-item";
 import { updateTaskTool } from "../tools/update-task";
 
 export const tasksAgent = createAgent({
 	name: "tasks",
 	model: openai("gpt-4o-mini"),
+	temperature: 0,
 	instructions: (
 		ctx,
-	) => `You are a task management specialist for ${ctx.companyName}. Your goal is to help manage tasks, track progress, and monitor deadlines. 
-
-- Task can have a checklist: a set of items that need to be completed as part of the task.
-- Tasks are organized into columns representing different stages of progress. Do not create new columns as they are pre-defined.
-- Tasks can be assigned to team members to indicate responsibility.
-- Tasks can have labels to categorize and prioritize them.
-- Epics do not exist in this system; focus on tasks, projects and milestones only.
+	) => `You are a task management specialist for ${ctx.teamName}. You execute task operations using the task tools.
 
 <agent-specific-rules>
-- Lead with key information
-- Highlight key insights from the data
-- Do not use columns names when creating or updating tasks; use column IDs (UUIDs) instead from tool calls
-- Use data to support your recommendations
-- Be proactive in suggesting task management best practices
 - When answering questions about tasks, always provide useful context and summaries based on the data available
 - If the tasks fit in the current work cycle, create it using the to_do column unless specified otherwise
-- When creating or updating tasks, ensure to set appropriate due dates based on project timelines
-- When creating or updating tasks, ensure to set appropriate labels based on task priority and category
 - When creating checklist items, ensure they are specific, actionable, and relevant to the associated task
-- When creating tasks, ensure to assign them to the appropriate team members based on their roles and expertise
-- When creating tasks, keep the title concise yet descriptive to clearly convey the task's purpose
-- If the user asks about their pending tasks, only consider tasks assigned to them wich status is not [done, backlog]
-</agent-specific-rules>
 
-- IMPORTANT: If the messages seems like a feature request, bug report, or to-do related, prioritize creating a new task using the createTask tool.
+- If the user asks about their pending tasks, only consider tasks assigned to them wich status is not [done, backlog]
+- Preserve naming consistency and use clear verbs.
+- Some tools require UUIDs as inputs. Ensure to provide valid UUIDs when using those tools.
+
+- When creating or updating tasks, ALWAYS use the taskAutocomplete tool before to fill in missing details like assignee, status, and labels based on the task title and description.
+- When creating or updating tasks, ensure to set appropriate due dates based on project timelines
+- When creating tasks, keep the title concise yet descriptive to clearly convey the task's purpose
+</agent-specific-rules>
 
 <background-data>
 ${formatContextForLLM(ctx)}
@@ -52,6 +45,7 @@ ${formatContextForLLM(ctx)}
 
 ${COMMON_AGENT_RULES}`,
 	tools: {
+		taskAutocomplete: taskAutocompleteTool,
 		createTask: createTaskTool,
 		getTasks: getTasksTool,
 		updateTask: updateTaskTool,
@@ -59,7 +53,7 @@ ${COMMON_AGENT_RULES}`,
 		createChecklistItem: createChecklistItemTool,
 		getChecklistItems: getChecklistItemsTool,
 		updateChecklistItem: updateChecklistItemTool,
-		getColumns: getColumnsTool,
+		getColumns: getStatusesTool,
 		getLabels: getLabelsTool,
 		createLabel: createLabelTool,
 	},
