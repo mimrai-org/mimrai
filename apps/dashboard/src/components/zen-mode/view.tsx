@@ -30,7 +30,7 @@ export const ZenModeView = ({ taskId }: { taskId: string }) => {
 				initial={{ opacity: 0, scale: 0.95, filter: "blur(8px)" }}
 				animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
 				exit={{ opacity: 0, scale: 0.95, filter: "blur(8px)" }}
-				transition={{ duration: 0.2 }}
+				transition={{ duration: 0.6 }}
 				className="flex flex-col items-center space-y-4 px-2 sm:px-4"
 			>
 				<div className="flex items-center gap-2 rounded-full border px-2 py-2 text-xs uppercase sm:w-fit sm:px-4">

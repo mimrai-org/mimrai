@@ -233,6 +233,11 @@ export const TaskForm = ({
 								</div>
 								<div className="space-y-1 py-2">
 									<input className="hidden size-0 opacity-0" />
+									<div className="flex gap-2 px-4 text-muted-foreground text-xs">
+										<span>
+											{user?.team?.prefix}-{defaultValues?.sequence}
+										</span>
+									</div>
 									<div className="flex items-center justify-between gap-4 px-4">
 										<Title />
 									</div>

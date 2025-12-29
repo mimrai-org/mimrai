@@ -2,6 +2,7 @@ import z from "zod";
 
 export const taskFormSchema = z.object({
 	id: z.string().optional(),
+	sequence: z.number().optional(),
 	permalinkId: z.string().optional(),
 	title: z.string().min(1, { message: "Task must have a title" }).max(255),
 	description: z.string().max(50_000).nullable().optional(),
