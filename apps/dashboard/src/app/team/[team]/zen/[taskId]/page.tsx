@@ -1,5 +1,6 @@
 import { ZenModeProvider } from "@/components/zen-mode/use-zen-mode";
 import { ZenModeView } from "@/components/zen-mode/view";
+import { trpcClient } from "@/utils/trpc";
 
 type Props = {
 	params: Promise<{ taskId: string }>;
@@ -7,11 +8,16 @@ type Props = {
 
 export default async function Page({ params }: Props) {
 	const { taskId } = await params;
+	const today = new Date();
+	trpcClient.users.updateProfile.mutate({
+		lastZenModeAt: today,
+	});
+
 	return (
 		<ZenModeProvider taskId={taskId}>
 			<div className="h-screen overflow-y-auto bg-background px-4 py-12">
 				<div className="relative mx-auto my-auto max-w-4xl">
-					<ZenModeView taskId={taskId} />
+					<ZenModeView />
 				</div>
 			</div>
 		</ZenModeProvider>

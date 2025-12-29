@@ -97,7 +97,7 @@ export const ZenModeWelcome = ({
 				</div>
 
 				<motion.div variants={defaultItem} className="mt-8">
-					<Link href={`/team/${user.team?.slug}/zen/${top3Tasks?.[0]?.id}`}>
+					<Link href={`/team/${user.team?.slug}/zen/orientation`}>
 						<Button
 							size={"lg"}
 							className="rounded-full font-normal transition-all hover:scale-105"

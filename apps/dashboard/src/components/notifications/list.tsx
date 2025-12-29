@@ -160,15 +160,23 @@ export const getNotificationItemProps = ({
 		case "mention":
 			return {
 				title: `You were mentioned in ${metadata.contextType}`,
-				description: `${metadata.contextSnippet}`,
+				description: "You were mentioned.",
 				...commonProps,
 			};
 
 		case "follow_up":
 			return {
 				title: `Follow up: ${metadata.message}`,
-				description: `It's time to follow up on this task.`,
+				description: "This could use your attention.",
 				icon: MessageCircleIcon,
+				...commonProps,
+			};
+		case "task_comment":
+			return {
+				title: `Comment: ${metadata.title}`,
+				description: "This may need your response.",
+				icon: MessageCircleIcon,
+				href: `${user?.basePath}/tasks/${activity.groupId}`,
 				...commonProps,
 			};
 		default:

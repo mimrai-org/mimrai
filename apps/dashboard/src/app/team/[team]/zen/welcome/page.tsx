@@ -1,6 +1,8 @@
-import { differenceInDays } from "date-fns";
 import { redirect } from "next/navigation";
 import { ZenModeEmpty } from "@/components/zen-mode/empty";
+import { ZenModeProvider } from "@/components/zen-mode/use-zen-mode";
+import { ZenModeClose } from "@/components/zen-mode/view";
+import { ZenModeWelcome } from "@/components/zen-mode/welcome";
 import { queryClient, trpc, trpcClient } from "@/utils/trpc";
 
 export default async function Page() {
@@ -16,14 +18,10 @@ export default async function Page() {
 	}
 	const firstTask = tasks.data[0]!;
 
-	//Last zen mode access is today?
-	const today = new Date();
-	const lastZenModeAt = user.lastZenModeAt
-		? new Date(user.lastZenModeAt)
-		: null;
-	if (!lastZenModeAt || differenceInDays(today, lastZenModeAt)) {
-		return redirect(`/team/${user.team.slug}/zen/welcome`);
-	}
-
-	return redirect(`/team/${user.team.slug}/zen/${firstTask.id}`);
+	return (
+		<ZenModeProvider taskId={firstTask.id}>
+			<ZenModeClose />
+			<ZenModeWelcome user={user} />
+		</ZenModeProvider>
+	);
 }

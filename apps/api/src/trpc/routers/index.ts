@@ -26,6 +26,7 @@ import { tasksSuggestionsRouter } from "./tasks-suggestions";
 import { teamsRouter } from "./teams";
 import { usersRouter } from "./users";
 import { widgetsRouter } from "./widgets";
+import { zenRouter } from "./zen";
 
 export const appRouter = router({
 	healthCheck: publicProcedure.query(() => {
@@ -62,6 +63,7 @@ export const appRouter = router({
 	tasksSuggestions: tasksSuggestionsRouter,
 	globalSearch: globalSearchRouter,
 	onboarding: onboardingRouter,
+	zen: zenRouter,
 });
 export type AppRouter = typeof appRouter;
 export type RouterOutputs = inferRouterOutputs<AppRouter>;

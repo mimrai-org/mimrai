@@ -16,7 +16,7 @@ import { ZenModeScrollSpy } from "./scroll-spy";
 import { useZenMode } from "./use-zen-mode";
 import { ZenModeWhyButton } from "./why-button";
 
-export const ZenModeView = ({ taskId }: { taskId: string }) => {
+export const ZenModeView = () => {
 	const { setParams } = useTaskParams();
 
 	const { contentRef, currentTask, next } = useZenMode();
@@ -95,7 +95,7 @@ export const ZenModeClose = () => {
 			<div className="flex size-4.5 items-center justify-center rounded-sm border bg-muted/30 transition-colors group-hover:border-foreground group-hover:text-foreground">
 				<XIcon className="size-3" />
 			</div>
-			Exit Focus
+			Exit
 		</button>
 	);
 };

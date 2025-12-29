@@ -13,7 +13,7 @@ import { trpc } from "@/utils/trpc";
 import { ZenModeLoading } from "./loading";
 import { ZenModeNotFound } from "./not-found";
 
-export type ZenModeTask = RouterOutputs["tasks"]["get"]["data"][number];
+export type ZenModeTask = RouterOutputs["zen"]["queue"]["data"][number];
 
 interface ZenModeState {
 	currentTask: ZenModeTask;
@@ -45,7 +45,7 @@ export const ZenModeProvider = ({
 	const editorRef = useRef<EditorInstance | null>(null);
 
 	const { data: tasks, isLoading } = useQuery(
-		trpc.tasks.getZenModeQueue.queryOptions(undefined, {
+		trpc.zen.queue.queryOptions(undefined, {
 			enabled: !!user,
 			refetchOnWindowFocus: false,
 			refetchOnMount: false,

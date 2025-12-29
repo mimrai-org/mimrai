@@ -58,17 +58,6 @@ export const tasksRouter = router({
 				teamId: ctx.user.teamId!,
 			});
 		}),
-	getZenModeQueue: protectedProcedure.query(async ({ ctx, input }) => {
-		const tasks = await getTasks({
-			teamId: ctx.user.teamId!,
-			assigneeId: [ctx.user.id],
-			statusType: ["to_do", "in_progress"],
-			view: "board",
-			pageSize: 20,
-		});
-
-		return tasks;
-	}),
 
 	create: protectedProcedure
 		.input(createTaskSchema)

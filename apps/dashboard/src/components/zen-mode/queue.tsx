@@ -166,6 +166,7 @@ const ZenModeQueueItem = ({
 	index?: number;
 	className?: string;
 }) => {
+	const { currentTask } = useZenMode();
 	const user = useUser();
 	const { setNodeRef, isOver } = useDroppable({
 		id: task.id,
@@ -199,7 +200,7 @@ const ZenModeQueueItem = ({
 					"group flex items-center gap-2 rounded-md px-4 py-2 font-light text-lg transition-all hover:bg-accent/50",
 					{
 						"hover:bg-accent": isDragging,
-						"bg-accent": index === 0,
+						"bg-accent": task.id === currentTask.id,
 						"translate-x-4": isOver && !isDragging,
 					},
 					className,
@@ -226,7 +227,7 @@ const ZenModeQueueItem = ({
 					className={cn(
 						"ml-auto flex items-center gap-2 opacity-0 transition-opacity group-hover:opacity-100",
 						{
-							"opacity-100": index === 0,
+							"opacity-100": task.id === currentTask.id,
 						},
 					)}
 				>
