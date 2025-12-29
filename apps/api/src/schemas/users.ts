@@ -19,6 +19,7 @@ export const switchTeamSchema = z
 	);
 
 export const updateUserProfileSchema = z.object({
-	name: z.string().min(2, "Name must be at least 2 characters long"),
+	name: z.string().min(2, "Name must be at least 2 characters long").optional(),
+	lastZenModeAt: z.coerce.date().optional().nullable(),
 	locale: z.string().optional(),
 });

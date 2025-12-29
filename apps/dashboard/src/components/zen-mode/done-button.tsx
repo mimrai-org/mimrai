@@ -24,7 +24,7 @@ export const ZenModeDoneButton = () => {
 
 	const { data: statuses } = useQuery(
 		trpc.statuses.get.queryOptions({
-			type: ["review", "done", "in_progress", "to_do", "backlog"],
+			type: ["done"],
 		}),
 	);
 
@@ -88,6 +88,14 @@ export const ZenModeDoneButton = () => {
 				disabled={isPending}
 				type="button"
 				onClick={(e) => {
+					if (sortedStatuses?.length === 1) {
+						updateTask({
+							id: task.id,
+							statusId: sortedStatuses[0]!.id,
+						});
+						return;
+					}
+
 					setDialogOpen(true);
 				}}
 			>
@@ -116,6 +124,7 @@ export const ZenModeDoneButton = () => {
 								type="button"
 								variant={"secondary"}
 								className="group h-14 w-full justify-start rounded-md"
+								disabled={isPending || task?.statusId === status.id}
 								onClick={() => {
 									updateTask({
 										id: task.id,

@@ -13,13 +13,13 @@ import { trpc } from "@/utils/trpc";
 import { ZenModeLoading } from "./loading";
 import { ZenModeNotFound } from "./not-found";
 
-export type Task = RouterOutputs["tasks"]["get"]["data"][number];
+export type ZenModeTask = RouterOutputs["tasks"]["get"]["data"][number];
 
 interface ZenModeState {
-	currentTask: Task;
+	currentTask: ZenModeTask;
 	setCurrentTask: (taskId: string) => void;
 	next: () => void;
-	tasks: Task[];
+	tasks: ZenModeTask[];
 	contentRef: React.RefObject<HTMLDivElement | null>;
 	editorRef: React.RefObject<EditorInstance | null>;
 	updateTask: UseMutateFunction<

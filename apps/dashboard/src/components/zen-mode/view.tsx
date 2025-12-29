@@ -37,7 +37,7 @@ export const ZenModeView = ({ taskId }: { taskId: string }) => {
 					{PriorityIcon[currentTask.priority]}
 					{currentTask.priority}
 				</div>
-				<h1 className="px-2 text-center text-3xl sm:px-4 sm:text-6xl">
+				<h1 className="px-2 text-center text-3xl sm:px-4 sm:text-5xl">
 					{currentTask.title}
 				</h1>
 				<div className="mb-0">

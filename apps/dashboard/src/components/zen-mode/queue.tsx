@@ -9,17 +9,9 @@ import { useMutation } from "@tanstack/react-query";
 import {
 	Dialog,
 	DialogContent,
-	DialogDescription,
 	DialogHeader,
 	DialogTitle,
 } from "@ui/components/ui/dialog";
-import {
-	Sheet,
-	SheetContent,
-	SheetDescription,
-	SheetHeader,
-	SheetTitle,
-} from "@ui/components/ui/sheet";
 import {
 	Tooltip,
 	TooltipContent,
@@ -30,14 +22,13 @@ import {
 	ArrowUpRight,
 	CircleQuestionMarkIcon,
 	ExternalLinkIcon,
-	GripVertical,
 } from "lucide-react";
+import { motion } from "motion/react";
 import Link from "next/link";
 import { useState } from "react";
 import { useUser } from "@/hooks/use-user";
 import { queryClient, trpc } from "@/utils/trpc";
-import { propertiesComponents } from "../tasks-view/properties/task-properties-components";
-import { type Task, useZenMode } from "./use-zen-mode";
+import { useZenMode, type ZenModeTask } from "./use-zen-mode";
 
 export const ZenModeQueue = () => {
 	const [open, setOpen] = useState(false);
@@ -48,7 +39,7 @@ export const ZenModeQueue = () => {
 	}
 
 	const currentTaskIndex = tasks.findIndex(
-		(task) => task.id === currentTask.id,
+		(task) => task.id === currentTask?.id,
 	);
 	const totalTasks = tasks.length;
 
@@ -63,7 +54,6 @@ export const ZenModeQueue = () => {
 					<ExternalLinkIcon className="size-3.5 text-muted-foreground transition-colors group-hover:text-foreground" />
 					<span className="uppercase">QUEUE</span>
 				</div>
-				<span className="text-muted-foreground">{totalTasks} left</span>
 				<span className="text-muted-foreground">
 					{currentTaskIndex} skipped
 				</span>
@@ -81,6 +71,32 @@ const ZenModeQueueSheet = ({
 	onOpenChange: (open: boolean) => void;
 }) => {
 	const { tasks, currentTask } = useZenMode();
+
+	return (
+		<Dialog open={open} onOpenChange={onOpenChange}>
+			<DialogContent
+				showCloseButton={false}
+				overlayClassName="dark:bg-background bg-background"
+				className="-translate-y-1/2 top-1/2 flex w-full justify-center bg-transparent sm:max-w-[40vw]"
+			>
+				<DialogHeader className="hidden">
+					<DialogTitle />
+				</DialogHeader>
+				<div className="flex max-h-[70vh] flex-1 flex-col overflow-y-auto">
+					<ZenModeQueueList tasks={tasks} />
+				</div>
+			</DialogContent>
+		</Dialog>
+	);
+};
+
+export const ZenModeQueueList = ({
+	tasks,
+	itemClassName,
+}: {
+	tasks: ZenModeTask[];
+	itemClassName?: string;
+}) => {
 	const { mutate: updateTask } = useMutation(
 		trpc.tasks.update.mutationOptions({
 			onSettled: () => {
@@ -128,31 +144,28 @@ const ZenModeQueueSheet = ({
 	};
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent
-				overlayClassName="dark:bg-background/99 bg-background/99"
-				className="-translate-y-1/2 top-1/2 w-auto bg-transparent sm:max-w-3xl"
-			>
-				<DialogHeader>
-					<DialogTitle className="text-4xl">Zen Queue</DialogTitle>
-					<DialogDescription>
-						Your zone, your rules. Drag and drop to reorder your tasks as you
-						see fit.
-					</DialogDescription>
-				</DialogHeader>
-				<div className="flex max-h-[70vh flex-col overflow-y-auto">
-					<DndContext onDragEnd={handleDragEnd}>
-						{tasks.map((task) => (
-							<ZenModeQueueItem key={task.id} task={task} />
-						))}
-					</DndContext>
-				</div>
-			</DialogContent>
-		</Dialog>
+		<DndContext onDragEnd={handleDragEnd}>
+			{tasks.map((task, index) => (
+				<ZenModeQueueItem
+					key={task.id}
+					task={task}
+					index={index}
+					className={itemClassName}
+				/>
+			))}
+		</DndContext>
 	);
 };
 
-const ZenModeQueueItem = ({ task }: { task: Task }) => {
+const ZenModeQueueItem = ({
+	task,
+	index,
+	className,
+}: {
+	task: ZenModeTask;
+	index?: number;
+	className?: string;
+}) => {
 	const user = useUser();
 	const { setNodeRef, isOver } = useDroppable({
 		id: task.id,
@@ -169,7 +182,12 @@ const ZenModeQueueItem = ({ task }: { task: Task }) => {
 	});
 
 	return (
-		<div
+		<motion.div
+			variants={{
+				hidden: { opacity: 0, x: 20, filter: "blur(4px)" },
+				show: { opacity: 1, x: 0, filter: "blur(0px)" },
+			}}
+			className={cn("w-full")}
 			style={{
 				transform: transform
 					? `translate3d(${transform.x}px, ${transform.y}px, 0)`
@@ -178,11 +196,13 @@ const ZenModeQueueItem = ({ task }: { task: Task }) => {
 		>
 			<div
 				className={cn(
-					"group flex items-center gap-2 rounded-md px-2 py-3 text-base transition-all hover:bg-accent/50",
+					"group flex items-center gap-2 rounded-md px-4 py-2 font-light text-lg transition-all hover:bg-accent/50",
 					{
 						"hover:bg-accent": isDragging,
+						"bg-accent": index === 0,
 						"translate-x-4": isOver && !isDragging,
 					},
+					className,
 				)}
 				ref={setNodeRef}
 				{...listeners}
@@ -193,16 +213,26 @@ const ZenModeQueueItem = ({ task }: { task: Task }) => {
 					className="cursor-grab overflow-hidden transition-colors hover:text-foreground"
 				>
 					<div className="flex flex-1 items-center gap-2">
-						<span className="flex items-center gap-2 text-muted-foreground text-sm">
+						{/* <span className="flex items-center gap-2 text-muted-foreground">
 							{user?.team?.prefix}-{task.sequence}
+						</span> */}
+						<span className="flex items-center gap-2 text-muted-foreground">
+							{index !== undefined ? index + 1 : ""}.
 						</span>
-						<div className="max-w-[400px] truncate">{task.title}</div>
+						<div className="truncate">{task.title}</div>
 					</div>
 				</div>
-				<div className="ml-auto flex items-center gap-2">
+				<div
+					className={cn(
+						"ml-auto flex items-center gap-2 opacity-0 transition-opacity group-hover:opacity-100",
+						{
+							"opacity-100": index === 0,
+						},
+					)}
+				>
 					<Tooltip>
 						<TooltipTrigger asChild>
-							<div className="text-muted-foreground opacity-0 transition-opacity hover:text-foreground group-hover:opacity-100">
+							<div className="text-muted-foreground hover:text-foreground">
 								<CircleQuestionMarkIcon className="size-4" />
 							</div>
 						</TooltipTrigger>
@@ -214,12 +244,12 @@ const ZenModeQueueItem = ({ task }: { task: Task }) => {
 					</Tooltip>
 					<Link
 						href={`${user?.basePath}/zen/${task.id}`}
-						className="text-muted-foreground opacity-0 transition-opacity hover:text-foreground group-hover:opacity-100"
+						className="text-muted-foreground hover:text-foreground"
 					>
 						<ArrowUpRight className="size-5" />
 					</Link>
 				</div>
 			</div>
-		</div>
+		</motion.div>
 	);
 };

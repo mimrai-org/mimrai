@@ -59,8 +59,6 @@ export const COMMON_AGENT_RULES = `<behavior-rules>
 - When using tools, ensure parameters named ID correspond to actual IDs from the system using tools
 - Always write in the team's preferred language as indicated by the locale
 - Use parallel tool calls when possible
-- Provide specific numbers and actionable insights
-- Lead with the most important information first
 </behavior-rules>`;
 
 export interface AppContext {

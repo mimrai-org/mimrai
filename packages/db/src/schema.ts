@@ -108,6 +108,9 @@ export const users = pgTable(
 		color: text("color").$defaultFn(() => randomColor()),
 		isSystemUser: boolean("is_system_user").default(false).notNull(),
 		dateFormat: text("date_format"),
+		lastZenModeAt: timestamp("last_zen_mode_at", {
+			withTimezone: true,
+		}),
 		createdAt: timestamp("created_at").notNull(),
 		updatedAt: timestamp("updated_at").notNull(),
 	},

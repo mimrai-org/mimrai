@@ -19,6 +19,7 @@ export const getCurrentUser = async (userId: string, teamId?: string) => {
 			name: users.name,
 			email: users.email,
 			locale: users.locale,
+			lastZenModeAt: users.lastZenModeAt,
 			image: users.image,
 			color: users.color,
 		})
@@ -194,9 +195,11 @@ export const getSystemUser = async () => {
 export const updateUser = async ({
 	userId,
 	name,
+	lastZenModeAt,
 	locale,
 }: {
 	userId: string;
+	lastZenModeAt?: Date | null;
 	name?: string;
 	locale?: string;
 }) => {
@@ -205,6 +208,7 @@ export const updateUser = async ({
 		.set({
 			name: name,
 			locale: locale,
+			lastZenModeAt: lastZenModeAt,
 			updatedAt: new Date(),
 		})
 		.where(eq(users.id, userId))

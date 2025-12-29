@@ -44,55 +44,57 @@ export const NavProjects = () => {
 					Projects
 				</Link>
 			</SidebarMenuButton>
-			<SidebarMenuSub>
-				{recentProjects?.data.map((project) => {
-					const isActive = pathname?.startsWith(
-						`${user?.basePath}/projects/${project.id}`,
-					);
+			{recentProjects?.data && recentProjects.data.length > 0 && (
+				<SidebarMenuSub>
+					{recentProjects?.data.map((project) => {
+						const isActive = pathname?.startsWith(
+							`${user?.basePath}/projects/${project.id}`,
+						);
 
-					const total =
-						project.progress.inProgress + project.progress.completed;
-					const progress =
-						total > 0
-							? Math.round((project.progress.completed / total) * 100)
-							: 0;
+						const total =
+							project.progress.inProgress + project.progress.completed;
+						const progress =
+							total > 0
+								? Math.round((project.progress.completed / total) * 100)
+								: 0;
 
-					return (
-						<SidebarMenuSubItem key={project.id}>
-							<SidebarMenuSubButton
-								isActive={isActive}
-								className="flex w-full cursor-pointer items-center justify-between space-x-2"
-								asChild
-							>
-								<Link
-									href={`/team/${user?.team?.slug}/projects/${project.id}/detail`}
+						return (
+							<SidebarMenuSubItem key={project.id}>
+								<SidebarMenuSubButton
+									isActive={isActive}
+									className="flex w-full cursor-pointer items-center justify-between space-x-2"
+									asChild
 								>
-									<div className="flex items-center space-x-2">
-										<CircularProgress
-											size={16}
-											thickness={2}
-											value={progress ?? 0}
-											min={0}
-											max={100}
-										>
-											<CircularProgressIndicator>
-												<CircularProgressTrack />
-												<CircularProgressRange
-													style={{
-														color: project.color || undefined,
-													}}
-												/>
-											</CircularProgressIndicator>
-										</CircularProgress>
-										{/* <ProjectIcon {...project} className="size-4" /> */}
-										<span className="truncate">{project.name}</span>
-									</div>
-								</Link>
-							</SidebarMenuSubButton>
-						</SidebarMenuSubItem>
-					);
-				})}
-			</SidebarMenuSub>
+									<Link
+										href={`/team/${user?.team?.slug}/projects/${project.id}/detail`}
+									>
+										<div className="flex items-center space-x-2">
+											<CircularProgress
+												size={16}
+												thickness={2}
+												value={progress ?? 0}
+												min={0}
+												max={100}
+											>
+												<CircularProgressIndicator>
+													<CircularProgressTrack />
+													<CircularProgressRange
+														style={{
+															color: project.color || undefined,
+														}}
+													/>
+												</CircularProgressIndicator>
+											</CircularProgress>
+											{/* <ProjectIcon {...project} className="size-4" /> */}
+											<span className="truncate">{project.name}</span>
+										</div>
+									</Link>
+								</SidebarMenuSubButton>
+							</SidebarMenuSubItem>
+						);
+					})}
+				</SidebarMenuSub>
+			)}
 		</SidebarMenuItem>
 	);
 };
