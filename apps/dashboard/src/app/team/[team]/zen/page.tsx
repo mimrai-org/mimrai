@@ -18,8 +18,8 @@ export default async function Page() {
 
 	//Last zen mode access is today?
 	const today = new Date();
-	const lastZenModeAt = user.lastZenModeAt
-		? new Date(user.lastZenModeAt)
+	const lastZenModeAt = user.team.lastZenModeAt
+		? new Date(user.team.lastZenModeAt)
 		: null;
 	if (!lastZenModeAt || differenceInDays(today, lastZenModeAt)) {
 		return redirect(`/team/${user.team.slug}/zen/welcome`);

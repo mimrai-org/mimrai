@@ -108,9 +108,6 @@ export const users = pgTable(
 		color: text("color").$defaultFn(() => randomColor()),
 		isSystemUser: boolean("is_system_user").default(false).notNull(),
 		dateFormat: text("date_format"),
-		lastZenModeAt: timestamp("last_zen_mode_at", {
-			withTimezone: true,
-		}),
 		createdAt: timestamp("created_at").notNull(),
 		updatedAt: timestamp("updated_at").notNull(),
 	},
@@ -132,6 +129,9 @@ export const usersOnTeams = pgTable(
 		teamId: text("team_id").notNull(),
 		role: teamRoleEnum().default("member").notNull(),
 		description: text("description").default(""),
+		lastZenModeAt: timestamp("last_zen_mode_at", {
+			withTimezone: true,
+		}),
 		createdAt: timestamp("created_at", {
 			withTimezone: true,
 			mode: "string",

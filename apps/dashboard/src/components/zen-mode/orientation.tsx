@@ -111,7 +111,7 @@ export const ZenModeOrientation = ({
 						<Button
 							type="button"
 							size="lg"
-							className="mt-8 rounded-full transition-all hover:scale-105"
+							className="mt-8 rounded-full font-normal transition-all hover:scale-105"
 						>
 							Begin focus
 							<Maximize2Icon />

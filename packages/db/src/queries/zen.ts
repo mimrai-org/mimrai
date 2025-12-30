@@ -1,4 +1,3 @@
-import { endOfDay } from "date-fns";
 import {
 	and,
 	arrayContains,
@@ -10,7 +9,7 @@ import {
 	or,
 } from "drizzle-orm";
 import { db } from "..";
-import { activities, tasks, users } from "../schema";
+import { activities, tasks, users, usersOnTeams } from "../schema";
 import { getTasks } from "./tasks";
 import { getCurrentUser } from "./users";
 
@@ -41,7 +40,7 @@ export const getZenOrientation = async ({
 	const user = await getCurrentUser(userId, teamId);
 	const queueTasksIds = queue.data.map((task) => task.id);
 
-	const lastZenMode = user.lastZenModeAt || new Date(0);
+	const lastZenMode = user.team?.lastZenModeAt || new Date(0);
 
 	const tasksActivities = await db
 		.select()
@@ -82,4 +81,23 @@ export const getZenOrientation = async ({
 	return {
 		activities: importantActivities,
 	};
+};
+
+export const updateLastZenModeAt = async ({
+	userId,
+	teamId,
+	date,
+}: {
+	userId: string;
+	teamId: string;
+	date: Date;
+}) => {
+	await db
+		.update(usersOnTeams)
+		.set({
+			lastZenModeAt: date,
+		})
+		.where(
+			and(eq(usersOnTeams.userId, userId), eq(usersOnTeams.teamId, teamId)),
+		);
 };

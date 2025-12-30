@@ -9,8 +9,8 @@ type Props = {
 export default async function Page({ params }: Props) {
 	const { taskId } = await params;
 	const today = new Date();
-	trpcClient.users.updateProfile.mutate({
-		lastZenModeAt: today,
+	trpcClient.zen.updateLastActivity.mutate({
+		date: today,
 	});
 
 	return (
