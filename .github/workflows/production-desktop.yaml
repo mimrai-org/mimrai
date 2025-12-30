@@ -1,0 +1,29 @@
+name: api
+permissions:
+  contents: write
+on:
+  push:
+    branches:
+      - main
+      - desktop
+    paths:
+      - apps/desktop/**
+jobs:
+  release:
+    name: 🚀 Release Desktop Application
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency: desktop-release
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      # move to apps/desktop
+      - name: Change Directory
+        run: cd apps/desktop
+      - name: Install dependencies
+        run: npm i
+      - name: Make Electron Forge Release
+        run: npx electron-forge publish --platform=all --arch=all --make
+      

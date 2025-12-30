@@ -1,5 +1,4 @@
-import { motion } from "framer-motion";
-import { AnimatePresence } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
 const loadingMessages = [

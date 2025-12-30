@@ -130,16 +130,13 @@ export const ZenModeQueueList = ({
 				});
 			});
 
-			queryClient.setQueryData(
-				trpc.tasks.getZenModeQueue.queryKey(),
-				(oldData) => {
-					if (!oldData) return oldData;
-					return {
-						...oldData,
-						data: newTasks,
-					};
-				},
-			);
+			queryClient.setQueryData(trpc.zen.queue.queryKey(), (oldData) => {
+				if (!oldData) return oldData;
+				return {
+					...oldData,
+					data: newTasks,
+				};
+			});
 		}
 	};
 

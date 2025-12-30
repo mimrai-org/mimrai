@@ -1,4 +1,4 @@
-import { differenceInDays } from "date-fns";
+import { getDate } from "date-fns";
 import { redirect } from "next/navigation";
 import { ZenModeEmpty } from "@/components/zen-mode/empty";
 import { queryClient, trpc, trpcClient } from "@/utils/trpc";
@@ -21,7 +21,7 @@ export default async function Page() {
 	const lastZenModeAt = user.team.lastZenModeAt
 		? new Date(user.team.lastZenModeAt)
 		: null;
-	if (!lastZenModeAt || differenceInDays(today, lastZenModeAt)) {
+	if (!lastZenModeAt || getDate(today) !== getDate(lastZenModeAt)) {
 		return redirect(`/team/${user.team.slug}/zen/welcome`);
 	}
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { TextShimmer } from "@mimir/ui/text-shimmer";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 
 interface AnimatedStatusProps {
 	text: string | null;

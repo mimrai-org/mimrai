@@ -14,6 +14,7 @@
     "date-fns": "^4.1.0",
     "@mimir/db": "workspace:*",
     "@mimir/utils": "workspace:*",
+    "@mimir/cache": "workspace:*",
     "stripe": "^19.1.0"
   },
   "devDependencies": {

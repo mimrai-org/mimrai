@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@ui/components/ui/button";
-import { motion } from "framer-motion";
 import { PencilIcon, SkipForwardIcon, XIcon } from "lucide-react";
+import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useUser } from "@/hooks/use-user";

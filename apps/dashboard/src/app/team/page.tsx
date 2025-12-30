@@ -13,6 +13,8 @@ export default async function Page({ searchParams }: Props) {
 		cache: "no-cache",
 	});
 
+	console.log("Redirect page accessed with session:", session);
+
 	if (!session?.user.id) {
 		return redirect("/sign-in");
 	}

@@ -3,6 +3,7 @@
   "private": true,
   "workspaces": [
     "apps/*",
+    "!apps/desktop",
     "packages/*",
     "packages/email/*"
   ],
@@ -25,8 +26,13 @@
   },
   "packageManager": "bun@1.2.21",
   "trustedDependencies": [
+    "@depot/cli",
+    "@sentry/cli",
     "@tailwindcss/oxide",
-    "es5-ext"
+    "es5-ext",
+    "esbuild",
+    "protobufjs",
+    "sharp"
   ],
   "dependencies": {
     "@trpc/next": "^11.6.0"

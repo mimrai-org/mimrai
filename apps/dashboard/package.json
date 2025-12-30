@@ -69,6 +69,7 @@
     "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.6.0",
     "import-in-the-middle": "1.14.4",
+    "lodash": "^4.17.21",
     "lucide-react": "^0.546.0",
     "marked": "^16.3.0",
     "motion": "^12.23.22",

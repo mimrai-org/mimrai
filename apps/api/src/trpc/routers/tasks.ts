@@ -1,5 +1,4 @@
 import { openai } from "@ai-sdk/openai";
-import { getUserContext } from "@api/ai/utils/get-user-context";
 import {
 	cloneTaskSchema,
 	commentTaskSchema,
@@ -20,15 +19,13 @@ import {
 	buildSmartCompletePrompt,
 	smartCompleteResponseSchema,
 } from "@api/utils/smart-complete";
-import { getLabels } from "@db/queries/labels";
-import { getMemberById, getMembers } from "@db/queries/teams";
+import { getMemberById } from "@db/queries/teams";
 import {
 	cloneTask,
 	createTask,
 	createTaskComment,
 	deleteTask,
 	deleteTaskComment,
-	getSmartCompleteContext,
 	getTaskById,
 	getTaskByPermalinkId,
 	getTaskSubscribers,

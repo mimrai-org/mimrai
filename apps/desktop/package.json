@@ -1,0 +1,67 @@
+{
+  "name": "mimrai",
+  "version": "0.1",
+  "main": "./src/main.ts",
+  "module": "./src/main.ts",
+  "description": "MIMRAI Desktop Application",
+  "license": "MIT",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "bun run --watch --bun electron ./src/main.ts",
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^7.10.2",
+    "@electron-forge/maker-deb": "^7.10.2",
+    "@electron-forge/maker-rpm": "^7.10.2",
+    "@electron-forge/maker-squirrel": "^7.10.2",
+    "@electron-forge/maker-zip": "^7.10.2",
+    "@types/bun": "latest",
+    "@types/electron-squirrel-startup": "^1.0.2",
+    "@manypkg/find-root": "^3.1.0",
+    "@npmcli/arborist": "^9.1.9",
+    "dotenv": "^17.2.3",
+    "electron": "^39.2.7"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.1"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {
+        "executableName": "mimrai"
+      },
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "electron_quick_start"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {
+            "executableName": "mimrai"
+          }
+        }
+      ]
+    }
+  }
+}

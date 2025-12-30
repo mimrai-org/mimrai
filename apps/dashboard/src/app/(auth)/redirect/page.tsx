@@ -12,7 +12,7 @@ export default async function Page() {
 
 	// TODO: Improve invite flow
 
-	if ("teamSlug" in session.user && !session.user.teamSlug) {
+	if ("teamSlug" in session.user && session.user.teamSlug) {
 		return redirect(`/team/${session.user.teamSlug}/onboarding`);
 	}
 

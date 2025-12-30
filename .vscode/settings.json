@@ -10,6 +10,9 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.formatOnPaste": true,
   "emmet.showExpandedAbbreviation": "never",
+  "rust-analyzer.linkedProjects": [
+    "apps/desktop/src-tauri/Cargo.toml",
+  ],
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },

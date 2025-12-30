@@ -32,6 +32,7 @@
     "@mimir/notifications": "workspace:*",
     "@mimir/utils": "workspace:*",
     "@mimir/billing": "workspace:*",
+    "@mimir/events": "workspace:*",
     "@sentry/node": "^10.17.0",
     "@slack/bolt": "^4.6.0",
     "@supabase/supabase-js": "^2.58.0",
