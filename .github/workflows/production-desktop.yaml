@@ -30,7 +30,7 @@ jobs:
           cd apps/desktop
           npm i
       - name: Build Desktop Application
-        with:
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd apps/desktop
