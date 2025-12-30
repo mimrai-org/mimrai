@@ -8,7 +8,6 @@
   "module": "./src/main.ts",
   "description": "MIMRAI Desktop Application",
   "license": "MIT",
-  "type": "module",
   "private": true,
   "scripts": {
     "dev": "bun run --watch --bun electron ./src/main.ts",
@@ -35,36 +34,5 @@
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.1"
-  },
-  "config": {
-    "forge": {
-      "packagerConfig": {
-        "executableName": "mimrai"
-      },
-      "makers": [
-        {
-          "name": "@electron-forge/maker-squirrel",
-          "config": {
-            "name": "mimrai"
-          }
-        },
-        {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "darwin"
-          ]
-        },
-        {
-          "name": "@electron-forge/maker-deb",
-          "config": {}
-        },
-        {
-          "name": "@electron-forge/maker-rpm",
-          "config": {
-            "executableName": "mimrai"
-          }
-        }
-      ]
-    }
   }
 }

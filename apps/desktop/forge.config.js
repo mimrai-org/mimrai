@@ -1,6 +1,6 @@
 module.exports = {
 	packagerConfig: {
-		name: "MIMRAI",
+		name: "mimrai",
 		asar: true,
 		osxSign: {},
 		appCategoryType: "public.app-category.developer-tools",
