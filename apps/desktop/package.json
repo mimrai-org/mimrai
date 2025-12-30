@@ -1,6 +1,9 @@
 {
   "name": "mimrai",
-  "version": "0.1",
+  "version": "0.1.0",
+  "author": {
+    "name": "Alain Alvarez"
+  },
   "main": "./src/main.ts",
   "module": "./src/main.ts",
   "description": "MIMRAI Desktop Application",
@@ -42,7 +45,7 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "electron_quick_start"
+            "name": "mimrai"
           }
         },
         {
