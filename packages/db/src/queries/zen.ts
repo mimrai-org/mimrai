@@ -9,9 +9,14 @@ import {
 	or,
 } from "drizzle-orm";
 import { db } from "..";
-import { activities, tasks, users, usersOnTeams } from "../schema";
+import {
+	activities,
+	tasks,
+	users,
+	type ZenModeSettings,
+	zenModeSettings,
+} from "../schema";
 import { getTasks } from "./tasks";
-import { getCurrentUser } from "./users";
 
 export const getZenQueue = async ({
 	userId,
@@ -37,10 +42,10 @@ export const getZenOrientation = async ({
 	teamId: string;
 }) => {
 	const queue = await getZenQueue({ userId, teamId });
-	const user = await getCurrentUser(userId, teamId);
+	const settings = await getZenModeSettings({ userId, teamId });
 	const queueTasksIds = queue.data.map((task) => task.id);
 
-	const lastZenMode = user.team?.lastZenModeAt || new Date(0);
+	const lastZenMode = settings.lastZenModeAt || new Date(0);
 
 	const tasksActivities = await db
 		.select()
@@ -93,11 +98,72 @@ export const updateLastZenModeAt = async ({
 	date: Date;
 }) => {
 	await db
-		.update(usersOnTeams)
-		.set({
+		.insert(zenModeSettings)
+		.values({
 			lastZenModeAt: date,
+			userId,
+			teamId,
 		})
+		.onConflictDoUpdate({
+			target: [zenModeSettings.userId, zenModeSettings.teamId],
+			set: {
+				lastZenModeAt: date,
+			},
+		});
+};
+
+export const getZenModeSettings = async ({
+	userId,
+	teamId,
+}: {
+	userId: string;
+	teamId: string;
+}) => {
+	const [settings] = await db
+		.select()
+		.from(zenModeSettings)
 		.where(
-			and(eq(usersOnTeams.userId, userId), eq(usersOnTeams.teamId, teamId)),
-		);
+			and(
+				eq(zenModeSettings.userId, userId),
+				eq(zenModeSettings.teamId, teamId),
+			),
+		)
+		.limit(1);
+
+	if (!settings) {
+		const [newSettings] = await db
+			.insert(zenModeSettings)
+			.values({
+				userId,
+				teamId,
+			})
+			.returning();
+		return newSettings!;
+	}
+
+	return settings;
+};
+
+export const updateZenModeSettings = async ({
+	userId,
+	teamId,
+	settings,
+}: {
+	userId: string;
+	teamId: string;
+	settings: ZenModeSettings;
+}) => {
+	await db
+		.insert(zenModeSettings)
+		.values({
+			userId,
+			teamId,
+			settings,
+		})
+		.onConflictDoUpdate({
+			target: [zenModeSettings.userId, zenModeSettings.teamId],
+			set: {
+				settings,
+			},
+		});
 };

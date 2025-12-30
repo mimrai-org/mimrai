@@ -35,7 +35,6 @@ export const getCurrentUser = async (userId: string, teamId?: string) => {
 				slug: teams.slug,
 				prefix: teams.prefix,
 				locale: teams.locale,
-				lastZenModeAt: usersOnTeams.lastZenModeAt,
 				timezone: teams.timezone,
 			})
 			.from(usersOnTeams)

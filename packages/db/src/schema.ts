@@ -129,9 +129,6 @@ export const usersOnTeams = pgTable(
 		teamId: text("team_id").notNull(),
 		role: teamRoleEnum().default("member").notNull(),
 		description: text("description").default(""),
-		lastZenModeAt: timestamp("last_zen_mode_at", {
-			withTimezone: true,
-		}),
 		createdAt: timestamp("created_at", {
 			withTimezone: true,
 			mode: "string",
@@ -1289,8 +1286,23 @@ export const prReviews = pgTable(
 	],
 );
 
-export const navbarSettings = pgTable(
-	"navbar_settings",
+export interface ZenModeSettings {
+	focusGuard: {
+		enabled: boolean;
+		// options: short = 25 minutes, medium = 50 minutes, long = 90 minutes
+		limit: "short" | "medium" | "long";
+		// whether to require breaks between focus sessions
+		requireBreaks: boolean;
+
+		// advanced
+		focusDurationMinutes?: number;
+		minBreakDurationMinutes?: number;
+		disableSkipBreaks?: boolean;
+	};
+}
+
+export const zenModeSettings = pgTable(
+	"zen_mode_settings",
 	{
 		id: text()
 			.$defaultFn(() => randomUUID())
@@ -1298,9 +1310,21 @@ export const navbarSettings = pgTable(
 			.notNull(),
 		userId: text("user_id").notNull(),
 		teamId: text("team_id").notNull(),
-		items: jsonb("items")
-			.$type<string[]>()
-			.default(["overview", "my-tasks", "tasks", "projects", "settings"]),
+
+		lastZenModeAt: timestamp("last_zen_mode_at", {
+			withTimezone: true,
+		}),
+
+		settings: jsonb("settings")
+			.$type<ZenModeSettings>()
+			.default({
+				focusGuard: {
+					enabled: false,
+					limit: "short",
+					requireBreaks: false,
+				},
+			}),
+
 		createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
 			.defaultNow()
 			.notNull(),
@@ -1309,19 +1333,19 @@ export const navbarSettings = pgTable(
 			.notNull(),
 	},
 	(table) => [
-		unique("unique_navbar_settings_per_user_team").on(
+		unique("unique_zen_mode_settings_per_user_team").on(
 			table.userId,
 			table.teamId,
 		),
 		foreignKey({
 			columns: [table.userId],
 			foreignColumns: [users.id],
-			name: "navbar_settings_user_id_fkey",
+			name: "zen_mode_settings_user_id_fkey",
 		}).onDelete("cascade"),
 		foreignKey({
 			columns: [table.teamId],
 			foreignColumns: [teams.id],
-			name: "navbar_settings_team_id_fkey",
+			name: "zen_mode_settings_team_id_fkey",
 		}).onDelete("cascade"),
 	],
 );

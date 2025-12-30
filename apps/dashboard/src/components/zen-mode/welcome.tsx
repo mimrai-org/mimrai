@@ -23,7 +23,7 @@ export const ZenModeWelcome = ({
 	user: {
 		name?: string;
 		team?: {
-			slug: string;
+			slug?: string;
 		};
 	};
 }) => {
@@ -92,7 +92,7 @@ export const ZenModeWelcome = ({
 					These are today's focus points
 				</motion.p>
 
-				<div className="mt-8 max-w-md font-light">
+				<div className="mt-8 max-w-md space-y-1 font-light">
 					<ZenModeQueueList tasks={top3Tasks} itemClassName="text-base py-2" />
 				</div>
 

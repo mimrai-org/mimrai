@@ -16,10 +16,12 @@ export default async function Page() {
 	}
 	const firstTask = tasks.data[0]!;
 
+	const settings = await trpcClient.zen.getSettings.query();
+
 	//Last zen mode access is today?
 	const today = new Date();
-	const lastZenModeAt = user.team.lastZenModeAt
-		? new Date(user.team.lastZenModeAt)
+	const lastZenModeAt = settings.lastZenModeAt
+		? new Date(settings.lastZenModeAt)
 		: null;
 	if (!lastZenModeAt || getDate(today) !== getDate(lastZenModeAt)) {
 		return redirect(`/team/${user.team.slug}/zen/welcome`);

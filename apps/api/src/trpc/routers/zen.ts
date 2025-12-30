@@ -1,4 +1,5 @@
 import {
+	getZenModeSettings,
 	getZenOrientation,
 	getZenQueue,
 	updateLastZenModeAt,
@@ -34,4 +35,11 @@ export const zenRouter = router({
 				date: input.date,
 			});
 		}),
+
+	getSettings: protectedProcedure.query(async ({ ctx }) => {
+		return getZenModeSettings({
+			userId: ctx.user.id,
+			teamId: ctx.user.teamId!,
+		});
+	}),
 });
