@@ -8,6 +8,11 @@ import {
 
 // if (import("electron-squirrel-startup")) app.quit();
 
+const url = {
+	development: "http://localhost:3000",
+	production: "https://app.mimrai.com",
+};
+
 const createWindow = () => {
 	const primaryDisplay = screen.getPrimaryDisplay();
 	const { width, height } = primaryDisplay.workAreaSize;
@@ -20,7 +25,10 @@ const createWindow = () => {
 
 	const view = new WebContentsView();
 	win.contentView.addChildView(view);
-	view.webContents.loadURL("http://localhost:3000");
+
+	const env =
+		(process.env.NODE_ENV as "development" | "production") || "production";
+	view.webContents.loadURL(url[env]);
 
 	function setBounds() {
 		if (!win || !view) return;

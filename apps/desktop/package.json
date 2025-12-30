@@ -10,8 +10,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "bun run --watch --bun electron ./src/main.ts",
-    "start": "electron-forge start",
+    "start": "NODE_ENV=development electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish"
