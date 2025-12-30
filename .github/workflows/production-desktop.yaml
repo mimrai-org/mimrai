@@ -1,4 +1,4 @@
-name: api
+name: dekstop
 permissions:
   contents: write
 on:
