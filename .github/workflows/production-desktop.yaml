@@ -20,7 +20,7 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v1
 
-      - name: Install Node.js, NPM and Yarn
+      - name: Install Node.js
         uses: actions/setup-node@v1
         with:
           node-version: 22
@@ -30,6 +30,8 @@ jobs:
           cd apps/desktop
           npm i
       - name: Build Desktop Application
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd apps/desktop
           npm run publish
