@@ -153,17 +153,36 @@ export const updateZenModeSettings = async ({
 	teamId: string;
 	settings: ZenModeSettings;
 }) => {
+	let updateSettings = { ...settings };
+	const [existing] = await db
+		.select()
+		.from(zenModeSettings)
+		.where(
+			and(
+				eq(zenModeSettings.userId, userId),
+				eq(zenModeSettings.teamId, teamId),
+			),
+		)
+		.limit(1);
+
+	if (existing) {
+		updateSettings = {
+			...existing.settings,
+			...settings,
+		};
+	}
+
 	await db
 		.insert(zenModeSettings)
 		.values({
 			userId,
 			teamId,
-			settings,
+			settings: updateSettings,
 		})
 		.onConflictDoUpdate({
 			target: [zenModeSettings.userId, zenModeSettings.teamId],
 			set: {
-				settings,
+				settings: updateSettings,
 			},
 		});
 };

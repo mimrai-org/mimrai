@@ -14,8 +14,9 @@ import { ZenModeLoading } from "./loading";
 import { ZenModeNotFound } from "./not-found";
 
 export type ZenModeTask = RouterOutputs["zen"]["queue"]["data"][number];
+export type ZenModeSettings = RouterOutputs["zen"]["getSettings"];
 
-interface ZenModeState {
+export interface ZenModeState {
 	currentTask: ZenModeTask;
 	setCurrentTask: (taskId: string) => void;
 	next: () => void;

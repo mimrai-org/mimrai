@@ -1,20 +1,13 @@
 "use client";
-import { motion } from "motion/react";
 
-const backgroundVariants = {};
-
+const color =
+	"dark:from-background dark:via-slate-900 dark:to-neutral-900 from-background via-slate-800 to-neutral-100 opacity-20";
 export const ZenModeBackground = () => {
 	return (
-		<motion.div
-			initial={{ scale: 1.5 }}
-			animate={{ scale: 1 }}
-			transition={{
-				duration: 30,
-				repeat: Number.POSITIVE_INFINITY,
-				repeatType: "reverse",
-				ease: "linear",
-			}}
-			className="pointer-events-none fixed inset-0 aspect-square bg-radial-[50%_50%] from-blue-200/2 to-transparent"
-		/>
+		<div className="pointer-events-none fixed inset-0 overflow-hidden">
+			<div
+				className={`-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 aspect-square size-[4000px] bg-radial-[50%_50%] ${color}`}
+			/>
+		</div>
 	);
 };

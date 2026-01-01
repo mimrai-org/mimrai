@@ -52,6 +52,10 @@ export const SettingsNavbar = () => {
 				scopes: ["team:write"],
 			},
 			{
+				to: addTeamToUrl("/settings/zen"),
+				label: "Zen Mode",
+			},
+			{
 				to: addTeamToUrl("/settings/integrations"),
 				label: t("settings.sidebar.integrations"),
 			},
@@ -80,9 +84,10 @@ export const SettingsNavbar = () => {
 							href={to}
 							key={to}
 							className={cn(
-								"rounded-sm border border-transparent px-4 py-2 transition-all hover:border-muted hover:text-accent-foreground",
+								"rounded-sm border border-transparent px-4 py-2 transition-all hover:border-muted hover:bg-accent/50 hover:text-accent-foreground",
 								{
-									"bg-card font-medium text-foreground": pathname.includes(to),
+									"bg-accent font-medium text-foreground":
+										pathname.includes(to),
 								},
 							)}
 						>

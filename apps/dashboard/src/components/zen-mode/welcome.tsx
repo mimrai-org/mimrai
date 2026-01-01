@@ -4,6 +4,7 @@ import { ArrowRightIcon, SunIcon } from "lucide-react";
 import { motion, stagger } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
+import { ZenModeBackground } from "./background";
 import { ZenModeQueueList } from "./queue";
 import { useZenMode, type ZenModeTask } from "./use-zen-mode";
 
@@ -32,6 +33,7 @@ export const ZenModeWelcome = ({
 
 	return (
 		<div className="overflow-hidden">
+			<ZenModeBackground />
 			<motion.div
 				className="mx-auto flex h-screen flex-col items-center justify-center"
 				initial="hidden"

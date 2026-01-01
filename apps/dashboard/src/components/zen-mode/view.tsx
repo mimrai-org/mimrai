@@ -1,12 +1,14 @@
 "use client";
 import { Button } from "@ui/components/ui/button";
 import { PencilIcon, SkipForwardIcon, XIcon } from "lucide-react";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useUser } from "@/hooks/use-user";
 import { PriorityIcon } from "../tasks-view/properties/priority";
 import { ZenModeAttachments } from "./attachments";
+import { ZenModeBackground } from "./background";
+import { ZenModeBreak } from "./break";
 import { ZenModeChecklist } from "./checklists";
 import { ZenModeContent } from "./content";
 import { ZenModeDoneButton } from "./done-button";
@@ -26,6 +28,8 @@ export const ZenModeView = () => {
 			<ZenModeClose />
 			<ZenModeQueue />
 			<ZenModeScrollSpy />
+			<ZenModeBreak />
+			<ZenModeBackground />
 			<motion.div
 				initial={{ opacity: 0, scale: 0.95, filter: "blur(8px)" }}
 				animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}

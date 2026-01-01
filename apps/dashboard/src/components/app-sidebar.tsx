@@ -50,7 +50,7 @@ const data: {
 		{
 			title: "Settings",
 			key: "settings",
-			url: "/team/{team}/settings",
+			url: "/team/{team}/settings/general",
 			icon: Settings2,
 		},
 	],

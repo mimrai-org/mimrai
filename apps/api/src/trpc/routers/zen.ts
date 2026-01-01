@@ -1,8 +1,10 @@
+import { updateZenSettingsSchema } from "@api/schemas/zen";
 import {
 	getZenModeSettings,
 	getZenOrientation,
 	getZenQueue,
 	updateLastZenModeAt,
+	updateZenModeSettings,
 } from "@mimir/db/queries/zen";
 import z from "zod";
 import { protectedProcedure, router } from "../init";
@@ -42,4 +44,14 @@ export const zenRouter = router({
 			teamId: ctx.user.teamId!,
 		});
 	}),
+
+	updateSettings: protectedProcedure
+		.input(updateZenSettingsSchema)
+		.mutation(async ({ ctx, input }) => {
+			return updateZenModeSettings({
+				userId: ctx.user.id,
+				teamId: ctx.user.teamId!,
+				settings: input,
+			});
+		}),
 });
