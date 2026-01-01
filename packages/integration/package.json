@@ -29,7 +29,7 @@
     "@mimir/utils": "workspace:*",
     "@slack/bolt": "^4.6.0",
     "ai": "5.0.87",
-    "drizzle-orm": "0.44.6",
+    "drizzle-orm": "catalog:",
     "googleapis": "^169.0.0",
     "mime-types": "^3.0.1",
     "redis": "^5.8.2",

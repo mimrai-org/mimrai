@@ -1,12 +1,17 @@
 {
   "name": "mimir",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "!apps/desktop",
-    "packages/*",
-    "packages/email/*"
-  ],
+  "workspaces": {
+    "catalog": {
+      "drizzle-orm": "0.45.1"
+    },
+    "packages": [
+      "apps/*",
+      "!apps/desktop",
+      "packages/*",
+      "packages/email/*"
+    ]
+  },
   "scripts": {
     "clean": "git clean -xdf node_modules",
     "check": "biome check --write .",
