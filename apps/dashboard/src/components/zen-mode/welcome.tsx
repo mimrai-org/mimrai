@@ -76,7 +76,7 @@ export const ZenModeWelcome = ({
 								duration: 3,
 								repeatType: "reverse",
 							}}
-							className="absolute inset-0 animate-blob rounded-full bg-radial-[50%_50%] from-yellow-500/10 via-red-400/5 to-transparent dark:from-yellow-100/10 dark:via-red-200/2"
+							className="absolute inset-0 animate-blob rounded-full bg-radial-[50%_50%] from-amber-200 via-transparent to-transparent opacity-20 dark:from-amber-400 dark:via-transparent dark:opacity-5"
 						/>
 					</motion.div>
 				</motion.div>
@@ -89,7 +89,7 @@ export const ZenModeWelcome = ({
 
 				<motion.p
 					variants={defaultItem}
-					className="mt-4 text-center font-light text-lg text-muted-foreground"
+					className="mt-2 text-center font-light text-lg text-muted-foreground"
 				>
 					These are today's focus points
 				</motion.p>
