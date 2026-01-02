@@ -30,7 +30,7 @@ export const ZenModeBreak = () => {
 	const [internalState, setInternalState] = useState(state);
 	const latestStateRef = useRef(state);
 	const canResumeWork =
-		!!settings?.settings?.focusGuard.requireBreaks && state === "focus";
+		!settings?.settings?.focusGuard.requireBreaks || state === "focus";
 	const lastZenModeAt = settings?.lastZenModeAt;
 
 	useEffect(() => {

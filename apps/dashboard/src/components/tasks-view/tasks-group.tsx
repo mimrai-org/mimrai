@@ -224,17 +224,20 @@ export const useTasksSorted = () => {
 		return [...tasks].sort((a, b) => {
 			// Weight-based sorting: each criterion only breaks ties from the previous one
 			const comparisons = [
-				// 1. Sort by status order (only when grouping by status)
+				// Sort by focus order (focused tasks first)
+				(a.focusOrder ?? 0) - (b.focusOrder ?? 0),
+
+				// Sort by status order (only when grouping by status)
 				filters.groupBy === "status" ? a.status.order - b.status.order : 0,
-				// 2. Sort by priority (urgent > high > medium > low)
+				// Sort by priority (urgent > high > medium > low)
 				(priorityOrder[a.priority ?? ""] ?? 5) -
 					(priorityOrder[b.priority ?? ""] ?? 5),
-				// 3. Sort by due date (earliest first, no due date goes last)
+				// Sort by due date (earliest first, no due date goes last)
 				(a.dueDate ? new Date(a.dueDate).getTime() : Number.POSITIVE_INFINITY) -
 					(b.dueDate
 						? new Date(b.dueDate).getTime()
 						: Number.POSITIVE_INFINITY),
-				// 4. Sort by order (fallback)
+				// Sort by order (fallback)
 				a.order - b.order,
 			];
 

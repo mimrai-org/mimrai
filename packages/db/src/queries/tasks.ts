@@ -27,7 +27,6 @@ import {
 	labelsOnTasks,
 	milestones,
 	projects,
-	pullRequestPlan,
 	statuses,
 	type statusTypeEnum,
 	tasks,
@@ -277,12 +276,6 @@ export const getTasks = async ({
 				total: checklistSubquery.total,
 				checklist: checklistSubquery.checklist,
 			},
-			pullRequestPlan: {
-				id: pullRequestPlan.id,
-				prUrl: pullRequestPlan.prUrl,
-				prTitle: pullRequestPlan.prTitle,
-				status: pullRequestPlan.status,
-			},
 			recurring: tasks.recurring,
 			recurringJobId: tasks.recurringJobId,
 			recurringNextDate: tasks.recurringNextDate,
@@ -304,14 +297,7 @@ export const getTasks = async ({
 		.leftJoin(checklistSubquery, eq(checklistSubquery.taskId, tasks.id))
 		.leftJoin(projects, eq(tasks.projectId, projects.id))
 		.leftJoin(milestones, eq(tasks.milestoneId, milestones.id))
-		.leftJoinLateral(dependenciesSubquery, sql`true`)
-		.leftJoin(
-			pullRequestPlan,
-			and(
-				eq(tasks.id, pullRequestPlan.taskId),
-				inArray(pullRequestPlan.status, ["pending", "completed", "error"]),
-			),
-		);
+		.leftJoinLateral(dependenciesSubquery, sql`true`);
 
 	if (input.view === "board") {
 		query.orderBy(
@@ -674,12 +660,6 @@ export const getTaskById = async (id: string, userId?: string) => {
 			permalinkId: tasks.permalinkId,
 			focusOrder: tasks.focusOrder,
 			focusReason: tasks.focusReason,
-			pullRequestPlan: {
-				id: pullRequestPlan.id,
-				prUrl: pullRequestPlan.prUrl,
-				prTitle: pullRequestPlan.prTitle,
-				status: pullRequestPlan.status,
-			},
 			recurring: tasks.recurring,
 			recurringJobId: tasks.recurringJobId,
 			recurringNextDate: tasks.recurringNextDate,
@@ -701,13 +681,6 @@ export const getTaskById = async (id: string, userId?: string) => {
 		.leftJoin(users, eq(tasks.assigneeId, users.id))
 		.leftJoin(projects, eq(tasks.projectId, projects.id))
 		.leftJoin(milestones, eq(tasks.milestoneId, milestones.id))
-		.leftJoin(
-			pullRequestPlan,
-			and(
-				eq(tasks.id, pullRequestPlan.taskId),
-				inArray(pullRequestPlan.status, ["pending", "completed", "error"]),
-			),
-		)
 		.limit(1);
 
 	return task;
