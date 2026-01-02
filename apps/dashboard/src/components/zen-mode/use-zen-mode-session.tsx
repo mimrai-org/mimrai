@@ -47,7 +47,6 @@ export const ZenModeSessionProvider = ({
 			(settings?.settings?.focusGuard.minBreakDurationMinutes ?? 0) * 60 * 1000;
 
 		setTime((prev) => {
-			console.log("Advancing to next state from", prev / 1000 / 60, "minutes");
 			if (state === "focus" && (nextState === "break" || !nextState)) {
 				return (
 					prev +
@@ -78,10 +77,6 @@ export const ZenModeSessionProvider = ({
 
 				const timeInCycle = time % cycleDuration;
 
-				console.log("Time in cycle:", timeInCycle / 1000 / 60, "minutes");
-				console.log("Focus duration (minutes):", focusDurationMs / 1000 / 60);
-				console.log("Break duration (minutes):", breakDurationMs / 1000 / 60);
-
 				if (timeInCycle < focusDurationMs) {
 					// Focus time
 					if (prev !== "focus") return "focus";
@@ -104,7 +99,6 @@ export const ZenModeSessionProvider = ({
 		if (elapsed >= 5000) {
 			setTime((prev) => {
 				const newTime = prev + elapsed;
-				console.log("Updating time to", newTime / 1000 / 60, "minutes");
 				sessionStorage.setItem(ZEN_MODE_SESSION_STORAGE_KEY, String(newTime));
 				return newTime;
 			});
@@ -120,7 +114,6 @@ export const ZenModeSessionProvider = ({
 			const saved = sessionStorage.getItem(ZEN_MODE_SESSION_STORAGE_KEY);
 			if (saved) {
 				const value = Number(saved);
-				console.log("Restoring saved time:", value / 1000 / 60, "minutes");
 				offsetTimeRef.current = value - lastTimeRef.current;
 				lastTimeRef.current = value;
 				setTime(() => value);

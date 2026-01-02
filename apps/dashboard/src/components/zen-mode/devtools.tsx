@@ -37,6 +37,9 @@ export const ZenModeDevTools = () => {
 				</div>
 				<div>Current State: {state}</div>
 				<div className="mt-2 grid grid-cols-2 gap-2">
+					<Button onClick={() => addMinutes(1)} type="button">
+						Add 1 Minute
+					</Button>
 					<Button onClick={() => addMinutes(5)} type="button">
 						Add 5 Minutes
 					</Button>

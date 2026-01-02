@@ -3,7 +3,7 @@ import { differenceInMinutes } from "date-fns";
 import { PlayIcon } from "lucide-react";
 import { AnimatePresence, motion, stagger } from "motion/react";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useUser } from "@/hooks/use-user";
 import { useZenModeSession } from "./use-zen-mode-session";
 
@@ -28,18 +28,90 @@ export const ZenModeBreak = () => {
 	const user = useUser();
 	const { state, advanceToNextState, settings } = useZenModeSession();
 	const [internalState, setInternalState] = useState(state);
+	const isFocused = useRef(true);
 	const latestStateRef = useRef(state);
 	const canResumeWork =
 		!settings?.settings?.focusGuard.requireBreaks || state === "focus";
 	const lastZenModeAt = settings?.lastZenModeAt;
 
+	const breakNotificationRef = useRef<Notification | null>(null);
+	const focusNotificationRef = useRef<Notification | null>(null);
+
+	const handleNotification = async (type: "break" | "focus") => {
+		if (!("Notification" in window)) {
+			// Notifications not supported
+			return;
+		}
+
+		if (Notification.permission !== "denied") {
+			// We need to ask the user for permission
+			await Notification.requestPermission();
+		}
+
+		if (Notification.permission !== "granted") {
+			// Notifications not granted
+			return;
+		}
+
+		if (isFocused.current) {
+			// Don't send notification if content is visible
+			return;
+		}
+
+		closeNotifications();
+		if (type === "break") {
+			breakNotificationRef.current = new Notification(
+				"Time for a short break 🌿",
+				{
+					body: "Take a short break to relax and recharge.",
+				},
+			);
+		} else if (type === "focus") {
+			focusNotificationRef.current = new Notification(
+				"You can return to focus whenever you're ready",
+				{
+					body: "Hope you had a refreshing break!",
+				},
+			);
+		}
+	};
+
 	useEffect(() => {
-		// prevent auto pass from break to focus on re-renders
 		if (latestStateRef.current !== state && state === "break") {
+			// prevent auto pass from break to focus on re-renders
+			// break state entered
+			handleNotification("break");
 			setInternalState(state);
 		}
+
+		if (latestStateRef.current !== state && state === "focus") {
+			// focus state entered
+			handleNotification("focus");
+		}
+
 		latestStateRef.current = state;
 	}, [state]);
+
+	const closeNotifications = () => {
+		breakNotificationRef.current?.close();
+		focusNotificationRef.current?.close();
+	};
+
+	useEffect(() => {
+		const handleFocus = () => {
+			closeNotifications();
+			isFocused.current = true;
+		};
+		const handleBlur = () => {
+			isFocused.current = false;
+		};
+		window.addEventListener("focus", handleFocus);
+		window.addEventListener("blur", handleBlur);
+		return () => {
+			window.removeEventListener("focus", handleFocus);
+			window.removeEventListener("blur", handleBlur);
+		};
+	}, []);
 
 	return (
 		<AnimatePresence>
