@@ -365,9 +365,7 @@ export const TaskChecklistItemForm = ({
 	return (
 		<div className="rounded-sm border px-4 py-2">
 			<Form {...form}>
-				<form
-					id="checklist-form"
-					onSubmit={form.handleSubmit(handleSubmit)}
+				<div
 					className="flex items-center space-y-1"
 					onClick={(e) => {
 						e.stopPropagation();
@@ -444,10 +442,13 @@ export const TaskChecklistItemForm = ({
 						/>
 
 						<Button
-							type="submit"
+							type="button"
 							size={"sm"}
 							variant={"ghost"}
 							className="size-6 rounded-full"
+							onClick={() => {
+								form.handleSubmit(handleSubmit)();
+							}}
 						>
 							<PlusIcon />
 							<span className="sr-only">
@@ -455,7 +456,7 @@ export const TaskChecklistItemForm = ({
 							</span>
 						</Button>
 					</div>
-				</form>
+				</div>
 			</Form>
 		</div>
 	);
