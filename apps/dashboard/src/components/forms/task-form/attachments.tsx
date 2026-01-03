@@ -9,6 +9,7 @@ import {
 } from "@ui/components/ui/context-menu";
 import { FileTextIcon } from "lucide-react";
 import Image from "next/image";
+import { useMemo } from "react";
 import { useFormContext } from "react-hook-form";
 import type { TaskFormValues } from "./form-type";
 
@@ -50,8 +51,17 @@ export const TaskAttachmentPreview = ({
 	onRemove: (index: number) => void;
 	index: number;
 }) => {
-	const url = new URL(attachment);
-	const isImage = url.pathname.match(/\.(jpeg|jpg|gif|png)/) != null;
+	const url = useMemo(() => {
+		if (!attachment?.startsWith("http")) {
+			return null;
+		}
+		return new URL(attachment);
+	}, [attachment]);
+	const isImage = url?.pathname.match(/\.(jpeg|jpg|gif|png)/) != null;
+
+	if (!url) {
+		return null;
+	}
 
 	return (
 		<Dialog>

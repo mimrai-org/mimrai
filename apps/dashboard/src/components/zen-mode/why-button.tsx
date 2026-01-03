@@ -1,20 +1,22 @@
-import type { RouterOutputs } from "@api/trpc/routers";
 import { Button } from "@ui/components/ui/button";
 import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@ui/components/ui/popover";
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@ui/components/ui/tooltip";
 import { CircleQuestionMarkIcon, SparklesIcon } from "lucide-react";
 import { useZenMode } from "./use-zen-mode";
 
-type Task = RouterOutputs["tasks"]["get"]["data"][number];
-
 export const ZenModeWhyButton = () => {
 	const { currentTask: task } = useZenMode();
+
+	if (!task.focusReason) {
+		return null;
+	}
+
 	return (
-		<Popover>
-			<PopoverTrigger asChild>
+		<Tooltip>
+			<TooltipTrigger asChild>
 				<Button
 					variant={"ghost"}
 					className="rounded-full text-xs opacity-70 sm:text-sm"
@@ -23,15 +25,15 @@ export const ZenModeWhyButton = () => {
 					<CircleQuestionMarkIcon />
 					Why focus on this?
 				</Button>
-			</PopoverTrigger>
-			<PopoverContent className="sm:w-128">
+			</TooltipTrigger>
+			<TooltipContent className="sm:max-w-92" side="bottom">
 				<div className="flex gap-2 text-sm">
 					<div>
 						<SparklesIcon className="size-4" />
 					</div>
-					{task.focusReason || "No reason provided."}
+					{task.focusReason}
 				</div>
-			</PopoverContent>
-		</Popover>
+			</TooltipContent>
+		</Tooltip>
 	);
 };

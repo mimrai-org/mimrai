@@ -1,6 +1,11 @@
 "use client";
 import { Button } from "@ui/components/ui/button";
-import { PencilIcon, SkipForwardIcon, XIcon } from "lucide-react";
+import {
+	ClipboardEditIcon,
+	PencilIcon,
+	SkipForwardIcon,
+	XIcon,
+} from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useTaskParams } from "@/hooks/use-task-params";
@@ -53,17 +58,6 @@ export const ZenModeView = () => {
 				<ZenModeChecklist />
 				<div className="mt-8 flex flex-col items-center gap-4 sm:flex-row">
 					<Button
-						className="size-10 rounded-full"
-						variant={"ghost"}
-						onClick={() => {
-							setParams({
-								taskId: currentTask.id,
-							});
-						}}
-					>
-						<PencilIcon />
-					</Button>
-					<Button
 						variant={"outline"}
 						className="rounded-full bg-transparent text-sm hover:scale-105 sm:text-base dark:bg-transparent"
 						size={"xl"}
@@ -74,7 +68,19 @@ export const ZenModeView = () => {
 					</Button>
 					<ZenModeDoneButton />
 				</div>
-				<div className="mt-4">
+				<div className="mt-4 flex items-center gap-2">
+					<Button
+						className="size-8 rounded-full text-sm opacity-70"
+						variant={"ghost"}
+						onClick={() => {
+							setParams({
+								taskId: currentTask.id,
+							});
+						}}
+					>
+						<ClipboardEditIcon />
+						<span className="sr-only">Edit Task</span>
+					</Button>
 					<ZenModeWhyButton />
 				</div>
 			</motion.div>
