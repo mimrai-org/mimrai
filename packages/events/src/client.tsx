@@ -6,15 +6,18 @@ import {
 
 const isProd = process.env.NODE_ENV === "production";
 
-const Provider = () => (
-	<OpenPanelComponent
-		clientId={process.env.NEXT_PUBLIC_OPENPANEL_CLIENT_ID!}
-		trackAttributes={true}
-		trackScreenViews={isProd}
-		trackOutgoingLinks={isProd}
-		waitForProfile
-	/>
-);
+const Provider = ({ profileId }: { profileId: string }) => {
+	return (
+		<OpenPanelComponent
+			clientId={process.env.NEXT_PUBLIC_OPENPANEL_CLIENT_ID!}
+			trackAttributes={true}
+			trackScreenViews={isProd}
+			trackOutgoingLinks={isProd}
+			profileId={profileId}
+			waitForProfile
+		/>
+	);
+};
 
 const track = (options: { event: string } & PostEventPayload["properties"]) => {
 	const { track: openTrack } = useOpenPanel();

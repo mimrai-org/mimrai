@@ -1,3 +1,4 @@
+import { Provider as OpenPanelProvider } from "@mimir/events/client";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -43,6 +44,7 @@ export default async function Layout({ children, params }: Props) {
 				{process.env.NODE_ENV === "development" && (
 					<ReactQueryDevtools buttonPosition="bottom-left" />
 				)}
+				<OpenPanelProvider profileId={session.user.id} />
 			</Suspense>
 		</>
 	);
