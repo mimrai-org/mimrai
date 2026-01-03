@@ -96,7 +96,6 @@ export const TasksView = ({
 				view: filters.viewType === "calendar" ? "list" : filters.viewType,
 			},
 			{
-				placeholderData: (prev) => prev,
 				getNextPageParam: (lastPage) => lastPage.meta.cursor,
 			},
 		),
