@@ -191,8 +191,8 @@ export const generateTeamSuggestionsJob = schemaTask({
 		- Include task title in the reason for context
 		- Include the overdue or inactive duration in the reason if relevant
 		- If the the update involves assigning include the user name
-	- Use the historical follow-ups and task suggestions to plan new follow-ups and suggestions
-		- avoid repeating the same follow-up messages if they were recently sent
+	- Use the historical info to plan new follow-ups and suggestions
+		- avoid repeating the same follow-up messages (only one follow-up per user in the last 3 days)
 		- avoid suggesting the same task updates that were recently suggested
 </guidelines>
 
@@ -207,17 +207,6 @@ export const generateTeamSuggestionsJob = schemaTask({
 		day: "2-digit",
 	})}
 </team-context>
-
-<historical-follow-ups>
-	${
-		recentFollowUps
-			.map(
-				(fu) =>
-					`- userId: ${fu.groupId}, message: ${fu.metadata?.message || "No message"}, createdAt: ${fu.createdAt}`,
-			)
-			.join("\n") || "No recent follow-ups."
-	}
-</historical-follow-ups>
 
 <historical-task-suggestions>
 	${
@@ -286,14 +275,6 @@ export const generateTeamSuggestionsJob = schemaTask({
 		const output = await generateObject({
 			model: openai("gpt-4o-mini"),
 			schema: z.object({
-				followUps: z.array(
-					z.object({
-						userId: z.string().describe("User ID (uuid)"),
-						message: z
-							.string()
-							.describe("The follow-up message to send to the user"),
-					}),
-				),
 				suggestions: z.array(
 					z.object({
 						taskId: z.string().describe("Task ID (uuid) to update"),
@@ -331,34 +312,6 @@ export const generateTeamSuggestionsJob = schemaTask({
 		console.log(output.usage);
 		console.log(prompt);
 		console.log(output.object);
-
-		const followUpPromises = [];
-		for (const followUp of output.object.followUps) {
-			// Create notification for the user
-			followUpPromises.push(
-				createActivity({
-					userId: followUp.userId,
-					teamId: payload.teamId,
-					type: "follow_up",
-					groupId: followUp.userId,
-					metadata: {
-						message: followUp.message,
-					},
-				}),
-			);
-
-			trackFollowUp({
-				userId: followUp.userId,
-				teamId: payload.teamId,
-				teamName: team.name || "",
-			});
-		}
-		try {
-			// Await all follow-up activity creations
-			await Promise.all(followUpPromises);
-		} catch (error) {
-			logger.error("Error creating follow-up activities", { error });
-		}
 
 		for (const suggestion of output.object.suggestions) {
 			// Create task updates based on the suggestions

@@ -3,7 +3,8 @@
   "private": true,
   "workspaces": {
     "catalog": {
-      "drizzle-orm": "0.45.1"
+      "drizzle-orm": "0.45.1",
+      "@trigger.dev/sdk": "4.3.1"
     },
     "packages": [
       "apps/*",

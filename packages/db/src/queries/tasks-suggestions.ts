@@ -1,4 +1,5 @@
-import { and, asc, eq, inArray, type SQL } from "drizzle-orm";
+import { subDays } from "date-fns";
+import { and, asc, eq, gte, inArray, type SQL } from "drizzle-orm";
 import { db } from "..";
 import {
 	type TaskSuggestionPayload,
@@ -6,6 +7,8 @@ import {
 	type taskSuggestionsStatusEnum,
 } from "../schema";
 import { createTaskComment, updateTask } from "./tasks";
+
+export const safeSuggestions = ["comment"];
 
 export const getTasksSuggestions = async ({
 	teamId,
@@ -68,6 +71,7 @@ export const createTaskSuggestion = async ({
 				eq(taskSuggestions.key, key),
 				eq(taskSuggestions.teamId, teamId),
 				eq(taskSuggestions.status, "pending"),
+				gte(taskSuggestions.createdAt, subDays(new Date(), 7).toISOString()),
 			),
 		)
 		.limit(1);
@@ -87,6 +91,15 @@ export const createTaskSuggestion = async ({
 			status,
 		})
 		.returning();
+
+	if (newSuggestion && safeSuggestions.includes(payload.type)) {
+		// Automatically accept safe suggestions
+		await acceptTaskSuggestion({
+			id: newSuggestion.id,
+			teamId: newSuggestion.teamId,
+		});
+		newSuggestion.status = "accepted";
+	}
 
 	return newSuggestion;
 };
