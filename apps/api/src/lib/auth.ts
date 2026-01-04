@@ -2,10 +2,11 @@ import { db } from "@db/index";
 import { account, session, users, verification } from "@mimir/db/schema";
 import { EmailVerificationEmail } from "@mimir/email/emails/email-verification";
 import { ResetPasswordEmail } from "@mimir/email/emails/reset-password";
+import { op } from "@mimir/events/server";
 import { getAppUrl, getEmailFrom } from "@mimir/utils/envs";
 import { type BetterAuthOptions, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { customSession } from "better-auth/plugins";
+import { createAuthMiddleware, customSession } from "better-auth/plugins";
 import { resend } from "./resend";
 
 export const auth = betterAuth<BetterAuthOptions>({
@@ -19,6 +20,21 @@ export const auth = betterAuth<BetterAuthOptions>({
 		},
 	}),
 	trustedOrigins: (process.env.ALLOWED_API_ORIGINS || "").split(","),
+	hooks: {
+		after: createAuthMiddleware(async (ctx) => {
+			if (ctx.path.startsWith("/sign-in")) {
+				const session = ctx.context.newSession;
+				if (session) {
+					op.identify({
+						profileId: session.user.id,
+						email: session.user.email,
+						firstName: session.user.name,
+						avatar: session.user.image,
+					});
+				}
+			}
+		}),
+	},
 	emailVerification: {
 		async sendVerificationEmail({ user, url }, request) {
 			const parsedUrl = new URL(url);
