@@ -7,6 +7,8 @@ import {
 	PersistQueryClientProvider,
 } from "@tanstack/react-query-persist-client";
 import { del, get, set } from "idb-keyval";
+import { useState } from "react";
+import type { getSession } from "@/lib/get-session";
 
 /**
  * Creates an Indexed DB persister
@@ -26,15 +28,23 @@ export function createIDBPersister(idbValidKey: IDBValidKey = "reactQuery") {
 	} as Persister;
 }
 
-const persister = createIDBPersister();
-
 export const PersistQueryClientProviderWithIDB = ({
 	children,
 	queryClient,
+	session,
 }: {
 	children: React.ReactNode;
 	queryClient: QueryClient;
+	session: Awaited<ReturnType<typeof getSession>>;
 }) => {
+	const [persister] = useState(
+		createIDBPersister(
+			session?.user
+				? `reactQuery-${session?.user?.email}:${session?.user?.teamSlug}`
+				: "reactQuery-anonymous",
+		),
+	);
+
 	return (
 		<PersistQueryClientProvider
 			client={queryClient}

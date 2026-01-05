@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { useChatParams } from "@/hooks/use-chat-params";
 import { useTeamParams } from "@/hooks/use-team-params";
 import { useUser } from "@/hooks/use-user";
-import { trpc } from "@/utils/trpc";
+import { queryClient, trpc } from "@/utils/trpc";
 
 export const TeamSwitcher = () => {
 	const user = useUser();

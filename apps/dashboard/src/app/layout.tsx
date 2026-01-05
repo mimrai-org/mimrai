@@ -5,6 +5,7 @@ import "../../index.css";
 
 import { Toaster } from "@ui/components/ui/sonner";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { getSession } from "@/lib/get-session";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -21,18 +22,20 @@ export const metadata: Metadata = {
 	description: "Mimrai - Your AI Task Management Assistant",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const session = await getSession();
+
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
 			>
 				<NuqsAdapter>
-					<Providers>{children}</Providers>
+					<Providers session={session}>{children}</Providers>
 					<Toaster
 						toastOptions={{
 							classNames: {
