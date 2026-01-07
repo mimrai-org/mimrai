@@ -9,14 +9,16 @@ import {
 import { XIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo } from "react";
-import { useTasksViewContext } from "../tasks-view";
-import { tasksFilterOptions } from "./tasks-filters-options";
+import type { FilterOption } from "./types";
+import { useFilters } from "./use-filters";
 
-export const TasksFiltersCurrentList = () => {
+export const FiltersCurrentList = () => {
+	const { options } = useFilters();
+
 	return (
 		<div className="flex flex-wrap items-center gap-2">
 			<AnimatePresence mode="popLayout">
-				{Object.entries(tasksFilterOptions).map(([key, option]) => {
+				{Object.entries(options).map(([key, option]) => {
 					return <TasksFiltersCurrentItem key={key} option={option} />;
 				})}
 			</AnimatePresence>
@@ -24,26 +26,28 @@ export const TasksFiltersCurrentList = () => {
 	);
 };
 
-const TasksFiltersCurrentItem = ({
-	option,
-}: {
-	option: (typeof tasksFilterOptions)[keyof typeof tasksFilterOptions];
-}) => {
-	const { filters, setFilters } = useTasksViewContext();
+const TasksFiltersCurrentItem = ({ option }: { option: FilterOption }) => {
+	const { filters, setFilters } = useFilters();
 	const filterValue = filters[option.filterKey as keyof typeof filters];
 	const noValue =
 		!filterValue || (Array.isArray(filterValue) && filterValue.length === 0);
 
-	// @ts-expect-error
 	const { data } = useQuery(option.queryOptions);
+	const safeData = data as {
+		label: string;
+		value: string;
+		icon?: React.ReactNode;
+	}[];
 
 	const displayValue = useMemo(() => {
 		if (Array.isArray(filterValue)) {
-			return data?.filter((item) => filterValue.includes(item.value as any));
+			return safeData?.filter((item) =>
+				filterValue.includes(item.value as any),
+			);
 		}
 
-		return data?.find((item) => item.value === filterValue);
-	}, [filterValue, data]);
+		return safeData?.find((item) => item.value === filterValue);
+	}, [filterValue, safeData]);
 
 	const handleToggle = (value: string) => {
 		if (option.multiple) {
@@ -95,21 +99,26 @@ const TasksFiltersCurrentItem = ({
 					<DropdownMenuTrigger asChild>
 						<button type="button" className="flex items-center gap-1">
 							<div className="text-muted-foreground">{option.label}</div>
-							{Array.isArray(displayValue) && displayValue.length > 1
+							{displayValue &&
+							Array.isArray(displayValue) &&
+							displayValue.length > 1
 								? "any of"
 								: " is"}
 							<div className="flex items-center gap-2">
 								{Array.isArray(displayValue) ? (
 									displayValue.length > 1 ? (
 										<div className="flex items-center gap-1">
-											{displayValue.map((item) => (
-												<div
-													key={item.value}
-													className="-ml-3 first:ml-0 [&_svg]:fill-background"
-												>
-													{item.icon}
-												</div>
-											))}
+											{displayValue.map((item) => {
+												if (!item.icon) return null;
+												return (
+													<div
+														key={item.value}
+														className="-ml-3 first:ml-0 [&_svg]:fill-background"
+													>
+														{item.icon}
+													</div>
+												);
+											})}
 											<span>
 												{displayValue.length} {option.label}s
 											</span>
@@ -134,14 +143,14 @@ const TasksFiltersCurrentItem = ({
 						}}
 						onClick={(e) => {
 							e.stopPropagation();
-							setFilters({ [option.filterKey]: undefined });
+							setFilters({ [option.filterKey]: null });
 						}}
 					>
 						<XIcon className="size-4" />
 					</motion.button>
 				</div>
 				<DropdownMenuContent>
-					{data?.map((item) => (
+					{safeData?.map((item) => (
 						<DropdownMenuCheckboxItem
 							checked={
 								Array.isArray(filterValue)

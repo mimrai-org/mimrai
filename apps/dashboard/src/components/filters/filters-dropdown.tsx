@@ -15,15 +15,16 @@ import {
 import { Input } from "@ui/components/ui/input";
 import { ChevronRightIcon, ListFilter } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useTasksViewContext } from "../tasks-view";
-import { TasksFiltersCurrentList } from "./tasks-filters-current";
-import { tasksFilterOptions } from "./tasks-filters-options";
+import { FiltersCurrentList } from "./filters-current";
+import type { FilterOption } from "./types";
+import { useFilters } from "./use-filters";
 
-export const TasksFiltersDropdown = () => {
+export const FiltersDropdown = () => {
 	const [globalSearch, setGlobalSearch] = useState("");
+	const { options } = useFilters();
 	return (
 		<div className="flex items-center gap-2">
-			<TasksFiltersCurrentList />
+			<FiltersCurrentList />
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<Button size={"sm"} variant="ghost">
@@ -41,7 +42,7 @@ export const TasksFiltersDropdown = () => {
 						/>
 					</DropdownMenuGroup>
 					<DropdownMenuGroup>
-						{Object.entries(tasksFilterOptions).map(([key, option]) => (
+						{Object.entries(options).map(([key, option]) => (
 							<TasksFiltersDropdownSub
 								key={key}
 								option={option}
@@ -59,33 +60,36 @@ export const TasksFiltersDropdownSub = ({
 	option,
 	globalSearch,
 }: {
-	option: (typeof tasksFilterOptions)[keyof typeof tasksFilterOptions];
+	option: FilterOption;
 	globalSearch: string;
 }) => {
 	const [search, setSearch] = useState("");
-	const { setFilters, filters } = useTasksViewContext();
+	const { setFilters, filters } = useFilters();
 
-	// @ts-expect-error
 	const { data } = useQuery(option.queryOptions);
 
+	const safeData = data as {
+		label: string;
+		value: string;
+		icon?: React.ReactNode;
+	}[];
+
 	const globalResults = useMemo(() => {
-		if (!globalSearch) return data;
+		if (!globalSearch) return safeData;
 		return (
-			data?.filter((item) =>
+			safeData?.filter((item) =>
 				item.label.toLowerCase().includes(globalSearch.toLowerCase()),
 			) || []
 		);
-	}, [data, globalSearch]);
-
+	}, [safeData, globalSearch]);
 	const localResults = useMemo(() => {
-		if (!search) return data;
+		if (!search) return safeData;
 		return (
-			data?.filter((item) =>
+			safeData?.filter((item) =>
 				item.label.toLowerCase().includes(search.toLowerCase()),
 			) || []
 		);
-	}, [data, search]);
-
+	}, [safeData, search]);
 	const handleToggle = (value: string) => {
 		if (option.multiple) {
 			const filterValue = filters[

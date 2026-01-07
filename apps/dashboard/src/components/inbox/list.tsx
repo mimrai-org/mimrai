@@ -1,74 +1,52 @@
 "use client";
-import type { RouterOutputs } from "@api/trpc/routers";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { cn } from "@ui/lib/utils";
 import { format } from "date-fns";
-import { DotIcon } from "lucide-react";
-import Link from "next/link";
-import { useEffect, useMemo } from "react";
-import { useUser } from "@/hooks/use-user";
-import { queryClient, trpc } from "@/utils/trpc";
 import {
 	EmptyState,
 	EmptyStateDescription,
 	EmptyStateTitle,
 } from "../empty-state";
+import { InboxFilters } from "./filters";
 import { InboxSourceIcon } from "./source-icon";
+import { useInbox } from "./use-inbox";
+import { useInboxFilterParams } from "./use-inbox-filter-params";
 
-export type Inbox = RouterOutputs["inbox"]["get"]["data"][number];
-
-export const InboxList = ({
-	className,
-	inboxId,
-}: {
-	className?: string;
-	inboxId?: string;
-}) => {
-	const user = useUser();
-	const { data } = useInfiniteQuery(
-		trpc.inbox.get.infiniteQueryOptions(
-			{
-				status: ["pending"],
-			},
-			{
-				getNextPageParam: (lastPage) => lastPage.meta.cursor,
-			},
-		),
-	);
-
-	const flatData = useMemo(() => {
-		return data?.pages.flatMap((page) => page.data) || [];
-	}, [data]);
-
-	useEffect(() => {
-		// prefetch inbox overview data
-		for (const item of flatData) {
-			queryClient.setQueryData(
-				trpc.inbox.getById.queryKey({ id: item.id }),
-				item,
-			);
-		}
-	}, [data]);
+export const InboxList = ({ className }: { className?: string }) => {
+	const { inboxes, selectedInbox } = useInbox();
+	const { setParams } = useInboxFilterParams();
 
 	return (
-		<div className={cn("mt-2 flex flex-col gap-1", className)}>
-			{flatData?.length === 0 && (
+		<div
+			className={cn(
+				"flex flex-col gap-1",
+				"h-[calc(100vh-80px)] overflow-y-auto p-2",
+				{
+					"w-1/3": selectedInbox,
+					"w-full": !selectedInbox,
+				},
+			)}
+		>
+			<InboxFilters />
+			{inboxes?.length === 0 && (
 				<EmptyState>
 					<EmptyStateTitle>Empty</EmptyStateTitle>
 					<EmptyStateDescription>You're all caught up!</EmptyStateDescription>
 				</EmptyState>
 			)}
-			{flatData?.map((item) => (
-				<Link
+			{inboxes?.map((item) => (
+				<button
 					key={item.id}
-					href={`${user?.basePath}/inbox/${item.id}`}
-					prefetch
+					type="button"
+					className="w-full text-left"
+					onClick={() => {
+						setParams({ selectedInboxId: item.id });
+					}}
 				>
 					<div
 						className={cn(
 							"cursor-pointer space-y-1 rounded-md px-4 py-2 text-sm transition-colors hover:bg-accent",
 							{
-								"bg-accent": inboxId === item.id,
+								"bg-accent": selectedInbox?.id === item.id,
 							},
 						)}
 					>
@@ -89,7 +67,7 @@ export const InboxList = ({
 							</p>
 						</div>
 					</div>
-				</Link>
+				</button>
 			))}
 		</div>
 	);

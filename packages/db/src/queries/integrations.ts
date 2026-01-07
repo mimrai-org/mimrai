@@ -506,5 +506,13 @@ export const uninstallIntegration = async ({
 		});
 	}
 
+	if (!deleted) {
+		throw new Error("Failed to uninstall integration");
+	}
+
+	await db
+		.delete(integrationUserLink)
+		.where(eq(integrationUserLink.integrationId, deleted.id));
+
 	return true;
 };

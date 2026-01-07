@@ -12,16 +12,12 @@ import Loader from "../loader";
 import { propertiesComponents } from "../tasks-view/properties/task-properties-components";
 import { InboxDropdown } from "./dropdown";
 import { InboxSourceIcon } from "./source-icon";
+import { useInbox } from "./use-inbox";
 
-export const InboxOverview = ({
-	className,
-	inboxId,
-}: {
-	className?: string;
-	inboxId: string;
-}) => {
+export const InboxOverview = ({ className }: { className?: string }) => {
 	const { setParams } = useTaskParams();
-	const { data } = useQuery(trpc.inbox.getById.queryOptions({ id: inboxId }));
+	const { inboxId, selectedInbox } = useInbox();
+
 	const { mutate: markAsSeen } = useMutation(
 		trpc.inbox.update.mutationOptions({
 			onSettled: () => {
@@ -55,7 +51,7 @@ export const InboxOverview = ({
 					}),
 				);
 				queryClient.invalidateQueries(
-					trpc.inbox.getById.queryOptions({ id: inboxId }),
+					trpc.inbox.getById.queryOptions({ id: inboxId! }),
 				);
 			},
 		}),
@@ -70,62 +66,62 @@ export const InboxOverview = ({
 					}),
 				);
 				queryClient.invalidateQueries(
-					trpc.inbox.getById.queryOptions({ id: inboxId }),
+					trpc.inbox.getById.queryOptions({ id: inboxId! }),
 				);
 			},
 		}),
 	);
 
 	useEffect(() => {
-		if (data && !data.seen) {
-			markAsSeen({ id: data.id, seen: true });
+		if (selectedInbox && !selectedInbox.seen) {
+			markAsSeen({ id: selectedInbox.id, seen: true });
 		}
-	}, [data]);
+	}, [selectedInbox]);
 
-	if (!data) {
+	if (!selectedInbox) {
 		return null;
 	}
 
 	return (
-		<div className={cn(className)}>
-			<div className="space-y-4">
+		<div className={cn("flex-1 p-2")}>
+			<div className="h-full space-y-4 rounded-lg bg-card p-4">
 				<div className="space-y-1">
 					<div className="flex justify-between">
 						<h1 className="truncate font-medium text-xl">
-							{data.payload.title}
+							{selectedInbox.payload.title}
 						</h1>
 						<div>
-							<InboxDropdown inbox={data} />
+							<InboxDropdown inbox={selectedInbox} />
 						</div>
 					</div>
 					<div className="flex items-center gap-1 text-muted-foreground text-sm">
-						<InboxSourceIcon source={data.source} className="size-4" />
-						{data.display}
+						<InboxSourceIcon source={selectedInbox.source} className="size-4" />
+						{selectedInbox.display}
 					</div>
 				</div>
 
 				<div className="flex items-center gap-2">
-					{data.payload.priority &&
+					{selectedInbox.payload.priority &&
 						propertiesComponents.priority({
-							priority: data.payload.priority,
+							priority: selectedInbox.payload.priority,
 						})}
-					{data.payload.dueDate &&
+					{selectedInbox.payload.dueDate &&
 						propertiesComponents.dueDate({
-							dueDate: data.payload.dueDate,
+							dueDate: selectedInbox.payload.dueDate,
 						})}
-					{data.assignee && (
-						<AssigneeAvatar {...data.assignee} className="size-5" />
+					{selectedInbox.assignee && (
+						<AssigneeAvatar {...selectedInbox.assignee} className="size-5" />
 					)}
 				</div>
-				{data.reasoning && (
+				{selectedInbox.reasoning && (
 					<Alert>
 						<AlertTitle>Reasoning</AlertTitle>
-						<AlertDescription>{data.reasoning}</AlertDescription>
+						<AlertDescription>{selectedInbox.reasoning}</AlertDescription>
 					</Alert>
 				)}
 
 				<p className="whitespace-pre-wrap text-sm">
-					{data.payload.description || (
+					{selectedInbox.payload.description || (
 						<span className="text-muted-foreground">
 							No description provided.
 						</span>
@@ -134,14 +130,14 @@ export const InboxOverview = ({
 
 				<hr />
 
-				{data.taskId ? (
+				{selectedInbox.taskId ? (
 					<div className="flex justify-end gap-2">
 						<Button
 							variant="default"
 							type="button"
 							onClick={() => {
 								setParams({
-									taskId: data.taskId,
+									taskId: selectedInbox.taskId,
 								});
 							}}
 						>
@@ -149,7 +145,7 @@ export const InboxOverview = ({
 							View Task
 						</Button>
 					</div>
-				) : data.status === "pending" ? (
+				) : selectedInbox.status === "pending" ? (
 					<div className="flex justify-end gap-2">
 						<Button
 							variant="default"
@@ -157,7 +153,7 @@ export const InboxOverview = ({
 							disabled={isAccepting || isDismissing}
 							onClick={() =>
 								accept({
-									id: data.id,
+									id: selectedInbox.id,
 								})
 							}
 						>
@@ -170,7 +166,7 @@ export const InboxOverview = ({
 							disabled={isAccepting || isDismissing}
 							onClick={() => {
 								dismiss({
-									id: data.id,
+									id: selectedInbox.id,
 									status: "dismissed",
 								});
 							}}
