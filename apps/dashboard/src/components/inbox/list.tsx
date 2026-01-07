@@ -59,7 +59,11 @@ export const InboxList = ({
 				</EmptyState>
 			)}
 			{flatData?.map((item) => (
-				<Link key={item.id} href={`${user?.basePath}/inbox/${item.id}`}>
+				<Link
+					key={item.id}
+					href={`${user?.basePath}/inbox/${item.id}`}
+					prefetch
+				>
 					<div
 						className={cn(
 							"cursor-pointer space-y-1 rounded-md px-4 py-2 text-sm transition-colors hover:bg-accent",

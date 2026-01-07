@@ -4,7 +4,8 @@ export const integrationsRegistry = {
 	mattermost: {
 		name: "Mattermost",
 		type: "mattermost" as const,
-		description: "Manage MIMRAI from Mattermost Open Source Messaging",
+		description:
+			"Integrate MIMIR with your Mattermost workspace. Create tasks directly from your channels",
 		configSchema: z.object({
 			token: z.string().min(1, "Token ID is required"),
 			url: z.string().url("Invalid URL"),
@@ -14,7 +15,7 @@ export const integrationsRegistry = {
 	github: {
 		name: "GitHub",
 		type: "github" as const,
-		description: "GitHub integration",
+		description: "Integrate MIMIR with your GitHub repositories.",
 		configSchema: z.object({
 			installationId: z.string().min(1, "Installation ID is required"),
 		}),
@@ -22,13 +23,15 @@ export const integrationsRegistry = {
 	whatsapp: {
 		name: "WhatsApp",
 		type: "whatsapp" as const,
-		description: "Manage MIMRAI from WhatsApp",
+		description:
+			"Chat with MIMIR on WhatsApp. Create tasks directly from your chats",
 		configSchema: z.object({}),
 	},
 	slack: {
 		name: "Slack",
 		type: "slack" as const,
-		description: "Manage MIMRAI from Slack",
+		description:
+			"Chat with MIMIR on Slack. Create tasks directly from your workspace",
 		configSchema: z.object({
 			accessToken: z.string(),
 		}),
@@ -36,13 +39,13 @@ export const integrationsRegistry = {
 	"google-calendar": {
 		name: "Google Calendar",
 		type: "google-calendar" as const,
-		description: "Google Calendar integration",
+		description: "Sync your tasks with Google Calendar. Never miss a deadline",
 		configSchema: z.object({}),
 	},
 	gmail: {
 		name: "Gmail",
 		type: "gmail" as const,
-		description: "Gmail integration",
+		description: "Intake tasks directly from your Gmail inbox",
 		configSchema: z.object({
 			filters: z
 				.object({

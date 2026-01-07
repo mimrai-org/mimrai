@@ -2,9 +2,16 @@
 
 import { t } from "@mimir/locale";
 import { Button } from "@mimir/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@mimir/ui/card";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@mimir/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
+import { IntegrationIcon } from "@/components/integrations/integration-icon";
 import { useIntegrationParams } from "@/hooks/use-integration-params";
 import { useScopes, useUser } from "@/hooks/use-user";
 import { getSlackInstallUrl } from "@/lib/integrations";
@@ -20,21 +27,27 @@ export const IntegrationsList = () => {
 		<Card>
 			<CardHeader>
 				<CardTitle>{t("settings.integrations.title")}</CardTitle>
+				<CardDescription>
+					Install and manage integrations to enhance your team's workflow.
+				</CardDescription>
 			</CardHeader>
 			<CardContent>
-				<ul>
+				<ul className="grid grid-cols-3 gap-4">
 					{data?.map((integration) => (
 						<li
 							key={integration.name}
-							className="flex items-center justify-between border-b py-4 text-sm last:border-0"
+							className="flex flex-col justify-between gap-4 rounded-md border p-4 text-sm"
 						>
-							<div>
-								<span>{integration.name}</span>
-								<p className="text-muted-foreground text-xs">
-									{integration.description}
-								</p>
+							<div className="space-y-4">
+								<IntegrationIcon type={integration.type} />
+								<div>
+									<h3>{integration.name}</h3>
+									<p className="text-muted-foreground text-xs">
+										{integration.description}
+									</p>
+								</div>
 							</div>
-							<div>
+							<div className="flex items-center justify-end">
 								<div>
 									{integration.isInstalledOnTeam ? (
 										integration.isInstalledOnUser ? (
