@@ -69,20 +69,20 @@ export const ZenModeWelcome = ({
 							height={300}
 						/>
 						<motion.div
-							initial={{ scale: 5.0 }}
-							animate={{ scale: 5.5 }}
+							initial={{ scale: 8.0 }}
+							animate={{ scale: 8.5 }}
 							transition={{
 								repeat: Number.POSITIVE_INFINITY,
 								duration: 3,
 								repeatType: "reverse",
 							}}
-							className="absolute inset-0 animate-blob rounded-full bg-radial-[50%_50%] from-amber-200 via-transparent to-transparent opacity-20 dark:from-amber-400 dark:via-transparent dark:opacity-5"
+							className="absolute inset-0 animate-blob rounded-full bg-radial-[50%_50%] from-amber-20 to-transparent opacity-20 dark:from-amber-400 dark:via-transparent dark:opacity-5"
 						/>
 					</motion.div>
 				</motion.div>
 				<motion.h1
 					variants={defaultItem}
-					className="mt-8 text-center font-thin text-4xl"
+					className="mt-8 text-center font-header text-4xl"
 				>
 					Good morning, {user?.name?.split(" ")[0]}!
 				</motion.h1>
@@ -94,7 +94,7 @@ export const ZenModeWelcome = ({
 					These are today's focus points
 				</motion.p>
 
-				<div className="mt-8 max-w-md space-y-1 font-light">
+				<div className="mt-8 w-full max-w-md space-y-1 font-light">
 					<ZenModeQueueList tasks={top3Tasks} itemClassName="text-base py-2" />
 				</div>
 

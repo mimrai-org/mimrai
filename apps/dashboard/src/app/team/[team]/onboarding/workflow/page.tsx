@@ -18,12 +18,18 @@ import {
 	SelectValue,
 } from "@ui/components/ui/select";
 import { Textarea } from "@ui/components/ui/textarea";
-import { ChevronRight, PencilIcon, SkipForward } from "lucide-react";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@ui/components/ui/tooltip";
+import { ChevronRight, InfoIcon, PencilIcon, SkipForward } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
+import Loader from "@/components/loader";
 import { useUser } from "@/hooks/use-user";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { trpc } from "@/utils/trpc";
@@ -91,6 +97,17 @@ export default function Page() {
 		}),
 	);
 
+	const { mutate: skipWorkflowSetup, isPending: isSkipping } = useMutation(
+		trpc.onboarding.defaultWorkflow.mutationOptions({
+			onSuccess: () => {
+				router.push(`/team/${user?.team?.slug}/board`);
+			},
+			onError: (error) => {
+				toast.error("Failed to skip workflow setup. Please try again.");
+			},
+		}),
+	);
+
 	const handleSubmit = (data: z.infer<typeof schema>) => {
 		if (!workflowSuggested) {
 			generateWorkflow(data);
@@ -103,9 +120,9 @@ export default function Page() {
 	const isLoading = isPending || isConfirming;
 
 	return (
-		<div className="mx-auto my-auto h-fit max-w-3xl justify-center gap-4 overflow-y-auto p-8">
-			<div className="mb-4 space-y-1">
-				<h1 className="text-4xl">Let's build your workflow</h1>
+		<div className="mx-auto my-auto h-fit max-w-3xl justify-center overflow-y-auto p-8">
+			<div className="mb-8 space-y-1">
+				<h1 className="font-header text-4xl">Let's build your workflow</h1>
 				<p className="text-muted-foreground">
 					To help you get started, we can suggest a workflow based on your team
 					information.
@@ -183,8 +200,8 @@ export default function Page() {
 						</>
 					)}
 					<div className="mt-4 flex justify-start gap-2">
-						<Button type="submit" disabled={isLoading}>
-							{isLoading ? "Generating..." : "Continue"}
+						<Button type="submit" disabled={isLoading || isSkipping}>
+							{isLoading ? <Loader /> : "Continue"}
 							<ChevronRight />
 						</Button>
 						{workflowSuggested && (
@@ -197,12 +214,23 @@ export default function Page() {
 								Change information
 							</Button>
 						)}
-						<Link href={`/team/${user?.team?.slug}/board`}>
-							<Button type="button" variant={"ghost"}>
-								<SkipForward />
-								Skip for now
-							</Button>
-						</Link>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<Button
+									type="button"
+									variant={"ghost"}
+									disabled={isSkipping || isLoading}
+									onClick={() => skipWorkflowSetup()}
+								>
+									{isSkipping ? <Loader /> : <SkipForward />}
+									Skip
+								</Button>
+							</TooltipTrigger>
+							<TooltipContent>
+								We will set up a basic workflow for you, and you can customize
+								it later.
+							</TooltipContent>
+						</Tooltip>
 					</div>
 				</form>
 			</Form>

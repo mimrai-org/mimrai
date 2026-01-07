@@ -7,7 +7,8 @@ import {
 } from "@mimir/ui/card";
 import { notFound } from "next/navigation";
 import { IntegrationForm } from "@/components/integrations/components";
-import { queryClient, trpc, trpcClient } from "@/utils/trpc";
+import { UninstallIntegrationCard } from "@/components/integrations/uninstall-card";
+import { queryClient, trpc } from "@/utils/trpc";
 import { LogsList } from "../logs-list";
 import { RepositoriesList } from "./repositories-list";
 
@@ -40,11 +41,7 @@ export default async function Page() {
 							GitHub App is installed and configured.
 						</p>
 					) : (
-						<IntegrationForm
-							id={id}
-							type={integration.type}
-							defaultValues={integration.config}
-						/>
+						<IntegrationForm type={integration.type} />
 					)}
 				</CardContent>
 			</Card>
@@ -57,6 +54,7 @@ export default async function Page() {
 					<LogsList integrationId={id} />
 				</CardContent>
 			</Card>
+			<UninstallIntegrationCard integrationType="github" />
 		</div>
 	);
 }

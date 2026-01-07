@@ -7,6 +7,7 @@ import {
 } from "@mimir/ui/card";
 import { notFound } from "next/navigation";
 import { IntegrationForm } from "@/components/integrations/components";
+import { UninstallIntegrationCard } from "@/components/integrations/uninstall-card";
 import { queryClient, trpc } from "@/utils/trpc";
 import { LogsList } from "../logs-list";
 import { LinkedUsersList } from "./linked-users-list";
@@ -34,13 +35,7 @@ export default async function Page() {
 					<CardTitle>Settings</CardTitle>
 				</CardHeader>
 				<CardContent>
-					{integration && (
-						<IntegrationForm
-							id={id}
-							type={integration.type}
-							defaultValues={integration.config}
-						/>
-					)}
+					{integration && <IntegrationForm type={integration.type} />}
 				</CardContent>
 			</Card>
 			<MattermostNotificationsSettings integrationId={id} />
@@ -60,6 +55,7 @@ export default async function Page() {
 					<LogsList integrationId={id} />
 				</CardContent>
 			</Card>
+			<UninstallIntegrationCard integrationType="mattermost" />
 		</div>
 	);
 }

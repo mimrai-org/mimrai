@@ -63,11 +63,6 @@ app.get("oauth/callback", ...protectedMiddleware, async (c) => {
 		teamId,
 	});
 
-	console.log({
-		userId,
-		payload,
-	});
-
 	const link = await linkUserToIntegration({
 		integrationId: integration.id,
 		userId,

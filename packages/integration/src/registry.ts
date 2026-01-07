@@ -39,6 +39,21 @@ export const integrationsRegistry = {
 		description: "Google Calendar integration",
 		configSchema: z.object({}),
 	},
+	gmail: {
+		name: "Gmail",
+		type: "gmail" as const,
+		description: "Gmail integration",
+		configSchema: z.object({
+			filters: z
+				.object({
+					sendersWhitelist: z.array(z.string().email()).optional(),
+					sendersBlacklist: z.array(z.string().email()).optional(),
+					subjectMatching: z.string().optional(),
+					bodyMatching: z.string().optional(),
+				})
+				.optional(),
+		}),
+	},
 } as const;
 
 export type IntegrationName = keyof typeof integrationsRegistry;

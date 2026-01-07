@@ -1,177 +1,177 @@
-import IORedis from "ioredis";
 import { createClient, type RedisClientType } from "redis";
 
 export class RedisCache {
-  private redis: RedisClientType | null = null;
-  private prefix: string;
-  private defaultTTL: number;
+	private redis: RedisClientType | null = null;
+	private prefix: string;
+	private defaultTTL: number;
 
-  constructor(prefix: string, defaultTTL: number = 30 * 60) {
-    this.prefix = prefix;
-    this.defaultTTL = defaultTTL;
-  }
+	constructor(prefix: string, defaultTTL: number = 30 * 60) {
+		this.prefix = prefix;
+		this.defaultTTL = defaultTTL;
+	}
 
-  public async getRedisClient(): Promise<RedisClientType> {
-    if (this.redis?.isOpen) {
-      return this.redis;
-    }
+	public async getRedisClient(): Promise<RedisClientType> {
+		if (this.redis?.isOpen) {
+			return this.redis;
+		}
 
-    // Create new connection with your proven solution
-    const redisUrl = process.env.REDIS_URL;
+		// Create new connection with your proven solution
+		const redisUrl = process.env.REDIS_URL;
 
-    if (!redisUrl) {
-      throw new Error("REDIS_URL environment variable is required");
-    }
+		if (!redisUrl) {
+			throw new Error("REDIS_URL environment variable is required");
+		}
 
-    const isProduction =
-      process.env.NODE_ENV === "production" || process.env.FLY_APP_NAME;
+		const isProduction =
+			process.env.NODE_ENV === "production" || process.env.FLY_APP_NAME;
 
-    this.redis = createClient({
-      url: redisUrl,
-      pingInterval: 4 * 60 * 1000, // Your proven 4-minute ping interval
-      socket: {
-        family: isProduction ? 6 : 4, // IPv6 for Fly.io production, IPv4 for local
-        connectTimeout: isProduction ? 15000 : 5000,
-      },
-    });
+		this.redis = createClient({
+			url: redisUrl,
 
-    // Event listeners from your proven solution
-    this.redis.on("error", (err) => {
-      console.error(`Redis error for ${this.prefix} cache:`, err);
-    });
+			pingInterval: 4 * 60 * 1000, // Your proven 4-minute ping interval
+			socket: {
+				family: isProduction ? 6 : 4, // IPv6 for Fly.io production, IPv4 for local
+				connectTimeout: isProduction ? 15000 : 5000,
+			},
+		});
 
-    await this.redis.connect();
-    return this.redis;
-  }
+		// Event listeners from your proven solution
+		this.redis.on("error", (err) => {
+			console.error(`Redis error for ${this.prefix} cache:`, err);
+		});
 
-  private parseValue<T>(value: string | null): T | undefined {
-    if (!value) return undefined;
+		await this.redis.connect();
+		return this.redis;
+	}
 
-    try {
-      return JSON.parse(value) as T;
-    } catch {
-      // If parsing fails, return the raw string (for backwards compatibility)
-      return value as unknown as T;
-    }
-  }
+	private parseValue<T>(value: string | null): T | undefined {
+		if (!value) return undefined;
 
-  private stringifyValue(value: any): string {
-    if (typeof value === "string") {
-      return value;
-    }
+		try {
+			return JSON.parse(value) as T;
+		} catch {
+			// If parsing fails, return the raw string (for backwards compatibility)
+			return value as unknown as T;
+		}
+	}
 
-    return JSON.stringify(value);
-  }
+	private stringifyValue(value: any): string {
+		if (typeof value === "string") {
+			return value;
+		}
 
-  private getKey(key: string): string {
-    return `${this.prefix}:${key}`;
-  }
+		return JSON.stringify(value);
+	}
 
-  async get<T>(key: string): Promise<T | undefined> {
-    try {
-      const redis = await this.getRedisClient();
-      const value = await redis.get(this.getKey(key));
-      return this.parseValue<T>(value as string);
-    } catch (error) {
-      console.error(
-        `Redis get error for ${this.prefix} cache, key "${key}":`,
-        error
-      );
-      // Reset connection on error to force reconnection next time
-      this.redis = null;
-      return undefined;
-    }
-  }
+	private getKey(key: string): string {
+		return `${this.prefix}:${key}`;
+	}
 
-  async set(key: string, value: any, ttlSeconds?: number): Promise<void> {
-    try {
-      const redis = await this.getRedisClient();
-      const serializedValue = this.stringifyValue(value);
-      const redisKey = this.getKey(key);
-      const ttl = ttlSeconds ?? this.defaultTTL;
+	async get<T>(key: string): Promise<T | undefined> {
+		try {
+			const redis = await this.getRedisClient();
+			const value = await redis.get(this.getKey(key));
+			return this.parseValue<T>(value as string);
+		} catch (error) {
+			console.error(
+				`Redis get error for ${this.prefix} cache, key "${key}":`,
+				error,
+			);
+			// Reset connection on error to force reconnection next time
+			this.redis = null;
+			return undefined;
+		}
+	}
 
-      await redis.set(redisKey, serializedValue);
-      if (ttl > 0) {
-        await redis.expire(redisKey, ttl);
-      }
-    } catch (error) {
-      console.error(
-        `Redis set error for ${this.prefix} cache, key "${key}":`,
-        error
-      );
-      // Reset connection on error
-      this.redis = null;
-    }
-  }
+	async set(key: string, value: any, ttlSeconds?: number): Promise<void> {
+		try {
+			const redis = await this.getRedisClient();
+			const serializedValue = this.stringifyValue(value);
+			const redisKey = this.getKey(key);
+			const ttl = ttlSeconds ?? this.defaultTTL;
 
-  async delete(key: string): Promise<void> {
-    try {
-      const redis = await this.getRedisClient();
-      await redis.del(this.getKey(key));
-    } catch (error) {
-      console.error(
-        `Redis delete error for ${this.prefix} cache, key "${key}":`,
-        error
-      );
-      // Reset connection on error
-      this.redis = null;
-    }
-  }
+			await redis.set(redisKey, serializedValue);
+			if (ttl > 0) {
+				await redis.expire(redisKey, ttl);
+			}
+		} catch (error) {
+			console.error(
+				`Redis set error for ${this.prefix} cache, key "${key}":`,
+				error,
+			);
+			// Reset connection on error
+			this.redis = null;
+		}
+	}
 
-  async healthCheck(): Promise<void> {
-    try {
-      const redis = await this.getRedisClient();
-      await redis.ping();
-    } catch (error) {
-      // Reset connection state on health check failure
-      if (this.redis) {
-        await this.redis.quit();
-        this.redis = null;
-      }
-      throw new Error(`Redis health check failed: ${error}`);
-    }
-  }
+	async delete(key: string): Promise<void> {
+		try {
+			const redis = await this.getRedisClient();
+			await redis.del(this.getKey(key));
+		} catch (error) {
+			console.error(
+				`Redis delete error for ${this.prefix} cache, key "${key}":`,
+				error,
+			);
+			// Reset connection on error
+			this.redis = null;
+		}
+	}
 
-  async subscribe(channel: string, callback: (message: string) => void) {
-    try {
-      const redis = await this.getRedisClient();
-      const subscriber = redis.duplicate();
-      await subscriber.connect();
-      await subscriber.subscribe(channel, (message) => {
-        callback(message);
-      });
-      return subscriber;
-    } catch (error) {
-      console.error(
-        `Redis subscribe error for ${this.prefix} cache, channel "${channel}":`,
-        error
-      );
-    }
-  }
+	async healthCheck(): Promise<void> {
+		try {
+			const redis = await this.getRedisClient();
+			await redis.ping();
+		} catch (error) {
+			// Reset connection state on health check failure
+			if (this.redis) {
+				await this.redis.quit();
+				this.redis = null;
+			}
+			throw new Error(`Redis health check failed: ${error}`);
+		}
+	}
 
-  async getSubscribersCount(channel: string): Promise<number> {
-    try {
-      const redis = await this.getRedisClient();
-      const count = await redis.pubSubNumSub(channel);
-      return count[channel] || 0;
-    } catch (error) {
-      console.error(
-        `Redis getSubscribersCount error for ${this.prefix} cache, channel "${channel}":`,
-        error
-      );
-      return 0;
-    }
-  }
+	async subscribe(channel: string, callback: (message: string) => void) {
+		try {
+			const redis = await this.getRedisClient();
+			const subscriber = redis.duplicate();
+			await subscriber.connect();
+			await subscriber.subscribe(channel, (message) => {
+				callback(message);
+			});
+			return subscriber;
+		} catch (error) {
+			console.error(
+				`Redis subscribe error for ${this.prefix} cache, channel "${channel}":`,
+				error,
+			);
+		}
+	}
 
-  async publish(channel: string, message: string): Promise<void> {
-    try {
-      const redis = await this.getRedisClient();
-      await redis.publish(channel, message);
-    } catch (error) {
-      console.error(
-        `Redis publish error for ${this.prefix} cache, channel "${channel}":`,
-        error
-      );
-    }
-  }
+	async getSubscribersCount(channel: string): Promise<number> {
+		try {
+			const redis = await this.getRedisClient();
+			const count = await redis.pubSubNumSub(channel);
+			return count[channel] || 0;
+		} catch (error) {
+			console.error(
+				`Redis getSubscribersCount error for ${this.prefix} cache, channel "${channel}":`,
+				error,
+			);
+			return 0;
+		}
+	}
+
+	async publish(channel: string, message: string): Promise<void> {
+		try {
+			const redis = await this.getRedisClient();
+			await redis.publish(channel, message);
+		} catch (error) {
+			console.error(
+				`Redis publish error for ${this.prefix} cache, channel "${channel}":`,
+				error,
+			);
+		}
+	}
 }

@@ -5,7 +5,7 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from "@ui/components/ui/sidebar";
-import { LayoutDashboardIcon, ScanIcon } from "lucide-react";
+import { InboxIcon, LayoutDashboardIcon, ScanIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUser } from "@/hooks/use-user";
@@ -31,6 +31,14 @@ export const NavMainGroup = () => {
 							<Link href={`${user?.basePath}/overview`}>
 								<LayoutDashboardIcon />
 								Overview
+							</Link>
+						</SidebarMenuButton>
+					</SidebarMenuItem>
+					<SidebarMenuItem>
+						<SidebarMenuButton asChild isActive={pathname?.includes("/inbox")}>
+							<Link href={`${user?.basePath}/inbox`}>
+								<InboxIcon />
+								Inbox
 							</Link>
 						</SidebarMenuButton>
 					</SidebarMenuItem>

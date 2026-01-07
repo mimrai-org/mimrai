@@ -17,6 +17,7 @@ import {
 	getIntegrations,
 	getLinkedUsers,
 	installIntegration,
+	uninstallIntegration,
 	updateIntegration,
 	updateLinkedUser,
 } from "@mimir/db/queries/integrations";
@@ -142,6 +143,20 @@ export const integrationsRouter = router({
 				teamId: ctx.user.teamId!,
 				userId: ctx.user.id,
 				...input,
+			});
+		}),
+
+	uninstall: protectedProcedure
+		.meta({ scopes: ["team:write"] })
+		.input(
+			z.object({
+				type: z.string(),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			return await uninstallIntegration({
+				type: input.type,
+				teamId: ctx.user.teamId!,
 			});
 		}),
 });

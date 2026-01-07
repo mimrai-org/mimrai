@@ -1,6 +1,14 @@
-import { getChatSchema, getChatsHistorySchema } from "@api/schemas/chat";
+import {
+	deleteChatSchema,
+	getChatSchema,
+	getChatsHistorySchema,
+} from "@api/schemas/chat";
 import { protectedProcedure, router } from "@api/trpc/init";
-import { getChatById, getChatHistory } from "@mimir/db/queries/chats";
+import {
+	deleteChat,
+	getChatById,
+	getChatHistory,
+} from "@mimir/db/queries/chats";
 
 export const chatRouter = router({
 	get: protectedProcedure.input(getChatSchema).query(async ({ ctx, input }) => {
@@ -13,5 +21,10 @@ export const chatRouter = router({
 				teamId: ctx.user.teamId!,
 				...input,
 			});
+		}),
+	delete: protectedProcedure
+		.input(deleteChatSchema)
+		.mutation(async ({ ctx, input }) => {
+			return deleteChat(input.chatId, ctx.user.teamId!);
 		}),
 });

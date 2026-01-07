@@ -2,9 +2,8 @@
 import { Button } from "@mimir/ui/button";
 import { Form } from "@mimir/ui/form";
 import { getApiUrl } from "@mimir/utils/envs";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Alert, AlertDescription } from "@ui/components/ui/alert";
-import { Switch } from "@ui/components/ui/switch";
 import { useState } from "react";
 import { toast } from "sonner";
 import z from "zod";

@@ -505,14 +505,12 @@ export const initMattermostSingle = async (
 												).text
 											: "Sorry, I could not process your message.";
 
-									log(
-										integration.id,
-										"info",
-										`Response: ${body.slice(0, 80)}...`,
-										{
-											message: body,
-										},
-									);
+									log({
+										integrationId: integration.id,
+										level: "info",
+										key: "message_responded",
+										message: `Responded to user ${associetedUser.userId} in Mattermost.`,
+									});
 
 									trackMessage({
 										userId: associetedUser.userId,

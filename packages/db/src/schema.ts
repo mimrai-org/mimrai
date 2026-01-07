@@ -21,6 +21,7 @@ import {
 	unique,
 	vector,
 } from "drizzle-orm/pg-core";
+import type { CreateTaskInput } from "./queries/tasks";
 import { buildGlobalSearchView } from "./utils/global-search-view";
 
 export const tsvector = customType<{
@@ -519,22 +520,45 @@ export const teamsWithIntegrationsRelations = relations(teams, ({ many }) => ({
 	integrations: many(integrations),
 }));
 
-export const integrationLogs = pgTable("integration_logs", {
-	id: text("id")
-		.$defaultFn(() => randomUUID())
-		.primaryKey()
-		.notNull(),
-	integrationId: text("integration_id").notNull(),
-	level: text("level").notNull(),
-	message: text("message").notNull(),
-	details: jsonb("details"),
-	inputTokens: integer("input_tokens"),
-	outputTokens: integer("output_tokens"),
-	createdAt: timestamp("created_at", {
-		withTimezone: true,
-		mode: "string",
-	}).defaultNow(),
-});
+export const integrationLogsLevelEnum = pgEnum("integration_logs_level", [
+	"info",
+	"warning",
+	"error",
+]);
+
+export const integrationLogs = pgTable(
+	"integration_logs",
+	{
+		id: text("id")
+			.$defaultFn(() => randomUUID())
+			.primaryKey()
+			.notNull(),
+		key: text("key").notNull(),
+		integrationId: text("integration_id").notNull(),
+		level: integrationLogsLevelEnum("level").notNull(),
+		message: text("message").notNull(),
+		userLinkId: text("integration_user_link_id"),
+		details: jsonb("details"),
+		inputTokens: integer("input_tokens"),
+		outputTokens: integer("output_tokens"),
+		createdAt: timestamp("created_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
+	},
+	(table) => [
+		foreignKey({
+			columns: [table.integrationId],
+			foreignColumns: [integrations.id],
+			name: "integration_logs_integration_id_fkey",
+		}).onDelete("cascade"),
+		foreignKey({
+			columns: [table.userLinkId],
+			foreignColumns: [integrationUserLink.id],
+			name: "integration_logs_integration_user_link_id_fkey",
+		}).onDelete("set null"),
+	],
+);
 
 export const integrationUserLink = pgTable(
 	"integration_user_link",
@@ -1347,6 +1371,66 @@ export const zenModeSettings = pgTable(
 			foreignColumns: [teams.id],
 			name: "zen_mode_settings_team_id_fkey",
 		}).onDelete("cascade"),
+	],
+);
+
+export const inboxStatusEnum = pgEnum("inbox_status", [
+	"pending",
+	"archived",
+	"accepted",
+	"dismissed",
+]);
+
+export const inbox = pgTable(
+	"inbox",
+	{
+		id: text("id")
+			.$defaultFn(() => randomUUID())
+			.primaryKey()
+			.notNull(),
+		userId: text("user_id").notNull(),
+		teamId: text("team_id").notNull(),
+		display: text("display").notNull(),
+		reasoning: text("reasoning"),
+		seen: boolean("seen").default(false).notNull(),
+		status: inboxStatusEnum("status").default("pending").notNull(),
+
+		assigneeId: text("assignee_id"),
+		source: text("source").notNull(),
+		sourceId: text("source_id").notNull(),
+		payload: jsonb("payload").$type<CreateTaskInput>().notNull(),
+
+		metadata: jsonb("metadata").$type<Record<string, any>>(),
+		taskId: text("task_id"),
+
+		createdAt: timestamp("created_at", {
+			withTimezone: true,
+			mode: "string",
+		})
+			.defaultNow()
+			.notNull(),
+	},
+	(table) => [
+		foreignKey({
+			columns: [table.userId],
+			foreignColumns: [users.id],
+			name: "inbox_user_id_fkey",
+		}).onDelete("cascade"),
+		foreignKey({
+			columns: [table.teamId],
+			foreignColumns: [teams.id],
+			name: "inbox_team_id_fkey",
+		}).onDelete("cascade"),
+		foreignKey({
+			columns: [table.assigneeId],
+			foreignColumns: [users.id],
+			name: "inbox_assignee_id_fkey",
+		}).onDelete("set null"),
+		foreignKey({
+			columns: [table.taskId],
+			foreignColumns: [tasks.id],
+			name: "inbox_task_id_fkey",
+		}).onDelete("set null"),
 	],
 );
 

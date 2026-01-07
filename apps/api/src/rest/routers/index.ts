@@ -4,6 +4,7 @@ import type { Context } from "../types";
 import { attachmentsRouter } from "./attachments";
 import { chatRouter } from "./chat";
 import { githubRouter } from "./github";
+import { gmail } from "./gmail";
 import { googleCalendar } from "./google-calendar";
 import { importsRouter } from "./imports";
 import { integrationsRouter } from "./integrations";
@@ -23,5 +24,6 @@ routers.route("/attachments", attachmentsRouter);
 routers.route("/slack", slackRouter);
 routers.route("/transcription", transcriptionRouter);
 routers.route("/google-calendar", googleCalendar);
+routers.route("/gmail", gmail);
 
 export { routers };

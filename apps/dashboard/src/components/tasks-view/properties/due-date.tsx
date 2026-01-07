@@ -3,7 +3,11 @@ import { differenceInDays, format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import type { Task } from "./task-properties";
 
-export const TaskPropertyDueDate = ({ task }: { task: Task }) => {
+export const TaskPropertyDueDate = ({
+	task,
+}: {
+	task: Pick<Task, "dueDate">;
+}) => {
 	if (!task.dueDate) {
 		return null;
 	}

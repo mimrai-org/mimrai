@@ -7,7 +7,7 @@
 		"paths": {
 			"@notifications/*": ["src/*"]
 		},
-		"types": ["bun-types"],
+		"types": ["@types/bun"],
 		"jsx": "react-jsx",
 		"jsxImportSource": "react"
 	}

@@ -4,8 +4,8 @@ import {
 	stringifyWorkflow,
 	workflowSuggestion,
 } from "@api/utils/workflow";
-import { createLabel } from "@db/queries/labels";
-import { createStatus } from "@db/queries/statuses";
+import { createDefaultLabels, createLabel } from "@db/queries/labels";
+import { createDefaultStatuses, createStatus } from "@db/queries/statuses";
 import { updateTeam } from "@db/queries/teams";
 import z from "zod";
 
@@ -61,4 +61,12 @@ export const onboardingRouter = router({
 
 			return { success: true };
 		}),
+	defaultWorkflow: protectedProcedure.mutation(async ({ ctx }) => {
+		// create statuses
+		await createDefaultStatuses(ctx.user.teamId);
+		// create labels
+		await createDefaultLabels(ctx.user.teamId);
+
+		return { success: true };
+	}),
 });

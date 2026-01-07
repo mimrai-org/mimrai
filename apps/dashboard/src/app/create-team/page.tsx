@@ -10,7 +10,7 @@ import {
 } from "@mimir/ui/form";
 import { Input } from "@mimir/ui/input";
 import { useMutation } from "@tanstack/react-query";
-import { RocketIcon } from "lucide-react";
+import { ArrowRightIcon, RocketIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import z from "zod";
@@ -53,7 +53,9 @@ export default function Page() {
 	return (
 		<div className="mx-auto my-auto">
 			<div className="mb-6 max-w-md">
-				<h1 className="mb-1 font-medium text-2xl">Create your team</h1>
+				<h1 className="mb-1 font-header font-thin text-4xl">
+					Create your team
+				</h1>
 				<p className="text-balance text-muted-foreground text-sm">
 					The team is the core unit of collaboration in Mimir. You can always
 					change this later.
@@ -102,8 +104,8 @@ export default function Page() {
 							}
 							type="submit"
 						>
-							Dive in
-							<RocketIcon />
+							Continue
+							<ArrowRightIcon />
 						</Button>
 					</div>
 				</form>

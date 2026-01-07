@@ -17,7 +17,8 @@
     "./task-comments": "./src/task-comments/index.ts",
     "./slack": "./src/slack/index.ts",
     "./whatsapp": "./src/whatsapp/index.ts",
-    "./google-calendar": "./src/google-calendar/index.ts"
+    "./google-calendar": "./src/google-calendar/index.ts",
+    "./gmail": "./src/gmail/index.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "2.0.62",
@@ -27,6 +28,8 @@
     "@mimir/db": "workspace:*",
     "@mimir/events": "workspace:*",
     "@mimir/utils": "workspace:*",
+    "@trigger.dev/sdk": "catalog:",
+    "date-fns": "^4.1.0",
     "@slack/bolt": "^4.6.0",
     "ai": "5.0.87",
     "drizzle-orm": "catalog:",

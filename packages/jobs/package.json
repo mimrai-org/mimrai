@@ -18,6 +18,7 @@
     "@mimir/email": "workspace:*",
     "@mimir/notifications": "workspace:*",
     "@mimir/utils": "workspace:*",
+    "@mimir/integration": "workspace:*",
     "@mimir/events": "workspace:*",
     "@sindresorhus/slugify": "^2.2.1",
     "@supabase/supabase-js": "^2.58.0",

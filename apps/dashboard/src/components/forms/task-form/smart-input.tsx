@@ -1,15 +1,16 @@
 import { Button } from "@mimir/ui/button";
 import { Textarea } from "@mimir/ui/textarea";
 import { useMutation } from "@tanstack/react-query";
+import { Skeleton } from "@ui/components/ui/skeleton";
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipTrigger,
 } from "@ui/components/ui/tooltip";
-import { CheckIcon, Loader2Icon, SparklesIcon } from "lucide-react";
+import { CheckIcon, SparklesIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { useDebounceCallback, useDebounceValue } from "usehooks-ts";
+import { useDebounceCallback } from "usehooks-ts";
 import Loader from "@/components/loader";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/utils/trpc";
@@ -121,7 +122,7 @@ export const SmartInput = () => {
 										) : (
 											<SparklesIcon className="size-4" />
 										)}
-										{title || value}
+										{isPending ? <Skeleton className="h-4 w-20" /> : title}
 									</div>
 								</TooltipTrigger>
 								<TooltipContent className="max-w-lg">

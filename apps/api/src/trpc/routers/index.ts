@@ -10,6 +10,7 @@ import { chatFeedbackRouter } from "./feedback";
 import { githubRouter } from "./github";
 import { globalSearchRouter } from "./global-search";
 import { importsRouter } from "./imports";
+import { inboxRouter } from "./inbox";
 import { integrationsRouter } from "./integrations";
 import { labelsRouter } from "./labels";
 import { milestonesRouter } from "./milestones";
@@ -50,6 +51,7 @@ export const appRouter = router({
 	activities: activitiesRouter,
 	github: githubRouter,
 	imports: importsRouter,
+	inbox: inboxRouter,
 	notificationSettings: notificationSettingsRouter,
 	autopilotSettings: autopilotSettingsRouter,
 	widgets: widgetsRouter,

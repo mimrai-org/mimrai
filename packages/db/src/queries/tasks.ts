@@ -345,11 +345,7 @@ export const getTasks = async ({
 	};
 };
 
-export const createTask = async ({
-	labels,
-	userId,
-	...input
-}: {
+export interface CreateTaskInput {
 	labels?: string[];
 	title: string;
 	description?: string;
@@ -371,7 +367,13 @@ export const createTask = async ({
 		frequency: "daily" | "weekly" | "monthly" | "yearly";
 		interval: number;
 	};
-}) => {
+}
+
+export const createTask = async ({
+	labels,
+	userId,
+	...input
+}: CreateTaskInput) => {
 	const { sequence, order } = await getNextTaskSequence(input.teamId);
 	const permalinkId = await generateTaskPermalinkId();
 	let projectId = input.projectId;

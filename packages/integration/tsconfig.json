@@ -4,6 +4,9 @@
 	"exclude": ["node_modules"],
 	"compilerOptions": {
 		"baseUrl": ".",
+		"verbatimModuleSyntax": true,
+		"module": "esnext",
+		"moduleResolution": "bundler",
 		"paths": {
 			"@integration/*": ["src/*"],
 			"@api/*": ["../../apps/api/src/*"]

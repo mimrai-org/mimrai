@@ -24,8 +24,11 @@ export const createTaskToolSchema = z.object({
 		.array(z.string())
 		.optional()
 		.describe("Array of label IDs (uuid) to be assigned to the task"),
-	projectId: z.string().optional().describe("ID of the project (uuid)"),
-	milestoneId: z.string().optional().describe("ID of the milestone (uuid)"),
+	projectId: z.string().optional().describe("ID of the project (only uuid)"),
+	milestoneId: z
+		.string()
+		.optional()
+		.describe("ID of the milestone (only uuid)"),
 
 	attachments: z
 		.array(z.url())

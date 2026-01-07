@@ -5,6 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Alert, AlertDescription } from "@ui/components/ui/alert";
 import { trpc } from "@/utils/trpc";
 import { InstallIntegrationGithubForm } from "./github/install";
+import { ConfigIntegrationGmailForm } from "./gmail/config";
+import { InstallIntegrationGmailForm } from "./gmail/install";
 import { ConfigIntegrationGoogleCalendarForm } from "./google-calendar/config";
 import { InstallIntegrationGoogleCalendarForm } from "./google-calendar/install";
 import { IntegrationMattermostForm } from "./mattermost/install";
@@ -25,6 +27,7 @@ export const integrationInstallForms: Partial<
 	mattermost: IntegrationMattermostForm,
 	whatsapp: InstallIntegrationWhatsappForm,
 	"google-calendar": InstallIntegrationGoogleCalendarForm,
+	gmail: InstallIntegrationGmailForm,
 };
 
 export const integrationLinkUserForms: Partial<
@@ -33,6 +36,7 @@ export const integrationLinkUserForms: Partial<
 	github: InstallIntegrationGithubForm,
 	mattermost: LinkIntegrationMattermostForm,
 	"google-calendar": InstallIntegrationGoogleCalendarForm,
+	gmail: InstallIntegrationGmailForm,
 };
 
 export const integrationConfigForms: Partial<
@@ -40,6 +44,7 @@ export const integrationConfigForms: Partial<
 > = {
 	"google-calendar": ConfigIntegrationGoogleCalendarForm,
 	github: InstallIntegrationGithubForm,
+	gmail: ConfigIntegrationGmailForm,
 };
 
 export const IntegrationForm = ({ type }: { type: IntegrationName }) => {

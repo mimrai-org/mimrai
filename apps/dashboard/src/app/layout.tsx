@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Petrona } from "next/font/google";
 import Providers from "@/components/providers";
 import "../../index.css";
 
@@ -17,6 +17,12 @@ const geistMono = Geist_Mono({
 	subsets: ["latin"],
 });
 
+const fontHeader = Petrona({
+	variable: "--font-header",
+	subsets: ["latin"],
+	weight: ["300"],
+});
+
 export const metadata: Metadata = {
 	title: "Mimrai - App",
 	description: "Mimrai - Your AI Task Management Assistant",
@@ -32,7 +38,7 @@ export default async function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
+				className={`${geistSans.variable} ${geistMono.variable} ${fontHeader.variable} flex min-h-screen flex-col antialiased`}
 			>
 				<NuqsAdapter>
 					<Providers session={session}>{children}</Providers>

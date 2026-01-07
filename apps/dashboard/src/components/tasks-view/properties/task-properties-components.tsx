@@ -85,7 +85,8 @@ export const propertiesComponents = {
 			</div>
 		);
 	},
-	dueDate: (task: Task) => task.dueDate && <TaskPropertyDueDate task={task} />,
+	dueDate: (task: Pick<Task, "dueDate">) =>
+		task.dueDate && <TaskPropertyDueDate task={task} />,
 
 	checklist: (task: Pick<Task, "checklistSummary">) =>
 		task.checklistSummary?.total > 0 && (

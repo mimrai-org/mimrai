@@ -273,6 +273,7 @@ export const getLinkedUsers = async ({
 			integrationId: integrations.id,
 			integrationType: integrations.type,
 			integrationConfig: integrations.config,
+			config: integrationUserLink.config,
 			accessToken: integrationUserLink.accessToken,
 			refreshToken: integrationUserLink.refreshToken,
 			type: integrations.type,
@@ -457,9 +458,53 @@ export const updateLinkedUser = async ({
 
 	const [updated] = await db
 		.update(integrationUserLink)
-		.set({ ...input })
+		.set({
+			...input,
+			...(input.config
+				? {
+						config: {
+							...existing.integration_user_link.config,
+							...input.config,
+						},
+					}
+				: {}),
+		})
 		.where(eq(integrationUserLink.id, existing.integration_user_link.id))
 		.returning();
 
 	return updated;
+};
+
+export const uninstallIntegration = async ({
+	type,
+	teamId,
+}: {
+	type: IntegrationName;
+	teamId?: string;
+}) => {
+	const whereClause: SQL[] = [eq(integrations.type, type)];
+	if (teamId) whereClause.push(eq(integrations.teamId, teamId));
+
+	const [existing] = await db
+		.select()
+		.from(integrations)
+		.where(and(...whereClause))
+		.limit(1);
+
+	if (!existing) {
+		throw new Error("Integration not found");
+	}
+
+	const [deleted] = await db
+		.delete(integrations)
+		.where(and(...whereClause))
+		.returning();
+
+	if (deleted) {
+		await integrationsCache.publish(deleted.id, {
+			type: "stop",
+		});
+	}
+
+	return true;
 };
