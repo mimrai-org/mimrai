@@ -33,8 +33,6 @@ export const propertiesComponents = {
 					dependency.dependsOnTaskId === task.id ? "from" : "to";
 				const key = `${type}:${direction}`;
 
-				console.log(dependency);
-
 				record[key] = (record[key] || 0) + 1;
 			}
 			return record;

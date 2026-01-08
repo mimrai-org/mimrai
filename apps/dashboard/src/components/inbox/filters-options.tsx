@@ -13,8 +13,6 @@ export const inboxFilterOptions: FilterOptions = {
 				Promise.resolve([
 					{ label: "Pending", value: "pending" },
 					{ label: "Archived", value: "archived" },
-					{ label: "Accepted", value: "accepted" },
-					{ label: "Dismissed", value: "dismissed" },
 				]),
 		},
 	},

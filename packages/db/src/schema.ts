@@ -1374,12 +1374,7 @@ export const zenModeSettings = pgTable(
 	],
 );
 
-export const inboxStatusEnum = pgEnum("inbox_status", [
-	"pending",
-	"archived",
-	"accepted",
-	"dismissed",
-]);
+export const inboxStatusEnum = pgEnum("inbox_status", ["pending", "archived"]);
 
 export const inbox = pgTable(
 	"inbox",
@@ -1391,17 +1386,15 @@ export const inbox = pgTable(
 		userId: text("user_id").notNull(),
 		teamId: text("team_id").notNull(),
 		display: text("display").notNull(),
-		reasoning: text("reasoning"),
+		subtitle: text("subtitle"),
+		content: text("content"),
+
 		seen: boolean("seen").default(false).notNull(),
 		status: inboxStatusEnum("status").default("pending").notNull(),
 
-		assigneeId: text("assignee_id"),
+		metadata: jsonb("metadata").$type<Record<string, any>>(),
 		source: text("source").notNull(),
 		sourceId: text("source_id").notNull(),
-		payload: jsonb("payload").$type<CreateTaskInput>().notNull(),
-
-		metadata: jsonb("metadata").$type<Record<string, any>>(),
-		taskId: text("task_id"),
 
 		createdAt: timestamp("created_at", {
 			withTimezone: true,
@@ -1421,15 +1414,65 @@ export const inbox = pgTable(
 			foreignColumns: [teams.id],
 			name: "inbox_team_id_fkey",
 		}).onDelete("cascade"),
+	],
+);
+
+export const intakeStatusEnum = pgEnum("intake_status", [
+	"pending",
+	"accepted",
+	"dismissed",
+]);
+
+export const intakes = pgTable(
+	"intakes",
+	{
+		id: text("id")
+			.$defaultFn(() => randomUUID())
+			.primaryKey()
+			.notNull(),
+		teamId: text("team_id").notNull(),
+		userId: text("user_id").notNull(),
+		status: intakeStatusEnum("status").default("pending").notNull(),
+		reasoning: text("reasoning"),
+
+		assigneeId: text("assignee_id"),
+		source: text("source").notNull(),
+		sourceId: text("source_id").notNull(),
+		payload: jsonb("payload").$type<CreateTaskInput>().notNull(),
+
+		inboxId: text("inbox_id"),
+		taskId: text("task_id"),
+
+		createdAt: timestamp("created_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
+	},
+	(table) => [
+		foreignKey({
+			columns: [table.teamId],
+			foreignColumns: [teams.id],
+			name: "intakes_team_id_fkey",
+		}).onDelete("cascade"),
+		foreignKey({
+			columns: [table.userId],
+			foreignColumns: [users.id],
+			name: "intakes_user_id_fkey",
+		}).onDelete("cascade"),
 		foreignKey({
 			columns: [table.assigneeId],
 			foreignColumns: [users.id],
-			name: "inbox_assignee_id_fkey",
+			name: "intakes_assignee_id_fkey",
+		}).onDelete("set null"),
+		foreignKey({
+			columns: [table.inboxId],
+			foreignColumns: [inbox.id],
+			name: "intakes_inbox_id_fkey",
 		}).onDelete("set null"),
 		foreignKey({
 			columns: [table.taskId],
 			foreignColumns: [tasks.id],
-			name: "inbox_task_id_fkey",
+			name: "intakes_task_id_fkey",
 		}).onDelete("set null"),
 	],
 );

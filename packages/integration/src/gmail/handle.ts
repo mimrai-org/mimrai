@@ -1,7 +1,6 @@
 import { log } from "@integration/logger";
 import type { IntegrationConfig } from "@integration/registry";
 import { db } from "@mimir/db/client";
-import { getLinkedUserByExternalId } from "@mimir/db/queries/integrations";
 import {
 	integrationLogs,
 	integrations,
@@ -11,8 +10,8 @@ import { tasks } from "@trigger.dev/sdk";
 import { startOfDay } from "date-fns";
 import { and, count, eq } from "drizzle-orm";
 import { gmail } from "googleapis/build/src/apis/gmail";
-import { createOAuth2Client, oauth2Client } from ".";
-import { decodeEmail, getHeader } from "./decode";
+import { createOAuth2Client } from ".";
+import { decodeEmail } from "./decode";
 
 export const handle = async ({
 	email,
@@ -78,7 +77,6 @@ export const handle = async ({
 
 			for (const messageAdded of historyRecord.messagesAdded) {
 				const { message } = messageAdded;
-				console.log({ messageAdded });
 				if (!message) continue;
 
 				if (!message.id) continue;
@@ -106,12 +104,24 @@ export const handle = async ({
 
 				// filter from addresses
 				if (
-					config.filters?.onlyFromAddresses &&
-					config.filters.onlyFromAddresses.length > 0
+					config.filters?.sendersWhitelist &&
+					config.filters.sendersWhitelist.length > 0
 				) {
 					if (
 						decoded.from &&
-						!config.filters.onlyFromAddresses.includes(decoded.from)
+						!config.filters.sendersWhitelist.includes(decoded.from)
+					) {
+						continue;
+					}
+				}
+
+				if (
+					config.filters?.sendersBlacklist &&
+					config.filters.sendersBlacklist.length > 0
+				) {
+					if (
+						decoded.from &&
+						config.filters.sendersBlacklist.includes(decoded.from)
 					) {
 						continue;
 					}

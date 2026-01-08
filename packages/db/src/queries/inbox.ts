@@ -1,38 +1,23 @@
-import {
-	and,
-	desc,
-	eq,
-	getTableColumns,
-	inArray,
-	type SQL,
-	sql,
-} from "drizzle-orm";
+import { and, desc, eq, getTableColumns, inArray, type SQL } from "drizzle-orm";
 import { db } from "..";
-import { inbox, users } from "../schema";
-import { type CreateTaskInput, createTask } from "./tasks";
+import { inbox, intakes } from "../schema";
+import { jsonAggBuildObject } from "../utils/drizzle";
 
 export const createInbox = async (input: {
 	userId: string;
 	teamId: string;
 	assigneeId?: string;
-	reasoning?: string;
 	display: string;
+	subtitle?: string;
+	content?: string;
+	metadata?: Record<string, any>;
 	source: string;
 	sourceId: string;
-	metadata?: Record<string, any>;
-	payload: CreateTaskInput;
 }) => {
 	const [existing] = await db
 		.select()
 		.from(inbox)
-		.where(
-			and(
-				eq(inbox.userId, input.userId),
-				eq(inbox.teamId, input.teamId),
-				eq(inbox.source, input.source),
-				eq(inbox.sourceId, input.sourceId),
-			),
-		)
+		.where(and(eq(inbox.userId, input.userId), eq(inbox.teamId, input.teamId)))
 		.limit(1);
 
 	if (existing) {
@@ -69,16 +54,8 @@ export const getInboxById = async ({
 	const [inboxItem] = await db
 		.select({
 			...getTableColumns(inbox),
-			assignee: {
-				id: users.id,
-				name: users.name,
-				email: users.email,
-				image: users.image,
-				color: users.color,
-			},
 		})
 		.from(inbox)
-		.leftJoin(users, eq(inbox.assigneeId, users.id))
 		.where(and(...whereClause))
 		.limit(1);
 
@@ -97,7 +74,7 @@ export const getInbox = async ({
 	teamId?: string;
 	pageSize?: number;
 	cursor?: string;
-	status?: ("archived" | "accepted" | "dismissed" | "pending")[];
+	status?: ("archived" | "pending")[];
 	seen?: boolean;
 }) => {
 	const whereClause: SQL[] = [];
@@ -113,18 +90,20 @@ export const getInbox = async ({
 	const query = db
 		.select({
 			...getTableColumns(inbox),
-			assignee: {
-				id: users.id,
-				name: users.name,
-				email: users.email,
-				image: users.image,
-				color: users.color,
-			},
+			intakes: jsonAggBuildObject({
+				id: intakes.id,
+				status: intakes.status,
+				reasoning: intakes.reasoning,
+				taskId: intakes.taskId,
+				payload: intakes.payload,
+				createdAt: intakes.createdAt,
+			}),
 		})
 		.from(inbox)
-		.leftJoin(users, eq(inbox.assigneeId, users.id))
+		.leftJoin(intakes, eq(inbox.id, intakes.inboxId))
 		.where(and(...whereClause))
-		.orderBy(desc(inbox.createdAt));
+		.orderBy(desc(inbox.createdAt))
+		.groupBy(inbox.id);
 
 	// Apply pagination
 	const offset = cursor ? Number.parseInt(cursor, 10) : 0;
@@ -156,14 +135,8 @@ export const updateInbox = async ({
 }: {
 	id: string;
 	display?: string;
-	source?: string;
-	sourceId?: string;
-	seen?: boolean;
-	status?: "archived" | "accepted" | "dismissed" | "pending";
-	reasoning?: string;
+	status?: "archived" | "pending";
 	metadata?: Record<string, any>;
-	payload?: CreateTaskInput;
-	taskId?: string;
 	userId?: string;
 	teamId?: string;
 }) => {
@@ -207,46 +180,6 @@ export const deleteInbox = async ({
 	if (!inboxItem) {
 		throw new Error("Failed to delete inbox item");
 	}
-
-	return inboxItem;
-};
-
-export const acceptInbox = async ({
-	id,
-	userId,
-	teamId,
-}: {
-	id: string;
-	userId?: string;
-	teamId?: string;
-}) => {
-	const existing = await getInboxById({ id, userId, teamId });
-	if (!existing) {
-		throw new Error("Inbox item not found");
-	}
-
-	if (existing.status === "accepted") {
-		return existing;
-	}
-
-	const task = await createTask({
-		userId: existing.userId,
-		teamId: existing.teamId,
-		statusId: existing.payload.statusId,
-		title: existing.payload.title,
-		description: existing.payload.description,
-		dueDate: existing.payload.dueDate,
-		priority: existing.payload.priority,
-		assigneeId: existing.payload.assigneeId,
-	});
-
-	const inboxItem = await updateInbox({
-		id,
-		userId,
-		teamId,
-		taskId: task.id,
-		status: "accepted",
-	});
 
 	return inboxItem;
 };

@@ -1,4 +1,5 @@
 import { createInbox } from "@mimir/db/queries/inbox";
+import { createIntake } from "@mimir/db/queries/intakes";
 import { getStatuses } from "@mimir/db/queries/statuses";
 import { type DecodedEmail, processEmail } from "@mimir/integration/gmail";
 import { logger, schemaTask } from "@trigger.dev/sdk";
@@ -32,23 +33,32 @@ export const processUserEmailJob = schemaTask({
 		}
 
 		const promises = [];
+		const inbox = await createInbox({
+			userId,
+			teamId,
+			display: `${decodedEmail.subject}`,
+			subtitle: `From: ${decodedEmail.from}`,
+			source: "gmail",
+			sourceId: decodedEmail.id,
+			content: decodedEmail.body,
+			metadata: {
+				messageId: decodedEmail.id,
+				from: decodedEmail.from,
+				to: decodedEmail.to,
+				subject: decodedEmail.subject,
+				date: decodedEmail.date,
+			},
+		});
 		for (const payload of output.object.tasksPayload) {
 			promises.push(
-				createInbox({
+				createIntake({
 					userId,
 					teamId,
 					assigneeId: payload.assigneeId,
-					display: `${decodedEmail.from} - ${decodedEmail.subject}`,
 					source: "gmail",
 					sourceId: decodedEmail.id,
 					reasoning: payload.reasoning,
-					metadata: {
-						messageId: decodedEmail.id,
-						from: decodedEmail.from,
-						to: decodedEmail.to,
-						subject: decodedEmail.subject,
-						date: decodedEmail.date,
-					},
+					inboxId: inbox.id,
 					payload: {
 						...payload,
 						teamId: teamId,

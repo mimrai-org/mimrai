@@ -16,7 +16,7 @@ import {
 import Link from "next/link";
 import { useUser } from "@/hooks/use-user";
 import { queryClient, trpc } from "@/utils/trpc";
-import type { Inbox } from "./list";
+import type { Inbox } from "./use-inbox";
 
 export const InboxDropdown = ({
 	className,
@@ -77,7 +77,6 @@ export const GmailItems = ({ inbox }: { inbox: Inbox }) => {
 		}),
 	);
 	const config = data?.installedUserIntegration?.config ?? {};
-	console.log({ data });
 	const sendersBlacklist: string[] = config?.filters?.sendersBlacklist || [];
 	const emailFrom = inbox.metadata?.from?.match(/<(.+)>/)[1];
 	const isIgnored = emailFrom && sendersBlacklist.includes(emailFrom);

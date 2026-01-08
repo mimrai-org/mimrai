@@ -6,8 +6,6 @@ import { useInboxFilterParams } from "./use-inbox-filter-params";
 export const InboxFilters = () => {
 	const { params, setParams } = useInboxFilterParams();
 
-	console.log({ params });
-
 	return (
 		<FiltersProvider
 			filters={params}

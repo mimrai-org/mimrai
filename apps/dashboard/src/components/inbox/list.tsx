@@ -19,9 +19,9 @@ export const InboxList = ({ className }: { className?: string }) => {
 		<div
 			className={cn(
 				"flex flex-col gap-1",
-				"h-[calc(100vh-80px)] overflow-y-auto p-2",
+				"h-[calc(100vh-90px)] overflow-y-auto p-2",
 				{
-					"w-1/3": selectedInbox,
+					"min-w-1/3 max-w-1/3": selectedInbox,
 					"w-full": !selectedInbox,
 				},
 			)}
@@ -55,14 +55,21 @@ export const InboxList = ({ className }: { className?: string }) => {
 								"font-normal text-muted-foreground": item.seen,
 							})}
 						>
-							{item.payload.title}
+							{item.display}
 						</h3>
-						<div className="flex justify-between">
-							<p className="flex items-center gap-1 truncate text-muted-foreground text-xs capitalize">
-								<InboxSourceIcon source={item.source} className="size-3.5" />{" "}
-								<span className="max-w-[200px] truncate">{item.display}</span>
-							</p>
-							<p className="text-muted-foreground text-xs">
+						<div className="flex justify-between gap-2">
+							<div className="flex items-center gap-1 truncate text-muted-foreground text-xs capitalize">
+								<div className="size-3.5">
+									<InboxSourceIcon
+										source={item.source}
+										className="size-3.5"
+									/>{" "}
+								</div>
+								<span className="truncate">
+									{item.subtitle || "No additional info"}
+								</span>
+							</div>
+							<p className="whitespace-nowrap text-muted-foreground text-xs">
 								{format(new Date(item.createdAt), "PP p")}
 							</p>
 						</div>

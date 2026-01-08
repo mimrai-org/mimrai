@@ -1,24 +1,25 @@
 import {
-	createInboxSchema,
-	deleteInboxSchema,
-	getInboxByIdSchema,
-	getInboxSchema,
-	updateInboxSchema,
-} from "@api/schemas/inbox";
+	createIntakeSchema,
+	deleteIntakeSchema,
+	getIntakeByIdSchema,
+	getIntakesSchema,
+	updateIntakeSchema,
+} from "@api/schemas/intakes";
 import { protectedProcedure, router } from "@api/trpc/init";
 import {
-	createInbox,
-	deleteInbox,
-	getInbox,
-	getInboxById,
-	updateInbox,
-} from "@mimir/db/queries/inbox";
+	acceptIntake,
+	createIntake,
+	deleteIntake,
+	getIntakeById,
+	getIntakes,
+	updateIntake,
+} from "@mimir/db/queries/intakes";
 
-export const inboxRouter = router({
+export const intakesRouter = router({
 	get: protectedProcedure
-		.input(getInboxSchema)
+		.input(getIntakesSchema)
 		.query(async ({ ctx, input }) => {
-			return getInbox({
+			return getIntakes({
 				...input,
 				userId: ctx.user.id,
 				teamId: ctx.user.teamId!,
@@ -26,9 +27,9 @@ export const inboxRouter = router({
 		}),
 
 	create: protectedProcedure
-		.input(createInboxSchema)
+		.input(createIntakeSchema)
 		.mutation(async ({ ctx, input }) => {
-			return await createInbox({
+			return await createIntake({
 				...input,
 				userId: ctx.user.id,
 				teamId: ctx.user.teamId!,
@@ -36,9 +37,9 @@ export const inboxRouter = router({
 		}),
 
 	update: protectedProcedure
-		.input(updateInboxSchema)
+		.input(updateIntakeSchema)
 		.mutation(async ({ ctx, input }) => {
-			return updateInbox({
+			return updateIntake({
 				...input,
 				userId: ctx.user.id,
 				teamId: ctx.user.teamId!,
@@ -46,9 +47,9 @@ export const inboxRouter = router({
 		}),
 
 	getById: protectedProcedure
-		.input(getInboxByIdSchema)
+		.input(getIntakeByIdSchema)
 		.query(async ({ ctx, input }) => {
-			return getInboxById({
+			return getIntakeById({
 				...input,
 				userId: ctx.user.id,
 				teamId: ctx.user.teamId!,
@@ -56,9 +57,19 @@ export const inboxRouter = router({
 		}),
 
 	delete: protectedProcedure
-		.input(deleteInboxSchema)
+		.input(deleteIntakeSchema)
 		.mutation(async ({ ctx, input }) => {
-			return deleteInbox({
+			return deleteIntake({
+				...input,
+				userId: ctx.user.id,
+				teamId: ctx.user.teamId!,
+			});
+		}),
+
+	accept: protectedProcedure
+		.input(getIntakeByIdSchema)
+		.mutation(async ({ ctx, input }) => {
+			return acceptIntake({
 				...input,
 				userId: ctx.user.id,
 				teamId: ctx.user.teamId!,

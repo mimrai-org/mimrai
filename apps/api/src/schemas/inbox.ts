@@ -5,9 +5,7 @@ import { paginationSchema } from "./base";
 export const getInboxSchema = z.object({
 	...paginationSchema.shape,
 	seen: z.boolean().optional(),
-	status: z
-		.array(z.enum(["archived", "accepted", "dismissed", "pending"]))
-		.optional(),
+	status: z.array(z.enum(["archived", "pending"])).optional(),
 });
 
 export const createInboxSchema = z.object({
@@ -20,7 +18,7 @@ export const createInboxSchema = z.object({
 export const updateInboxSchema = z.object({
 	id: z.string(),
 	display: z.string().optional(),
-	status: z.enum(["archived", "accepted", "dismissed", "pending"]).optional(),
+	status: z.enum(["archived", "pending"]).optional(),
 	seen: z.boolean().optional(),
 	source: z.string().optional(),
 	sourceId: z.string().optional(),

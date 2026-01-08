@@ -11,6 +11,7 @@ import { githubRouter } from "./github";
 import { globalSearchRouter } from "./global-search";
 import { importsRouter } from "./imports";
 import { inboxRouter } from "./inbox";
+import { intakesRouter } from "./intakes";
 import { integrationsRouter } from "./integrations";
 import { labelsRouter } from "./labels";
 import { milestonesRouter } from "./milestones";
@@ -52,6 +53,7 @@ export const appRouter = router({
 	github: githubRouter,
 	imports: importsRouter,
 	inbox: inboxRouter,
+	intakes: intakesRouter,
 	notificationSettings: notificationSettingsRouter,
 	autopilotSettings: autopilotSettingsRouter,
 	widgets: widgetsRouter,

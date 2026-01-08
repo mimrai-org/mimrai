@@ -1,22 +1,34 @@
 "use client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Alert, AlertDescription, AlertTitle } from "@ui/components/ui/alert";
+import { Badge } from "@ui/components/ui/badge";
 import { Button } from "@ui/components/ui/button";
+import {
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
+} from "@ui/components/ui/collapsible";
 import { cn } from "@ui/lib/utils";
-import { CheckIcon, EyeIcon } from "lucide-react";
-import { useEffect } from "react";
+import { CheckIcon, EyeIcon, PlusIcon } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { queryClient, trpc } from "@/utils/trpc";
 import { AssigneeAvatar } from "../asignee-avatar";
+import { Response } from "../chat/response";
 import Loader from "../loader";
 import { propertiesComponents } from "../tasks-view/properties/task-properties-components";
 import { InboxDropdown } from "./dropdown";
 import { InboxSourceIcon } from "./source-icon";
 import { useInbox } from "./use-inbox";
 
+const intakeFilterStatus = ["pending", "accepted"] as const;
+
 export const InboxOverview = ({ className }: { className?: string }) => {
 	const { setParams } = useTaskParams();
 	const { inboxId, selectedInbox } = useInbox();
+	const [intakeStatus, setIntakeStatus] =
+		useState<(typeof intakeFilterStatus)[number]>("pending");
+	const { data: members } = useQuery(trpc.teams.getMembers.queryOptions());
 
 	const { mutate: markAsSeen } = useMutation(
 		trpc.inbox.update.mutationOptions({
@@ -43,7 +55,7 @@ export const InboxOverview = ({ className }: { className?: string }) => {
 	);
 
 	const { mutate: accept, isPending: isAccepting } = useMutation(
-		trpc.inbox.accept.mutationOptions({
+		trpc.intakes.accept.mutationOptions({
 			onSettled: () => {
 				queryClient.invalidateQueries(
 					trpc.inbox.get.infiniteQueryOptions({
@@ -58,7 +70,7 @@ export const InboxOverview = ({ className }: { className?: string }) => {
 	);
 
 	const { mutate: dismiss, isPending: isDismissing } = useMutation(
-		trpc.inbox.update.mutationOptions({
+		trpc.intakes.update.mutationOptions({
 			onSettled: () => {
 				queryClient.invalidateQueries(
 					trpc.inbox.get.infiniteQueryOptions({
@@ -72,6 +84,49 @@ export const InboxOverview = ({ className }: { className?: string }) => {
 		}),
 	);
 
+	const intakesByStatus = useMemo(() => {
+		if (!selectedInbox?.intakes) return {};
+
+		const byStatus = (
+			selectedInbox?.intakes.filter((intake) => !!intake.id) || []
+		).reduce(
+			(acc, intake) => {
+				if (!acc[intake.status]) {
+					acc[intake.status] = [];
+				}
+				acc[intake.status]!.push(intake);
+				return acc;
+			},
+			{} as Record<string, typeof selectedInbox.intakes>,
+		);
+
+		return byStatus;
+	}, [selectedInbox]);
+
+	const intakes = intakesByStatus[intakeStatus] || [];
+
+	const intakesAssignees = useMemo(() => {
+		if (!selectedInbox || !members) return {};
+
+		const assigneesMap: Record<
+			string,
+			{ name: string; email: string; image?: string }
+		> = {};
+		for (const intake of selectedInbox.intakes) {
+			if (intake.payload?.assigneeId) {
+				const member = members.find((m) => m.id === intake.payload.assigneeId);
+				if (member) {
+					assigneesMap[intake.payload.assigneeId] = {
+						name: member.name,
+						email: member.email,
+						image: member.image || undefined,
+					};
+				}
+			}
+		}
+		return assigneesMap;
+	}, [selectedInbox, members]);
+
 	useEffect(() => {
 		if (selectedInbox && !selectedInbox.seen) {
 			markAsSeen({ id: selectedInbox.id, seen: true });
@@ -84,11 +139,11 @@ export const InboxOverview = ({ className }: { className?: string }) => {
 
 	return (
 		<div className={cn("flex-1 p-2")}>
-			<div className="h-full space-y-4 rounded-lg bg-card p-4">
+			<div className="h-[calc(100vh-90px)] space-y-4 overflow-y-auto rounded-lg bg-card p-4">
 				<div className="space-y-1">
 					<div className="flex justify-between">
 						<h1 className="truncate font-medium text-xl">
-							{selectedInbox.payload.title}
+							{selectedInbox.display}
 						</h1>
 						<div>
 							<InboxDropdown inbox={selectedInbox} />
@@ -96,88 +151,136 @@ export const InboxOverview = ({ className }: { className?: string }) => {
 					</div>
 					<div className="flex items-center gap-1 text-muted-foreground text-sm">
 						<InboxSourceIcon source={selectedInbox.source} className="size-4" />
-						{selectedInbox.display}
+						{selectedInbox.subtitle || "No additional info"}
 					</div>
 				</div>
 
-				<div className="flex items-center gap-2">
-					{selectedInbox.payload.priority &&
-						propertiesComponents.priority({
-							priority: selectedInbox.payload.priority,
-						})}
-					{selectedInbox.payload.dueDate &&
-						propertiesComponents.dueDate({
-							dueDate: selectedInbox.payload.dueDate,
-						})}
-					{selectedInbox.assignee && (
-						<AssigneeAvatar {...selectedInbox.assignee} className="size-5" />
-					)}
+				<div className="text-sm">
+					<Collapsible>
+						<CollapsibleTrigger className="collapsible-chevron">
+							Content
+						</CollapsibleTrigger>
+						<CollapsibleContent>
+							<p className="mt-4 rounded-md border p-4 text-muted-foreground text-sm">
+								{selectedInbox.content ?? "No content available."}
+							</p>
+						</CollapsibleContent>
+					</Collapsible>
 				</div>
-				{selectedInbox.reasoning && (
-					<Alert>
-						<AlertTitle>Reasoning</AlertTitle>
-						<AlertDescription>{selectedInbox.reasoning}</AlertDescription>
-					</Alert>
-				)}
 
-				<p className="whitespace-pre-wrap text-sm">
-					{selectedInbox.payload.description || (
-						<span className="text-muted-foreground">
-							No description provided.
-						</span>
-					)}
-				</p>
-
-				<hr />
-
-				{selectedInbox.taskId ? (
-					<div className="flex justify-end gap-2">
+				<div className="flex items-center justify-end gap-2">
+					{intakeFilterStatus.map((status) => (
 						<Button
-							variant="default"
+							key={status}
+							variant={status === intakeStatus ? "secondary" : "ghost"}
+							className="capitalize"
 							type="button"
+							size="sm"
 							onClick={() => {
-								setParams({
-									taskId: selectedInbox.taskId,
-								});
+								setIntakeStatus(status);
 							}}
 						>
-							<EyeIcon />
-							View Task
+							{status}
+							{intakesByStatus[status] &&
+								intakesByStatus[status]?.length > 0 && (
+									<Badge className="ml-1 size-5 rounded-sm">
+										{intakesByStatus[status]?.length || 0}
+									</Badge>
+								)}
 						</Button>
-					</div>
-				) : selectedInbox.status === "pending" ? (
-					<div className="flex justify-end gap-2">
-						<Button
-							variant="default"
-							type="button"
-							disabled={isAccepting || isDismissing}
-							onClick={() =>
-								accept({
-									id: selectedInbox.id,
-								})
-							}
-						>
-							{isAccepting ? <Loader /> : <CheckIcon />}
-							Accept
-						</Button>
-						<Button
-							variant="ghost"
-							type="button"
-							disabled={isAccepting || isDismissing}
-							onClick={() => {
-								dismiss({
-									id: selectedInbox.id,
-									status: "dismissed",
-								});
-							}}
-						>
-							{isDismissing ? <Loader /> : null}
-							Dismiss
-						</Button>
-					</div>
-				) : (
-					<div />
+					))}
+				</div>
+				{intakes.length === 0 && (
+					<p className="rounded-md border p-4 text-center text-muted-foreground text-sm">
+						No intakes found.
+					</p>
 				)}
+				{intakes.map((intake) => (
+					<div key={intake.id} className="space-y-4 rounded-md border p-4">
+						<div className="space-y-2">
+							<h2 className="font-medium text-base">{intake.payload.title}</h2>
+							<div className="flex items-center gap-2">
+								{intake.payload.priority &&
+									propertiesComponents.priority({
+										priority: intake.payload.priority,
+									})}
+								{intake.payload.dueDate &&
+									propertiesComponents.dueDate({
+										dueDate: intake.payload.dueDate,
+									})}
+								{intake.payload.assigneeId &&
+									intakesAssignees[intake.payload.assigneeId] && (
+										<AssigneeAvatar
+											{...intakesAssignees[intake.payload.assigneeId]}
+											className="size-5"
+										/>
+									)}
+							</div>
+						</div>
+						<p className="whitespace-pre-wrap text-sm">
+							{intake.payload.description || (
+								<span className="text-muted-foreground">
+									No description provided.
+								</span>
+							)}
+						</p>
+						{intake.reasoning && (
+							<Alert>
+								<AlertTitle>Reasoning</AlertTitle>
+								<AlertDescription>{intake.reasoning}</AlertDescription>
+							</Alert>
+						)}
+
+						{intake.taskId ? (
+							<div className="flex justify-end gap-2">
+								<Button
+									variant="default"
+									type="button"
+									onClick={() => {
+										setParams({
+											taskId: intake.taskId,
+										});
+									}}
+								>
+									<EyeIcon />
+									View Task
+								</Button>
+							</div>
+						) : intake.status === "pending" ? (
+							<div className="flex justify-end gap-2">
+								<Button
+									variant="default"
+									type="button"
+									disabled={isAccepting || isDismissing}
+									onClick={() =>
+										accept({
+											id: intake.id,
+										})
+									}
+								>
+									{isAccepting ? <Loader /> : <PlusIcon />}
+									Create Task
+								</Button>
+								<Button
+									variant="ghost"
+									type="button"
+									disabled={isAccepting || isDismissing}
+									onClick={() => {
+										dismiss({
+											id: intake.id,
+											status: "dismissed",
+										});
+									}}
+								>
+									{isDismissing ? <Loader /> : null}
+									Dismiss
+								</Button>
+							</div>
+						) : (
+							<div />
+						)}
+					</div>
+				))}
 			</div>
 		</div>
 	);
