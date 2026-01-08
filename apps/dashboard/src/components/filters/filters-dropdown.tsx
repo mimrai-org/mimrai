@@ -22,6 +22,11 @@ import { useFilters } from "./use-filters";
 export const FiltersDropdown = () => {
 	const [globalSearch, setGlobalSearch] = useState("");
 	const { options } = useFilters();
+
+	const hasOptions = Object.keys(options).length > 0;
+
+	if (!hasOptions) return null;
+
 	return (
 		<div className="flex items-center gap-2">
 			<FiltersCurrentList />

@@ -30,14 +30,21 @@ import { ProjectIcon } from "@/components/project-icon";
 import { useProjectParams } from "@/hooks/use-project-params";
 import { useUser } from "@/hooks/use-user";
 import { queryClient, trpc } from "@/utils/trpc";
+import { ProjectsFilters } from "./filters";
+import { useProjectsFilterParams } from "./use-projects-filter-params";
 
 export const ProjectsList = () => {
 	const router = useRouter();
 	const user = useUser();
 	const { setParams } = useProjectParams();
+	const { params } = useProjectsFilterParams();
+
 	const { data, isLoading } = useInfiniteQuery(
 		trpc.projects.get.infiniteQueryOptions(
-			{ pageSize: 20 },
+			{
+				pageSize: 20,
+				search: params.search ?? "",
+			},
 			{
 				getNextPageParam: (lastPage) => lastPage.meta.cursor,
 			},
@@ -79,31 +86,28 @@ export const ProjectsList = () => {
 		return data?.pages.flatMap((page) => page.data) || [];
 	}, [data]);
 
-	if (listData.length === 0 && !isLoading) {
-		return (
-			<EmptyState>
-				<EmptyStateIcon>
-					<BoxIcon className="size-10" />
-				</EmptyStateIcon>
-				<EmptyStateTitle>No projects found</EmptyStateTitle>
-				<EmptyStateDescription>
-					You haven't created any projects yet. Projects help you organize your
-					tasks and teams effectively.
-				</EmptyStateDescription>
-				<EmptyStateAction>
-					<Button
-						onClick={() => setParams({ createProject: true })}
-						variant="default"
-					>
-						Create your first project
-					</Button>
-				</EmptyStateAction>
-			</EmptyState>
-		);
-	}
-
 	return (
-		<div className="w-full">
+		<div className="h-full w-full overflow-hidden">
+			<ProjectsFilters />
+
+			{listData.length === 0 && !isLoading && (
+				<EmptyState>
+					<EmptyStateTitle>No projects found</EmptyStateTitle>
+					<EmptyStateDescription>
+						You haven't created any projects yet. Projects help you organize
+						your tasks and teams effectively.
+					</EmptyStateDescription>
+					<EmptyStateAction>
+						<Button
+							onClick={() => setParams({ createProject: true })}
+							variant="default"
+						>
+							Create your first project
+						</Button>
+					</EmptyStateAction>
+				</EmptyState>
+			)}
+
 			{listData.map((project) => (
 				<ContextMenu key={project.id}>
 					<ContextMenuTrigger asChild>

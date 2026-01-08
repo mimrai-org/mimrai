@@ -6,8 +6,8 @@ import {
 	CardHeader,
 } from "@ui/components/ui/card";
 import { AssigneeAvatar } from "@/components/asignee-avatar";
+import { Progress } from "@/components/projects/list";
 import { trpc } from "@/utils/trpc";
-import { Progress } from "../../projects-list";
 
 export const ProjectProgressCard = ({ projectId }: { projectId: string }) => {
 	const { data } = useQuery(

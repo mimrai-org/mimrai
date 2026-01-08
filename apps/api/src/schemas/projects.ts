@@ -3,6 +3,7 @@ import { paginationSchema } from "./base";
 
 export const getProjectsSchema = z.object({
 	...paginationSchema.shape,
+	search: z.string().optional(),
 });
 
 export const createProjectSchema = z.object({

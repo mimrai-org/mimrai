@@ -220,6 +220,7 @@ export const InboxOverview = ({ className }: { className?: string }) => {
 											variant="default"
 											type="button"
 											size="sm"
+											className="size-6 rounded-full"
 											onClick={() => {
 												setParams({
 													taskId: intake.taskId,
@@ -227,7 +228,6 @@ export const InboxOverview = ({ className }: { className?: string }) => {
 											}}
 										>
 											<EyeIcon />
-											View Task
 										</Button>
 									</div>
 								) : intake.status === "pending" ? (
