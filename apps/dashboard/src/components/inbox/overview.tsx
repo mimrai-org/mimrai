@@ -191,7 +191,10 @@ export const InboxOverview = ({ className }: { className?: string }) => {
 								{status}
 								{intakesByStatus[status] &&
 									intakesByStatus[status]?.length > 0 && (
-										<Badge className="ml-1 size-5 rounded-sm">
+										<Badge
+											className="ml-1 size-5 rounded-sm"
+											variant="secondary"
+										>
 											{intakesByStatus[status]?.length || 0}
 										</Badge>
 									)}

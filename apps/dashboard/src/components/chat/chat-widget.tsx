@@ -206,7 +206,7 @@ export const ChatWidget = () => {
 							{isFetched && <ChatInterface showMessages={show} id={chatId} />}
 						</div>
 					</motion.div>
-					{process.env.NODE_ENV === "development" && (
+					{/* {process.env.NODE_ENV === "development" && (
 						<AIDevtools
 							config={{
 								streamCapture: {
@@ -216,7 +216,7 @@ export const ChatWidget = () => {
 								},
 							}}
 						/>
-					)}
+					)} */}
 				</Provider>
 			)}
 		</div>

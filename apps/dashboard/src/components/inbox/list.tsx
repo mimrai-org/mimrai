@@ -37,7 +37,7 @@ export const InboxList = ({ className }: { className?: string }) => {
 				<button
 					key={item.id}
 					type="button"
-					className="w-full text-left"
+					className="w-full pl-2 text-left"
 					onClick={() => {
 						setParams({ selectedInboxId: item.id });
 					}}
