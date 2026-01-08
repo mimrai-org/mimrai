@@ -7,6 +7,7 @@ import {
 } from "@api/schemas/inbox";
 import { protectedProcedure, router } from "@api/trpc/init";
 import {
+	countInbox,
 	createInbox,
 	deleteInbox,
 	getInbox,
@@ -64,4 +65,12 @@ export const inboxRouter = router({
 				teamId: ctx.user.teamId!,
 			});
 		}),
+
+	count: protectedProcedure.query(async ({ ctx }) => {
+		return await countInbox({
+			userId: ctx.user.id,
+			teamId: ctx.user.teamId!,
+			seen: false,
+		});
+	}),
 });

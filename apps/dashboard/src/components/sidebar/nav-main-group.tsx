@@ -10,6 +10,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUser } from "@/hooks/use-user";
 import { CreateButton } from "../create-button";
+import { NavInboxItem } from "./nav-inbox-item";
 import { NavPrReviewsItem } from "./nav-pr-reviews-item";
 
 export const NavMainGroup = () => {
@@ -34,14 +35,7 @@ export const NavMainGroup = () => {
 							</Link>
 						</SidebarMenuButton>
 					</SidebarMenuItem>
-					<SidebarMenuItem>
-						<SidebarMenuButton asChild isActive={pathname?.includes("/inbox")}>
-							<Link href={`${user?.basePath}/inbox`}>
-								<InboxIcon />
-								Inbox
-							</Link>
-						</SidebarMenuButton>
-					</SidebarMenuItem>
+					<NavInboxItem />
 					<SidebarMenuItem>
 						<SidebarMenuButton asChild isActive={isMyTasksActive}>
 							<Link href={`${user?.basePath}/my-tasks`}>

@@ -1,4 +1,12 @@
-import { and, desc, eq, getTableColumns, inArray, type SQL } from "drizzle-orm";
+import {
+	and,
+	count,
+	desc,
+	eq,
+	getTableColumns,
+	inArray,
+	type SQL,
+} from "drizzle-orm";
 import { db } from "..";
 import { inbox, intakes } from "../schema";
 import { jsonAggBuildObject } from "../utils/drizzle";
@@ -182,4 +190,30 @@ export const deleteInbox = async ({
 	}
 
 	return inboxItem;
+};
+
+export const countInbox = async ({
+	userId,
+	teamId,
+	seen,
+}: {
+	userId?: string;
+	teamId?: string;
+	seen?: boolean;
+}) => {
+	const whereClause: SQL[] = [];
+	userId && whereClause.push(eq(inbox.userId, userId));
+	teamId && whereClause.push(eq(inbox.teamId, teamId));
+	if (seen !== undefined) {
+		whereClause.push(eq(inbox.seen, seen));
+	}
+
+	const [r] = await db
+		.select({
+			c: count(inbox.id),
+		})
+		.from(inbox)
+		.where(and(...whereClause));
+
+	return Number(r?.c || 0);
 };

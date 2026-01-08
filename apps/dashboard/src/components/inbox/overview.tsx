@@ -9,7 +9,13 @@ import {
 	CollapsibleTrigger,
 } from "@ui/components/ui/collapsible";
 import { cn } from "@ui/lib/utils";
-import { CheckIcon, EyeIcon, PlusIcon } from "lucide-react";
+import {
+	CheckIcon,
+	EyeIcon,
+	PlusIcon,
+	SparklesIcon,
+	XIcon,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { queryClient, trpc } from "@/utils/trpc";
@@ -157,7 +163,7 @@ export const InboxOverview = ({ className }: { className?: string }) => {
 
 				<div className="text-sm">
 					<Collapsible>
-						<CollapsibleTrigger className="collapsible-chevron">
+						<CollapsibleTrigger className="collapsible-chevron text-muted-foreground text-sm">
 							Content
 						</CollapsibleTrigger>
 						<CollapsibleContent>
@@ -168,27 +174,30 @@ export const InboxOverview = ({ className }: { className?: string }) => {
 					</Collapsible>
 				</div>
 
-				<div className="flex items-center justify-end gap-2">
-					{intakeFilterStatus.map((status) => (
-						<Button
-							key={status}
-							variant={status === intakeStatus ? "secondary" : "ghost"}
-							className="capitalize"
-							type="button"
-							size="sm"
-							onClick={() => {
-								setIntakeStatus(status);
-							}}
-						>
-							{status}
-							{intakesByStatus[status] &&
-								intakesByStatus[status]?.length > 0 && (
-									<Badge className="ml-1 size-5 rounded-sm">
-										{intakesByStatus[status]?.length || 0}
-									</Badge>
-								)}
-						</Button>
-					))}
+				<div className="flex items-center justify-between gap-2">
+					<h3 className="font-medium">Intakes</h3>
+					<div className="flex items-center gap-2">
+						{intakeFilterStatus.map((status) => (
+							<Button
+								key={status}
+								variant={status === intakeStatus ? "secondary" : "ghost"}
+								className="capitalize"
+								type="button"
+								size="sm"
+								onClick={() => {
+									setIntakeStatus(status);
+								}}
+							>
+								{status}
+								{intakesByStatus[status] &&
+									intakesByStatus[status]?.length > 0 && (
+										<Badge className="ml-1 size-5 rounded-sm">
+											{intakesByStatus[status]?.length || 0}
+										</Badge>
+									)}
+							</Button>
+						))}
+					</div>
 				</div>
 				{intakes.length === 0 && (
 					<p className="rounded-md border p-4 text-center text-muted-foreground text-sm">
@@ -196,9 +205,64 @@ export const InboxOverview = ({ className }: { className?: string }) => {
 					</p>
 				)}
 				{intakes.map((intake) => (
-					<div key={intake.id} className="space-y-4 rounded-md border p-4">
+					<div key={intake.id} className="space-y-2 rounded-md border p-4">
 						<div className="space-y-2">
-							<h2 className="font-medium text-base">{intake.payload.title}</h2>
+							<div className="flex items-center justify-between">
+								<h2 className="font-medium text-base">
+									{intake.payload.title}
+								</h2>
+								{intake.taskId ? (
+									<div className="flex gap-2">
+										<Button
+											variant="default"
+											type="button"
+											size="sm"
+											onClick={() => {
+												setParams({
+													taskId: intake.taskId,
+												});
+											}}
+										>
+											<EyeIcon />
+											View Task
+										</Button>
+									</div>
+								) : intake.status === "pending" ? (
+									<div className="flex gap-2">
+										<Button
+											variant="default"
+											type="button"
+											size="sm"
+											className="size-6 rounded-full"
+											disabled={isAccepting || isDismissing}
+											onClick={() =>
+												accept({
+													id: intake.id,
+												})
+											}
+										>
+											{isAccepting ? <Loader /> : <PlusIcon />}
+										</Button>
+										<Button
+											variant="ghost"
+											type="button"
+											size="sm"
+											className="size-6 rounded-full"
+											disabled={isAccepting || isDismissing}
+											onClick={() => {
+												dismiss({
+													id: intake.id,
+													status: "dismissed",
+												});
+											}}
+										>
+											{isDismissing ? <Loader /> : <XIcon />}
+										</Button>
+									</div>
+								) : (
+									<div />
+								)}
+							</div>
 							<div className="flex items-center gap-2">
 								{intake.payload.priority &&
 									propertiesComponents.priority({
@@ -217,67 +281,19 @@ export const InboxOverview = ({ className }: { className?: string }) => {
 									)}
 							</div>
 						</div>
-						<p className="whitespace-pre-wrap text-sm">
-							{intake.payload.description || (
-								<span className="text-muted-foreground">
-									No description provided.
-								</span>
-							)}
-						</p>
-						{intake.reasoning && (
-							<Alert>
-								<AlertTitle>Reasoning</AlertTitle>
-								<AlertDescription>{intake.reasoning}</AlertDescription>
-							</Alert>
-						)}
-
-						{intake.taskId ? (
-							<div className="flex justify-end gap-2">
-								<Button
-									variant="default"
-									type="button"
-									onClick={() => {
-										setParams({
-											taskId: intake.taskId,
-										});
-									}}
-								>
-									<EyeIcon />
-									View Task
-								</Button>
-							</div>
-						) : intake.status === "pending" ? (
-							<div className="flex justify-end gap-2">
-								<Button
-									variant="default"
-									type="button"
-									disabled={isAccepting || isDismissing}
-									onClick={() =>
-										accept({
-											id: intake.id,
-										})
-									}
-								>
-									{isAccepting ? <Loader /> : <PlusIcon />}
-									Create Task
-								</Button>
-								<Button
-									variant="ghost"
-									type="button"
-									disabled={isAccepting || isDismissing}
-									onClick={() => {
-										dismiss({
-											id: intake.id,
-											status: "dismissed",
-										});
-									}}
-								>
-									{isDismissing ? <Loader /> : null}
-									Dismiss
-								</Button>
-							</div>
-						) : (
-							<div />
+						{intake.payload.description && (
+							<Collapsible>
+								<CollapsibleTrigger className="collapsible-chevron text-muted-foreground text-xs">
+									Description
+								</CollapsibleTrigger>
+								<CollapsibleContent>
+									<p className="mt-2 rounded-sm border p-2 text-muted-foreground text-xs">
+										<SparklesIcon className="mr-2 inline-block size-3.5" />
+										{intake.reasoning}
+									</p>
+									<p className="p-2 text-sm">{intake.payload.description}</p>
+								</CollapsibleContent>
+							</Collapsible>
 						)}
 					</div>
 				))}
