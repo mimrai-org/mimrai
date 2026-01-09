@@ -14,7 +14,7 @@ import {
 	TooltipTrigger,
 } from "@ui/components/ui/tooltip";
 import { format } from "date-fns";
-import { BoxIcon, CopyPlusIcon, LayersIcon, TrashIcon } from "lucide-react";
+import { CopyPlusIcon, LayersIcon, TrashIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { toast } from "sonner";
@@ -22,7 +22,6 @@ import {
 	EmptyState,
 	EmptyStateAction,
 	EmptyStateDescription,
-	EmptyStateIcon,
 	EmptyStateTitle,
 } from "@/components/empty-state";
 import { MilestoneIcon } from "@/components/milestone-icon";

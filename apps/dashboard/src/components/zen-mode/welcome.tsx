@@ -34,6 +34,7 @@ export const ZenModeWelcome = ({
 	return (
 		<div className="overflow-hidden">
 			<ZenModeBackground />
+
 			<motion.div
 				className="mx-auto flex h-screen flex-col items-center justify-center"
 				initial="hidden"

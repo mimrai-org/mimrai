@@ -1,4 +1,4 @@
-import { shareablePolicyEnum, shareableTypeEnum } from "@db/schema";
+import { shareablePolicyEnum, shareableTypeEnum } from "@mimir/db/schema";
 import z from "zod";
 
 export const upsertShareableSchema = z.object({

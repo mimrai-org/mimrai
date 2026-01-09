@@ -1,7 +1,7 @@
 import { experimental_createMCPClient } from "@ai-sdk/mcp";
-import { db } from "@db/index";
-import { getIntegrationByType } from "@db/queries/integrations";
-import { activities, tasks } from "@db/schema";
+import { db } from "@mimir/db/client";
+import { getIntegrationByType } from "@mimir/db/queries/integrations";
+import { activities, tasks } from "@mimir/db/schema";
 import { generateText, stepCountIs } from "ai";
 import { and, eq } from "drizzle-orm";
 
@@ -12,7 +12,7 @@ export const createTaskPullRequest = async ({
 	taskId: string;
 	teamId: string;
 }) => {
-	const [integration] = await getIntegrationByType({
+	const integration = await getIntegrationByType({
 		type: "github",
 		teamId,
 	});

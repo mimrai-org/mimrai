@@ -1,5 +1,5 @@
-import { db } from "@db/index";
-import { checklistItems, tasks } from "@db/schema";
+import { db } from "@mimir/db/client";
+import { checklistItems, tasks } from "@mimir/db/schema";
 import { getTaskPermalink } from "@mimir/utils/tasks";
 import { tool } from "ai";
 import { and, eq } from "drizzle-orm";

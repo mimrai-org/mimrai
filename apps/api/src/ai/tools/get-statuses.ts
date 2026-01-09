@@ -1,5 +1,5 @@
-import { db } from "@db/index";
-import { statuses } from "@db/schema";
+import { db } from "@mimir/db/client";
+import { statuses } from "@mimir/db/schema";
 import { tool } from "ai";
 import { eq } from "drizzle-orm";
 import z from "zod";

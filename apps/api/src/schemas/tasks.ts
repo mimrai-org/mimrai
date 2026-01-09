@@ -3,7 +3,7 @@ import {
 	priorityEnum,
 	shareablePolicyEnum,
 	statusTypeEnum,
-} from "@db/schema";
+} from "@mimir/db/schema";
 import z from "zod";
 import { paginationSchema } from "./base";
 

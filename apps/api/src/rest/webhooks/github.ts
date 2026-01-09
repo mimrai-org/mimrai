@@ -1,16 +1,16 @@
+import { OpenAPIHono } from "@hono/zod-openapi";
 import {
 	getConnectedRepositoryByInstallationId,
 	getPullRequestPlanByHead,
 	updatePullRequestPlanStatus,
-} from "@db/queries/github";
+} from "@mimir/db/queries/github";
 import {
 	getLinkedUserByUserId,
 	installIntegration,
 	linkUserToIntegration,
-} from "@db/queries/integrations";
-import { syncPrReview } from "@db/queries/pr-reviews";
-import { updateTask } from "@db/queries/tasks";
-import { OpenAPIHono } from "@hono/zod-openapi";
+} from "@mimir/db/queries/integrations";
+import { syncPrReview } from "@mimir/db/queries/pr-reviews";
+import { updateTask } from "@mimir/db/queries/tasks";
 import { log } from "@mimir/integration/logger";
 import { getAppUrl } from "@mimir/utils/envs";
 import type {

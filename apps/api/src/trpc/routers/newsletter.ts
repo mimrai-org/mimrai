@@ -1,5 +1,5 @@
-import { db } from "@db/index";
-import { newsletter } from "@db/schema";
+import { db } from "@mimir/db/client";
+import { newsletter } from "@mimir/db/schema";
 import z from "zod";
 import { publicProcedure, router } from "../init";
 

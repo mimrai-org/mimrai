@@ -1,11 +1,11 @@
-import { db } from "@db/index";
+import { OpenAPIHono } from "@hono/zod-openapi";
+import { db } from "@mimir/db/client";
 import {
 	installIntegration,
 	linkUserToIntegration,
-} from "@db/queries/integrations";
-import { getTeamById } from "@db/queries/teams";
-import { session, users } from "@db/schema";
-import { OpenAPIHono } from "@hono/zod-openapi";
+} from "@mimir/db/queries/integrations";
+import { getTeamById } from "@mimir/db/queries/teams";
+import { session, users } from "@mimir/db/schema";
 import {
 	generateAuthUrl,
 	oauth2Client,

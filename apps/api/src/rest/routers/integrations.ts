@@ -2,10 +2,10 @@ import {
 	associateMattermostUserSchema,
 	associeteIntegrationUserSchema,
 } from "@api/schemas/integrations";
-import { db } from "@db/index";
-import { getIntegrationById } from "@db/queries/integrations";
-import { integrationUserLink } from "@db/schema";
 import { OpenAPIHono } from "@hono/zod-openapi";
+import { db } from "@mimir/db/client";
+import { getIntegrationById } from "@mimir/db/queries/integrations";
+import { integrationUserLink } from "@mimir/db/schema";
 import { sendMattermostNotification } from "@mimir/integration/mattermost";
 import { sendWhatsappNotification } from "@mimir/integration/whatsapp";
 import { and, eq, type SQL } from "drizzle-orm";

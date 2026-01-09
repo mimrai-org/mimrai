@@ -19,7 +19,6 @@ import {
 	buildSmartCompletePrompt,
 	smartCompleteResponseSchema,
 } from "@api/utils/smart-complete";
-import { getMemberById } from "@db/queries/teams";
 import {
 	cloneTask,
 	createTask,
@@ -37,6 +36,7 @@ import {
 	updateTaskRecurringJob,
 } from "@mimir/db/queries/tasks";
 import { getDuplicateTaskEmbedding } from "@mimir/db/queries/tasks-embeddings";
+import { getMemberById } from "@mimir/db/queries/teams";
 import { trackMessage, trackTaskCreated } from "@mimir/events/server";
 import { syncGoogleCalendarTaskEvent } from "@mimir/integration/google-calendar";
 import { handleTaskComment } from "@mimir/integration/task-comments";

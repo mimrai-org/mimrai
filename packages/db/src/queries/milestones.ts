@@ -177,5 +177,8 @@ export const updateMilestone = async ({
 		})
 		.where(and(...whereClause))
 		.returning();
+
+	if (!result) throw new Error("Failed to update milestone");
+
 	return result;
 };

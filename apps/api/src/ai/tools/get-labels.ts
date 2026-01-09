@@ -1,5 +1,5 @@
-import { db } from "@db/index";
-import { labels } from "@db/schema";
+import { db } from "@mimir/db/client";
+import { labels } from "@mimir/db/schema";
 import { tool } from "ai";
 import { and, eq } from "drizzle-orm";
 import z from "zod";

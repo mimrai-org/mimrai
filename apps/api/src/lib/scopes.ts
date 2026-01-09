@@ -1,4 +1,4 @@
-import type { teamRoleEnum } from "@db/schema/schemas";
+import type { teamRoleEnum } from "@mimir/db/schema/schemas";
 import type { InferEnum } from "drizzle-orm/";
 
 export const SCOPES = ["team:write"] as const;

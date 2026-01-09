@@ -1,4 +1,4 @@
-import { updateTask } from "@db/queries/tasks";
+import { updateTask } from "@mimir/db/queries/tasks";
 import { tool } from "ai";
 import z from "zod";
 import type { AppContext } from "../agents/config/shared";

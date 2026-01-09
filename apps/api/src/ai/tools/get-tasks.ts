@@ -1,5 +1,5 @@
-import { statusTypeEnum } from "@db/schema";
 import { getTasks } from "@mimir/db/queries/tasks";
+import { statusTypeEnum } from "@mimir/db/schema";
 import { getAppUrl } from "@mimir/utils/envs";
 import { getTaskPermalink } from "@mimir/utils/tasks";
 import { tool } from "ai";

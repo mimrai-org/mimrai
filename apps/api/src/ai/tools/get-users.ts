@@ -1,4 +1,4 @@
-import { getMembers } from "@db/queries/teams";
+import { getMembers } from "@mimir/db/queries/teams";
 import { tool } from "ai";
 import z from "zod";
 import type { AppContext } from "../agents/config/shared";

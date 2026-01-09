@@ -1,14 +1,11 @@
 import type { RouterOutputs } from "@mimir/api/trpc";
-import { differenceInDays } from "date-fns";
 import { motion } from "motion/react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { TaskProperty } from "@/components/tasks-view/properties/task-properties";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useUser } from "@/hooks/use-user";
 import { cn } from "@/lib/utils";
 import { queryClient, trpc } from "@/utils/trpc";
-import { KanbanTaskStamp } from "./stamp";
 
 export type KanbanTask = RouterOutputs["tasks"]["get"]["data"][number];
 

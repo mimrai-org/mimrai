@@ -1,4 +1,4 @@
-import { db } from "@db/index";
+import { db } from "@mimir/db/client";
 import { account, session, users, verification } from "@mimir/db/schema";
 import { EmailVerificationEmail } from "@mimir/email/emails/email-verification";
 import { ResetPasswordEmail } from "@mimir/email/emails/reset-password";

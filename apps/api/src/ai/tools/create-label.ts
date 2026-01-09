@@ -1,4 +1,4 @@
-import { createLabel } from "@db/queries/labels";
+import { createLabel } from "@mimir/db/queries/labels";
 import { tool } from "ai";
 import z from "zod";
 import type { AppContext } from "../agents/config/shared";

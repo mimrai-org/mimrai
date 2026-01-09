@@ -1,4 +1,4 @@
-import { statusTypeEnum } from "@db/schema";
+import { statusTypeEnum } from "@mimir/db/schema";
 import z from "zod";
 import { paginationSchema } from "./base";
 

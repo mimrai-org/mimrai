@@ -1,7 +1,7 @@
 import { openai } from "@ai-sdk/openai";
-import { getLabels } from "@db/queries/labels";
-import { getStatuses } from "@db/queries/statuses";
-import { getMembers } from "@db/queries/teams";
+import { getLabels } from "@mimir/db/queries/labels";
+import { getStatuses } from "@mimir/db/queries/statuses";
+import { getMembers } from "@mimir/db/queries/teams";
 import { generateObject, tool } from "ai";
 import z from "zod";
 import type { AppContext } from "../agents/config/shared";

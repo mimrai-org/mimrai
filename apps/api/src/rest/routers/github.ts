@@ -1,12 +1,12 @@
 import { sentry } from "@api/lib/instrument";
+import { OpenAPIHono } from "@hono/zod-openapi";
 import {
 	cancelPullRequestPlan,
 	getConnectedRepositoryByRepoId,
 	getPullRequestPlanById,
-} from "@db/queries/github";
-import { getIntegrationById } from "@db/queries/integrations";
-import { switchTeam } from "@db/queries/users";
-import { OpenAPIHono } from "@hono/zod-openapi";
+} from "@mimir/db/queries/github";
+import { getIntegrationById } from "@mimir/db/queries/integrations";
+import { switchTeam } from "@mimir/db/queries/users";
 import { getAppUrl } from "@mimir/utils/envs";
 import { Octokit } from "octokit";
 import type { Context } from "../types";

@@ -30,19 +30,16 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
 	children,
-	...props
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const session = await getSession();
-
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} ${fontHeader.variable} flex min-h-screen flex-col antialiased`}
 			>
 				<NuqsAdapter>
-					<Providers session={session}>{children}</Providers>
+					<Providers>{children}</Providers>
 					<Toaster
 						toastOptions={{
 							classNames: {

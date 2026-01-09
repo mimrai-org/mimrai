@@ -1,5 +1,5 @@
-import { installIntegration } from "@db/queries/integrations";
 import { OpenAPIHono } from "@hono/zod-openapi";
+import { installIntegration } from "@mimir/db/queries/integrations";
 import { getApiUrl, getAppUrl } from "@mimir/utils/envs";
 import { webApi } from "@slack/bolt";
 import type { Context } from "../types";

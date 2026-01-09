@@ -1,4 +1,3 @@
-import type { DeleteTaskInput } from "@api/schemas/tasks";
 import type { MagicTaskAction } from "@mimir/utils/pr-reviews";
 import { getTaskPermalink } from "@mimir/utils/tasks";
 import { subDays } from "date-fns";
@@ -437,7 +436,7 @@ export const createTask = async ({
 	return task;
 };
 
-export const deleteTask = async (input: DeleteTaskInput) => {
+export const deleteTask = async (input: { id: string; teamId?: string }) => {
 	const whereClause: SQL[] = [eq(tasks.id, input.id)];
 
 	if (input.teamId) {

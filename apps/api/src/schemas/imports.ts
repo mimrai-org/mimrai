@@ -1,4 +1,4 @@
-import { importStatusEnum } from "@db/schema";
+import { importStatusEnum } from "@mimir/db/schema";
 import z from "zod";
 
 export const getImportsSchema = z.object({

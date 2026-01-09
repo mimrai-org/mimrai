@@ -9,7 +9,6 @@ import {
 	validateIntegrationSchema,
 } from "@api/schemas/integrations";
 import { protectedProcedure, router } from "@api/trpc/init";
-import { getCurrentUser } from "@db/queries/users";
 import {
 	getIntegrationById,
 	getIntegrationByType,
@@ -21,6 +20,7 @@ import {
 	updateIntegration,
 	updateLinkedUser,
 } from "@mimir/db/queries/integrations";
+import { getCurrentUser } from "@mimir/db/queries/users";
 import {
 	type IntegrationName,
 	integrationsRegistry,

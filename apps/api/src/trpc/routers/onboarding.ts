@@ -4,9 +4,12 @@ import {
 	stringifyWorkflow,
 	workflowSuggestion,
 } from "@api/utils/workflow";
-import { createDefaultLabels, createLabel } from "@db/queries/labels";
-import { createDefaultStatuses, createStatus } from "@db/queries/statuses";
-import { updateTeam } from "@db/queries/teams";
+import { createDefaultLabels, createLabel } from "@mimir/db/queries/labels";
+import {
+	createDefaultStatuses,
+	createStatus,
+} from "@mimir/db/queries/statuses";
+import { updateTeam } from "@mimir/db/queries/teams";
 import z from "zod";
 
 export const onboardingRouter = router({

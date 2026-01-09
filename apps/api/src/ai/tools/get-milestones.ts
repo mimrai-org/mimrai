@@ -1,4 +1,4 @@
-import { getMilestones } from "@db/queries/milestones";
+import { getMilestones } from "@mimir/db/queries/milestones";
 import { getAppUrl } from "@mimir/utils/envs";
 import { tool } from "ai";
 import z from "zod";

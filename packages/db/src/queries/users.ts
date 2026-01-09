@@ -1,4 +1,3 @@
-import type { GetUsersInput } from "@api/schemas/users";
 import { and, eq, ilike, type SQL } from "drizzle-orm";
 import { db } from "..";
 import { teams, users, usersOnTeams } from "../schema";
@@ -59,7 +58,12 @@ export const getUsers = async ({
 	pageSize,
 	cursor,
 	...input
-}: GetUsersInput) => {
+}: {
+	pageSize: number;
+	cursor?: string;
+	search?: string;
+	teamId?: string;
+}) => {
 	const whereConditions: SQL[] = [];
 
 	input.search && whereConditions.push(ilike(users.name, `%${input.search}%`));

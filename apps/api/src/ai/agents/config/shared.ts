@@ -6,7 +6,7 @@ import {
 	type ContextItem,
 	formatLLMContextItems,
 } from "@api/ai/utils/format-context-items";
-import { db } from "@db/index";
+import { db } from "@mimir/db/client";
 import { DrizzleProvider } from "./drizzle-provider";
 import { memoryTemplate } from "./memory-template";
 import { suggestionsInstructions } from "./suggestions-instructions";

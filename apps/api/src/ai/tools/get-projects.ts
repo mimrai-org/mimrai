@@ -1,4 +1,4 @@
-import { getProjects } from "@db/queries/projects";
+import { getProjects } from "@mimir/db/queries/projects";
 import { getAppUrl } from "@mimir/utils/envs";
 import { tool } from "ai";
 import z from "zod";

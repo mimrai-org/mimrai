@@ -6,9 +6,8 @@ import type {
 	WorkingMemory,
 } from "@ai-sdk-tools/memory";
 import type { UIChatMessage } from "@api/ai/types";
-import type { Database } from "@db/index";
-import { chatMessages, chats, users, workingMemory } from "@db/schema";
-import { convertToModelMessages, type UIMessagePart } from "ai";
+import type { Database } from "@mimir/db/client";
+import { chatMessages, chats, users, workingMemory } from "@mimir/db/schema";
 import { and, desc, eq, like, sql } from "drizzle-orm";
 
 export class DrizzleProvider implements MemoryProvider {

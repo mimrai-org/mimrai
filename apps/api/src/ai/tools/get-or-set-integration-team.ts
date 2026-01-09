@@ -1,4 +1,4 @@
-// import { getAvailableTeams, switchTeam } from "@db/queries/users";
+// import { getAvailableTeams, switchTeam } from "@mimir/db/queries/users";
 // import { tool } from "ai";
 // import z from "zod";
 // import { getContext, setContext } from "../context";

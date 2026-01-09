@@ -142,6 +142,8 @@ export const createProject = async ({
 		})
 		.returning();
 
+	if (!project) throw new Error("Failed to create project");
+
 	return project;
 };
 

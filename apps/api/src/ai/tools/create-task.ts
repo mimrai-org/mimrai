@@ -1,4 +1,4 @@
-import { createTask } from "@db/queries/tasks";
+import { createTask } from "@mimir/db/queries/tasks";
 import { trackTaskCreated } from "@mimir/events/server";
 import { getTaskPermalink } from "@mimir/utils/tasks";
 import { tool } from "ai";

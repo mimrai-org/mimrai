@@ -1,5 +1,5 @@
 import { artifact } from "@ai-sdk-tools/artifacts";
-import { priorityEnum } from "@db/schema/schemas";
+import { priorityEnum } from "@mimir/db/schema/schemas";
 import z from "zod";
 
 export const taskArtifact = artifact(
