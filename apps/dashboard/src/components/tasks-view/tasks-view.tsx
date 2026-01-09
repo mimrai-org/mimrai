@@ -97,6 +97,7 @@ export const TasksView = ({
 			},
 			{
 				getNextPageParam: (lastPage) => lastPage.meta.cursor,
+				placeholderData: (oldData) => oldData,
 			},
 		),
 	);

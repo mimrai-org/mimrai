@@ -1,5 +1,7 @@
 "use client";
 
+import { QueryClientProvider } from "@tanstack/react-query";
+import { useState } from "react";
 import type { getSession } from "@/lib/get-session";
 import { PersistQueryClientProviderWithIDB } from "@/utils/persister";
 import { queryClient } from "@/utils/trpc";
@@ -12,11 +14,10 @@ export default function Providers({
 	children: React.ReactNode;
 	session: Awaited<ReturnType<typeof getSession>>;
 }) {
+	const [localQueryClient] = useState(() => queryClient);
+
 	return (
-		<PersistQueryClientProviderWithIDB
-			queryClient={queryClient}
-			session={session}
-		>
+		<QueryClientProvider client={localQueryClient}>
 			<ThemeProvider
 				attribute="class"
 				defaultTheme="system"
@@ -27,6 +28,6 @@ export default function Providers({
 			</ThemeProvider>
 			{/* <CleanTasksFilters /> */}
 			{/* <ReactQueryDevtools /> */}
-		</PersistQueryClientProviderWithIDB>
+		</QueryClientProvider>
 	);
 }

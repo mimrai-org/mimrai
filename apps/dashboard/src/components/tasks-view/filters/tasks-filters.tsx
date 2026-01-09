@@ -17,7 +17,13 @@ import { type TasksGroupBy, tasksGroupByItems } from "../tasks-group";
 import { useTasksViewContext } from "../tasks-view";
 import { tasksFilterOptions } from "./tasks-filters-options";
 
-export const TasksFilters = () => {
+export type TasksFiltersProps = {
+	showFilters?: Array<"assignee" | "project" | "milestone" | "labels">;
+};
+
+export const TasksFilters = ({
+	showFilters = ["assignee", "project", "milestone", "labels"],
+}: TasksFiltersProps) => {
 	const { setFilters, filters } = useTasksViewContext();
 
 	return (

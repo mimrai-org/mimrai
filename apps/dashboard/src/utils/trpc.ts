@@ -8,6 +8,7 @@ import {
 	splitLink,
 } from "@trpc/client";
 import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
+import { cache } from "react";
 
 export const queryClient = new QueryClient({
 	defaultOptions: {
