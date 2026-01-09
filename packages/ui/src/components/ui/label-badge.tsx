@@ -1,4 +1,5 @@
 import { getContrast } from "@mimir/utils/random";
+import { TagIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "./badge";
 
@@ -22,10 +23,7 @@ export const LabelBadge = ({
 			)}
 			variant={variant}
 		>
-			<div
-				className="size-2 rounded-full"
-				style={{ backgroundColor: color, color: getContrast(color) }}
-			/>
+			<TagIcon className="size-2" style={{ color: color }} />
 			{name}
 		</Badge>
 	);

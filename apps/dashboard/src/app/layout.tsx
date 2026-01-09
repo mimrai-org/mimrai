@@ -5,7 +5,6 @@ import "../../index.css";
 
 import { Toaster } from "@ui/components/ui/sonner";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-import { getSession } from "@/lib/get-session";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",

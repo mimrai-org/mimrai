@@ -49,7 +49,7 @@ export const KanbanTask = ({
 		>
 			{/* <Link href={`${user?.basePath}/tasks/${task.id}`} prefetch={true}> */}
 			<div className="p-3">
-				<div className="flex h-full grow-1 flex-col justify-between gap-0.5">
+				<div className="flex h-full grow-1 flex-col justify-between gap-2">
 					<div className="flex items-center justify-between gap-2">
 						<div className={"flex items-center gap-1 text-xs"}>
 							{task.sequence !== null && (
@@ -57,6 +57,7 @@ export const KanbanTask = ({
 									{user?.team?.prefix}-{task.sequence}
 								</span>
 							)}
+							<TaskProperty property="labels" task={task} />
 						</div>
 						<TaskProperty property="assignee" task={task} />
 					</div>
@@ -67,11 +68,10 @@ export const KanbanTask = ({
 						</div>
 					</div>
 
-					<div className="mt-2 flex flex-wrap items-center gap-1.5">
+					<div className="flex flex-wrap items-center gap-1.5">
 						<TaskProperty property="priority" task={task} />
 						<TaskProperty property="dependencies" task={task} />
 
-						<TaskProperty property="labels" task={task} />
 						<TaskProperty property="project" task={task} />
 						<TaskProperty property="milestone" task={task} />
 						<TaskProperty property="dueDate" task={task} />
