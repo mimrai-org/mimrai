@@ -25,7 +25,7 @@
     "resend": "^6.1.2",
     "snakecase-keys": "^9.0.2",
     "ws": "^8.18.3",
-    "zod": "^3.23.8"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@mattermost/types": "^10.12.0",

@@ -50,7 +50,7 @@
     "resend": "^6.1.2",
     "stripe": "^19.1.0",
     "twilio": "^5.10.4",
-    "zod": "4.1.10",
+    "zod": "catalog:",
     "zod-openapi": "^5.4.1"
   },
   "trustedDependencies": [

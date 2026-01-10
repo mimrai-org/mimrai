@@ -2,7 +2,7 @@
 import { Button } from "@mimir/ui/button";
 import { Form } from "@mimir/ui/form";
 import { getTaskPermalink } from "@mimir/utils/tasks";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Editor as EditorInstance } from "@tiptap/react";
 import { format } from "date-fns";
 import { Link2Icon, Loader2, SparklesIcon } from "lucide-react";

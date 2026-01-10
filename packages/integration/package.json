@@ -38,7 +38,7 @@
     "redis": "^5.8.2",
     "twilio": "^5.10.6",
     "ws": "^8.18.3",
-    "zod": "4.1.10"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@mattermost/types": "^10.12.0",
