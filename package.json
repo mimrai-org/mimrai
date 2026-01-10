@@ -20,14 +20,14 @@
     "build": "turbo build",
     "check-types": "turbo check-types",
     "dev:dashboard": "turbo -F @mimir/dashboard dev",
-    "dev:api": "turbo -F @mimir/api dev",
+    "dev:api": "turbo -F @mimir/api -F @mimir/trpc dev",
     "dev:website": "turbo -F @mimir/website dev",
     "db:push": "turbo -F @mimir/db db:push"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.0",
     "@mimir/tsconfig": "workspace:*",
-    "turbo": "2.6.3",
+    "turbo": "^2.7.3",
     "typescript": "^5.9.2"
   },
   "packageManager": "bun@1.2.21",

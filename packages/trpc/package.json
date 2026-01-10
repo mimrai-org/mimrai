@@ -9,6 +9,7 @@
     "lint": "biome check .",
     "format": "biome format --write .",
     "build": "bun tsc -p tsconfig.json",
+    "dev": "bun tsc --watch -p tsconfig.json",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {},
