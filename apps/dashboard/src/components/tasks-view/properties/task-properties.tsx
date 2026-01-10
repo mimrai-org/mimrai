@@ -1,5 +1,5 @@
 "use client";
-import type { RouterOutputs } from "@api/trpc/routers";
+import type { RouterOutputs } from "@mimir/trpc";
 import { memo } from "react";
 import { useTasksViewContext } from "../tasks-view";
 import { propertiesComponents } from "./task-properties-components";

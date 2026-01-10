@@ -1,5 +1,5 @@
 "use client";
-import type { RouterInputs, RouterOutputs } from "@api/trpc/routers";
+import type { RouterInputs, RouterOutputs } from "@mimir/trpc";
 import {
 	type UseMutateFunction,
 	useMutation,

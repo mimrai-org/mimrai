@@ -131,6 +131,7 @@ export const handleTaskComment = async ({
 				chatId: chatId,
 				userId: userId,
 				message: message,
+				role: "user",
 				createdAt: createdAt,
 			}),
 		),

@@ -1,5 +1,5 @@
 "use client";
-import type { RouterOutputs } from "@api/trpc/routers";
+import type { RouterOutputs } from "@mimir/trpc";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/ui/button";
 import {
@@ -19,6 +19,8 @@ import { trpc } from "@/utils/trpc";
 import { NotificationItem, type NotificationItemProps } from "./item";
 import { useNotificationStore } from "./store";
 
+type Status = "unread" | "read" | "archived";
+
 export const NotificationList = () => {
 	const user = useUser();
 	const { selectedIds, toggleSelection, clearSelection } =
@@ -29,7 +31,7 @@ export const NotificationList = () => {
 		trpc.activities.get.infiniteQueryOptions(
 			{
 				onlyForUser: true,
-				status: params.status ?? ["unread", "read"],
+				status: (params.status as Status[]) ?? ["unread", "read"],
 				search: params.search || undefined,
 			},
 			{

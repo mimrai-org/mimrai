@@ -1,6 +1,6 @@
 "use client";
 
-import type { RouterOutputs } from "@mimir/api/trpc";
+import type { RouterOutputs } from "@mimir/trpc";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { create } from "zustand";

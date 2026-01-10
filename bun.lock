@@ -82,7 +82,6 @@
         "@floating-ui/dom": "^1.7.4",
         "@hookform/resolvers": "^5.2.2",
         "@mdxeditor/editor": "^3.46.1",
-        "@mimir/api": "workspace:*",
         "@mimir/events": "workspace:*",
         "@mimir/locale": "workspace:*",
         "@mimir/tsconfig": "workspace:*",
@@ -169,6 +168,7 @@
         "zustand": "^5.0.8",
       },
       "devDependencies": {
+        "@mimir/trpc": "workspace:*",
         "@tailwindcss/postcss": "^4.1.10",
         "@tanstack/react-query-devtools": "^5.85.5",
         "@types/ms": "^2.1.0",
@@ -452,6 +452,16 @@
         "@types/html-to-text": "^9.0.4",
         "@types/redis": "^4.0.11",
         "@types/ws": "^8.18.1",
+      },
+    },
+    "packages/trpc": {
+      "name": "@mimir/trpc",
+      "version": "1.0.0",
+      "devDependencies": {
+        "@mimir/db": "workspace:*",
+        "@mimir/tsconfig": "workspace:*",
+        "@trpc/server": "^11.6.0",
+        "typescript": "^5.9.2",
       },
     },
     "packages/tsconfig": {
@@ -1098,6 +1108,8 @@
     "@mimir/logger": ["@mimir/logger@workspace:packages/logger"],
 
     "@mimir/notifications": ["@mimir/notifications@workspace:packages/notifications"],
+
+    "@mimir/trpc": ["@mimir/trpc@workspace:packages/trpc"],
 
     "@mimir/tsconfig": ["@mimir/tsconfig@workspace:packages/tsconfig"],
 

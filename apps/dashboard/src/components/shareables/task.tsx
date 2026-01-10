@@ -1,4 +1,4 @@
-import type { RouterOutputs } from "@api/trpc/routers";
+import type { RouterOutputs } from "@mimir/trpc";
 import { Checkbox } from "@ui/components/ui/checkbox";
 import { cn } from "@ui/lib/utils";
 import { LayersIcon } from "lucide-react";

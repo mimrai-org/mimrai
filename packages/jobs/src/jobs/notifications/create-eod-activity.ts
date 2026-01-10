@@ -1,5 +1,4 @@
 import { TZDate } from "@date-fns/tz";
-import { getDb } from "@jobs/init";
 import { createActivity } from "@mimir/db/queries/activities";
 import {
 	activities,
@@ -23,6 +22,7 @@ import {
 	sql,
 } from "drizzle-orm";
 import z from "zod";
+import { getDb } from "../../init";
 
 export const createEODActivityJob = schemaTask({
 	id: "create-eod-activity",

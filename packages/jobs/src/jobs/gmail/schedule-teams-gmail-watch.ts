@@ -1,8 +1,8 @@
-import { getDb } from "@jobs/init";
 import { integrations, integrationUserLink } from "@mimir/db/schema";
 import { watchGmail } from "@mimir/integration/gmail";
 import { schedules } from "@trigger.dev/sdk";
 import { and, eq } from "drizzle-orm";
+import { getDb } from "../../init";
 
 export const teamsGmailWatch = schedules.task({
 	id: "schedule-teams-gmail-watch",

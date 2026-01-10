@@ -1,5 +1,5 @@
 "use client";
-import type { RouterOutputs } from "@api/trpc/routers";
+import type { RouterOutputs } from "@mimir/trpc";
 import { Button } from "@mimir/ui/button";
 import {
 	Card,
@@ -58,7 +58,7 @@ export const RepositoriesList = ({
 		trpc.github.disconnectRepository.mutationOptions({
 			onSuccess: () => {
 				queryClient.invalidateQueries(
-					trpc.github.getConnectedRepositories.queryOptions(),
+					trpc.github.getConnectedRepositories.queryOptions({}),
 				);
 			},
 		}),
@@ -141,7 +141,7 @@ export const ConnectRepositoryInput = ({
 				setShowPopover(false);
 				setSearch("");
 				queryClient.invalidateQueries(
-					trpc.github.getConnectedRepositories.queryOptions(),
+					trpc.github.getConnectedRepositories.queryOptions({}),
 				);
 			},
 		}),
@@ -206,7 +206,7 @@ export const BranchesInput = ({
 		trpc.github.updateConnectedRepository.mutationOptions({
 			onSuccess: () => {
 				queryClient.invalidateQueries(
-					trpc.github.getConnectedRepositories.queryOptions(),
+					trpc.github.getConnectedRepositories.queryOptions({}),
 				);
 			},
 		}),

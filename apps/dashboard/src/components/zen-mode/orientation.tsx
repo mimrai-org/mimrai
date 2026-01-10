@@ -1,10 +1,10 @@
 "use client";
-import type { RouterOutputs } from "@api/trpc/routers";
+import type { RouterOutputs } from "@mimir/trpc";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/ui/button";
 import { cn } from "@ui/lib/utils";
 import { formatRelative } from "date-fns";
-import { DotIcon, Maximize2Icon } from "lucide-react";
+import { Maximize2Icon } from "lucide-react";
 import { motion, stagger } from "motion/react";
 import Link from "next/link";
 import { useUser } from "@/hooks/use-user";
@@ -68,6 +68,7 @@ export const ZenModeOrientation = ({
 							const props = getNotificationItemProps({
 								activity: {
 									...item.activities,
+									// @ts-expect-error
 									user: item.user,
 								},
 								user,

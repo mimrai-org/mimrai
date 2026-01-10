@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
 	typescript: {
 		ignoreBuildErrors: true,
 	},
-	transpilePackages: ["@mimir/integration", "@mimir/api", "@mimir/ui"],
+	transpilePackages: ["@mimir/integration", "@mimir/trpc", "@mimir/ui"],
 	images: {
 		remotePatterns: [
 			{

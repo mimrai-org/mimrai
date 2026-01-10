@@ -6,12 +6,12 @@
 		"../integration/src/registry.ts",
 		"../jobs/src/jobs/notifications/send-notification-job.ts"
 	],
-	"exclude": ["node_modules"],
 	"compilerOptions": {
 		"baseUrl": ".",
 		"verbatimModuleSyntax": true,
 		"module": "esnext",
 		"moduleResolution": "bundler",
+		"types": ["@types/bun"],
 
 		"paths": {
 			"@api/*": ["../../apps/api/src/*"],

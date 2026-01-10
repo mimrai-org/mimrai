@@ -8,6 +8,7 @@
 			"@ui/*": ["../../packages/ui/src/*"]
 		},
 		"strict": true,
+		"strictNullChecks": false,
 		"verbatimModuleSyntax": true
 	},
 	"include": [
@@ -17,5 +18,5 @@
 		"./next-env.d.ts",
 		".next/types/**/*.ts"
 	],
-	"exclude": ["node_modules", ".next"]
+	"exclude": ["**/node_modules", "**/.*/", ".next", "next.config.ts"]
 }

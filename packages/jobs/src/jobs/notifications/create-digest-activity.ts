@@ -1,6 +1,5 @@
 import { openai } from "@ai-sdk/openai";
 import { TZDate } from "@date-fns/tz";
-import { getDb } from "@jobs/init";
 import { createActivity } from "@mimir/db/queries/activities";
 import {
 	autopilotSettings,
@@ -27,6 +26,7 @@ import {
 	sql,
 } from "drizzle-orm";
 import z from "zod";
+import { getDb } from "../../init";
 
 export const createDigestActivityJob = schemaTask({
 	id: "create-digest-activity",

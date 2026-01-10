@@ -1,4 +1,3 @@
-import { globalSearch } from "@mimir/db/queries/global-search";
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { protectedProcedure, publicProcedure, router } from "../init";
 import { activitiesRouter } from "./activities";

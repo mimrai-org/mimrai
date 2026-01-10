@@ -2,7 +2,7 @@ import {
 	useChatMessages,
 	useChatStatus as useChatStoreStatus,
 } from "@ai-sdk-tools/store";
-import type { UIChatMessage } from "@mimir/api/ai/types";
+import type { UIChatMessage } from "@api/ai/types";
 import { cn } from "@ui/lib/utils";
 import type { UIMessage } from "ai";
 import { PaperclipIcon } from "lucide-react";

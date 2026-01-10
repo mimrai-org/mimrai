@@ -1,5 +1,5 @@
 "use client";
-import type { RouterInputs, RouterOutputs } from "@api/trpc/routers";
+import type { RouterInputs, RouterOutputs } from "@mimir/trpc";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { createContext, useContext, useMemo, useState } from "react";
 import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";

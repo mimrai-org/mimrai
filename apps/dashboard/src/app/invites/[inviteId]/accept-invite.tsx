@@ -1,6 +1,6 @@
 "use client";
 
-import type { RouterOutputs } from "@mimir/api/trpc";
+import type { RouterOutputs } from "@mimir/trpc";
 import { Button } from "@mimir/ui/button";
 import { Card, CardContent } from "@mimir/ui/card";
 import { useMutation } from "@tanstack/react-query";

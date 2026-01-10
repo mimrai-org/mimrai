@@ -1,8 +1,8 @@
 "use client";
 
-import type { RouterOutputs } from "@api/trpc/routers";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
+import type { RouterOutputs } from "@mimir/trpc";
 import { TaskProperty } from "@/components/tasks-view/properties/task-properties";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { cn } from "@/lib/utils";

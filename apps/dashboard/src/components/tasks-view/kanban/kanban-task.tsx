@@ -1,4 +1,4 @@
-import type { RouterOutputs } from "@mimir/api/trpc";
+import type { RouterOutputs } from "@mimir/trpc";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { TaskProperty } from "@/components/tasks-view/properties/task-properties";

@@ -1,4 +1,4 @@
-import type { RouterOutputs } from "@api/trpc/routers";
+import type { RouterOutputs } from "@mimir/trpc";
 import { LabelBadge } from "@ui/components/ui/label-badge";
 import { cn } from "@ui/lib/utils";
 import { CheckSquareIcon } from "lucide-react";
@@ -6,7 +6,6 @@ import { useMemo } from "react";
 import { DependencyIcon } from "../../dependency-icon";
 import { MilestoneIcon } from "../../milestone-icon";
 import { ProjectIcon } from "../../project-icon";
-import { StatusIcon } from "../../status-icon";
 import { TaskPropertyAssignee } from "./assignee";
 import { TaskPropertyDueDate } from "./due-date";
 import { Priority } from "./priority";

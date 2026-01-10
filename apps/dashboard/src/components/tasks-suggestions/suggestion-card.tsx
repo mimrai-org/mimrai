@@ -1,4 +1,4 @@
-import type { RouterOutputs } from "@api/trpc/routers";
+import type { RouterOutputs } from "@mimir/trpc";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@ui/components/ui/button";
 import { cn } from "@ui/lib/utils";
@@ -79,8 +79,8 @@ export const SuggestionCard = ({
 
 				if (!data) return;
 
-				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
-				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
+				queryClient.invalidateQueries(trpc.tasks.get.queryOptions({}));
+				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions({}));
 				queryClient.setQueryData(
 					trpc.tasksSuggestions.get.queryKey({
 						status: ["pending"],

@@ -1,5 +1,5 @@
 "use client";
-import type { RouterOutputs } from "@api/trpc/routers";
+import type { RouterOutputs } from "@mimir/trpc";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { createContext, useContext, useEffect, useMemo } from "react";
 import { queryClient, trpc } from "@/utils/trpc";
@@ -19,7 +19,6 @@ export const InboxContext = createContext<InboxContextValue | undefined>(
 
 export const InboxProvider = ({ children }: { children: React.ReactNode }) => {
 	const { params } = useInboxFilterParams();
-
 	const { data } = useInfiniteQuery(
 		trpc.inbox.get.infiniteQueryOptions(
 			{

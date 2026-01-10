@@ -1,7 +1,5 @@
 import { openai } from "@ai-sdk/openai";
 import { TZDate } from "@date-fns/tz";
-import { getDb } from "@jobs/init";
-import { createActivity } from "@mimir/db/queries/activities";
 import { createTaskSuggestion } from "@mimir/db/queries/tasks-suggestions";
 import {
 	activities,
@@ -13,7 +11,6 @@ import {
 	users,
 	usersOnTeams,
 } from "@mimir/db/schema";
-import { trackFollowUp } from "@mimir/events/server";
 import { logger, schemaTask } from "@trigger.dev/sdk";
 import { generateObject } from "ai";
 import {
@@ -29,6 +26,7 @@ import {
 	sql,
 } from "drizzle-orm";
 import z from "zod";
+import { getDb } from "../../init";
 
 export const generateTeamSuggestionsJob = schemaTask({
 	id: "generate-team-suggestions-job",

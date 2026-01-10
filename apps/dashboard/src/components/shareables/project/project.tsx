@@ -1,5 +1,4 @@
-import type { RouterOutputs } from "@api/trpc/routers";
-import { Progress } from "@/app/team/[team]/(navigation)/projects/projects-list";
+import type { RouterOutputs } from "@mimir/trpc";
 import { ProjectIcon } from "@/components/project-icon";
 import { Response } from "../../chat/response";
 import { ProjectBoardShareable } from "./board";

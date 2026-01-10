@@ -1,4 +1,4 @@
-import type { RouterOutputs } from "@api/trpc/routers";
+import type { RouterOutputs } from "@mimir/trpc";
 import { type UseQueryOptions, useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { trpc } from "@/utils/trpc";
@@ -38,7 +38,7 @@ export type GroupByOption<O = any, D = GenericGroup<O>, DD = Array<D>> = {
 	updateData: (item: Partial<Task>, data: any) => void;
 	select: (tasks: Task[], group: O) => Task[];
 
-	queryOptions: UseQueryOptions<DD, any, DD, any>;
+	queryOptions: UseQueryOptions<any, any, DD, any>;
 };
 
 // Group By Options
@@ -73,7 +73,7 @@ export const tasksGroupByOptions: Record<TasksGroupBy, GroupByOption> = {
 			},
 			{
 				select: (statuses) => {
-					return statuses.data.map((status) => ({
+					return statuses.data.map((status: Status) => ({
 						id: status.id,
 						name: status.name,
 						type: "status" as const,
@@ -99,7 +99,7 @@ export const tasksGroupByOptions: Record<TasksGroupBy, GroupByOption> = {
 			{},
 			{
 				select: (members) => {
-					return members.map((member) => ({
+					return members.map((member: TeamMember) => ({
 						id: member.id,
 						name: member.name || "No Name",
 						type: "assignee" as const,
@@ -154,7 +154,7 @@ export const tasksGroupByOptions: Record<TasksGroupBy, GroupByOption> = {
 			{},
 			{
 				select: (projects) => {
-					return projects.data.map((project) => ({
+					return projects.data.map((project: Project) => ({
 						id: project.id,
 						name: project.name,
 						type: "project" as const,
@@ -180,7 +180,7 @@ export const tasksGroupByOptions: Record<TasksGroupBy, GroupByOption> = {
 			{},
 			{
 				select: (milestones) => {
-					return milestones.data.map((milestone) => ({
+					return milestones.data.map((milestone: Milestone) => ({
 						id: milestone.id,
 						name: milestone.name,
 						type: "milestone" as const,

@@ -1,6 +1,5 @@
 "use client";
 
-import type { RouterOutputs } from "@api/trpc/routers";
 import {
 	DndContext,
 	type DragEndEvent,
@@ -11,6 +10,7 @@ import {
 	useSensor,
 	useSensors,
 } from "@dnd-kit/core";
+import type { RouterOutputs } from "@mimir/trpc";
 import { Button } from "@ui/components/ui/button";
 import {
 	addDays,

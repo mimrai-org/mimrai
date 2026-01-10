@@ -7,7 +7,7 @@ import {
 
 export const inboxFilterParams = {
 	status: parseAsArrayOf(
-		parseAsStringLiteral(["pending", "accepted", "archived", "dismissed"]),
+		parseAsStringLiteral(["pending", "archived"]),
 	).withDefault(["pending"]),
 	selectedInboxId: parseAsString,
 };

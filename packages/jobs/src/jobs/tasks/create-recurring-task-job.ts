@@ -1,4 +1,3 @@
-import { getDb } from "@jobs/init";
 import { createTask, updateTaskRecurringJob } from "@mimir/db/queries/tasks";
 import {
 	checklistItems,
@@ -11,6 +10,7 @@ import { getNextTaskRecurrenceDate } from "@mimir/utils/recurrence";
 import { logger, schemaTask } from "@trigger.dev/sdk";
 import { and, desc, eq } from "drizzle-orm";
 import z from "zod";
+import { getDb } from "../../init";
 
 export const createRecurringTaskJob = schemaTask({
 	id: "create-recurring-task-job",

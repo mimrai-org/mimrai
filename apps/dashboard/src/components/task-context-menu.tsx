@@ -1,4 +1,4 @@
-import type { RouterOutputs } from "@mimir/api/trpc";
+import type { RouterOutputs } from "@mimir/trpc";
 import { Checkbox } from "@mimir/ui/checkbox";
 import {
 	ContextMenu,
@@ -368,7 +368,6 @@ export const TaskContextMenu = ({
 					</ContextMenuSubTrigger>
 					<ContextMenuSubContent className="w-48">
 						<ContextMenuItem
-							// @ts-expect-error
 							onClick={handleUpdateTask.bind(null, { assigneeId: null })}
 						>
 							<div className="flex items-center gap-2">

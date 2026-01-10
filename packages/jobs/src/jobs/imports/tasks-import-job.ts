@@ -1,4 +1,3 @@
-import { createAdminClient } from "@jobs/utils/supabase";
 import { getImportById, updateImportStatus } from "@mimir/db/queries/imports";
 import { createLabel, getLabelByName } from "@mimir/db/queries/labels";
 import { getBacklogStatus } from "@mimir/db/queries/statuses";
@@ -10,6 +9,7 @@ import { generateObject } from "ai";
 import * as cptable from "xlsx/dist/cpexcel.full.mjs";
 import * as XLSX from "xlsx/xlsx.mjs";
 import z from "zod";
+import { createAdminClient } from "../../utils/supabase";
 
 export const tasksImportJob = schemaTask({
 	id: "tasks-import",

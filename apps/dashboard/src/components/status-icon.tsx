@@ -1,4 +1,4 @@
-import type { RouterOutputs } from "@mimir/api/trpc";
+import type { RouterOutputs } from "@mimir/trpc";
 import { cn } from "@ui/lib/utils";
 import {
 	CircleCheckIcon,

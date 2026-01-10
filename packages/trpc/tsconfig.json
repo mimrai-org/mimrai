@@ -1,0 +1,29 @@
+{
+	"extends": "@mimir/tsconfig/base.json",
+	"compilerOptions": {
+		"baseUrl": ".",
+		"lib": ["ESNext", "DOM", "DOM.Iterable"],
+		"target": "esnext",
+		"module": "esnext",
+		"outDir": "dist",
+		"declaration": true,
+		"emitDeclarationOnly": true,
+		"moduleDetection": "force",
+		"allowJs": true,
+		"moduleResolution": "bundler",
+		"strict": false,
+		"strictNullChecks": false,
+		"noCheck": true,
+		"isolatedModules": true,
+		"esModuleInterop": true,
+		"resolveJsonModule": true,
+		"verbatimModuleSyntax": true,
+		"allowImportingTsExtensions": true,
+		"types": [],
+		"paths": {
+			"@api/*": ["../../apps/api/src/*.ts"]
+		}
+	},
+	"include": ["src"],
+	"exclude": ["**/node_modules", "**/.*/"]
+}

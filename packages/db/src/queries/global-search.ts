@@ -1,9 +1,9 @@
 import { and, type SQL, sql } from "drizzle-orm";
 import { QueryBuilder } from "drizzle-orm/pg-core";
-import { db } from "..";
+import { db } from "../index";
 import { globalSearchView } from "../schema";
 
-interface GlobalSearchResult {
+export interface GlobalSearchResult {
 	id: string;
 	type: string;
 	title: string;

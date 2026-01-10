@@ -1,4 +1,4 @@
-import type { Scope } from "@mimir/api/scopes";
+import type { Scope } from "@api/lib/scopes";
 import { useQuery } from "@tanstack/react-query";
 import { trpc } from "@/utils/trpc";
 

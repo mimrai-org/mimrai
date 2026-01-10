@@ -1,5 +1,5 @@
 "use client";
-import type { RouterOutputs } from "@api/trpc/routers";
+import type { RouterOutputs } from "@mimir/trpc";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/ui/button";
 import {
@@ -166,7 +166,7 @@ const Item = ({
 					}),
 				);
 
-				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
+				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions({}));
 			},
 		}),
 	);

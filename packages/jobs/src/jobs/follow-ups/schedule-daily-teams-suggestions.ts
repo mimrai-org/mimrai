@@ -1,8 +1,8 @@
 import { TZDate } from "@date-fns/tz";
-import { getDb } from "@jobs/init";
 import { autopilotSettings, teams } from "@mimir/db/schema";
 import { logger, schedules } from "@trigger.dev/sdk";
 import { eq } from "drizzle-orm";
+import { getDb } from "../../init";
 import { generateTeamSuggestionsJob } from "./generate-team-suggestions-job";
 
 export const scheduleDailyTeamsSuggestions = schedules.task({

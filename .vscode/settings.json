@@ -8,6 +8,7 @@
   "biome.requireConfiguration": true,
   "biome.lsp.bin": "./node_modules/.bin/biome",
   "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.tsserver.enableTracing": true,
   "editor.formatOnPaste": true,
   "emmet.showExpandedAbbreviation": "never",
   "rust-analyzer.linkedProjects": [

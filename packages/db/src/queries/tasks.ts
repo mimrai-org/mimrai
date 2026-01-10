@@ -104,7 +104,7 @@ export const getTasks = async ({
 	nProjectId?: string[];
 	search?: string;
 	recurring?: boolean;
-	view?: "board" | "list";
+	view?: "board" | "list" | "calendar";
 }) => {
 	const whereClause: (SQL | undefined)[] = [];
 

@@ -24,7 +24,7 @@ export const getTasksSchema = z.object({
 	milestoneId: z.array(z.string()).optional().nullable(),
 	search: z.string().optional().nullable(),
 	labels: z.array(z.string()).optional().nullable(),
-	view: z.enum(["board", "list"]).optional().nullable(),
+	view: z.enum(["board", "list", "calendar"]).optional().nullable(),
 	recurring: z.boolean().optional().nullable(),
 });
 export type GetTasksInput = z.infer<typeof getTasksSchema>;

@@ -1,9 +1,9 @@
 import { TZDate } from "@date-fns/tz";
-import { getDb } from "@jobs/init";
 import { teams, users, usersOnTeams } from "@mimir/db/schema";
 import { schedules } from "@trigger.dev/sdk";
 import { format, set } from "date-fns";
 import { eq } from "drizzle-orm";
+import { getDb } from "../../init";
 import { createDigestActivityJob } from "./create-digest-activity";
 import { createEODActivityJob } from "./create-eod-activity";
 
