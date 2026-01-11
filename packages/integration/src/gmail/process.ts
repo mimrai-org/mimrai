@@ -21,7 +21,7 @@ export const processEmail = async ({
 	});
 
 	const response = await generateObject({
-		model: openai("gpt-4o-mini"),
+		model: openai("gpt-4o"),
 		system: `
 <guidelines>
 - Extract the assignee if suffient information is present in the email content or deduce it from the team members list based on their descriptions. Use their user ID to set the assigneeId.
