@@ -461,6 +461,7 @@
         "@mimir/db": "workspace:*",
         "@mimir/tsconfig": "workspace:*",
         "@trpc/server": "^11.6.0",
+        "drizzle-orm": "catalog:",
         "typescript": "^5.9.2",
         "zod": "catalog:",
       },

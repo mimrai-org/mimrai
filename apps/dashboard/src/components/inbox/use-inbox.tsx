@@ -43,6 +43,7 @@ export const InboxProvider = ({ children }: { children: React.ReactNode }) => {
 		for (const item of flatData) {
 			queryClient.setQueryData(
 				trpc.inbox.getById.queryKey({ id: item.id }),
+				// @ts-expect-error
 				item,
 			);
 		}

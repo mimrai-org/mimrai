@@ -1,6 +1,5 @@
 "use client";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Alert, AlertDescription, AlertTitle } from "@ui/components/ui/alert";
 import { Badge } from "@ui/components/ui/badge";
 import { Button } from "@ui/components/ui/button";
 import {
@@ -9,18 +8,11 @@ import {
 	CollapsibleTrigger,
 } from "@ui/components/ui/collapsible";
 import { cn } from "@ui/lib/utils";
-import {
-	CheckIcon,
-	EyeIcon,
-	PlusIcon,
-	SparklesIcon,
-	XIcon,
-} from "lucide-react";
+import { EyeIcon, PlusIcon, SparklesIcon, XIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { queryClient, trpc } from "@/utils/trpc";
 import { AssigneeAvatar } from "../asignee-avatar";
-import { Response } from "../chat/response";
 import Loader from "../loader";
 import { propertiesComponents } from "../tasks-view/properties/task-properties-components";
 import { InboxDropdown } from "./dropdown";
@@ -148,7 +140,7 @@ export const InboxOverview = ({ className }: { className?: string }) => {
 			<div className="h-[calc(100vh-90px)] space-y-4 overflow-y-auto rounded-lg bg-card p-4">
 				<div className="space-y-1">
 					<div className="flex justify-between">
-						<h1 className="truncate font-medium text-xl">
+						<h1 className="truncate font-header text-2xl">
 							{selectedInbox.display}
 						</h1>
 						<div>
@@ -211,7 +203,7 @@ export const InboxOverview = ({ className }: { className?: string }) => {
 					<div key={intake.id} className="space-y-2 rounded-md border p-4">
 						<div className="space-y-2">
 							<div className="flex items-center justify-between">
-								<h2 className="font-medium text-base">
+								<h2 className="font-normal text-base">
 									{intake.payload.title}
 								</h2>
 								{intake.taskId ? (

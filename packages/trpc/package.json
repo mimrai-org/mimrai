@@ -16,6 +16,7 @@
   "devDependencies": {
     "@mimir/tsconfig": "workspace:*",
     "@mimir/db": "workspace:*",
+    "drizzle-orm": "catalog:",
     "@trpc/server": "^11.6.0",
     "zod": "catalog:",
     "typescript": "^5.9.2"
