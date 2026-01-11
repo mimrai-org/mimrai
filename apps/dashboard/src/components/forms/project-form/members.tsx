@@ -45,7 +45,7 @@ export const ProjectMembersSelect = () => {
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger className="flex h-7 items-center gap-2 rounded-sm border px-2 text-xs">
+			<DropdownMenuTrigger className="flex h-6 items-center gap-2 rounded-sm border px-2 text-xs">
 				<UsersIcon className="size-3.5 text-muted-foreground" />
 				{members.length > 0 ? (
 					<div className="-space-x-2 flex">
@@ -54,7 +54,7 @@ export const ProjectMembersSelect = () => {
 						))}
 					</div>
 				) : (
-					<span>Members</span>
+					<span className="text-muted-foreground">Members</span>
 				)}
 			</DropdownMenuTrigger>
 			<DropdownMenuContent>

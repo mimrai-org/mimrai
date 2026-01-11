@@ -103,7 +103,7 @@ export const RangeInput = () => {
 	return (
 		<Tooltip>
 			<TooltipTrigger asChild>
-				<div className="flex h-7 items-center gap-2 rounded-sm border bg-background px-2">
+				<div className="flex h-6 items-center gap-2 rounded-sm border bg-background px-2">
 					<CalendarClockIcon className="size-3.5" />
 					<ProjectDateSelect name="startDate" placeholder="Start" />
 					<span className="text-muted-foreground text-sm">to</span>

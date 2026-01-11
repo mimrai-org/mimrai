@@ -32,9 +32,13 @@ export const ProjectVisibilitySelect = () => {
 		<DropdownMenu>
 			<Tooltip>
 				<TooltipTrigger asChild>
-					<DropdownMenuTrigger className="flex h-7 items-center gap-2 rounded-sm border px-2 text-xs">
+					<DropdownMenuTrigger className="flex h-6 items-center gap-2 rounded-sm border px-2 text-xs">
 						<EyeIcon className="size-3.5 text-muted-foreground" />
-						{visibility ? <span>{label}</span> : <span>Visibility</span>}
+						{visibility ? (
+							<span>{label}</span>
+						) : (
+							<span className="text-muted-foreground">Visibility</span>
+						)}
 					</DropdownMenuTrigger>
 				</TooltipTrigger>
 				<TooltipContent>
