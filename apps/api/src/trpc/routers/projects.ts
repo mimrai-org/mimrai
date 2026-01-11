@@ -1,17 +1,23 @@
 import {
+	addProjectMemberSchema,
 	createProjectSchema,
+	getProjectMembersSchema,
 	getProjectsSchema,
+	removeProjectMemberSchema,
 	updateProjectSchema,
 } from "@api/schemas/projects";
 import { protectedProcedure, router } from "@api/trpc/init";
 import {
+	addProjectMember,
 	cloneProject,
 	createProject,
 	deleteProject,
 	getProjectById,
+	getProjectMembers,
 	getProjectProgress,
 	getProjects,
 	getProjectsForTimeline,
+	removeProjectMember,
 	updateProject,
 } from "@mimir/db/queries/projects";
 import z from "zod";
@@ -23,12 +29,14 @@ export const projectsRouter = router({
 			return getProjects({
 				...input,
 				teamId: ctx.user.teamId,
+				userId: ctx.user.id,
 			});
 		}),
 
 	getForTimeline: protectedProcedure.query(async ({ ctx }) => {
 		return getProjectsForTimeline({
 			teamId: ctx.user.teamId,
+			userId: ctx.user.id,
 		});
 	}),
 
@@ -48,6 +56,7 @@ export const projectsRouter = router({
 			return getProjectById({
 				projectId: input.id,
 				teamId: ctx.user.teamId,
+				userId: ctx.user.id,
 			});
 		}),
 
@@ -85,6 +94,36 @@ export const projectsRouter = router({
 				projectId: input.id,
 				teamId: ctx.user.teamId,
 				userId: ctx.user.id,
+			});
+		}),
+
+	// Project members management
+	addMember: protectedProcedure
+		.input(addProjectMemberSchema)
+		.mutation(async ({ ctx, input }) => {
+			return addProjectMember({
+				projectId: input.projectId,
+				userId: input.userId,
+				teamId: ctx.user.teamId,
+			});
+		}),
+
+	removeMember: protectedProcedure
+		.input(removeProjectMemberSchema)
+		.mutation(async ({ ctx, input }) => {
+			return removeProjectMember({
+				projectId: input.projectId,
+				userId: input.userId,
+				teamId: ctx.user.teamId,
+			});
+		}),
+
+	getMembers: protectedProcedure
+		.input(getProjectMembersSchema)
+		.query(async ({ ctx, input }) => {
+			return getProjectMembers({
+				projectId: input.projectId,
+				teamId: ctx.user.teamId,
 			});
 		}),
 });

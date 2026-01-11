@@ -1,4 +1,4 @@
-import { ProjectDetail } from "./project-detail";
+import { ProjectOverview } from "@/components/projects/overview/overview";
 
 type Props = {
 	params: Promise<{ projectId: string }>;
@@ -7,5 +7,5 @@ type Props = {
 export default async function Page({ params }: Props) {
 	const { projectId } = await params;
 
-	return <ProjectDetail projectId={projectId} />;
+	return <ProjectOverview projectId={projectId} />;
 }

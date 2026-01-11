@@ -25,6 +25,7 @@ import {
 	labels,
 	labelsOnTasks,
 	milestones,
+	projectMembers,
 	projects,
 	statuses,
 	type statusTypeEnum,
@@ -99,6 +100,7 @@ export const getTasks = async ({
 	statusType?: (typeof statusTypeEnum.enumValues)[number][];
 	labels?: string[];
 	teamId?: string;
+	userId?: string;
 	projectId?: string[];
 	milestoneId?: string[];
 	nProjectId?: string[];
@@ -138,6 +140,40 @@ export const getTasks = async ({
 				isNull(tasks.projectId),
 			),
 		);
+
+	// Filter by project visibility:
+	// - Show tasks with no project
+	// - Show tasks from team-wide projects
+	// - Show tasks from private projects where user is assigned
+	// - Show tasks from private projects where user is lead/member/creator
+	if (input.userId && input.teamId) {
+		whereClause.push(
+			or(
+				// Tasks with no project
+				isNull(tasks.projectId),
+				// Tasks from team-wide projects
+				sql`${tasks.projectId} IN (
+					SELECT ${projects.id} FROM ${projects}
+					WHERE ${projects.visibility} = 'team'
+					AND ${projects.teamId} = ${input.teamId}
+				)`,
+				// Tasks explicitly assigned to the user (even in private projects)
+				eq(tasks.assigneeId, input.userId),
+				// Tasks from private projects where user is lead, creator or member
+				sql`${tasks.projectId} IN (
+					SELECT ${projects.id} FROM ${projects}
+					LEFT JOIN ${projectMembers} ON ${projectMembers.projectId} = ${projects.id}
+					WHERE ${projects.visibility} = 'private'
+					AND ${projects.teamId} = ${input.teamId}
+					AND (
+						${projects.leadId} = ${input.userId}
+						OR ${projects.userId} = ${input.userId}
+						OR ${projectMembers.userId} = ${input.userId}
+					)
+				)`,
+			),
+		);
+	}
 
 	if (input.search) {
 		// Check if the search input is a UUID

@@ -7,6 +7,11 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@ui/components/ui/popover";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@ui/components/ui/tooltip";
 import { set } from "better-auth";
 import { format, isValid, parse } from "date-fns";
 import { CalendarClockIcon, XIcon } from "lucide-react";
@@ -96,12 +101,19 @@ function parseDateString(value: string): Date | null {
 
 export const RangeInput = () => {
 	return (
-		<div className="flex h-5.5 items-center gap-2 rounded-sm border bg-background px-2">
-			<CalendarClockIcon className="size-3.5" />
-			<ProjectDateSelect name="startDate" placeholder="Start" />
-			<span className="text-muted-foreground text-sm">to</span>
-			<ProjectDateSelect name="endDate" placeholder="End" />
-		</div>
+		<Tooltip>
+			<TooltipTrigger asChild>
+				<div className="flex h-7 items-center gap-2 rounded-sm border bg-background px-2">
+					<CalendarClockIcon className="size-3.5" />
+					<ProjectDateSelect name="startDate" placeholder="Start" />
+					<span className="text-muted-foreground text-sm">to</span>
+					<ProjectDateSelect name="endDate" placeholder="End" />
+				</div>
+			</TooltipTrigger>
+			<TooltipContent>
+				Set the start and end dates for the project.
+			</TooltipContent>
+		</Tooltip>
 	);
 };
 
@@ -141,7 +153,7 @@ export const ProjectDateSelect = ({
 						<button type="button" className="text-xs">
 							{field.value ? (
 								format(
-									field.value ? new Date(field.value) : new Date(),
+									field.value ? new Date(field.value as string) : new Date(),
 									"MMM d",
 								)
 							) : (
@@ -173,8 +185,10 @@ export const ProjectDateSelect = ({
 						<Calendar
 							key={calendarVersion}
 							mode="single"
-							today={field.value ? new Date(field.value) : new Date()}
-							selected={field.value ? new Date(field.value) : undefined}
+							today={field.value ? new Date(field.value as string) : new Date()}
+							selected={
+								field.value ? new Date(field.value as string) : undefined
+							}
 							onSelect={(date) => {
 								field.onChange(date ? date.toISOString() : null);
 								setInputValue(date ? format(date, "MMM d, yyyy") : "");

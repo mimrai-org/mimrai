@@ -2,11 +2,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { ProjectForm } from "@/components/forms/project-form/form";
 import { trpc } from "@/utils/trpc";
-import { LatestUpdate } from "./latest-update";
+import { LatestUpdate } from "./latest-update-card";
 import { MilestonesCard } from "./milestones-card";
 import { ProjectProgressCard } from "./progress-card";
 
-export const ProjectDetail = ({ projectId }: { projectId: string }) => {
+export const ProjectOverview = ({ projectId }: { projectId: string }) => {
 	const { data } = useQuery(
 		trpc.projects.getById.queryOptions({
 			id: projectId,

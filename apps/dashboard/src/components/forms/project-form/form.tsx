@@ -12,8 +12,12 @@ import { ActionsMenu } from "./actions-menu";
 import { ProjectColorPicker } from "./color-picker";
 import { Description } from "./description";
 import { type ProjectFormValues, projectFormSchema } from "./form-type";
+import { ProjectLeadSelect } from "./lead";
+import { ProjectMembersSelect } from "./members";
 import { RangeInput } from "./range-input";
+import { ProjectStatusSelect } from "./status";
 import { Name } from "./title";
+import { ProjectVisibilitySelect } from "./visibility";
 
 export const ProjectForm = ({
 	defaultValues,
@@ -130,8 +134,12 @@ export const ProjectForm = ({
 							</div>
 							<Name />
 							<Description />
-							<div className="flex flex-wrap items-center">
+							<div className="flex flex-wrap items-center gap-2">
 								<RangeInput />
+								<ProjectStatusSelect />
+								<ProjectVisibilitySelect />
+								<ProjectLeadSelect />
+								<ProjectMembersSelect />
 							</div>
 						</div>
 					</div>

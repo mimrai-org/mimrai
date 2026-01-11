@@ -53,6 +53,7 @@ export const tasksRouter = router({
 				pageSize: 100,
 				...input,
 				teamId: ctx.user.teamId!,
+				userId: ctx.user.id,
 			});
 		}),
 

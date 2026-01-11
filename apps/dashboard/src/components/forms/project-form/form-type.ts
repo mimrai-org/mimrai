@@ -7,6 +7,13 @@ export const projectFormSchema = z.object({
 	color: z.string().optional().nullable(),
 	startDate: z.string().optional().nullable(),
 	endDate: z.string().optional().nullable(),
+	status: z
+		.enum(["planning", "in_progress", "completed", "on_hold"])
+		.optional()
+		.nullable(),
+	memberIds: z.array(z.string()).optional(),
+	leadId: z.string().optional().nullable(),
+	visibility: z.enum(["team", "private"]).optional().nullable(),
 	updatedAt: z.string().optional().nullable(),
 });
 

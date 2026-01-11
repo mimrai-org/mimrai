@@ -962,6 +962,11 @@ export const checklistItems = pgTable(
 	],
 );
 
+export const projectVisibilityEnum = pgEnum("project_visibility", [
+	"team",
+	"private",
+]);
+
 export const projectStatusEnum = pgEnum("project_status", [
 	"planning",
 	"in_progress",
@@ -982,6 +987,8 @@ export const projects = pgTable(
 		archived: boolean("archived").default(false).notNull(),
 		teamId: text("team_id").notNull(),
 		userId: text("user_id").notNull(),
+		leadId: text("lead_id"),
+		visibility: projectVisibilityEnum("visibility").default("team").notNull(),
 		startDate: timestamp("start_date", {
 			withTimezone: true,
 			mode: "string",
@@ -1009,8 +1016,56 @@ export const projects = pgTable(
 			foreignColumns: [teams.id],
 			name: "projects_team_id_fkey",
 		}).onDelete("cascade"),
+		foreignKey({
+			columns: [table.leadId],
+			foreignColumns: [users.id],
+			name: "projects_lead_id_fkey",
+		}).onDelete("set null"),
 	],
 );
+
+export const projectMembers = pgTable(
+	"project_members",
+	{
+		projectId: text("project_id").notNull(),
+		userId: text("user_id").notNull(),
+		createdAt: timestamp("created_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
+	},
+	(table) => [
+		primaryKey({
+			columns: [table.projectId, table.userId],
+			name: "project_members_pkey",
+		}),
+		foreignKey({
+			columns: [table.projectId],
+			foreignColumns: [projects.id],
+			name: "project_members_project_id_fkey",
+		})
+			.onDelete("cascade")
+			.onUpdate("cascade"),
+		foreignKey({
+			columns: [table.userId],
+			foreignColumns: [users.id],
+			name: "project_members_user_id_fkey",
+		})
+			.onDelete("cascade")
+			.onUpdate("cascade"),
+	],
+);
+
+export const projectMembersRelations = relations(projectMembers, ({ one }) => ({
+	project: one(projects, {
+		fields: [projectMembers.projectId],
+		references: [projects.id],
+	}),
+	user: one(users, {
+		fields: [projectMembers.userId],
+		references: [users.id],
+	}),
+}));
 
 export const projectHealthEnum = pgEnum("project_health", [
 	"on_track",
