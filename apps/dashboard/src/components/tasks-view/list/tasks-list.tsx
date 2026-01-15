@@ -7,7 +7,17 @@ import {
 	useSensors,
 } from "@dnd-kit/core";
 import { Button } from "@ui/components/ui/button";
-import { ListPlusIcon, PlusIcon } from "lucide-react";
+import {
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
+} from "@ui/components/ui/collapsible";
+import {
+	ListPlusIcon,
+	Maximize2Icon,
+	Minimize2Icon,
+	PlusIcon,
+} from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import { useTaskParams } from "@/hooks/use-task-params";
 import Loader from "../../loader";
@@ -91,35 +101,48 @@ export const TaskGroupItem = ({
 			className="flex flex-col gap-2"
 			ref={setDroppableNodeRef}
 		>
-			<h2 className="flex items-center gap-2 rounded-sm border bg-card px-4 py-2 text-sm dark:border-none">
-				{taskGroup.column.icon}
-				{taskGroup.column.name}
-				<span className="text-muted-foreground text-xs">
-					{taskGroup.tasks.length}
-				</span>
-			</h2>
-			{taskGroup.tasks.map((task) => (
-				<TaskContextMenu key={task.id} task={task}>
-					<div>
-						<TaskItem task={task} />
-					</div>
-				</TaskContextMenu>
-			))}
-			<Button
-				className="w-full justify-start border border-transparent border-dashed text-start text-muted-foreground text-xs hover:border-input"
-				variant={"ghost"}
-				onClick={() => {
-					setTaskParams({
-						createTask: true,
-						taskStatusId: taskGroup.column.id,
-						taskProjectId:
-							filters.projectId?.length > 0 ? filters.projectId[0] : undefined,
-					});
-				}}
-			>
-				<PlusIcon className="size-3.5" />
-				Create Task
-			</Button>
+			<Collapsible defaultOpen={true}>
+				<CollapsibleTrigger asChild>
+					<h2 className="group mb-2 flex items-center gap-2 rounded-sm border bg-card px-4 py-2 text-sm dark:border-none">
+						{taskGroup.column.icon}
+						{taskGroup.column.name}
+						<span className="text-muted-foreground text-xs">
+							{taskGroup.tasks.length}
+						</span>
+						<div className="ml-auto text-muted-foreground group-hover:text-foreground">
+							<Maximize2Icon className="size-4 group-[&[data-state=open]]:hidden" />
+							<Minimize2Icon className="hidden size-4 group-[&[data-state=open]]:inline" />
+						</div>
+					</h2>
+				</CollapsibleTrigger>
+
+				<CollapsibleContent>
+					{taskGroup.tasks.map((task) => (
+						<TaskContextMenu key={task.id} task={task}>
+							<div>
+								<TaskItem task={task} />
+							</div>
+						</TaskContextMenu>
+					))}
+					<Button
+						className="w-full justify-start border border-transparent border-dashed text-start text-muted-foreground text-xs hover:border-input"
+						variant={"ghost"}
+						onClick={() => {
+							setTaskParams({
+								createTask: true,
+								taskStatusId: taskGroup.column.id,
+								taskProjectId:
+									filters.projectId?.length > 0
+										? filters.projectId[0]
+										: undefined,
+							});
+						}}
+					>
+						<PlusIcon className="size-3.5" />
+						Create Task
+					</Button>
+				</CollapsibleContent>
+			</Collapsible>
 		</div>
 	);
 };
