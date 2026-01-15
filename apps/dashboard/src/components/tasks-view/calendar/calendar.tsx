@@ -133,7 +133,7 @@ export const TasksCalendar = () => {
 			onDragEnd={handleDragEnd}
 			onDragCancel={handleDragCancel}
 		>
-			<div className="flex h-full grow-1 flex-col">
+			<div className="flex grow-1 flex-col">
 				{/* Calendar Header */}
 				<div className="flex items-center justify-between border-b px-4 py-3">
 					<div className="flex items-center gap-2">

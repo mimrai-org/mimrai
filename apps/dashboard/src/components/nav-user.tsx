@@ -10,7 +10,6 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@ui/components/ui/dropdown-menu";
-import { useSidebar } from "@ui/components/ui/sidebar";
 import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/hooks/use-user";
@@ -19,7 +18,6 @@ import { authClient } from "@/lib/auth-client";
 export function NavUser() {
 	const user = useUser();
 	const router = useRouter();
-	const { isMobile } = useSidebar();
 	if (!user) return <div className="size-8 rounded-full bg-secondary/50" />;
 
 	return (
@@ -47,7 +45,7 @@ export function NavUser() {
 			</DropdownMenuTrigger>
 			<DropdownMenuContent
 				className="w-(--radix-dropdown-menu-trigger-width) min-w-56"
-				side={isMobile ? "bottom" : "bottom"}
+				side="bottom"
 				align="end"
 				sideOffset={4}
 			>

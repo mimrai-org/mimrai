@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { NavList } from "./nav-list";
 
 type Props = {
 	params: Promise<{
@@ -8,5 +8,9 @@ type Props = {
 
 export default async function Page({ params }: Props) {
 	const { team } = await params;
-	return redirect(`/team/${team}/settings/general`);
+	return (
+		<div className="animate-blur-in">
+			<NavList />
+		</div>
+	);
 }

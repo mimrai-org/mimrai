@@ -37,6 +37,7 @@ export type GlobalSearchItem = {
 	title: string;
 	color?: string;
 	parentId?: string | null;
+	href?: string;
 	teamId: string;
 };
 
@@ -64,6 +65,62 @@ const defaultSearchState: GlobalSearchItem[] = [
 		type: "project",
 		title: "View all projects",
 		teamId: "",
+	},
+	{
+		id: "action:navigate:inbox",
+		type: "navigation",
+		title: "Inbox",
+		teamId: "",
+		href: "/inbox",
+	},
+	{
+		id: "action:navigate:reviews",
+		type: "navigation",
+		title: "Reviews",
+		teamId: "",
+		href: "/pr-reviews",
+	},
+	{
+		id: "action:navigate:settings",
+		type: "navigation",
+		title: "Settings",
+		teamId: "",
+		href: "/settings",
+	},
+	{
+		id: "action:navigate:general",
+		type: "navigation",
+		title: "General",
+		teamId: "",
+		href: "/settings/general",
+	},
+	{
+		id: "action:navigate:profile",
+		type: "navigation",
+		title: "Profile",
+		teamId: "",
+		href: "/settings/profile",
+	},
+	{
+		id: "action:navigate:billing",
+		type: "navigation",
+		title: "Billing",
+		teamId: "",
+		href: "/settings/billing",
+	},
+	{
+		id: "action:navigate:members",
+		type: "navigation",
+		title: "Members",
+		teamId: "",
+		href: "/settings/members",
+	},
+	{
+		id: "action:navigate:integrations",
+		type: "navigation",
+		title: "Integrations",
+		teamId: "",
+		href: "/settings/integrations",
 	},
 ];
 
@@ -155,6 +212,7 @@ export const GlobalSearchDialog = ({
 		id: string;
 		type: string;
 		parentId?: string | null;
+		href?: string;
 	}) => {
 		if (onSelect) {
 			onSelect(item as GlobalSearchItem);
@@ -207,6 +265,13 @@ export const GlobalSearchDialog = ({
 				);
 				break;
 			}
+			case "navigation": {
+				if (item.href) {
+					// navigate to href
+					router.push(`${user?.basePath}${item.href}`);
+				}
+				break;
+			}
 			default:
 				break;
 		}
@@ -218,7 +283,7 @@ export const GlobalSearchDialog = ({
 				<DialogHeader className="hidden">
 					<DialogTitle />
 				</DialogHeader>
-				<Command shouldFilter={false}>
+				<Command shouldFilter={false} className="bg-transparent">
 					<CommandInput
 						value={search}
 						onValueChange={setSearch}
@@ -249,8 +314,9 @@ export const GlobalSearchDialog = ({
 											return (
 												<CommandItem
 													key={item.id}
-													className="group flex w-full animate-fade-in cursor-pointer items-center rounded-sm px-4 py-3 text-sm transition-colors duration-200 hover:bg-accent hover:text-accent-foreground"
+													className="group flex w-full cursor-pointer items-center rounded-sm px-4 py-2 text-sm transition-colors duration-200 hover:bg-accent hover:text-accent-foreground"
 													onSelect={() => {
+														// @ts-expect-error -- type matches
 														handleSelect(item);
 														onOpenChange(false);
 													}}

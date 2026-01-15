@@ -20,8 +20,8 @@ import { cn } from "@ui/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import { PipetteIcon } from "lucide-react";
 import * as React from "react";
-import { VisuallyHiddenInput } from "@/components/visually-hidden-input";
 import { useComposedRefs } from "@/lib/compose-refs";
+import { VisuallyHiddenInput } from "./visually-hidden-input";
 
 /**
  * @see https://gist.github.com/bkrmendy/f4582173f50fab209ddfef1377ab31e3

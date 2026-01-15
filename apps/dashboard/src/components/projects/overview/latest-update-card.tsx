@@ -35,22 +35,22 @@ export const LatestUpdate = ({
 
 	if (!latest) {
 		return (
-			<Card className={className}>
-				<CardContent className="flex h-[100px] items-center justify-center">
+			<div className={className}>
+				<div className="flex items-center justify-center">
 					<Link href={`${user?.basePath}/projects/${projectId}/updates`}>
-						<Button variant="outline" type="button">
+						<Button variant="ghost" type="button">
 							<ExternalLinkIcon />
 							Write your first project update
 						</Button>
 					</Link>
-				</CardContent>
-			</Card>
+				</div>
+			</div>
 		);
 	}
 
 	return (
-		<Card className={className}>
-			<CardContent className="group space-y-4">
+		<div className={className}>
+			<div className="group space-y-4">
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-2 text-sm">
 						<ProjectHealthIcon health={latest?.health} className="size-4" />
@@ -86,7 +86,7 @@ export const LatestUpdate = ({
 						</span>
 					)}
 				</div>
-			</CardContent>
-		</Card>
+			</div>
+		</div>
 	);
 };

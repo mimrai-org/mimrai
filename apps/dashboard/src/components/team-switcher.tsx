@@ -11,12 +11,13 @@ import {
 import { Kbd, KbdGroup } from "@mimir/ui/kbd";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ChevronsUpDownIcon, PlusIcon } from "lucide-react";
+import Link from "next/link";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { useChatParams } from "@/hooks/use-chat-params";
 import { useTeamParams } from "@/hooks/use-team-params";
 import { useUser } from "@/hooks/use-user";
-import { queryClient, trpc } from "@/utils/trpc";
+import { trpc } from "@/utils/trpc";
 
 export const TeamSwitcher = () => {
 	const user = useUser();
@@ -30,7 +31,7 @@ export const TeamSwitcher = () => {
 			onSuccess: (data) => {
 				setChatParams(null);
 				setParams(null);
-				window.location.href = `/team/${data.slug}/overview`;
+				window.location.href = `/team/${data.slug}`;
 			},
 			onError: () => {
 				toast.error("Failed to switch team");
@@ -74,32 +75,31 @@ export const TeamSwitcher = () => {
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
-				<button
-					type="button"
-					className="flex w-full items-center justify-between gap-2 py-2 opacity-90 hover:bg-transparent hover:opacity-100 focus:outline-none dark:hover:bg-transparent"
-				>
-					<div className="flex gap-2">
-						<div className="flex aspect-square size-8 items-center justify-center rounded-sm border border-primary bg-primary text-sidebar-primary-foreground">
-							<Avatar className="size-6 bg-transparent text-base">
+			<button
+				type="button"
+				className="flex w-full items-center justify-between gap-2 py-2 opacity-90 hover:bg-transparent hover:opacity-100 focus:outline-none dark:hover:bg-transparent"
+			>
+				<Link href={`/team/${user?.team?.slug}`}>
+					<div className="flex items-center gap-2">
+						<div className="flex aspect-square size-5 items-center justify-center rounded-sm border border-primary bg-primary text-sidebar-primary-foreground">
+							<Avatar className="bg-transparent text-xs">
 								<AvatarFallback className="bg-transparent text-primary-foreground">
 									{user?.team?.name?.charAt(0).toUpperCase()}
 								</AvatarFallback>
 							</Avatar>
 						</div>
-						<div className="grid flex-1 text-left text-sm leading-tight">
-							<span className="truncate font-medium">{user?.team?.name}</span>
-							<span className="truncate text-muted-foreground text-xs capitalize">
-								{user?.team?.role}
-							</span>
-						</div>
+						<span className="truncate font-medium text-sm">
+							{user?.team?.name}
+						</span>
 					</div>
+				</Link>
 
+				<DropdownMenuTrigger asChild>
 					<div>
-						<ChevronsUpDownIcon className="size-4" />
+						<ChevronsUpDownIcon className="size-4 text-muted-foreground" />
 					</div>
-				</button>
-			</DropdownMenuTrigger>
+				</DropdownMenuTrigger>
+			</button>
 			<DropdownMenuContent
 				className="w-72"
 				side="right"

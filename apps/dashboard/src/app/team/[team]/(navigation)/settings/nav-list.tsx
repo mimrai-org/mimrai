@@ -6,6 +6,7 @@ import {
 	CircleDashedIcon,
 	CloudUploadIcon,
 	CreditCardIcon,
+	FolderIcon,
 	MaximizeIcon,
 	SettingsIcon,
 	SparklesIcon,
@@ -16,10 +17,16 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
+import {
+	NavItem,
+	NavItemContent,
+	NavItemSubtitle,
+	NavItemTitle,
+} from "@/components/nav/nav-item";
 import { useUser } from "@/hooks/use-user";
 import { cn } from "@/lib/utils";
 
-export const SettingsNavbar = () => {
+export const NavList = () => {
 	const user = useUser();
 	const pathname = usePathname();
 
@@ -94,7 +101,7 @@ export const SettingsNavbar = () => {
 
 	return (
 		<div className="h-fit w-full">
-			<ul className="flex space-x-1 overflow-x-auto text-sm">
+			<ul className="flex flex-wrap gap-4">
 				{settingsLinks.map(({ to, label, scopes, icon: Icon }) => {
 					if (
 						scopes &&
@@ -104,19 +111,16 @@ export const SettingsNavbar = () => {
 					)
 						return null;
 					return (
-						<Link
-							href={to}
-							key={to}
-							className={cn(
-								"flex items-center gap-1 rounded-sm px-4 py-2 transition-all hover:bg-accent/50 hover:text-accent-foreground",
-								{
-									"bg-accent font-medium text-foreground":
-										pathname.includes(to),
-								},
-							)}
-						>
-							<Icon className="size-4" />
-							<li>{label}</li>
+						<Link href={to} key={to} className="min-w-[100px]">
+							<NavItem>
+								<div className="relative">
+									<FolderIcon className="size-10" />
+									<Icon className="absolute bottom-0 left-0 size-4 bg-background" />
+								</div>
+								<NavItemContent>
+									<NavItemTitle>{label}</NavItemTitle>
+								</NavItemContent>
+							</NavItem>
 						</Link>
 					);
 				})}

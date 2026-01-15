@@ -39,7 +39,7 @@ export const createTaskSchema = z.object({
 	labels: z.array(z.string()).nullable().optional(),
 	dueDate: z.string().nullable().optional(),
 	milestoneId: z.string().nullable().optional(),
-	projectId: z.string().optional().nullable(),
+	projectId: z.string(),
 	mentions: z.array(z.string()).nullable().optional(),
 	repositoryName: z.string().nullable().optional(),
 	branchName: z.string().nullable().optional(),

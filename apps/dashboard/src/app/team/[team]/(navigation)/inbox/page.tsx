@@ -1,5 +1,9 @@
 import { InboxView } from "@/components/inbox/view";
 
 export default async function Page() {
-	return <InboxView />;
+	return (
+		<div className="animate-blur-in">
+			<InboxView />
+		</div>
+	);
 }

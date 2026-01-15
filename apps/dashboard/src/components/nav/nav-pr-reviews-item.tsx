@@ -1,12 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { SidebarMenuButton, SidebarMenuItem } from "@ui/components/ui/sidebar";
 import { cn } from "@ui/lib/utils";
-import { GitPullRequestIcon } from "lucide-react";
+import { FolderIcon, GitPullRequestIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUser } from "@/hooks/use-user";
 import { trpc } from "@/utils/trpc";
-import type { NavItem } from "../app-sidebar";
+import {
+	NavItem,
+	NavItemContent,
+	NavItemIcon,
+	NavItemIconSecondary,
+	NavItemIndicator,
+	NavItemSubtitle,
+	NavItemTitle,
+} from "./nav-item";
 
 export const NavPrReviewsItem = () => {
 	const user = useUser();
@@ -44,17 +52,22 @@ export const NavPrReviewsItem = () => {
 	}
 
 	return (
-		<SidebarMenuItem>
-			<SidebarMenuButton asChild isActive={isActive}>
-				<Link href={`${user?.basePath}/pr-reviews`}>
-					<GitPullRequestIcon />
-					<span>Reviews</span>
-
-					<span className="ml-auto flex size-5 items-center justify-center rounded-sm bg-red-400 text-white text-xs">
+		<Link href={`${user?.basePath}/pr-reviews`}>
+			<NavItem>
+				<NavItemIcon>
+					<FolderIcon />
+					<NavItemIconSecondary>
+						<GitPullRequestIcon />
+					</NavItemIconSecondary>
+					<NavItemIndicator show={!!prReviewsCount}>
 						{prReviewsCount}
-					</span>
-				</Link>
-			</SidebarMenuButton>
-		</SidebarMenuItem>
+					</NavItemIndicator>
+				</NavItemIcon>
+				<NavItemContent>
+					<NavItemTitle>Reviews</NavItemTitle>
+					<NavItemSubtitle>Pull requests awaiting your review</NavItemSubtitle>
+				</NavItemContent>
+			</NavItem>
+		</Link>
 	);
 };

@@ -1,13 +1,15 @@
-import { BoxIcon } from "lucide-react";
+import { FolderIcon } from "lucide-react";
 
 export const ProjectIcon = ({
 	color,
+	hasTasks,
 	className,
 }: {
 	color?: string | null;
+	hasTasks?: boolean;
 	className?: string;
 }) => {
-	return (
-		<BoxIcon className={className} style={{ color: color || "inherit" }} />
-	);
+	const Icon = hasTasks ? FolderIcon : FolderIcon;
+
+	return <Icon className={className} style={{ color: color || "inherit" }} />;
 };

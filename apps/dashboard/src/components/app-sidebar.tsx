@@ -11,8 +11,8 @@ import {
 import { type LucideIcon, Settings2 } from "lucide-react";
 import type * as React from "react";
 import { NavSecondary } from "@/components/nav-secondary";
-import { NavMainGroup } from "./sidebar/nav-main-group";
-import { NavWorkspace } from "./sidebar/nav-workspace";
+import { NavMainGroup } from "./nav/nav-main-group";
+import { NavWorkspace } from "./nav/nav-workspace";
 import { SidebarSubscriptionStatus } from "./sidebar-subscription-status";
 import { TeamSwitcher } from "./team-switcher";
 

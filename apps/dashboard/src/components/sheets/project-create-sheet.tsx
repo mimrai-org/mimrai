@@ -19,7 +19,7 @@ export const ProjectCreateSheet = () => {
 				<DialogTitle />
 			</DialogHeader>
 			<DialogContent className="sm:min-w-[1000px]">
-				<ProjectForm />
+				<ProjectForm propertiesLayout="compact" />
 			</DialogContent>
 		</Dialog>
 	);

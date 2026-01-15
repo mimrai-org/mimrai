@@ -116,6 +116,13 @@ export const getProjects = async ({
 				image: leadSubquery.image,
 			},
 			members: membersSubquery.members,
+			status: projects.status,
+			userId: projects.userId,
+			memberIds: sql<
+				string[]
+			>`(SELECT ARRAY_AGG(${projectMembers.userId}) FROM ${projectMembers} WHERE ${projectMembers.projectId} = ${projects.id})`.as(
+				"member_ids",
+			),
 			progress: {
 				completed: progressSubquery.completed,
 				inProgress: progressSubquery.inProgress,

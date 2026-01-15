@@ -1,14 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
-import { Button } from "@ui/components/ui/button";
 import { Form } from "@ui/components/ui/form";
-import { SaveIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { cn } from "@ui/lib/utils";
+import { useState } from "react";
 import { toast } from "sonner";
-import Loader from "@/components/loader";
 import { useProjectParams } from "@/hooks/use-project-params";
-import { useZodForm } from "@/hooks/use-zod-form";
+import { useFormAutoSave, useZodForm } from "@/hooks/use-zod-form";
 import { queryClient, trpc } from "@/utils/trpc";
-import { ActionsMenu } from "./actions-menu";
 import { ProjectColorPicker } from "./color-picker";
 import { Description } from "./description";
 import { type ProjectFormValues, projectFormSchema } from "./form-type";
@@ -19,10 +16,14 @@ import { ProjectStatusSelect } from "./status";
 import { Name } from "./title";
 import { ProjectVisibilitySelect } from "./visibility";
 
+export type PropertiesLayout = "compact" | "expanded";
+
 export const ProjectForm = ({
 	defaultValues,
+	propertiesLayout,
 }: {
 	defaultValues?: Partial<ProjectFormValues>;
+	propertiesLayout?: PropertiesLayout;
 }) => {
 	const [lastSavedAt, setLastSavedAt] = useState<Date | null>(
 		defaultValues?.updatedAt ? new Date(defaultValues.updatedAt) : null,
@@ -90,56 +91,33 @@ export const ProjectForm = ({
 		}
 	};
 
-	useEffect(() => {
-		return () => {
-			const { isDirty, isValid } = form.formState;
-			if (isValid && isDirty) {
-				const values = form.getValues();
-				if (!values.id) return;
-
-				// Auto save
-				updateProject({
-					...values,
-					id: values.id,
-				});
-			}
-		};
-	}, []);
+	useFormAutoSave(form, handleSubmit, {
+		enabled: Boolean(defaultValues?.id),
+	});
 
 	return (
 		<div className="h-full space-y-4">
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(handleSubmit)} className="h-full">
 					<div className="w-full space-y-4">
-						<div className="space-y-4">
-							<div className="flex justify-between">
+						<div className="space-y-1">
+							<div className="flex items-center gap-4">
 								<ProjectColorPicker />
-								<div className="flex justify-end">
-									<div className="flex items-center gap-4">
-										<span className="text-muted-foreground text-xs">
-											Last saved at {lastSavedAt?.toLocaleString()}
-										</span>
-										<Button
-											type="submit"
-											variant={"default"}
-											size={"sm"}
-											disabled={isCreating || isUpdating}
-										>
-											{isCreating || isUpdating ? <Loader /> : <SaveIcon />}
-											{defaultValues?.id ? "Save" : "Create"}
-										</Button>
-										{defaultValues?.id && <ActionsMenu />}
-									</div>
-								</div>
+								<Name />
 							</div>
-							<Name />
 							<Description />
-							<div className="flex flex-wrap items-center gap-2">
-								<RangeInput />
-								<ProjectStatusSelect />
-								<ProjectVisibilitySelect />
-								<ProjectLeadSelect />
-								<ProjectMembersSelect />
+							<div
+								className={cn(
+									propertiesLayout === "compact"
+										? "flex flex-wrap items-center gap-6"
+										: "space-y-4",
+								)}
+							>
+								<RangeInput variant={propertiesLayout} />
+								<ProjectStatusSelect variant={propertiesLayout} />
+								<ProjectVisibilitySelect variant={propertiesLayout} />
+								<ProjectLeadSelect variant={propertiesLayout} />
+								<ProjectMembersSelect variant={propertiesLayout} />
 							</div>
 						</div>
 					</div>

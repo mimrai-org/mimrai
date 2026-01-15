@@ -1,6 +1,6 @@
 import { Button } from "@ui/components/ui/button";
 import { Calendar } from "@ui/components/ui/calendar";
-import { FormField } from "@ui/components/ui/form";
+import { FormField, FormLabel } from "@ui/components/ui/form";
 import { Input } from "@ui/components/ui/input";
 import {
 	Popover,
@@ -99,21 +99,21 @@ function parseDateString(value: string): Date | null {
 	return null;
 }
 
-export const RangeInput = () => {
+export const RangeInput = ({
+	variant,
+}: {
+	variant?: "compact" | "expanded";
+}) => {
 	return (
-		<Tooltip>
-			<TooltipTrigger asChild>
-				<div className="flex h-6 items-center gap-2 rounded-sm border bg-background px-2">
-					<CalendarClockIcon className="size-3.5" />
-					<ProjectDateSelect name="startDate" placeholder="Start" />
-					<span className="text-muted-foreground text-sm">to</span>
-					<ProjectDateSelect name="endDate" placeholder="End" />
-				</div>
-			</TooltipTrigger>
-			<TooltipContent>
-				Set the start and end dates for the project.
-			</TooltipContent>
-		</Tooltip>
+		<div className="space-y-1">
+			{variant !== "compact" && <FormLabel>Duration</FormLabel>}
+			<div className="flex items-center gap-2 text-sm">
+				<CalendarClockIcon className="size-3.5 text-muted-foreground" />
+				<ProjectDateSelect name="startDate" placeholder="Start" />
+				<span className="text-muted-foreground">to</span>
+				<ProjectDateSelect name="endDate" placeholder="End" />
+			</div>
+		</div>
 	);
 };
 
@@ -150,7 +150,7 @@ export const ProjectDateSelect = ({
 			render={({ field }) => (
 				<Popover>
 					<PopoverTrigger asChild>
-						<button type="button" className="text-xs">
+						<button type="button">
 							{field.value ? (
 								format(
 									field.value ? new Date(field.value as string) : new Date(),

@@ -1,7 +1,6 @@
 "use client";
 import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/ui/button";
-import { Card, CardContent } from "@ui/components/ui/card";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -49,119 +48,100 @@ export const MilestonesCard = ({ projectId }: { projectId: string }) => {
 	}, [data]);
 
 	return (
-		<Card>
-			<CardContent>
-				<div className="flex items-center justify-between">
-					<h3 className="text-sm">Milestones</h3>
-					<Button
-						variant={"ghost"}
-						size={"sm"}
-						onClick={() =>
-							setParams({
-								createMilestone: true,
-								milestoneProjectId: projectId,
-							})
-						}
-					>
-						<PlusIcon />
-					</Button>
-				</div>
+		<div>
+			<div className="flex items-center justify-between">
+				<h3 className="text-sm">Milestones</h3>
+				<Button
+					variant={"ghost"}
+					size={"sm"}
+					onClick={() =>
+						setParams({
+							createMilestone: true,
+							milestoneProjectId: projectId,
+						})
+					}
+				>
+					<PlusIcon />
+				</Button>
+			</div>
 
-				<ul className="mt-4 space-y-2">
-					<AnimatePresence mode="popLayout">
-						{milestones.map((milestone) => {
-							const total =
-								milestone.progress.completed + milestone.progress.inProgress;
-							const percentage = total
-								? Math.round((milestone.progress.completed / total) * 100)
-								: 0;
-							return (
-								<motion.li
-									key={milestone.id}
-									variants={{
-										initial: { opacity: 0, height: 0 },
-										animate: { opacity: 1, height: "auto" },
-										hover: {
-											opacity: 1,
-										},
-									}}
-									initial={"initial"}
-									animate={"animate"}
-									exit={"initial"}
-									whileHover={"hover"}
-									transition={{ duration: 0.2 }}
-								>
-									{milestoneId === milestone.id ? (
-										<MilestoneForm
-											projectId={projectId}
-											defaultValues={milestone}
-										/>
-									) : (
-										<div className="flex items-center justify-between text-sm">
-											<div className="flex items-center gap-1">
-												<MilestoneIcon
-													color={milestone.color}
-													className="size-4"
-												/>
-												<Tooltip>
-													<TooltipTrigger asChild>
-														<span className="max-w-52 truncate px-3">
-															{milestone.name}
-														</span>
-													</TooltipTrigger>
-													<TooltipContent>{milestone.name}</TooltipContent>
-												</Tooltip>
-												<span className="text-muted-foreground text-xs">
-													{percentage}% of {total}
-												</span>
-											</div>
-											<div className="flex items-center gap-2 text-xs">
-												<Link href={`./tasks?mId=${milestone.id}`}>
-													<motion.button
-														type="button"
-														variants={{
-															hover: {
-																opacity: 1,
-															},
-															initial: {
-																opacity: 0,
-															},
-														}}
-														className="flex items-center gap-1 text-muted-foreground hover:text-foreground"
-													>
-														<ExternalLinkIcon className="size-3.5" />
-														See Tasks
-													</motion.button>
-												</Link>
-												{milestone.dueDate && (
-													<span className="text-muted-foreground">
-														{format(new Date(milestone.dueDate), "MMM dd")}
-													</span>
-												)}
-												<MilestoneDropdownMenu
-													milestoneId={milestone.id}
-													projectId={milestone.projectId}
-												/>
-											</div>
-										</div>
-									)}
-								</motion.li>
-							);
-						})}
-						{createMilestone && (
+			<ul className="mt-2 space-y-1">
+				<AnimatePresence mode="popLayout">
+					{milestones.map((milestone) => {
+						const total =
+							milestone.progress.completed + milestone.progress.inProgress;
+						const percentage = total
+							? Math.round((milestone.progress.completed / total) * 100)
+							: 0;
+						return (
 							<motion.li
-								initial={{ opacity: 0, height: 0 }}
-								animate={{ opacity: 1, height: "auto" }}
-								exit={{ opacity: 0, height: 0 }}
+								key={milestone.id}
+								variants={{
+									initial: { opacity: 0, height: 0 },
+									animate: { opacity: 1, height: "auto" },
+									hover: {
+										opacity: 1,
+									},
+								}}
+								initial={"initial"}
+								animate={"animate"}
+								exit={"initial"}
+								whileHover={"hover"}
 								transition={{ duration: 0.2 }}
 							>
-								<MilestoneForm projectId={projectId} />
+								{milestoneId === milestone.id ? (
+									<MilestoneForm
+										projectId={projectId}
+										defaultValues={milestone}
+									/>
+								) : (
+									<div className="flex items-center justify-between text-sm">
+										<div className="flex items-center gap-1">
+											<MilestoneIcon
+												color={milestone.color}
+												className="size-4"
+											/>
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<span className="max-w-52 truncate px-1">
+														{milestone.name}
+													</span>
+												</TooltipTrigger>
+												<TooltipContent>{milestone.name}</TooltipContent>
+											</Tooltip>
+											<span className="text-muted-foreground text-xs">
+												{percentage}% of {total}
+											</span>
+										</div>
+										<div className="flex items-center gap-2 text-xs">
+											{milestone.dueDate && (
+												<span className="text-muted-foreground">
+													{format(new Date(milestone.dueDate), "MMM dd")}
+												</span>
+											)}
+											<MilestoneDropdownMenu
+												milestoneId={milestone.id}
+												projectId={milestone.projectId}
+											/>
+										</div>
+									</div>
+								)}
 							</motion.li>
-						)}
-					</AnimatePresence>
-				</ul>
-			</CardContent>
-		</Card>
+						);
+					})}
+					{createMilestone && (
+						<motion.li
+							initial={{ opacity: 0, height: 0 }}
+							animate={{ opacity: 1, height: "auto" }}
+							exit={{ opacity: 0, height: 0 }}
+							transition={{ duration: 0.2 }}
+						>
+							<MilestoneForm projectId={projectId} />
+						</motion.li>
+					)}
+				</AnimatePresence>
+			</ul>
+		</div>
 	);
 };
 

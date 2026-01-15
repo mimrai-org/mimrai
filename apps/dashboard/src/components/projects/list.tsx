@@ -3,6 +3,12 @@
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@ui/components/ui/button";
 import {
+	CircularProgress,
+	CircularProgressIndicator,
+	CircularProgressRange,
+	CircularProgressTrack,
+} from "@ui/components/ui/circular-progress";
+import {
 	ContextMenu,
 	ContextMenuContent,
 	ContextMenuItem,
@@ -13,8 +19,14 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@ui/components/ui/tooltip";
-import { format } from "date-fns";
-import { CopyPlusIcon, LayersIcon, TrashIcon } from "lucide-react";
+import {
+	CopyPlusIcon,
+	FolderIcon,
+	PlusIcon,
+	PlusSquareIcon,
+	TrashIcon,
+} from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { toast } from "sonner";
@@ -24,15 +36,26 @@ import {
 	EmptyStateDescription,
 	EmptyStateTitle,
 } from "@/components/empty-state";
-import { MilestoneIcon } from "@/components/milestone-icon";
 import { ProjectIcon } from "@/components/project-icon";
 import { useProjectParams } from "@/hooks/use-project-params";
 import { useUser } from "@/hooks/use-user";
 import { queryClient, trpc } from "@/utils/trpc";
+import {
+	NavItem,
+	NavItemContent,
+	NavItemIcon,
+	NavItemIconSecondary,
+	NavItemSubtitle,
+	NavItemTitle,
+} from "../nav/nav-item";
 import { ProjectsFilters } from "./filters";
 import { useProjectsFilterParams } from "./use-projects-filter-params";
 
-export const ProjectsList = () => {
+export const ProjectsList = ({
+	showFilters = true,
+}: {
+	showFilters?: boolean;
+}) => {
 	const router = useRouter();
 	const user = useUser();
 	const { setParams } = useProjectParams();
@@ -86,102 +109,102 @@ export const ProjectsList = () => {
 	}, [data]);
 
 	return (
-		<div className="h-full w-full overflow-hidden">
-			<ProjectsFilters />
+		<div className="w-full">
+			{showFilters && <ProjectsFilters />}
 
-			{listData.length === 0 && !isLoading && (
-				<EmptyState>
-					<EmptyStateTitle>No projects found</EmptyStateTitle>
-					<EmptyStateDescription>
-						You haven't created any projects yet. Projects help you organize
-						your tasks and teams effectively.
-					</EmptyStateDescription>
-					<EmptyStateAction>
-						<Button
-							onClick={() => setParams({ createProject: true })}
-							variant="default"
-						>
-							Create your first project
-						</Button>
-					</EmptyStateAction>
-				</EmptyState>
-			)}
+			<div className="flex flex-wrap gap-4">
+				{listData.map((project) => {
+					const total =
+						project.progress.inProgress + project.progress.completed;
+					const progress =
+						total > 0
+							? Math.round((project.progress.completed / total) * 100)
+							: 0;
+					return (
+						<ContextMenu key={project.id}>
+							<ContextMenuTrigger asChild>
+								<Link href={`${user?.basePath}/projects/${project.id}`}>
+									<NavItem>
+										<NavItemIcon>
+											<ProjectIcon hasTasks={total > 0} color={project.color} />
+											<NavItemIconSecondary className="flex items-center justify-center">
+												<CircularProgress
+													size={12}
+													thickness={2}
+													value={progress ?? 0}
+													min={0}
+													max={100}
+												>
+													<CircularProgressIndicator>
+														<CircularProgressTrack />
+														<CircularProgressRange
+															style={{
+																color: project.color || undefined,
+															}}
+														/>
+													</CircularProgressIndicator>
+												</CircularProgress>
+											</NavItemIconSecondary>
+										</NavItemIcon>
+										<NavItemContent>
+											<NavItemTitle>{project.name}</NavItemTitle>
+											<NavItemSubtitle>
+												<div className="flex items-center gap-1 text-xs">
+													<span>
+														{Number(project.progress.completed) +
+															Number(project.progress.inProgress)}
+													</span>
+													Tasks
+												</div>
+											</NavItemSubtitle>
+										</NavItemContent>
+									</NavItem>
+								</Link>
+							</ContextMenuTrigger>
+							<ContextMenuContent>
+								<ContextMenuItem
+									onClick={() => {
+										cloneProject({ id: project.id });
+									}}
+								>
+									<CopyPlusIcon />
+									Clone
+								</ContextMenuItem>
+								<ContextMenuItem
+									variant="destructive"
+									disabled={isDeleting}
+									onClick={() => {
+										deleteProject({ id: project.id });
+									}}
+								>
+									<TrashIcon />
+									Delete
+								</ContextMenuItem>
+							</ContextMenuContent>
+						</ContextMenu>
+					);
+				})}
 
-			{listData.map((project) => (
-				<ContextMenu key={project.id}>
-					<ContextMenuTrigger asChild>
-						<button
-							className="flex w-full flex-wrap justify-between px-4 py-4 text-sm transition-colors last:border-0 hover:bg-accent"
-							type="button"
-							onClick={() => {
-								queryClient.setQueryData(
-									trpc.projects.getById.queryKey({ id: project.id }),
-									project,
-								);
-								router.push(`${user?.basePath}/projects/${project.id}/detail`);
-							}}
-						>
-							<div className="flex items-center gap-2">
-								<ProjectIcon className="size-4" color={project.color} />
-								<h3 className="font-medium">{project.name}</h3>
-								{project.milestone?.name && (
-									<div
-										role="button"
-										tabIndex={0}
-										onClick={(e) => {
-											e.stopPropagation();
-											router.push(
-												`${user?.basePath}/projects/${project.id}/tasks?mId=${project.milestone?.id}`,
-											);
-										}}
-										className="ml-2 flex items-center gap-1 text-xs opacity-70 transition-opacity hover:opacity-100"
-									>
-										<MilestoneIcon {...project.milestone} className="size-4" />
-										<span>{project.milestone.name}</span>
-										{project.milestone.dueDate && (
-											<span>
-												{format(new Date(project.milestone.dueDate), "MMM dd")}
-											</span>
-										)}
-									</div>
-								)}
-							</div>
-							<div className="flex items-center gap-4">
-								<div className="w-24 sm:w-48">
-									<Progress {...project.progress} />
-								</div>
-								<div className="flex h-5 items-center gap-2 rounded-sm bg-secondary px-2">
-									<LayersIcon className="size-3" />
-									<span>
-										{Number(project.progress.completed) +
-											Number(project.progress.inProgress)}
-									</span>
-								</div>
-							</div>
-						</button>
-					</ContextMenuTrigger>
-					<ContextMenuContent>
-						<ContextMenuItem
-							onClick={() => {
-								cloneProject({ id: project.id });
-							}}
-						>
-							<CopyPlusIcon />
-							Clone
-						</ContextMenuItem>
-						<ContextMenuItem
-							variant="destructive"
-							disabled={isDeleting}
-							onClick={() => {
-								deleteProject({ id: project.id });
-							}}
-						>
-							<TrashIcon />
-							Delete
-						</ContextMenuItem>
-					</ContextMenuContent>
-				</ContextMenu>
-			))}
+				<NavItem
+					className="border border-dashed text-muted-foreground"
+					onClick={() => {
+						setParams({ createProject: true });
+					}}
+				>
+					{/* <NavItemIcon>
+						<FolderIcon className="stroke-1 [stroke-dasharray:5]" />
+						<NavItemIconSecondary>
+							<PlusIcon />
+						</NavItemIconSecondary>
+					</NavItemIcon> */}
+					<NavItemContent>
+						<NavItemTitle>Create Project</NavItemTitle>
+						<NavItemSubtitle>
+							Start a new project to organize your work
+						</NavItemSubtitle>
+					</NavItemContent>
+				</NavItem>
+			</div>
 		</div>
 	);
 };

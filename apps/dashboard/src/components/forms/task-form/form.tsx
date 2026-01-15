@@ -4,6 +4,11 @@ import { Form } from "@mimir/ui/form";
 import { getTaskPermalink } from "@mimir/utils/tasks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Editor as EditorInstance } from "@tiptap/react";
+import {
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
+} from "@ui/components/ui/collapsible";
 import { format } from "date-fns";
 import { Link2Icon, Loader2, SparklesIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -168,69 +173,6 @@ export const TaskForm = ({
 					) : (
 						<>
 							<div className="pt-4">
-								<div className="flex flex-wrap items-center justify-end gap-2">
-									{id && (
-										<span className="mr-2 text-muted-foreground text-xs">
-											Last saved at {format(lastSavedDate, "PP, p")}
-										</span>
-									)}
-									{id && (
-										<Button
-											variant={"ghost"}
-											size="icon"
-											type="button"
-											aria-label="Copy task link"
-											onClick={() => {
-												navigator.clipboard.writeText(
-													getTaskPermalink(permalinkId ?? id!),
-												);
-												toast.success("Task link copied to clipboard");
-											}}
-										>
-											<Link2Icon />
-										</Button>
-									)}
-									{id && (
-										<Button
-											variant={"secondary"}
-											size="sm"
-											type="button"
-											onClick={() => {
-												setItems([
-													{
-														type: "task",
-														id: id,
-														label: defaultValues?.title!,
-														key: `task-${id}`,
-													},
-												]);
-												toggle(true);
-												setParams(null);
-											}}
-										>
-											<SparklesIcon />
-											Ask MIMIR
-										</Button>
-									)}
-									<Button
-										type="submit"
-										variant={"default"}
-										size={"sm"}
-										className="text-xs"
-										disabled={
-											!form.formState.isDirty ||
-											isPendingCreate ||
-											isPendingUpdate
-										}
-									>
-										{(isPendingCreate || isPendingUpdate) && (
-											<Loader2 className="animate-spin" />
-										)}
-										{id ? "Save Changes" : "Create Task"}
-									</Button>
-
-									{id && <ActionsMenu />}
-								</div>
 								<div className="space-y-1 py-2">
 									<input className="hidden size-0 opacity-0" />
 									<div className="flex gap-2 px-4 text-muted-foreground text-xs">
@@ -254,6 +196,69 @@ export const TaskForm = ({
 									<div className="space-y-4">
 										<Description editorRef={editorRef} />
 
+										<div className="flex flex-wrap items-center justify-end gap-2">
+											{id && (
+												<span className="mr-2 text-muted-foreground text-xs">
+													Last saved at {format(lastSavedDate, "PP, p")}
+												</span>
+											)}
+											{id && (
+												<Button
+													variant={"ghost"}
+													size="icon"
+													type="button"
+													aria-label="Copy task link"
+													onClick={() => {
+														navigator.clipboard.writeText(
+															getTaskPermalink(permalinkId ?? id!),
+														);
+														toast.success("Task link copied to clipboard");
+													}}
+												>
+													<Link2Icon />
+												</Button>
+											)}
+											{id && (
+												<Button
+													variant={"secondary"}
+													size="sm"
+													type="button"
+													onClick={() => {
+														setItems([
+															{
+																type: "task",
+																id: id,
+																label: defaultValues?.title!,
+																key: `task-${id}`,
+															},
+														]);
+														toggle(true);
+														setParams(null);
+													}}
+												>
+													<SparklesIcon />
+													Ask MIMIR
+												</Button>
+											)}
+											<Button
+												type="submit"
+												variant={"default"}
+												size={"sm"}
+												className="text-xs"
+												disabled={
+													!form.formState.isDirty ||
+													isPendingCreate ||
+													isPendingUpdate
+												}
+											>
+												{(isPendingCreate || isPendingUpdate) && (
+													<Loader2 className="animate-spin" />
+												)}
+												{id ? "Save Changes" : "Create Task"}
+											</Button>
+
+											{id && <ActionsMenu />}
+										</div>
 										<hr className="my-6" />
 										<div className="flex flex-col justify-between sm:flex-row">
 											<div className="space-y-4">
@@ -274,13 +279,19 @@ export const TaskForm = ({
 								{id && (
 									<div>
 										<hr className="my-6" />
-										<div>
-											<div className="mb-4 flex items-center justify-between">
-												<span className="font-medium text-sm">Activity</span>
-												{id && <SubscribersList taskId={id!} />}
-											</div>
-											<TaskActivitiesList taskId={id} />
-										</div>
+										<Collapsible>
+											<CollapsibleTrigger asChild className="">
+												<div className="mb-4 flex items-center justify-between">
+													<span className="collapsible-chevron font-medium text-sm">
+														Activity
+													</span>
+													{id && <SubscribersList taskId={id!} />}
+												</div>
+											</CollapsibleTrigger>
+											<CollapsibleContent>
+												<TaskActivitiesList taskId={id} />
+											</CollapsibleContent>
+										</Collapsible>
 										<div className="mt-4">
 											<CommentInput taskId={id} />
 										</div>

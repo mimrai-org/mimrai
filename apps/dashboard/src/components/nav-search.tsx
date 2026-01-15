@@ -1,4 +1,5 @@
 "use client";
+import { Kbd, KbdGroup } from "@ui/components/ui/kbd";
 import { SearchIcon } from "lucide-react";
 import { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -8,7 +9,7 @@ export const NavSearch = () => {
 	const [open, setOpen] = useState(false);
 
 	useHotkeys(
-		"mod+k",
+		"ctrl+p, meta+p",
 		(e) => {
 			e.preventDefault();
 			setOpen((o) => !o);
@@ -25,10 +26,16 @@ export const NavSearch = () => {
 				onClick={() => {
 					setOpen(true);
 				}}
-				className="flex w-48 items-center gap-4 rounded-md px-3 py-2 text-start text-muted-foreground text-sm transition-colors hover:text-foreground"
+				className="flex w-52 items-center gap-4 rounded-md px-3 py-2 text-start text-muted-foreground text-sm transition-colors hover:text-foreground"
 			>
 				<SearchIcon className="size-4" />
 				Find anything...
+				<Kbd className="ml-auto">
+					<KbdGroup>
+						<span>⌘</span>
+						<span>P</span>
+					</KbdGroup>
+				</Kbd>
 			</button>
 			<GlobalSearchDialog open={open} onOpenChange={setOpen} />
 		</>

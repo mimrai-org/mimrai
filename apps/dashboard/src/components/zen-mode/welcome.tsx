@@ -1,12 +1,12 @@
 "use client";
 import { Button } from "@ui/components/ui/button";
-import { ArrowRightIcon, SunIcon } from "lucide-react";
+import { SunIcon } from "lucide-react";
 import { motion, stagger } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { ZenModeBackground } from "./background";
 import { ZenModeQueueList } from "./queue";
-import { useZenMode, type ZenModeTask } from "./use-zen-mode";
+import { useZenMode } from "./use-zen-mode";
 
 const container = {
 	hidden: {},

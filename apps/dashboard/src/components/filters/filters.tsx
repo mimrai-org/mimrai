@@ -8,8 +8,8 @@ import { useFilters } from "./use-filters";
 
 export const Filters = ({ children }: { children?: React.ReactNode }) => {
 	return (
-		<div className="mt-2 flex items-center justify-between gap-4 rounded-md p-2">
-			<div className="flex w-full items-center gap-2 px-2">
+		<div className="flex items-center justify-between gap-4 rounded-md">
+			<div className="flex w-full items-center gap-2">
 				<FiltersDropdown />
 				{children}
 			</div>

@@ -1,6 +1,10 @@
-import { redirect } from "next/navigation";
+import { SunIcon } from "lucide-react";
+import { NavTopTasks } from "@/components/nav/nav-top-tasks";
+import { NavWorkspace } from "@/components/nav/nav-workspace";
+import { NavSearch } from "@/components/nav-search";
+import { ProjectsList } from "@/components/projects/list";
+import { TeamSwitcher } from "@/components/team-switcher";
 import { getSession } from "@/lib/get-session";
-import { trpcClient } from "@/utils/trpc";
 
 type Props = {
 	searchParams: Promise<{
@@ -10,19 +14,26 @@ type Props = {
 
 export default async function Page({ searchParams }: Props) {
 	const session = await getSession();
-	if (!session?.user?.id) {
-		return redirect("/sign-in");
-	}
 
-	const team = await trpcClient.teams.getCurrent.query();
-	if (!team) {
-		return redirect(`/team/${session.user.teamSlug}/onboarding`);
-	}
-
-	// redirect to overview with search params
-	const paramsToRedirect = await searchParams;
-	const queryString = new URLSearchParams(
-		paramsToRedirect as Record<string, string>,
-	).toString();
-	return redirect(`/team/${team?.slug}/overview?${queryString}`);
+	return (
+		<div className="flex h-screen w-screen flex-col items-center justify-center pb-4">
+			<div className="max-w-4xl animate-blur-in space-y-8">
+				<div className="space-y-1">
+					<div className="w-fit">
+						<TeamSwitcher />
+					</div>
+					<h1 className="flex items-center gap-2 font-header text-4xl">
+						Hello, {session?.user?.name.split(" ")[0]}
+					</h1>
+					<p className="text-muted-foreground text-sm">
+						All your projects in one place.
+					</p>
+				</div>
+				<NavTopTasks />
+				<NavSearch />
+				<NavWorkspace />
+				<ProjectsList showFilters={false} />
+			</div>
+		</div>
+	);
 }

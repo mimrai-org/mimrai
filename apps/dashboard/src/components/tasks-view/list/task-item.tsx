@@ -1,6 +1,8 @@
 "use client";
+import { useDraggable, useDroppable } from "@dnd-kit/core";
 import type { RouterOutputs } from "@mimir/trpc";
 import { motion } from "motion/react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useUser } from "@/hooks/use-user";
@@ -14,7 +16,7 @@ type Property = keyof typeof propertiesComponents;
 export const TaskItem = ({
 	task,
 	className,
-	dialog = true,
+	dialog = false,
 	disableEvent = false,
 	onClick,
 }: {
@@ -24,42 +26,44 @@ export const TaskItem = ({
 	dialog?: boolean;
 	disableEvent?: boolean;
 }) => {
+	const { listeners, attributes, setNodeRef, transform, isDragging } =
+		useDraggable({
+			id: task.id,
+		});
+	const { setNodeRef: setDroppableNodeRef } = useDroppable({
+		id: task.id,
+	});
+
 	const router = useRouter();
 	const user = useUser();
 	const { setParams } = useTaskParams();
 
 	return (
-		<div className="flex items-center gap-2 transition-colors hover:bg-accent">
+		<div
+			className="flex items-center gap-2 rounded-sm transition-colors hover:bg-accent"
+			ref={(node) => {
+				setNodeRef(node);
+				setDroppableNodeRef(node);
+			}}
+			{...listeners}
+			{...attributes}
+			style={{
+				transform: transform
+					? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+					: undefined,
+			}}
+		>
 			{/* <Checkbox /> */}
-			<motion.button
+			<button
 				type="button"
-				initial={{ opacity: 0, y: 10 }}
-				animate={{ opacity: 1, y: 0 }}
-				exit={{ opacity: 0, y: 10 }}
 				className={cn(
 					"flex w-full flex-col justify-between gap-2 bg-transparent px-4 py-2 sm:flex-row",
 					className,
 				)}
 				onClick={(e) => {
-					queryClient.setQueryData(
-						trpc.tasks.getById.queryKey({ id: task.id }),
-						task,
-					);
-
-					if (onClick) {
-						onClick(e);
-						return;
-					}
-
-					if (disableEvent) {
-						return;
-					}
-
-					if (dialog) {
-						setParams({ taskId: task.id });
-					} else {
-						router.push(`${user?.basePath}/tasks/${task.id}`);
-					}
+					if (isDragging) return;
+					e.preventDefault();
+					router.push(`${user.basePath}/projects/${task.projectId}/${task.id}`);
 				}}
 			>
 				<div className="flex items-center gap-2 text-start text-sm">
@@ -79,7 +83,7 @@ export const TaskItem = ({
 					<TaskProperty property="milestone" task={task} />
 					<TaskProperty property="assignee" task={task} />
 				</div>
-			</motion.button>
+			</button>
 		</div>
 	);
 };

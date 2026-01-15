@@ -6,7 +6,7 @@ import { TasksTodoWidget } from "@/components/widgets/tasks-todo-widget";
 
 export default function Page() {
 	return (
-		<div className="grid gap-6 p-6 md:grid-cols-4">
+		<div className="grid animate-blur-in gap-6 p-6 md:grid-cols-4">
 			<div className="">
 				<SuggestionsWidget />
 			</div>

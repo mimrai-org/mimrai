@@ -3,9 +3,28 @@ import { TagsIcon, UserIcon } from "lucide-react";
 import { AssigneeAvatar } from "@/components/asignee-avatar";
 import { MilestoneIcon } from "@/components/milestone-icon";
 import { ProjectIcon } from "@/components/project-icon";
+import { StatusIcon } from "@/components/status-icon";
 import { trpc } from "@/utils/trpc";
 
 export const tasksFilterOptions = {
+	status: {
+		label: "Status",
+		multiple: true,
+		icon: <StatusIcon type="to_do" className="size-4!" />,
+		filterKey: "statusId",
+		queryOptions: trpc.statuses.get.queryOptions(
+			{},
+			{
+				select: (statuses) =>
+					statuses.data.map((status) => ({
+						value: status.id,
+						label: status.name.charAt(0).toUpperCase() + status.name.slice(1),
+						icon: <StatusIcon {...status} className="size-4!" />,
+						original: status,
+					})),
+			},
+		),
+	},
 	assignee: {
 		label: "Assignee",
 		multiple: true,

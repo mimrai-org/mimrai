@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { TasksView } from "@/components/tasks-view/tasks-view";
 
 type Props = {
 	params: Promise<{ projectId: string; team: string }>;
@@ -6,5 +6,9 @@ type Props = {
 
 export default async function Page({ params }: Props) {
 	const { projectId, team } = await params;
-	return redirect(`/team/${team}/projects/${projectId}/detail`);
+	return (
+		<div>
+			<TasksView projectId={[projectId]} viewType="list" showEmptyColumns />
+		</div>
+	);
 }

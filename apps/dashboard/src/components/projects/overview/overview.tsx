@@ -1,10 +1,10 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
+import { FolderIcon } from "lucide-react";
+import { useSetBreadcrumbs } from "@/components/breadcrumbs";
 import { ProjectForm } from "@/components/forms/project-form/form";
 import { trpc } from "@/utils/trpc";
-import { LatestUpdate } from "./latest-update-card";
 import { MilestonesCard } from "./milestones-card";
-import { ProjectProgressCard } from "./progress-card";
 
 export const ProjectOverview = ({ projectId }: { projectId: string }) => {
 	const { data } = useQuery(
@@ -13,8 +13,12 @@ export const ProjectOverview = ({ projectId }: { projectId: string }) => {
 		}),
 	);
 
+	useSetBreadcrumbs([
+		{ label: data?.name, segments: ["projects", projectId], icon: FolderIcon },
+	]);
+
 	return (
-		<div className="mx-auto max-w-6xl px-6 py-6">
+		<div className="h-full overflow-y-auto rounded-md bg-card p-6">
 			{data && (
 				<div className="space-y-6">
 					<ProjectForm
@@ -22,11 +26,8 @@ export const ProjectOverview = ({ projectId }: { projectId: string }) => {
 							...data,
 						}}
 					/>
-					<div className="grid gap-6 md:grid-cols-2">
-						<MilestonesCard projectId={projectId} />
-						<ProjectProgressCard projectId={projectId} />
-						<LatestUpdate projectId={projectId} className="col-span-2" />
-					</div>
+					<hr />
+					<MilestonesCard projectId={projectId} />
 				</div>
 			)}
 		</div>

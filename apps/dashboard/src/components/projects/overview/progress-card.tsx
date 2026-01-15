@@ -15,8 +15,8 @@ export const ProjectProgressCard = ({ projectId }: { projectId: string }) => {
 	);
 
 	return (
-		<Card>
-			<CardHeader>
+		<div className="space-y-2">
+			<div className="space-y-1">
 				<div className="flex justify-between">
 					<CardDescription>Overall Project Progress</CardDescription>
 				</div>
@@ -39,8 +39,8 @@ export const ProjectProgressCard = ({ projectId }: { projectId: string }) => {
 						inProgress={data?.overall?.inProgress ?? 0}
 					/>
 				</div>
-			</CardHeader>
-			<CardContent>
+			</div>
+			<div>
 				<ul className="mt-4 space-y-2">
 					{data?.members.map((member) => {
 						const total =
@@ -64,7 +64,7 @@ export const ProjectProgressCard = ({ projectId }: { projectId: string }) => {
 						);
 					})}
 				</ul>
-			</CardContent>
-		</Card>
+			</div>
+		</div>
 	);
 };

@@ -12,7 +12,7 @@ import {
 import { Settings2Icon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { PlanList } from "@/app/team/[team]/(navigation)/settings/billing/plan-list";
+import { PlanList } from "@/app/team/[team]/(navigation)/settings/(navigation)/billing/plan-list";
 import { usePlanParams } from "@/hooks/use-plan-params";
 import { useUser } from "@/hooks/use-user";
 import { trpc } from "@/utils/trpc";

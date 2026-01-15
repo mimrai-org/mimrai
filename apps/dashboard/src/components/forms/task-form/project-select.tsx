@@ -41,8 +41,6 @@ export const ProjectSelect = () => {
 					<FormControl>
 						<DataSelectInput
 							size="sm"
-							clearable
-							renderClear={() => "No project"}
 							className="h-6! text-xs"
 							queryOptions={trpc.projects.get.queryOptions(
 								{},

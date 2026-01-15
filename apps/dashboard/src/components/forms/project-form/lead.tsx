@@ -5,14 +5,20 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@ui/components/ui/dropdown-menu";
+import { FormLabel } from "@ui/components/ui/form";
 import { UserStarIcon } from "lucide-react";
 import { useMemo } from "react";
 import { useFormContext } from "react-hook-form";
 import { AssigneeAvatar } from "@/components/asignee-avatar";
 import { trpc } from "@/utils/trpc";
+import type { PropertiesLayout } from "./form";
 import type { ProjectFormValues } from "./form-type";
 
-export const ProjectLeadSelect = () => {
+export const ProjectLeadSelect = ({
+	variant,
+}: {
+	variant?: PropertiesLayout;
+}) => {
 	const form = useFormContext<ProjectFormValues>();
 
 	const leadId = form.watch("leadId");
@@ -24,32 +30,37 @@ export const ProjectLeadSelect = () => {
 	}, [leadId, teamMembers]);
 
 	return (
-		<DropdownMenu>
-			<DropdownMenuTrigger className="flex h-6 items-center gap-2 rounded-sm border px-2 text-xs">
-				<UserStarIcon className="size-3.5 text-muted-foreground" />
-				{lead ? (
-					<div className="flex gap-2">
-						<AssigneeAvatar key={lead.id} {...lead} className="size-4" />
-						{lead.name}
-					</div>
-				) : (
-					<span className="text-muted-foreground">Lead</span>
-				)}
-			</DropdownMenuTrigger>
-			<DropdownMenuContent>
-				{teamMembers?.map((member) => (
-					<DropdownMenuItem
-						key={member.id}
-						className="flex items-center gap-2"
-						onSelect={() => {
-							form.setValue("leadId", member.id);
-						}}
-					>
-						<AssigneeAvatar {...member} className="size-5" />
-						<span className="flex-1">{member.name}</span>
-					</DropdownMenuItem>
-				))}
-			</DropdownMenuContent>
-		</DropdownMenu>
+		<div className="space-y-1">
+			{variant !== "compact" && <FormLabel>Lead</FormLabel>}
+			<DropdownMenu>
+				<DropdownMenuTrigger className="flex h-6 items-center gap-2 rounded-sm text-sm">
+					{lead ? (
+						<div className="flex items-center gap-2">
+							<AssigneeAvatar key={lead.id} {...lead} className="size-4" />
+							{lead.name}
+						</div>
+					) : (
+						<span className="flex items-center gap-2 text-muted-foreground">
+							<UserStarIcon className="size-3.5 text-muted-foreground" />
+							Lead
+						</span>
+					)}
+				</DropdownMenuTrigger>
+				<DropdownMenuContent>
+					{teamMembers?.map((member) => (
+						<DropdownMenuItem
+							key={member.id}
+							className="flex items-center gap-2"
+							onSelect={() => {
+								form.setValue("leadId", member.id);
+							}}
+						>
+							<AssigneeAvatar {...member} className="size-5" />
+							<span className="flex-1">{member.name}</span>
+						</DropdownMenuItem>
+					))}
+				</DropdownMenuContent>
+			</DropdownMenu>
+		</div>
 	);
 };

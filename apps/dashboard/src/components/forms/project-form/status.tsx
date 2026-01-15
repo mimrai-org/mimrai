@@ -4,6 +4,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@ui/components/ui/dropdown-menu";
+import { FormField, FormLabel } from "@ui/components/ui/form";
 import {
 	Tooltip,
 	TooltipContent,
@@ -22,7 +23,11 @@ const options = [
 	{ value: "on_hold" as const, label: "On Hold" },
 ];
 
-export const ProjectStatusSelect = () => {
+export const ProjectStatusSelect = ({
+	variant,
+}: {
+	variant?: "compact" | "expanded";
+}) => {
 	const form = useFormContext<ProjectFormValues>();
 
 	const status = form.watch("status");
@@ -32,42 +37,45 @@ export const ProjectStatusSelect = () => {
 	}, [status]);
 
 	return (
-		<DropdownMenu>
-			<Tooltip>
-				<TooltipTrigger asChild>
-					<DropdownMenuTrigger className="flex h-6 items-center gap-2 rounded-sm border px-2 text-xs">
-						<ProjectStatusIcon
-							status={status}
-							className="size-3.5 text-muted-foreground"
-						/>
-						{status ? (
-							<span>{label}</span>
-						) : (
-							<span className="text-muted-foreground">Status</span>
-						)}
-					</DropdownMenuTrigger>
-				</TooltipTrigger>
-				<TooltipContent>
-					Status determines the current state of this project.
-				</TooltipContent>
-			</Tooltip>
-			<DropdownMenuContent>
-				{options?.map((option) => (
-					<DropdownMenuItem
-						key={option.value}
-						className="flex items-center gap-2"
-						onSelect={() => {
-							form.setValue("status", option.value);
-						}}
-					>
-						<ProjectStatusIcon
-							status={option.value}
-							className="size-3.5 text-muted-foreground"
-						/>
-						<span className="flex-1">{option.label}</span>
-					</DropdownMenuItem>
-				))}
-			</DropdownMenuContent>
-		</DropdownMenu>
+		<FormField
+			control={form.control}
+			name="status"
+			render={({ field }) => (
+				<div className="space-y-1">
+					{variant !== "compact" && <FormLabel>Status</FormLabel>}
+					<DropdownMenu>
+						<DropdownMenuTrigger className="flex h-6 items-center gap-2 text-sm">
+							<ProjectStatusIcon
+								status={status}
+								className="size-3.5 text-muted-foreground"
+							/>
+							{status ? (
+								<span>{label}</span>
+							) : (
+								<span className="text-muted-foreground">Status</span>
+							)}
+						</DropdownMenuTrigger>
+						<DropdownMenuContent>
+							{options?.map((option) => (
+								<DropdownMenuItem
+									key={option.value}
+									className="flex items-center gap-2"
+									onSelect={() => {
+										field.onChange(option.value);
+										field.onBlur();
+									}}
+								>
+									<ProjectStatusIcon
+										status={option.value}
+										className="size-3.5 text-muted-foreground"
+									/>
+									<span className="flex-1">{option.label}</span>
+								</DropdownMenuItem>
+							))}
+						</DropdownMenuContent>
+					</DropdownMenu>
+				</div>
+			)}
+		/>
 	);
 };

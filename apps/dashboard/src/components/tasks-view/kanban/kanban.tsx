@@ -31,7 +31,7 @@ export function TasksBoard() {
 	}, [formattedBoardData]);
 
 	return (
-		<div className="flex h-full grow-1 flex-col p-2">
+		<div className="flex grow-1 flex-col p-2">
 			<Kanban.Root
 				value={formattedBoardData}
 				getItemValue={(item) => item.id}

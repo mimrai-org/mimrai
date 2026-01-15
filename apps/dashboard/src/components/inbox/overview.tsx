@@ -140,9 +140,7 @@ export const InboxOverview = ({ className }: { className?: string }) => {
 			<div className="h-[calc(100vh-90px)] space-y-4 overflow-y-auto rounded-lg bg-card p-4">
 				<div className="space-y-1">
 					<div className="flex justify-between">
-						<h1 className="truncate font-header text-2xl">
-							{selectedInbox.display}
-						</h1>
+						<h1 className="truncate text-2xl">{selectedInbox.display}</h1>
 						<div>
 							<InboxDropdown inbox={selectedInbox} />
 						</div>

@@ -37,14 +37,14 @@ export const InboxList = ({ className }: { className?: string }) => {
 				<button
 					key={item.id}
 					type="button"
-					className="w-full pl-2 text-left"
+					className="w-full text-left"
 					onClick={() => {
 						setParams({ selectedInboxId: item.id });
 					}}
 				>
 					<div
 						className={cn(
-							"cursor-pointer space-y-1 rounded-md px-4 py-2 text-sm transition-colors hover:bg-accent",
+							"cursor-pointer space-y-1 rounded-md px-2 py-2 text-sm transition-colors hover:bg-accent",
 							{
 								"bg-accent": selectedInbox?.id === item.id,
 							},
