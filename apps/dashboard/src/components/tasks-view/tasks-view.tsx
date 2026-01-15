@@ -68,7 +68,6 @@ const defaultFilters: TasksViewContextFilters = {
 		"dueDate",
 		"labels",
 		"milestone",
-		"project",
 	] as Array<keyof typeof propertiesComponents>,
 	groupBy: "status" as TasksGroupBy,
 	pageSize: 100,
