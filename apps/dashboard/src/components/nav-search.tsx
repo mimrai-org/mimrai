@@ -1,11 +1,18 @@
 "use client";
 import { Kbd, KbdGroup } from "@ui/components/ui/kbd";
+import { cn } from "@ui/lib/utils";
 import { SearchIcon } from "lucide-react";
 import { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { GlobalSearchDialog } from "./global-search-dialog";
 
-export const NavSearch = () => {
+export const NavSearch = ({
+	placeholder,
+	className,
+}: {
+	placeholder?: string;
+	className?: string;
+}) => {
 	const [open, setOpen] = useState(false);
 
 	useHotkeys(
@@ -26,10 +33,13 @@ export const NavSearch = () => {
 				onClick={() => {
 					setOpen(true);
 				}}
-				className="flex w-52 items-center gap-4 rounded-md px-3 py-2 text-start text-muted-foreground text-sm transition-colors hover:text-foreground"
+				className={cn(
+					"flex w-52 items-center gap-4 rounded-md px-3 py-2 text-start text-muted-foreground text-sm transition-colors hover:text-foreground",
+					className,
+				)}
 			>
 				<SearchIcon className="size-4" />
-				Find anything...
+				{placeholder || "Find anything..."}
 				<Kbd className="ml-auto">
 					<KbdGroup>
 						<span>⌘</span>

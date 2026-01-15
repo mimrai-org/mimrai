@@ -25,16 +25,25 @@ export default async function Page({ searchParams }: Props) {
 						<TeamSwitcher />
 					</div>
 					<h1 className="flex items-center gap-2 font-header text-4xl">
-						Hello, {session?.user?.name.split(" ")[0]}
+						Jump into your work
 					</h1>
 					<p className="text-muted-foreground text-sm">
-						All your projects in one place.
+						Hello, {session?.user?.name.split(" ")[0]}
 					</p>
 				</div>
 				<NavTopTasks />
-				<NavSearch />
-				<NavWorkspace />
-				<ProjectsList showFilters={false} />
+				<NavSearch
+					className="w-fit"
+					placeholder="Or search any task, project, milestone and more"
+				/>
+				<div>
+					<h2 className="mb-2 font-header">Pick a project</h2>
+					<ProjectsList showFilters={false} />
+				</div>
+				<div>
+					<h2 className="mb-2 font-header">Your workspace</h2>
+					<NavWorkspace />
+				</div>
 			</div>
 		</div>
 	);

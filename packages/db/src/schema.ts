@@ -1532,4 +1532,40 @@ export const intakes = pgTable(
 	],
 );
 
+// export const taskViews = pgTable(
+// 	"task_views",
+// 	{
+// 		id: text("id")
+// 			.$defaultFn(() => randomUUID())
+// 			.primaryKey()
+// 			.notNull(),
+// 		name: text("name").notNull(),
+// 		description: text("description"),
+// 		teamId: text("team_id").notNull(),
+// 		userId: text("user_id").notNull(),
+// 		viewType: text("view_type").notNull(), // e.g., 'list', 'board', 'calendar'
+// 		filters: jsonb("filters").$type<Record<string, any>>().notNull(),
+// 		createdAt: timestamp("created_at", {
+// 			withTimezone: true,
+// 			mode: "string",
+// 		}).defaultNow(),
+// 		updatedAt: timestamp("updated_at", {
+// 			withTimezone: true,
+// 			mode: "string",
+// 		}).defaultNow(),
+// 	},
+// 	(table) => [
+// 		foreignKey({
+// 			columns: [table.teamId],
+// 			foreignColumns: [teams.id],
+// 			name: "task_views_team_id_fkey",
+// 		}).onDelete("cascade"),
+// 		foreignKey({
+// 			columns: [table.userId],
+// 			foreignColumns: [users.id],
+// 			name: "task_views_user_id_fkey",
+// 		}).onDelete("cascade"),
+// 	],
+// );
+
 export const globalSearchView = buildGlobalSearchView();

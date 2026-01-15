@@ -26,7 +26,7 @@ export const NavTopTasks = () => {
 
 	return (
 		<div className="space-y-2 rounded-md border p-4">
-			<h2 className="font-header">Top Tasks</h2>
+			<h2 className="font-header">Continue where you left off</h2>
 			{top3?.map((task) => (
 				<Link
 					key={task.id}
