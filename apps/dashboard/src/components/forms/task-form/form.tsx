@@ -17,8 +17,8 @@ import { useDebounceValue } from "usehooks-ts";
 import type z from "zod";
 import { useChatContext } from "@/components/chat/chat-context/store";
 import { useChatWidget } from "@/components/chat/chat-widget";
+import { useUser } from "@/components/user-provider";
 import { useTaskParams } from "@/hooks/use-task-params";
-import { useUser } from "@/hooks/use-user";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { trpc } from "@/utils/trpc";
 import { ActionsMenu } from "./actions-menu";
@@ -218,28 +218,7 @@ export const TaskForm = ({
 													<Link2Icon />
 												</Button>
 											)}
-											{id && (
-												<Button
-													variant={"secondary"}
-													size="sm"
-													type="button"
-													onClick={() => {
-														setItems([
-															{
-																type: "task",
-																id: id,
-																label: defaultValues?.title!,
-																key: `task-${id}`,
-															},
-														]);
-														toggle(true);
-														setParams(null);
-													}}
-												>
-													<SparklesIcon />
-													Ask MIMIR
-												</Button>
-											)}
+
 											<Button
 												type="submit"
 												variant={"default"}

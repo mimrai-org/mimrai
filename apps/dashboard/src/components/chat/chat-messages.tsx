@@ -8,8 +8,8 @@ import type { UIMessage } from "ai";
 import { PaperclipIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
+import { useUser } from "@/components/user-provider";
 import { useChatStatus } from "@/hooks/use-chat-status";
-import { useUser } from "@/hooks/use-user";
 import { Conversation, ConversationContent } from "../ai-elements/conversation";
 import { Message, MessageAvatar, MessageContent } from "../ai-elements/message";
 import {

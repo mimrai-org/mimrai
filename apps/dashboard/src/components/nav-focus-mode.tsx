@@ -3,7 +3,7 @@ import { Button } from "@ui/components/ui/button";
 import { cn } from "@ui/lib/utils";
 import { Maximize2Icon } from "lucide-react";
 import Link from "next/link";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 
 export const NavZenMode = () => {
 	const user = useUser();

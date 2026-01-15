@@ -1,7 +1,7 @@
 "use client";
 
 import { TasksView } from "@/components/tasks-view/tasks-view";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 
 export default function Page() {
 	const user = useUser();

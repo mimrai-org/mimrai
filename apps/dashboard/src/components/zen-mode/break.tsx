@@ -4,7 +4,7 @@ import { PlayIcon } from "lucide-react";
 import { AnimatePresence, motion, stagger } from "motion/react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 import { useZenModeSession } from "./use-zen-mode-session";
 
 const container = {

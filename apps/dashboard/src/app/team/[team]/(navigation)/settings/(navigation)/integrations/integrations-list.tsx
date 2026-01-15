@@ -12,8 +12,9 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { IntegrationIcon } from "@/components/integrations/integration-icon";
+import { useUser } from "@/components/user-provider";
 import { useIntegrationParams } from "@/hooks/use-integration-params";
-import { useScopes, useUser } from "@/hooks/use-user";
+import { useScopes } from "@/hooks/use-scopes";
 import { getSlackInstallUrl } from "@/lib/integrations";
 import { trpc } from "@/utils/trpc";
 

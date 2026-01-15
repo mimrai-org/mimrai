@@ -26,7 +26,7 @@ import {
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useState } from "react";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 import { queryClient, trpc } from "@/utils/trpc";
 import { useZenMode, type ZenModeTask } from "./use-zen-mode";
 

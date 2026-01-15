@@ -23,7 +23,7 @@ import {
 	NavItemSubtitle,
 	NavItemTitle,
 } from "@/components/nav/nav-item";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 import { cn } from "@/lib/utils";
 
 export const NavList = () => {

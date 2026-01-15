@@ -5,7 +5,7 @@ import { Card, CardContent } from "@ui/components/ui/card";
 import { SparklesIcon } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import Link from "next/link";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 import { trpc } from "@/utils/trpc";
 import { SuggestionCard } from "../tasks-suggestions/suggestion-card";
 

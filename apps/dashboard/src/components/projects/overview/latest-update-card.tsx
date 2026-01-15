@@ -11,7 +11,7 @@ import {
 	ProjectHealthIcon,
 	ProjectHealthLabel,
 } from "@/components/forms/project-health-update-form/project-health-icon";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 import { trpc } from "@/utils/trpc";
 
 export const LatestUpdate = ({

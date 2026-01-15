@@ -17,9 +17,9 @@ import { useRouter } from "next/navigation";
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 import Loader from "@/components/loader";
+import { useUser } from "@/components/user-provider";
 import { useProjectParams } from "@/hooks/use-project-params";
 import { useShareableParams } from "@/hooks/use-shareable-params";
-import { useUser } from "@/hooks/use-user";
 import { queryClient, trpc } from "@/utils/trpc";
 import type { ProjectFormValues } from "./form-type";
 

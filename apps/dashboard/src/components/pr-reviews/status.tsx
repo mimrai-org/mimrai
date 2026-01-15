@@ -4,7 +4,7 @@ import {
 	GitPullRequestDraft,
 	GitPullRequestIcon,
 } from "lucide-react";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 import type { PrReview } from "./use-pr-reviews";
 
 const prReviewsStateIcons = {

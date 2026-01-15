@@ -1,9 +1,9 @@
 import { Provider as OpenPanelProvider } from "@mimir/events/client";
-// import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+// import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { GlobalSheets } from "@/components/sheets/global-sheets";
-import { getSession } from "@/lib/get-session";
+import { UserProvider } from "@/components/user-provider";
 import { trpcClient } from "@/utils/trpc";
 
 type Props = {
@@ -15,37 +15,37 @@ type Props = {
 
 export default async function Layout({ children, params }: Props) {
 	const { team } = await params;
-	const session = await getSession();
+	const user = await trpcClient.users.getCurrent.query();
 
-	if (!session?.user.id) {
+	if (!user?.id) {
 		return redirect("/sign-in");
 	}
 
 	// switch to the team in the URL
 	try {
-		if (session.user.teamSlug !== team) {
+		if (user.team?.slug !== team) {
 			await trpcClient.users.switchTeam.mutate({
 				slug: team,
 			});
 		}
 	} catch (error) {
-		if (!session.user.teamSlug) {
+		if (!user.team?.slug) {
 			return redirect("/team");
 		}
-		return redirect(`/team/${session.user.teamSlug}/onboarding`);
+		return redirect(`/team/${user.team.slug}/onboarding`);
 	}
 
 	return (
-		<>
-			{children}
-			<Suspense>
+		<Suspense>
+			<UserProvider user={user}>
 				<GlobalSheets />
+				{children}
 
 				{/* {process.env.NODE_ENV === "development" && (
-					<ReactQueryDevtools buttonPosition="bottom-left" />
-				)} */}
-				<OpenPanelProvider profileId={session.user.id} />
-			</Suspense>
-		</>
+						<ReactQueryDevtools buttonPosition="bottom-left" />
+					)} */}
+				<OpenPanelProvider profileId={user.id} />
+			</UserProvider>
+		</Suspense>
 	);
 }

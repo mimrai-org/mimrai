@@ -10,7 +10,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { create } from "zustand";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/utils/trpc";
 import { ChatInterface } from "./chat-interface";

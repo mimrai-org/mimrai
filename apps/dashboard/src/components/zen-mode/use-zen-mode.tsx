@@ -8,7 +8,7 @@ import {
 import type { Editor as EditorInstance } from "@tiptap/react";
 import { redirect, useRouter } from "next/navigation";
 import { createContext, useContext, useRef } from "react";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 import { trpc } from "@/utils/trpc";
 import { ZenModeLoading } from "./loading";
 import { ZenModeNotFound } from "./not-found";

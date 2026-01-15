@@ -1,6 +1,6 @@
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@mimir/ui/card";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 import { ProfileForm } from "./profile-form";
 
 export const Profile = () => {

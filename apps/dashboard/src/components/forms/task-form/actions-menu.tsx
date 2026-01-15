@@ -9,10 +9,8 @@ import {
 	DropdownMenuTrigger,
 } from "@ui/components/ui/dropdown-menu";
 import {
-	CopyIcon,
 	CopyPlusIcon,
 	EllipsisVerticalIcon,
-	FlagIcon,
 	ShareIcon,
 	TrashIcon,
 } from "lucide-react";

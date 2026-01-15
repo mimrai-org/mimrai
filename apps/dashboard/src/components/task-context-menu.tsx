@@ -27,8 +27,8 @@ import {
 import ms from "ms";
 import Link from "next/link";
 import { toast } from "sonner";
+import { useUser } from "@/components/user-provider";
 import { useTaskParams } from "@/hooks/use-task-params";
-import { useUser } from "@/hooks/use-user";
 import { queryClient, trpc } from "@/utils/trpc";
 import { Assignee, AssigneeAvatar } from "./asignee-avatar";
 import { useChatContext } from "./chat/chat-context/store";

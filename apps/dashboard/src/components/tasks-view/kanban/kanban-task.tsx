@@ -2,8 +2,8 @@ import type { RouterOutputs } from "@mimir/trpc";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { TaskProperty } from "@/components/tasks-view/properties/task-properties";
+import { useUser } from "@/components/user-provider";
 import { useTaskParams } from "@/hooks/use-task-params";
-import { useUser } from "@/hooks/use-user";
 import { cn } from "@/lib/utils";
 import { queryClient, trpc } from "@/utils/trpc";
 

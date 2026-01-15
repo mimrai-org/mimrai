@@ -13,8 +13,8 @@ import {
 	SquarePlusIcon,
 } from "lucide-react";
 import { useEffect, useMemo } from "react";
+import { useUser } from "@/components/user-provider";
 import { useNotificationFilterParams } from "@/hooks/use-notification-filter-params";
-import { useUser } from "@/hooks/use-user";
 import { trpc } from "@/utils/trpc";
 import { NotificationItem, type NotificationItemProps } from "./item";
 import { useNotificationStore } from "./store";

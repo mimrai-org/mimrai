@@ -14,7 +14,7 @@ import {
 	SettingsIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 import { queryClient, trpc } from "@/utils/trpc";
 import type { Inbox } from "./use-inbox";
 

@@ -11,7 +11,7 @@ import { CheckIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 import { queryClient, trpc } from "@/utils/trpc";
 import { StatusIcon } from "../status-icon";
 import { useZenMode } from "./use-zen-mode";

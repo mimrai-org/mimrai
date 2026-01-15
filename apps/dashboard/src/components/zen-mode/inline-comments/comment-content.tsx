@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import Loader from "@/components/loader";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 import { queryClient, trpc } from "@/utils/trpc";
 import { AssigneeAvatar } from "../../asignee-avatar";
 import { Response } from "../../chat/response";

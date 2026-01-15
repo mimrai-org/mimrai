@@ -91,7 +91,7 @@ export const TaskGroupItem = ({
 			className="flex flex-col gap-2"
 			ref={setDroppableNodeRef}
 		>
-			<h2 className="flex items-center gap-2 rounded-sm bg-card px-4 py-2 text-sm">
+			<h2 className="flex items-center gap-2 rounded-sm border bg-card px-4 py-2 text-sm dark:border-none">
 				{taskGroup.column.icon}
 				{taskGroup.column.name}
 				<span className="text-muted-foreground text-xs">

@@ -14,9 +14,9 @@ import { ChevronsUpDownIcon, PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import { useUser } from "@/components/user-provider";
 import { useChatParams } from "@/hooks/use-chat-params";
 import { useTeamParams } from "@/hooks/use-team-params";
-import { useUser } from "@/hooks/use-user";
 import { trpc } from "@/utils/trpc";
 
 export const TeamSwitcher = () => {

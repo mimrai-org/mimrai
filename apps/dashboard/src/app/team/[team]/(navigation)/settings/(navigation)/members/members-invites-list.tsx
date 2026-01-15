@@ -13,7 +13,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { CopyIcon, EllipsisIcon } from "lucide-react";
 import { Toaster, toast } from "sonner";
-import { useScopes } from "@/hooks/use-user";
+import { useScopes } from "@/hooks/use-scopes";
 import { queryClient, trpc } from "@/utils/trpc";
 
 export const MembersInvitesList = () => {

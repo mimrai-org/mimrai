@@ -1,19 +1,24 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
+import { Skeleton } from "@ui/components/ui/skeleton";
 import { LayersIcon } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 import { trpc } from "@/utils/trpc";
 import { propertiesComponents } from "../tasks-view/properties/task-properties-components";
 
 export const NavTopTasks = () => {
 	const user = useUser();
-	const { data } = useQuery(trpc.zen.queue.queryOptions());
+	const { data, isLoading } = useQuery(trpc.zen.queue.queryOptions());
 
 	const top3 = useMemo(() => {
 		return data?.data?.slice(0, 3);
 	}, [data]);
+
+	if (isLoading || !user) {
+		return <Skeleton className="h-44 w-full rounded-md" />;
+	}
 
 	if (!top3 || top3.length === 0) {
 		return null;

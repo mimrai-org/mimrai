@@ -9,7 +9,7 @@ import { cn } from "@ui/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type * as React from "react";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 import type { NavItem } from "./app-sidebar";
 
 export function NavSecondary({

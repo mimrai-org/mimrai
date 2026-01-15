@@ -12,7 +12,7 @@ import {
 } from "@ui/components/ui/dropdown-menu";
 import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 import { authClient } from "@/lib/auth-client";
 
 export function NavUser() {

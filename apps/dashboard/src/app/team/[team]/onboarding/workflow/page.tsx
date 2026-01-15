@@ -30,7 +30,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import Loader from "@/components/loader";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { trpc } from "@/utils/trpc";
 import { WorkflowSuggested } from "./workflow-suggested";

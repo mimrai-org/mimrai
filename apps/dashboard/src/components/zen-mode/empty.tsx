@@ -3,7 +3,7 @@
 import { Button } from "@ui/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 
 export const ZenModeEmpty = () => {
 	const user = useUser();

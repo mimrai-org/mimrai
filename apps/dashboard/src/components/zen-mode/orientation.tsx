@@ -7,7 +7,7 @@ import { formatRelative } from "date-fns";
 import { Maximize2Icon } from "lucide-react";
 import { motion, stagger } from "motion/react";
 import Link from "next/link";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 import { trpc } from "@/utils/trpc";
 import { getNotificationItemProps } from "../notifications/list";
 import { useZenMode } from "./use-zen-mode";

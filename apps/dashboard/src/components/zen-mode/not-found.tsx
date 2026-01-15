@@ -2,7 +2,7 @@
 import { Button } from "@ui/components/ui/button";
 import { ChevronLeftIcon, CircleQuestionMarkIcon } from "lucide-react";
 import Link from "next/link";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 
 export const ZenModeNotFound = () => {
 	const user = useUser();

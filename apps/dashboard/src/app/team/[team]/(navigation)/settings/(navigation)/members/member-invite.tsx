@@ -2,7 +2,7 @@
 import { t } from "@mimir/locale";
 import { Card, CardContent, CardDescription, CardHeader } from "@mimir/ui/card";
 import { MemberInviteForm } from "@/components/forms/member-invite-form";
-import { useScopes } from "@/hooks/use-user";
+import { useScopes } from "@/hooks/use-scopes";
 
 export const MemberInvite = () => {
 	const canWriteTeam = useScopes(["team:write"]);

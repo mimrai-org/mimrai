@@ -13,8 +13,8 @@ import { Settings2Icon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PlanList } from "@/app/team/[team]/(navigation)/settings/(navigation)/billing/plan-list";
+import { useUser } from "@/components/user-provider";
 import { usePlanParams } from "@/hooks/use-plan-params";
-import { useUser } from "@/hooks/use-user";
 import { trpc } from "@/utils/trpc";
 
 export const PlanSelectSheet = () => {

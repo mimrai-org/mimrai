@@ -12,7 +12,7 @@ import {
 import { Input } from "@ui/components/ui/input";
 import { Loader2 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 import { trpc } from "@/utils/trpc";
 
 export const TeamDelete = () => {

@@ -18,7 +18,7 @@ export const ProjectOverview = ({ projectId }: { projectId: string }) => {
 	]);
 
 	return (
-		<div className="h-full overflow-y-auto rounded-md bg-card p-6">
+		<div className="h-full overflow-y-auto rounded-md border bg-card p-6 dark:border-none">
 			{data && (
 				<div className="space-y-6">
 					<ProjectForm

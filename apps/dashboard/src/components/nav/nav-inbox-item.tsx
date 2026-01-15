@@ -7,7 +7,7 @@ import {
 import { FolderIcon, InboxIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 import { trpc } from "@/utils/trpc";
 import {
 	NavItem,

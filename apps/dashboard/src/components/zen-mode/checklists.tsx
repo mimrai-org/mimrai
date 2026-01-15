@@ -5,7 +5,7 @@ import { cn } from "@ui/lib/utils";
 import { CircleCheckIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useState } from "react";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 import { queryClient, trpc } from "@/utils/trpc";
 import { AssigneeAvatar } from "../asignee-avatar";
 import { Response } from "../chat/response";

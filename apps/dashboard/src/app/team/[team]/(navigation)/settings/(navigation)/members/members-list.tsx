@@ -12,8 +12,9 @@ import {
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { EllipsisIcon } from "lucide-react";
 import { AssigneeAvatar } from "@/components/asignee-avatar";
+import { useUser } from "@/components/user-provider";
 import { useMemberParams } from "@/hooks/use-member-params";
-import { useScopes, useUser } from "@/hooks/use-user";
+import { useScopes } from "@/hooks/use-scopes";
 import { queryClient, trpc } from "@/utils/trpc";
 
 export const MembersList = () => {

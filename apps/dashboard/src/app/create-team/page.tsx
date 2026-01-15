@@ -14,7 +14,7 @@ import { ArrowRightIcon, RocketIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import z from "zod";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { trpc } from "@/utils/trpc";
 

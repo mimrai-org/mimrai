@@ -37,8 +37,8 @@ import {
 	EmptyStateTitle,
 } from "@/components/empty-state";
 import { ProjectIcon } from "@/components/project-icon";
+import { useUser } from "@/components/user-provider";
 import { useProjectParams } from "@/hooks/use-project-params";
-import { useUser } from "@/hooks/use-user";
 import { queryClient, trpc } from "@/utils/trpc";
 import {
 	NavItem,

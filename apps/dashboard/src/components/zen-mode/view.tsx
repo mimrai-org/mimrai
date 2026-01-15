@@ -8,8 +8,8 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/components/user-provider";
 import { useTaskParams } from "@/hooks/use-task-params";
-import { useUser } from "@/hooks/use-user";
 import { PriorityIcon } from "../tasks-view/properties/priority";
 import { ZenModeAttachments } from "./attachments";
 import { ZenModeBackground } from "./background";

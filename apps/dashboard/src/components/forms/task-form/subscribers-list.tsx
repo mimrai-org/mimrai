@@ -11,7 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@mimir/ui/popover";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { EyeIcon, EyeOffIcon, PlusIcon } from "lucide-react";
 import { AssigneeAvatar } from "@/components/asignee-avatar";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 import { queryClient, trpc } from "@/utils/trpc";
 
 export const SubscribersList = ({ taskId }: { taskId: string }) => {

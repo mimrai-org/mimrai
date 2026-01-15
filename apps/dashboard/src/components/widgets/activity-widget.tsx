@@ -12,8 +12,8 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@ui/components/ui/tooltip";
+import { useUser } from "@/components/user-provider";
 import { useTaskParams } from "@/hooks/use-task-params";
-import { useUser } from "@/hooks/use-user";
 import { trpc } from "@/utils/trpc";
 import { AssigneeAvatar } from "../asignee-avatar";
 import { getNotificationItemProps } from "../notifications/list";

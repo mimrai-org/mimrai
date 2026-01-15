@@ -26,9 +26,9 @@ import {
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
+import { useUser } from "@/components/user-provider";
 import { useProjectParams } from "@/hooks/use-project-params";
 import { useTaskParams } from "@/hooks/use-task-params";
-import { useUser } from "@/hooks/use-user";
 import { trpc } from "@/utils/trpc";
 
 export type GlobalSearchItem = {
@@ -314,7 +314,7 @@ export const GlobalSearchDialog = ({
 											return (
 												<CommandItem
 													key={item.id}
-													className="group flex w-full cursor-pointer items-center rounded-sm px-4 py-2 text-sm transition-colors duration-200 hover:bg-accent hover:text-accent-foreground"
+													className="group flex w-full cursor-pointer items-center rounded-sm px-4 py-2 text-sm transition-colors duration-200 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/30"
 													onSelect={() => {
 														// @ts-expect-error -- type matches
 														handleSelect(item);

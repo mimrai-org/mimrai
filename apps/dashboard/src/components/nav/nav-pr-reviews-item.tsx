@@ -4,7 +4,7 @@ import { cn } from "@ui/lib/utils";
 import { FolderIcon, GitPullRequestIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/components/user-provider";
 import { trpc } from "@/utils/trpc";
 import {
 	NavItem,
