@@ -25,12 +25,12 @@ export const NavTopTasks = () => {
 			{top3?.map((task) => (
 				<Link
 					key={task.id}
-					href={`${user.basePath}/projects/${task.projectId}/${task.id}`}
+					href={`${user?.basePath}/projects/${task.projectId}/${task.id}`}
 				>
 					<div className="flex items-center gap-2 rounded-md px-2 py-2 text-sm hover:bg-accent dark:hover:bg-accent/30">
 						<LayersIcon className="size-4 text-muted-foreground" />
 						<span className="text-muted-foreground">
-							{user.team.prefix}-{task.sequence}
+							{user?.team?.prefix}-{task.sequence}
 						</span>
 						{task.title}
 

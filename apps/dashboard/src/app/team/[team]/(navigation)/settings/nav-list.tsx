@@ -32,7 +32,7 @@ export const NavList = () => {
 
 	const addTeamToUrl = (url: string) => {
 		if (!user?.team) return url;
-		return `${user.basePath}${url}`;
+		return `${user?.basePath}${url}`;
 	};
 
 	const settingsLinks = useMemo(() => {

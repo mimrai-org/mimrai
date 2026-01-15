@@ -63,7 +63,9 @@ export const TaskItem = ({
 				onClick={(e) => {
 					if (isDragging) return;
 					e.preventDefault();
-					router.push(`${user.basePath}/projects/${task.projectId}/${task.id}`);
+					router.push(
+						`${user?.basePath}/projects/${task.projectId}/${task.id}`,
+					);
 				}}
 			>
 				<div className="flex items-center gap-2 text-start text-sm">
