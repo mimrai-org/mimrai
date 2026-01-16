@@ -40,7 +40,12 @@ export const TaskItem = ({
 
 	return (
 		<div
-			className="flex items-center gap-2 rounded-sm transition-colors hover:bg-accent dark:hover:bg-accent/30"
+			className={cn(
+				"flex items-center gap-2 rounded-sm transition-colors hover:bg-accent dark:hover:bg-accent/30",
+				{
+					"z-50 opacity-50": isDragging,
+				},
+			)}
 			ref={(node) => {
 				setNodeRef(node);
 				setDroppableNodeRef(node);

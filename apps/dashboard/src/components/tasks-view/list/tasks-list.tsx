@@ -12,6 +12,7 @@ import {
 	CollapsibleContent,
 	CollapsibleTrigger,
 } from "@ui/components/ui/collapsible";
+import { cn } from "@ui/lib/utils";
 import {
 	ListPlusIcon,
 	Maximize2Icon,
@@ -19,6 +20,7 @@ import {
 	PlusIcon,
 } from "lucide-react";
 import { AnimatePresence } from "motion/react";
+import { useState } from "react";
 import { useTaskParams } from "@/hooks/use-task-params";
 import Loader from "../../loader";
 import { TaskContextMenu } from "../../task-context-menu";
@@ -88,6 +90,7 @@ export const TaskGroupItem = ({
 }: {
 	taskGroup: { column: GenericGroup; tasks: Task[] };
 }) => {
+	const [open, setOpen] = useState(true);
 	const { filters } = useTasksViewContext();
 	const { setParams: setTaskParams } = useTaskParams();
 
@@ -101,7 +104,7 @@ export const TaskGroupItem = ({
 			className="flex flex-col gap-2"
 			ref={setDroppableNodeRef}
 		>
-			<Collapsible defaultOpen={true}>
+			<Collapsible open={open} onOpenChange={setOpen}>
 				<CollapsibleTrigger asChild>
 					<h2 className="group mb-2 flex items-center gap-2 rounded-sm border bg-card px-4 py-2 text-sm dark:border-none">
 						{taskGroup.column.icon}
@@ -116,7 +119,11 @@ export const TaskGroupItem = ({
 					</h2>
 				</CollapsibleTrigger>
 
-				<CollapsibleContent>
+				<CollapsibleContent
+					className={cn({
+						"overflow-visible!": open,
+					})}
+				>
 					{taskGroup.tasks.map((task) => (
 						<TaskContextMenu key={task.id} task={task}>
 							<div>
