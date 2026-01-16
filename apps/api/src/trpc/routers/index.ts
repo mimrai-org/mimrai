@@ -22,6 +22,7 @@ import { projectsRouter } from "./projects";
 import { shareableRouter } from "./shareable";
 import { statusesRouter } from "./statuses";
 import { taskDependenciesRouter } from "./task-dependencies";
+import { taskViewsRouter } from "./task-views";
 import { tasksRouter } from "./tasks";
 import { tasksSuggestionsRouter } from "./tasks-suggestions";
 import { teamsRouter } from "./teams";
@@ -64,6 +65,7 @@ export const appRouter = router({
 	chatFeedback: chatFeedbackRouter,
 	shareable: shareableRouter,
 	tasksSuggestions: tasksSuggestionsRouter,
+	taskViews: taskViewsRouter,
 	globalSearch: globalSearchRouter,
 	onboarding: onboardingRouter,
 	zen: zenRouter,

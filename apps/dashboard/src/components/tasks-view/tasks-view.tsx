@@ -29,6 +29,7 @@ export type TasksViewContextValue = {
 	fetchNextPage: () => void;
 	hasNextPage?: boolean;
 	isLoading?: boolean;
+	viewId?: string;
 };
 export const TasksViewContext = createContext<TasksViewContextValue | null>(
 	null,
@@ -70,14 +71,19 @@ const defaultFilters: TasksViewContextFilters = {
 		"milestone",
 	] as Array<keyof typeof propertiesComponents>,
 	groupBy: "status" as TasksGroupBy,
+	search: "",
 	pageSize: 100,
 };
 
 export const TasksView = ({
 	showFilters,
+	viewId,
 	...props
 }: Partial<
-	TasksViewContextFilters & Pick<TasksFiltersProps, "showFilters">
+	TasksViewContextFilters &
+		Pick<TasksFiltersProps, "showFilters"> & {
+			viewId: string;
+		}
 >) => {
 	const { params } = useTasksFilterParams();
 
@@ -115,6 +121,7 @@ export const TasksView = ({
 				tasks,
 				fetchNextPage,
 				hasNextPage,
+				viewId,
 				isLoading,
 			}}
 		>

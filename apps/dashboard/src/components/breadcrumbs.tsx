@@ -260,13 +260,22 @@ export const Breadcrumbs = () => {
 	);
 };
 
-export const useSetBreadcrumbs = (payload: BreadcrumpItem[]) => {
+export const useSetBreadcrumbs = (
+	payload: BreadcrumpItem[],
+	options: {
+		enabled?: boolean;
+	} = {
+		enabled: true,
+	},
+) => {
+	const { enabled } = options;
 	const { setCrumb } = useBreadcrumbs();
 	useEffect(() => {
+		if (!enabled) return;
 		for (const crumb of payload) {
 			if (crumb.label) setCrumb(crumb);
 		}
-	}, [payload, setCrumb]);
+	}, [payload, setCrumb, enabled]);
 };
 
 export const BreadcrumbSetter = ({ crumbs }: { crumbs: BreadcrumpItem[] }) => {

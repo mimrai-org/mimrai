@@ -16,6 +16,7 @@ import { propertiesComponents } from "../properties/task-properties-components";
 import { type TasksGroupBy, tasksGroupByItems } from "../tasks-group";
 import { useTasksViewContext } from "../tasks-view";
 import { tasksFilterOptions } from "./tasks-filters-options";
+import { TasksViewCreate, TasksViewsList } from "./tasks-views-list";
 
 export type TasksFiltersProps = {
 	showFilters?: Array<"assignee" | "project" | "milestone" | "labels">;
@@ -32,9 +33,11 @@ export const TasksFilters = ({
 			setFilters={setFilters}
 			options={tasksFilterOptions}
 		>
+			<TasksViewsList projectId={filters.projectId?.[0]} />
 			<Filters>
 				<FiltersSearchInput placeholder="Search tasks..." />
 				<div className="ml-auto flex gap-4">
+					<TasksViewCreate />
 					<Popover>
 						<PopoverTrigger asChild>
 							<Button variant={"ghost"} size="sm">
