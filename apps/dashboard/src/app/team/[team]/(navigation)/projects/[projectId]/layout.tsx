@@ -13,7 +13,7 @@ export default async function ProjectLayout({ children, params }: Props) {
 			<div className="sticky top-12 h-[calc(100vh-100px)]">
 				<ProjectOverview projectId={projectId} />
 			</div>
-			{children}
+			<div className="overflow-x-auto">{children}</div>
 		</div>
 	);
 }
