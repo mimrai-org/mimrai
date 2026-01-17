@@ -18,7 +18,7 @@ export const InboxList = ({ className }: { className?: string }) => {
 	return (
 		<div
 			className={cn(
-				"flex flex-col gap-1",
+				"flex flex-col gap-2",
 				"h-[calc(100vh-90px)] overflow-y-auto p-2",
 				{
 					"min-w-1/3 max-w-1/3": selectedInbox,
@@ -44,9 +44,9 @@ export const InboxList = ({ className }: { className?: string }) => {
 				>
 					<div
 						className={cn(
-							"cursor-pointer space-y-1 rounded-md px-2 py-2 text-sm transition-colors hover:bg-accent",
+							"cursor-pointer space-y-1 rounded-md px-2 py-2 text-sm transition-colors hover:bg-accent dark:hover:bg-accent/30",
 							{
-								"bg-accent": selectedInbox?.id === item.id,
+								"bg-accent dark:bg-accent/30": selectedInbox?.id === item.id,
 							},
 						)}
 					>

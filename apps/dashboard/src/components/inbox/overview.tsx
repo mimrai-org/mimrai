@@ -137,10 +137,12 @@ export const InboxOverview = ({ className }: { className?: string }) => {
 
 	return (
 		<div className={cn("flex-1 p-2")}>
-			<div className="h-[calc(100vh-90px)] space-y-4 overflow-y-auto rounded-lg bg-card p-4">
+			<div className="h-[calc(100vh-90px)] space-y-4 overflow-y-auto rounded-md border bg-card p-8 dark:border-none">
 				<div className="space-y-1">
 					<div className="flex justify-between">
-						<h1 className="truncate text-2xl">{selectedInbox.display}</h1>
+						<h1 className="truncate font-header text-3xl">
+							{selectedInbox.display}
+						</h1>
 						<div>
 							<InboxDropdown inbox={selectedInbox} />
 						</div>
@@ -193,12 +195,15 @@ export const InboxOverview = ({ className }: { className?: string }) => {
 					</div>
 				</div>
 				{intakes.length === 0 && (
-					<p className="rounded-md border p-4 text-center text-muted-foreground text-sm">
+					<p className="rounded-sm border bg-card p-4 text-center text-muted-foreground text-sm dark:border-none">
 						No intakes found.
 					</p>
 				)}
 				{intakes.map((intake) => (
-					<div key={intake.id} className="space-y-2 rounded-md border p-4">
+					<div
+						key={intake.id}
+						className="space-y-2 rounded-sm border bg-card p-4"
+					>
 						<div className="space-y-2">
 							<div className="flex items-center justify-between">
 								<h2 className="font-normal text-base">
