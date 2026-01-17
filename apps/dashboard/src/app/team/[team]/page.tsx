@@ -34,7 +34,7 @@ export default async function Page({ searchParams }: Props) {
 				<NavTopTasks />
 				<NavSearch
 					className="w-fit"
-					placeholder="Or search any task, project, milestone and more"
+					placeholder="Search any task, project, milestone and more"
 				/>
 				<div>
 					<h2 className="mb-2 font-header">Pick a project</h2>

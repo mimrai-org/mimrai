@@ -106,7 +106,6 @@ export const githubRouter = router({
 				throw new Error("GitHub integration not found");
 			}
 
-			console.log(link);
 			const token = link.accessToken;
 			const octokit = new Octokit({ auth: token });
 			const repos = await octokit.paginate(

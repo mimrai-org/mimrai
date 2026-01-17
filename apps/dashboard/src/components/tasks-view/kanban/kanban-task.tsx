@@ -20,13 +20,12 @@ export const KanbanTask = ({
 	ref?: React.Ref<HTMLDivElement>;
 }) => {
 	const user = useUser();
-	const router = useRouter();
 	const { setParams } = useTaskParams();
 
 	return (
 		<motion.div
 			className={cn(
-				"relative flex min-h-14 cursor-pointer flex-col rounded-md border bg-card transition-colors hover:bg-accent/80 dark:border-none dark:bg-secondary/50",
+				"relative flex min-h-14 cursor-pointer flex-col rounded-md border transition-colors hover:bg-accent dark:hover:bg-accent/30",
 				{
 					"opacity-50!": task.status?.type === "done",
 				},

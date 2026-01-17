@@ -14,6 +14,8 @@ import { StatusUpdateSheet } from "./status-update-sheet ";
 import { TaskCreateSheet } from "./task-create-sheet";
 import { TaskDependencyDialog } from "./task-dependency-dialog";
 import { TaskUpdateSheet } from "./task-update-sheet";
+import { TaskViewCreateSheet } from "./task-view-create-sheet";
+import { TaskViewUpdateSheet } from "./task-view-update-sheet";
 import { TeamCreateSheet } from "./team-create-sheet";
 
 export const GlobalSheets = () => {
@@ -33,6 +35,8 @@ export const GlobalSheets = () => {
 			<ProjectHealthUpdateDialog />
 			<ShareableCreateSheet />
 			<PlanSelectSheet />
+			<TaskViewCreateSheet />
+			<TaskViewUpdateSheet />
 			<TasksSuggestions />
 			<TaskDependencyDialog />
 		</>

@@ -1,4 +1,8 @@
 import { ProjectOverview } from "@/components/projects/overview/overview";
+import {
+	StickySidebar,
+	StickySidebarContainer,
+} from "@/components/sticky-sidebar";
 
 type Props = {
 	children: React.ReactNode;
@@ -9,11 +13,11 @@ export default async function ProjectLayout({ children, params }: Props) {
 	const { projectId, team } = await params;
 
 	return (
-		<div className="grid h-full grow-1 animate-blur-in grid-cols-[350px_1fr] gap-6">
-			<div className="sticky top-12 h-[calc(100vh-100px)]">
+		<StickySidebarContainer className="h-full grow-1 animate-blur-in">
+			<StickySidebar>
 				<ProjectOverview projectId={projectId} />
-			</div>
+			</StickySidebar>
 			<div className="overflow-x-auto">{children}</div>
-		</div>
+		</StickySidebarContainer>
 	);
 }

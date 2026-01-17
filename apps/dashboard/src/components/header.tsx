@@ -3,6 +3,7 @@
 import { Breadcrumbs } from "./breadcrumbs";
 import { NavSearch } from "./nav-search";
 import { NavUser } from "./nav-user";
+import { StickySidebarClose } from "./sticky-sidebar";
 
 export default function Header() {
 	return (
@@ -10,6 +11,7 @@ export default function Header() {
 			<div className="flex h-full flex-col items-start justify-center py-4">
 				<div className="flex w-full items-center justify-between">
 					<div className="flex items-center gap-4">
+						<StickySidebarClose />
 						<Breadcrumbs />
 						<NavSearch />
 					</div>
