@@ -1,4 +1,6 @@
 import { openai } from "@ai-sdk/openai";
+import { getLabels } from "@mimir/db/queries/labels";
+import { getProjects } from "@mimir/db/queries/projects";
 import { getMembers, getTeamById } from "@mimir/db/queries/teams";
 import { generateObject } from "ai";
 import z from "zod";
@@ -20,8 +22,18 @@ export const processEmail = async ({
 		teamId: team.id,
 	});
 
+	const projects = await getProjects({
+		teamId: team.id,
+		pageSize: 20,
+	});
+
+	const labels = await getLabels({
+		teamId: team.id,
+		pageSize: 50,
+	});
+
 	const response = await generateObject({
-		model: openai("gpt-4o"),
+		model: openai("gpt-4o-mini"),
 		system: `
 <guidelines>
 - Extract the assignee if suffient information is present in the email content or deduce it from the team members list based on their descriptions. Use their user ID to set the assigneeId.
@@ -29,6 +41,9 @@ export const processEmail = async ({
 - Ensure tasks are actionable and clearly defined.
 - Use the team context to better understand roles and responsibilities.
 - Prioritize tasks based on urgency and importance inferred from the email content.
+- Ensure each task is associated with a project from the provided projects list. Use the project ID for the projectId field.
+- Assign relevant labels to each task based on the email content and the provided labels list. Use the label IDs for the labels field.
+- The tasks array has no maximum length, extract as many tasks as are relevant from the email content.
 - Analyze the email to identify if it is noise or spam (e.g., promotional emails, irrelevant content to the team). If so, do not extract any tasks and return an empty list.
 </guidelines>
 
@@ -53,6 +68,29 @@ ${members
 	)
 	.join("\n")}
 </members>
+
+<projects>
+${projects.data
+	.map(
+		(project) => `
+- id: ${project.id}
+	name: ${project.name}
+	description: "${project.description || "None"}"
+`,
+	)
+	.join("\n")}
+</projects>
+<labels>
+${labels
+	.map(
+		(label) => `
+- id: ${label.id}
+	name: ${label.name}
+	description: "${label.description || "None"}"
+`,
+	)
+	.join("\n")}
+</labels>
 </team-context>
 		`,
 		prompt: `Extract tasks information from the following email content. 
@@ -68,7 +106,7 @@ ${members
 };
 
 const schema = z.object({
-	tasksPayload: z.array(
+	tasks: z.array(
 		z.object({
 			title: z.string().describe("Title of the task"),
 			description: z.string().describe("Description of the task"),
@@ -85,6 +123,11 @@ const schema = z.object({
 				.enum(["low", "medium", "high", "urgent"])
 				.optional()
 				.describe("Priority of the task"),
+			projectId: z.string().describe("Project ID to which the task belongs"),
+			labels: z
+				.array(z.string())
+				.optional()
+				.describe("Labels IDs associated with the task"),
 		}),
 	),
 });

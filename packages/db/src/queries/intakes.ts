@@ -204,6 +204,8 @@ export const acceptIntake = async ({
 		dueDate: existing.payload.dueDate,
 		priority: existing.payload.priority,
 		assigneeId: existing.payload.assigneeId,
+		projectId: existing.payload.projectId,
+		labels: existing.payload.labels,
 	});
 
 	const intakeItem = await updateIntake({
