@@ -35,13 +35,17 @@ export const processEmail = async ({
 	const response = await generateObject({
 		model: openai("gpt-4o-mini"),
 		system: `
+IMPORTANT: Follow the guidelines strictly. Do not make any assumptions outside of the provided context. And do not make up any data.
 <guidelines>
-- Extract the assignee if suffient information is present in the email content or deduce it from the team members list based on their descriptions. Use their user ID to set the assigneeId.
 - If no tasks are found, return an empty list.
 - Ensure tasks are actionable and clearly defined.
 - Use the team context to better understand roles and responsibilities.
 - Prioritize tasks based on urgency and importance inferred from the email content.
 - Ensure each task is associated with a project from the provided projects list. Use the project ID for the projectId field.
+- Ensure the assigneeId corresponds to a valid team member ID from the provided members list.
+- If no suitable assignee is found, leave the assigneeId field undefined.
+- Set due dates based on any temporal references in the email. If no due date is mentioned, leave the dueDate field undefined.
+- Assign priority levels (low, medium, high, urgent) based on the tone and content of the email. If no clear priority can be inferred, set it to medium.
 - Assign relevant labels to each task based on the email content and the provided labels list. Use the label IDs for the labels field.
 - The tasks array has no maximum length, extract as many tasks as are relevant from the email content.
 - Analyze the email to identify if it is noise or spam (e.g., promotional emails, irrelevant content to the team). If so, do not extract any tasks and return an empty list.
@@ -62,7 +66,6 @@ ${members
 		(member) => `
 - id: ${member.id}
 	name: ${member.name}
-	email: ${member.email}
 	description: "${member.description || "None"}"
 `,
 	)
