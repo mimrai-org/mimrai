@@ -16,13 +16,11 @@ export const FiltersCurrentList = () => {
 	const { options } = useFilters();
 
 	return (
-		<div className="flex flex-wrap items-center gap-2">
-			<AnimatePresence mode="popLayout">
-				{Object.entries(options).map(([key, option]) => {
-					return <TasksFiltersCurrentItem key={key} option={option} />;
-				})}
-			</AnimatePresence>
-		</div>
+		<AnimatePresence mode="popLayout">
+			{Object.entries(options).map(([key, option]) => {
+				return <TasksFiltersCurrentItem key={key} option={option} />;
+			})}
+		</AnimatePresence>
 	);
 };
 

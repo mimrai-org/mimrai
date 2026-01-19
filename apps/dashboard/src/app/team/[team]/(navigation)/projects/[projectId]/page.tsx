@@ -15,11 +15,11 @@ export default async function Page({ params }: Props) {
 	return (
 		<div>
 			<TasksView
-				viewType={(defaultView?.viewType as "list") || "list"}
-				viewId={defaultView?.id}
-				showEmptyColumns
-				{...defaultView?.filters}
-				projectId={[projectId]}
+				defaultFilters={{
+					...defaultView?.filters,
+				}}
+				id={defaultView?.id}
+				projectId={projectId}
 			/>
 		</div>
 	);

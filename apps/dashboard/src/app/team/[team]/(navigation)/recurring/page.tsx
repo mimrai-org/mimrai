@@ -6,9 +6,11 @@ export default function Page() {
 		<Suspense>
 			<div className="h-full">
 				<TasksView
-					viewType={"list"}
-					recurring={true}
-					showEmptyColumns={false}
+					defaultFilters={{
+						viewType: "list",
+						recurring: true,
+						showEmptyColumns: false,
+					}}
 				/>
 			</div>
 		</Suspense>

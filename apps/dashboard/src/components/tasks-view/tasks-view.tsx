@@ -59,7 +59,7 @@ export const useTasksViewContext = () => {
 	return context;
 };
 
-const defaultFilters: TasksViewContextFilters = {
+const DEFAULT_FILTERS: TasksViewContextFilters = {
 	viewType: "board" as TasksViewType,
 	properties: [
 		"assignee",
@@ -75,21 +75,27 @@ const defaultFilters: TasksViewContextFilters = {
 	pageSize: 100,
 };
 
+interface TasksViewProps {
+	showFilters?: TasksFiltersProps["showFilters"];
+	projectId?: string;
+	/**
+	 * Unique identifier for the view instance
+	 */
+	id?: string;
+	defaultFilters?: Partial<TasksViewContextFilters>;
+}
+
 export const TasksView = ({
 	showFilters,
-	viewId,
-	...props
-}: Partial<
-	TasksViewContextFilters &
-		Pick<TasksFiltersProps, "showFilters"> & {
-			viewId: string;
-		}
->) => {
+	projectId,
+	id: viewId,
+	defaultFilters,
+}: TasksViewProps) => {
 	const { params } = useTasksFilterParams();
 
 	const [filters, setFilters] = useState<TasksViewContextFilters>({
+		...DEFAULT_FILTERS,
 		...defaultFilters,
-		...props,
 		...params,
 	});
 
@@ -125,7 +131,7 @@ export const TasksView = ({
 				isLoading,
 			}}
 		>
-			<TasksFilters showFilters={showFilters} />
+			<TasksFilters showFilters={showFilters} projectId={projectId} />
 			{filters.viewType === "board" && <TasksBoard />}
 			{filters.viewType === "list" && <TasksList />}
 			{filters.viewType === "calendar" && <TasksCalendar />}

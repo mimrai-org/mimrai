@@ -12,11 +12,13 @@ export default function Page() {
 
 	return (
 		<TasksView
-			assigneeId={[user?.id!]}
-			viewType="list"
-			groupBy="none"
-			statusType={["to_do", "in_progress"]}
-			showEmptyColumns={false}
+			defaultFilters={{
+				assigneeId: [user?.id!],
+				viewType: "list",
+				groupBy: "none",
+				statusType: ["to_do", "in_progress"],
+				showEmptyColumns: false,
+			}}
 		/>
 	);
 }

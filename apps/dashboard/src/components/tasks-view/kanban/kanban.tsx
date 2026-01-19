@@ -31,7 +31,7 @@ export function TasksBoard() {
 	}, [formattedBoardData]);
 
 	return (
-		<div className="flex grow-1 flex-col p-2">
+		<div className="flex grow-1 flex-col">
 			<Kanban.Root
 				value={formattedBoardData}
 				getItemValue={(item) => item.id}
@@ -83,7 +83,7 @@ export function TasksBoard() {
 				}}
 			>
 				<AnimatePresence mode="popLayout">
-					<Kanban.Board className="flex items-stretch gap-4 overflow-x-auto p-2">
+					<Kanban.Board className="flex items-stretch gap-4 overflow-x-auto py-2">
 						{columnsArray.map(({ name: columnName, column, tasks }) => {
 							return (
 								<BoardColumn

@@ -1,10 +1,9 @@
 "use client";
 import {
 	ChartPieIcon,
-	FolderCog,
 	FolderIcon,
 	FoldersIcon,
-	Maximize2Icon,
+	KanbanIcon,
 	SettingsIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -53,6 +52,21 @@ export const NavWorkspace = () => {
 					<NavItemContent>
 						<NavItemTitle>Projects</NavItemTitle>
 						<NavItemSubtitle>View all projects</NavItemSubtitle>
+					</NavItemContent>
+				</NavItem>
+			</Link>
+
+			<Link href={`${pathname}/views`}>
+				<NavItem>
+					<NavItemIcon>
+						<FolderIcon />
+						<NavItemIconSecondary>
+							<KanbanIcon />
+						</NavItemIconSecondary>
+					</NavItemIcon>
+					<NavItemContent>
+						<NavItemTitle>Views</NavItemTitle>
+						<NavItemSubtitle>View all task views</NavItemSubtitle>
 					</NavItemContent>
 				</NavItem>
 			</Link>

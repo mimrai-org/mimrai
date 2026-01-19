@@ -20,10 +20,12 @@ import { TasksViewCreate, TasksViewsList } from "./tasks-views-list";
 
 export type TasksFiltersProps = {
 	showFilters?: Array<"assignee" | "project" | "milestone" | "labels">;
+	projectId?: string;
 };
 
 export const TasksFilters = ({
 	showFilters = ["assignee", "project", "milestone", "labels"],
+	projectId,
 }: TasksFiltersProps) => {
 	const { setFilters, filters } = useTasksViewContext();
 
@@ -33,7 +35,7 @@ export const TasksFilters = ({
 			setFilters={setFilters}
 			options={tasksFilterOptions}
 		>
-			<TasksViewsList projectId={filters.projectId?.[0]} />
+			<TasksViewsList projectId={projectId} />
 			<Filters>
 				<FiltersSearchInput placeholder="Search tasks..." />
 				<div className="ml-auto flex gap-4">

@@ -17,7 +17,7 @@
   "scripts": {
     "clean": "git clean -xdf node_modules",
     "check": "biome check --write .",
-    "dev": "turbo dev",
+    "dev": "turbo dev -F @mimir/dashboard -F @mimir/api -F @mimir/trpc",
     "build": "turbo build",
     "check-types": "turbo check-types",
     "dev:dashboard": "turbo -F @mimir/dashboard dev",

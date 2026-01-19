@@ -1,4 +1,4 @@
-import { and, desc, eq, type SQL } from "drizzle-orm";
+import { and, desc, eq, getTableColumns, type SQL } from "drizzle-orm";
 import { db } from "..";
 import { taskViews } from "../schema";
 
@@ -22,7 +22,9 @@ export const getTaskViews = async ({
 	const offset = cursor ? Number.parseInt(cursor, 10) : 0;
 
 	const data = await db
-		.select()
+		.select({
+			...getTableColumns(taskViews),
+		})
 		.from(taskViews)
 		.where(and(...whereClause))
 		.orderBy(desc(taskViews.isDefault), desc(taskViews.createdAt))

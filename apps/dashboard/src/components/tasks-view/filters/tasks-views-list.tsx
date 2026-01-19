@@ -67,12 +67,14 @@ export const TasksViewsList = ({ projectId }: { projectId: string }) => {
 		<div>
 			<div className="mb-1 flex flex-wrap gap-1">
 				{taskViews?.data.map((view) => {
+					const viewLink = projectId
+						? `${user.basePath}/projects/${projectId}/views/${view.id}`
+						: `${user.basePath}/views/${view.id}`;
+
 					return (
 						<ContextMenu key={view.id}>
 							<ContextMenuTrigger asChild>
-								<Link
-									href={`${user.basePath}/projects/${projectId}/views/${view.id}`}
-								>
+								<Link href={viewLink}>
 									<div
 										className={cn(
 											"flex w-fit items-center gap-1 rounded-sm px-2 py-1 text-xs hover:bg-accent dark:hover:bg-accent/30",
