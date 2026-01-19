@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { ViewsList } from "@/components/views/list";
 
 interface Props {
 	params: Promise<{ projectId: string; team: string }>;
@@ -6,5 +6,10 @@ interface Props {
 
 export default async function Page({ params }: Props) {
 	const { projectId, team } = await params;
-	return redirect(`/team/${team}/projects/${projectId}`);
+
+	return (
+		<div className="animate-blur-in">
+			<ViewsList projectId={projectId} />
+		</div>
+	);
 }

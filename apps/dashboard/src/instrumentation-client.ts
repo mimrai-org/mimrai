@@ -1,40 +1,6 @@
-// This file configures the initialization of Sentry on the client.
-// The added config here will be used whenever a users loads a page in their browser.
-// https://docs.sentry.io/platforms/javascript/guides/nextjs/
+import posthog from "posthog-js";
 
-// Only import and initialize Sentry in production
-let onRouterTransitionStart: () => void;
-
-if (process.env.NODE_ENV === "production") {
-  const Sentry = require("@sentry/nextjs");
-
-  Sentry.init({
-    dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
-    environment: process.env.NODE_ENV,
-
-    integrations: [
-      Sentry.replayIntegration(),
-      Sentry.feedbackAsyncIntegration({
-        colorScheme: "system",
-      }),
-    ],
-
-    // Lower trace sampling to save quota
-    tracesSampleRate: 0.1,
-
-    // Enable logs
-    enableLogs: true,
-
-    // Disable debug
-    debug: false,
-
-    replaysSessionSampleRate: 0.1, // 10% of sessions
-    replaysOnErrorSampleRate: 1.0, // 100% of sessions with errors
-  });
-
-  onRouterTransitionStart = Sentry.captureRouterTransitionStart;
-} else {
-  onRouterTransitionStart = () => {};
-}
-
-export { onRouterTransitionStart };
+posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
+	api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+	defaults: "2025-11-30",
+});

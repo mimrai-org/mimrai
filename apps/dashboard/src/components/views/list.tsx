@@ -9,10 +9,11 @@ import { useUser } from "../user-provider";
 
 type View = RouterOutputs["taskViews"]["get"]["data"][number];
 
-export const ViewsList = () => {
+export const ViewsList = ({ projectId }: { projectId?: string }) => {
 	const { data: views } = useInfiniteQuery(
 		trpc.taskViews.get.infiniteQueryOptions(
 			{
+				projectId,
 				pageSize: 20,
 			},
 			{
@@ -28,16 +29,27 @@ export const ViewsList = () => {
 	return (
 		<div>
 			{flatViews.map((view) => (
-				<ViewItem key={view.id} view={view} />
+				<ViewItem key={view.id} view={view} projectId={projectId} />
 			))}
 		</div>
 	);
 };
 
-export const ViewItem = ({ view }: { view: View }) => {
+export const ViewItem = ({
+	view,
+	projectId,
+}: {
+	view: View;
+	projectId?: string;
+}) => {
 	const user = useUser();
+
+	const viewLink = projectId
+		? `${user.basePath}/projects/${projectId}/views/${view.id}`
+		: `${user.basePath}/views/${view.id}`;
+
 	return (
-		<Link href={`${user.basePath}/views/${view.id}`}>
+		<Link href={viewLink}>
 			<div className="flex items-center gap-2 rounded-sm px-4 py-2 text-sm hover:bg-accent dark:hover:bg-accent/30">
 				<FolderKanbanIcon className="size-4 text-muted-foreground" />
 				<h3 className="font-medium">{view.name}</h3>

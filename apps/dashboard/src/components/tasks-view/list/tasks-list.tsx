@@ -106,7 +106,7 @@ export const TaskGroupItem = ({
 		>
 			<Collapsible open={open} onOpenChange={setOpen}>
 				<CollapsibleTrigger asChild>
-					<h2 className="group mb-2 flex items-center gap-2 rounded-sm border bg-card px-4 py-2 text-sm transition-colors hover:bg-card/80 dark:border-none">
+					<h2 className="group mb-2 flex items-center gap-2 rounded-sm border bg-card/60 px-4 py-2 text-sm transition-colors hover:bg-card dark:border-none">
 						{taskGroup.column.icon}
 						{taskGroup.column.name}
 						<span className="text-muted-foreground text-xs">
