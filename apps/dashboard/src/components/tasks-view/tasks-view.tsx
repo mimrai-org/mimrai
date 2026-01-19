@@ -4,6 +4,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { createContext, useContext, useMemo, useState } from "react";
 import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";
 import { trpc } from "@/utils/trpc";
+import { useUser } from "../user-provider";
 import { TasksCalendar } from "./calendar/calendar";
 import { TasksFilters, type TasksFiltersProps } from "./filters/tasks-filters";
 import { TasksBoard } from "./kanban/kanban";
@@ -91,12 +92,23 @@ export const TasksView = ({
 	id: viewId,
 	defaultFilters,
 }: TasksViewProps) => {
+	const user = useUser();
 	const { params } = useTasksFilterParams();
+
+	const assigneeIdWithMe = useMemo(() => {
+		const source =
+			params.assigneeId ||
+			defaultFilters?.assigneeId ||
+			DEFAULT_FILTERS.assigneeId;
+		return source?.map((id) => (id === "me" ? user.id : id));
+	}, [params.assigneeId, defaultFilters?.assigneeId, user.id]);
 
 	const [filters, setFilters] = useState<TasksViewContextFilters>({
 		...DEFAULT_FILTERS,
 		...defaultFilters,
 		...params,
+		assigneeId: assigneeIdWithMe,
+		projectId: projectId ? [projectId] : undefined,
 	});
 
 	const { data, fetchNextPage, hasNextPage, isLoading } = useInfiniteQuery(

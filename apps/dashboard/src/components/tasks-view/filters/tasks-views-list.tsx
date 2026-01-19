@@ -1,4 +1,5 @@
 "use client";
+import type { RouterOutputs } from "@mimir/trpc";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/ui/button";
 import {
@@ -20,9 +21,13 @@ import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import { TaskViewForm } from "@/components/forms/task-view/form";
 import { useUser } from "@/components/user-provider";
+import { TaskViewContextMenu } from "@/components/views/context-menu";
+import { DEFAULT_VIEWS } from "@/components/views/default-views";
 import { useTaskViewParams } from "@/hooks/use-task-view-params";
 import { queryClient, trpc } from "@/utils/trpc";
 import { useTasksViewContext } from "../tasks-view";
+
+type View = RouterOutputs["taskViews"]["get"]["data"][number];
 
 export const TasksViewsList = ({ projectId }: { projectId: string }) => {
 	const user = useUser();
@@ -36,101 +41,26 @@ export const TasksViewsList = ({ projectId }: { projectId: string }) => {
 		}),
 	);
 
-	// const { data: selectedView, isFetched} = useQuery(
-	// 	trpc.taskViews.getById.queryOptions(
-	// 		{
-	// 			id: viewId!,
-	// 		},
-	// 		{
-	// 			enabled: Boolean(viewId),
-	// 		},
-	// 	),
-	// );
-
-	const { mutate: deleteView } = useMutation(
-		trpc.taskViews.delete.mutationOptions({
-			onSuccess: () => {
-				queryClient.invalidateQueries(trpc.taskViews.get.queryOptions());
-			},
-		}),
-	);
-
-	const { mutate: createView } = useMutation(
-		trpc.taskViews.create.mutationOptions({
-			onSuccess: () => {
-				queryClient.invalidateQueries(trpc.taskViews.get.queryOptions());
-			},
-		}),
-	);
-
 	return (
 		<div>
 			<div className="mb-1 flex flex-wrap gap-1">
-				{taskViews?.data.map((view) => {
-					const viewLink = projectId
-						? `${user.basePath}/projects/${projectId}/views/${view.id}`
-						: `${user.basePath}/views/${view.id}`;
-
-					return (
-						<ContextMenu key={view.id}>
-							<ContextMenuTrigger asChild>
-								<Link href={viewLink}>
-									<div
-										className={cn(
-											"flex w-fit items-center gap-1 rounded-sm px-2 py-1 text-xs hover:bg-accent dark:hover:bg-accent/30",
-											{
-												"border bg-accent dark:bg-accent/30":
-													view.id === viewId,
-											},
-										)}
-									>
-										<FolderKanbanIcon className="size-3.5 text-muted-foreground" />
-										{view.name}
-									</div>
-								</Link>
-							</ContextMenuTrigger>
-							<ContextMenuContent>
-								<ContextMenuItem
-									onSelect={() => {
-										queryClient.setQueryData(
-											trpc.taskViews.getById.queryKey({ id: view.id }),
-											view,
-										);
-										setParams({
-											viewId: view.id,
-										});
-									}}
-								>
-									<PencilIcon />
-									Edit
-								</ContextMenuItem>
-								<ContextMenuItem
-									onSelect={() => {
-										createView({
-											...view,
-											name: `${view.name} Copy`,
-											isDefault: false,
-										});
-									}}
-								>
-									<SaveIcon />
-									Duplicate
-								</ContextMenuItem>
-								<ContextMenuItem
-									variant="destructive"
-									onSelect={() =>
-										deleteView({
-											id: view.id,
-										})
-									}
-								>
-									<TrashIcon />
-									Delete
-								</ContextMenuItem>
-							</ContextMenuContent>
-						</ContextMenu>
-					);
-				})}
+				{DEFAULT_VIEWS.map((view) => (
+					<TasksViewItem
+						key={view.id}
+						view={view}
+						selectedViewId={viewId}
+						projectId={projectId}
+					/>
+				))}
+				<div className="w-px bg-border" />
+				{taskViews?.data.map((view) => (
+					<TasksViewItem
+						key={view.id}
+						view={view}
+						selectedViewId={viewId}
+						projectId={projectId}
+					/>
+				))}
 				<button
 					type="button"
 					onClick={() => {
@@ -157,9 +87,51 @@ export const TasksViewsList = ({ projectId }: { projectId: string }) => {
 	);
 };
 
+const TasksViewItem = ({
+	view,
+	selectedViewId,
+	projectId,
+}: {
+	view: View;
+	selectedViewId: string;
+	projectId: string;
+}) => {
+	const user = useUser();
+
+	const viewLink = projectId
+		? `${user.basePath}/projects/${projectId}/views/${view.id}`
+		: `${user.basePath}/views/${view.id}`;
+
+	return (
+		<TaskViewContextMenu view={view}>
+			<Link href={viewLink}>
+				<div
+					className={cn(
+						"flex w-fit items-center gap-1 rounded-sm px-2 py-1 text-xs hover:bg-accent dark:hover:bg-accent/30",
+						{
+							"border bg-accent dark:bg-accent/30": view.id === selectedViewId,
+						},
+					)}
+				>
+					<FolderKanbanIcon
+						className="size-3.5 text-muted-foreground"
+						style={{
+							color: view.project?.color ?? undefined,
+						}}
+					/>
+					{view.name}
+				</div>
+			</Link>
+		</TaskViewContextMenu>
+	);
+};
+
 export const TasksViewCreate = () => {
 	const { setParams } = useTaskViewParams();
 	const { viewId, filters, setFilters } = useTasksViewContext();
+
+	// the view is only editable if it's not a default view
+	const isEditable = !DEFAULT_VIEWS.find((v) => v.id === viewId);
 
 	const initialFilters = useRef(filters);
 	const hasFiltersChanged = useMemo(() => {
@@ -179,7 +151,7 @@ export const TasksViewCreate = () => {
 
 	return (
 		<div className="flex gap-2">
-			{hasFiltersChanged && (
+			{hasFiltersChanged && isEditable && (
 				<Button
 					size="sm"
 					variant="ghost"

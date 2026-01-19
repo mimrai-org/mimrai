@@ -1,6 +1,7 @@
-import { and, desc, eq, getTableColumns, type SQL } from "drizzle-orm";
+import { and, asc, desc, eq, getTableColumns, type SQL } from "drizzle-orm";
 import { db } from "..";
-import { taskViews } from "../schema";
+import { projects, taskViews } from "../schema";
+import { jsonAggBuildObject } from "../utils/drizzle";
 
 export const getTaskViews = async ({
 	teamId,
@@ -24,10 +25,21 @@ export const getTaskViews = async ({
 	const data = await db
 		.select({
 			...getTableColumns(taskViews),
+			project: {
+				id: projects.id,
+				name: projects.name,
+				description: projects.description,
+				color: projects.color,
+			},
 		})
 		.from(taskViews)
+		.leftJoin(projects, eq(taskViews.projectId, projects.id))
 		.where(and(...whereClause))
-		.orderBy(desc(taskViews.isDefault), desc(taskViews.createdAt))
+		.orderBy(
+			asc(taskViews.projectId),
+			desc(taskViews.isDefault),
+			desc(taskViews.createdAt),
+		)
 		.limit(pageSize)
 		.offset(offset);
 

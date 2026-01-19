@@ -111,11 +111,17 @@ export const getTasks = async ({
 	const whereClause: (SQL | undefined)[] = [];
 
 	const assigneesConcat = `${input.assigneeId?.join(",")}`;
-	input.assigneeId &&
-		input.assigneeId.length > 0 &&
+	const assigneeIdsWithMe = input.assigneeId
+		?.map((id) => (id === "me" ? input.userId : id))
+		.filter(Boolean) as string[];
+
+	console.log(assigneeIdsWithMe);
+
+	assigneeIdsWithMe &&
+		assigneeIdsWithMe.length > 0 &&
 		whereClause.push(
 			or(
-				inArray(tasks.assigneeId, input.assigneeId),
+				inArray(tasks.assigneeId, assigneeIdsWithMe),
 				// filter by any checklist item assignee
 				sql`${tasks.id} IN (SELECT ${checklistItems.taskId} FROM ${checklistItems} WHERE ${checklistItems.assigneeId} IN (${assigneesConcat}) AND ${checklistItems.isCompleted} = false)`,
 			),
