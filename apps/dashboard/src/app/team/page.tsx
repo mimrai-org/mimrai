@@ -13,8 +13,6 @@ export default async function Page({ searchParams }: Props) {
 		cache: "no-cache",
 	});
 
-	console.log("Redirect page accessed with session:", session);
-
 	if (!session?.user.id) {
 		return redirect("/sign-in");
 	}
@@ -39,5 +37,5 @@ export default async function Page({ searchParams }: Props) {
 	const queryString = new URLSearchParams(
 		paramsToRedirect as Record<string, string>,
 	).toString();
-	return redirect(`/team/${team?.slug}/overview?${queryString}`);
+	return redirect(`/team/${team?.slug}?${queryString}`);
 }
