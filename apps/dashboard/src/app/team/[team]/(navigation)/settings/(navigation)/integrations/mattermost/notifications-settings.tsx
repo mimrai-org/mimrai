@@ -34,7 +34,7 @@ export const MattermostNotificationsSettings = ({
 		trpc.integrations.getByType.queryOptions({ type: "mattermost" }),
 	);
 
-	const installedIntegration = integration?.installedIntegration[0];
+	const installedIntegration = integration?.installedIntegration;
 
 	const form = useZodForm(schema, {
 		defaultValues: {
@@ -58,6 +58,8 @@ export const MattermostNotificationsSettings = ({
 			},
 		}),
 	);
+
+	console.log(form.formState.errors);
 
 	const handleSubmit = (data: z.infer<typeof schema>) => {
 		if (!installedIntegration) return;
