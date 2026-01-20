@@ -670,6 +670,7 @@ export const activityTypeEnum = pgEnum("activity_type", [
 	"daily_digest",
 	"daily_pulse",
 	"daily_end_of_day",
+	"daily_team_summary",
 	"follow_up",
 ]);
 

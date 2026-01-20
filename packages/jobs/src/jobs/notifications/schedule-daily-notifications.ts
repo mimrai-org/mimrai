@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import { getDb } from "../../init";
 import { createDigestActivityJob } from "./create-digest-activity";
 import { createEODActivityJob } from "./create-eod-activity";
+import { createEODTeamSummaryActivityJob } from "./create-eod-team-summary";
 
 export const scheduleDailyNotificationsJob = schedules.task({
 	id: "schedule-daily-notifications",
@@ -43,7 +44,7 @@ export const scheduleDailyNotificationsJob = schedules.task({
 
 			const eodDate = set(date, { hours: 17, minutes: 0, seconds: 0 });
 
-			if (eodDate > date)
+			if (eodDate > date) {
 				await createEODActivityJob.trigger(
 					{
 						userId: userOnTeam.user.id,
@@ -60,6 +61,26 @@ export const scheduleDailyNotificationsJob = schedules.task({
 						],
 					},
 				);
+			}
+		}
+
+		const teamsList = await db.select().from(teams);
+		for (const team of teamsList) {
+			const date = TZDate.tz(team.timezone);
+			const eodDate = set(date, { hours: 17, minutes: 0, seconds: 0 });
+
+			if (eodDate > date) {
+				await createEODTeamSummaryActivityJob.trigger(
+					{
+						teamId: team.id,
+					},
+					{
+						delay: eodDate,
+						idempotencyKey: `daily-team-summary-${team.id}-${format(eodDate, "yyyy-MM-dd")}`,
+						tags: [`teamId:${team.id}`],
+					},
+				);
+			}
 		}
 	},
 });

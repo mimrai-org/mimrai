@@ -2,6 +2,7 @@ export * from "./checklist-item-completed";
 export * from "./checklist-item-created";
 export * from "./daily-digest";
 export * from "./daily-eod";
+export * from "./daily-team-summary";
 export * from "./follow-up";
 export * from "./mention";
 export * from "./resume-generated";
