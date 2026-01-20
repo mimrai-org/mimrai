@@ -40,7 +40,7 @@ export default function SignInForm() {
 	});
 
 	const handleSuccess = () => {
-		const callbackUrl = localStorage.getItem("callbackUrl") ?? "/redirect";
+		const callbackUrl = localStorage.getItem("callbackUrl") ?? "/team";
 
 		localStorage.removeItem("callbackUrl");
 		toast.success("Sign in successful");

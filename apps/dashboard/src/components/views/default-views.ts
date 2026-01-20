@@ -18,6 +18,8 @@ export const DEFAULT_VIEWS: TaskView[] = [
 		filters: {
 			viewType: "list",
 			assigneeId: ["me"],
+			statusType: ["to_do", "in_progress", "review"],
+			groupBy: "none",
 		},
 		...commonMeta,
 	},
@@ -27,6 +29,8 @@ export const DEFAULT_VIEWS: TaskView[] = [
 		description: "Visualize tasks in a kanban board format.",
 		filters: {
 			viewType: "board",
+			statusType: ["to_do", "in_progress", "review", "done"],
+			showEmptyColumns: true,
 		},
 		...commonMeta,
 	},

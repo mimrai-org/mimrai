@@ -1,8 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
+import { Button } from "@ui/components/ui/button";
 import { Form } from "@ui/components/ui/form";
 import { cn } from "@ui/lib/utils";
+import { SaveIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import Loader from "@/components/loader";
 import { useProjectParams } from "@/hooks/use-project-params";
 import { useFormAutoSave, useZodForm } from "@/hooks/use-zod-form";
 import { queryClient, trpc } from "@/utils/trpc";
@@ -95,6 +98,8 @@ export const ProjectForm = ({
 		enabled: Boolean(defaultValues?.id),
 	});
 
+	const isLoading = isCreating || isUpdating;
+
 	return (
 		<div className="h-full space-y-4">
 			<Form {...form}>
@@ -121,6 +126,20 @@ export const ProjectForm = ({
 							</div>
 						</div>
 					</div>
+
+					{!defaultValues?.id && (
+						<div className="flex justify-end">
+							<Button
+								type="submit"
+								disabled={isLoading}
+								size="sm"
+								variant="default"
+							>
+								{isLoading ? <Loader /> : <SaveIcon />}
+								Save Project
+							</Button>
+						</div>
+					)}
 				</form>
 			</Form>
 		</div>
