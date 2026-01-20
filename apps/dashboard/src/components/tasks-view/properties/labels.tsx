@@ -24,11 +24,7 @@ export const TaskPropertyLabels = (task: {
 	return (
 		<div className="flex max-w-[180px] items-center gap-2 overflow-x-hidden">
 			{meta.firstLabel && (
-				<LabelBadge
-					variant="secondary"
-					{...meta.firstLabel}
-					className="bg-transparent"
-				/>
+				<LabelBadge variant="secondary" {...meta.firstLabel} />
 			)}
 			{meta.hasMoreThanOne && (
 				<Tooltip>
