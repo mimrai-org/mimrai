@@ -8,6 +8,7 @@ import { MilestoneIcon } from "../../milestone-icon";
 import { ProjectIcon } from "../../project-icon";
 import { TaskPropertyAssignee } from "./assignee";
 import { TaskPropertyDueDate } from "./due-date";
+import { TaskPropertyLabels } from "./labels";
 import { Priority } from "./priority";
 import { TaskPropertyStatus } from "./status";
 
@@ -68,19 +69,7 @@ export const propertiesComponents = {
 		<TaskPropertyStatus status={task.status} id={task.id} />
 	),
 	labels: (task: Pick<Task, "labels">) => {
-		if (!task.labels || task.labels.length === 0) return null;
-		return (
-			<div className="flex gap-2">
-				{task.labels?.map((label) => (
-					<LabelBadge
-						key={label.id}
-						variant="secondary"
-						{...label}
-						className="bg-secondary"
-					/>
-				))}
-			</div>
-		);
+		return <TaskPropertyLabels labels={task.labels} />;
 	},
 	dueDate: (task: Pick<Task, "dueDate">) =>
 		task.dueDate && <TaskPropertyDueDate task={task} />,

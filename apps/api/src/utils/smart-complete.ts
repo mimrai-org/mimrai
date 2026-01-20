@@ -28,7 +28,6 @@ export const buildSmartCompletePrompt = async ({
 - Keep the title concise and self-explanatory.
 - The description should provide enough detail for someone to understand the task without further clarification.
 - If the user prompt lacks clarity, use the context to fill in the gaps.
-- Be careful when assigning projects; only assign if the user prompt specifies it.
 - If the user prompt is less than 4 words, use it as the title and do not generate a description unless there is relevant context.
 - return dates in UTC ISO 8601 format.
 </rules>
@@ -82,10 +81,6 @@ export const smartCompleteResponseSchema = z.object({
 		.string()
 		.optional()
 		.describe("ID of the user to assign the task to"),
-	projectId: z
-		.string()
-		.optional()
-		.describe("ID (uuid) of the project to assign the task to"),
 	recurring: z
 		.object({
 			frequency: z.enum(["daily", "weekly", "monthly", "yearly"]),

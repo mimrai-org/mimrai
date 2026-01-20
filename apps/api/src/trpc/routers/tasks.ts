@@ -254,8 +254,6 @@ export const tasksRouter = router({
 				prompt: `Create a task based on the user's prompt: "${input.prompt}"`,
 			});
 
-			console.log("usage", response.usage);
-
 			trackMessage({
 				userId: ctx.user.id,
 				teamId: ctx.user.teamId!,
