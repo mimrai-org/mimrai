@@ -25,7 +25,7 @@ export default async function Page({ params }: Props) {
 	}
 
 	return (
-		<div className="animate-blur-in">
+		<div className="h-full animate-blur-in">
 			<BreadcrumbSetter
 				crumbs={[
 					{

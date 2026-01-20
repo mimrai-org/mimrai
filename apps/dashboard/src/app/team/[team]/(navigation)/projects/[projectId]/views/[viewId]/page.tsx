@@ -23,7 +23,7 @@ export default async function Page({ params }: Props) {
 	}
 
 	return (
-		<div>
+		<div className="h-full">
 			<BreadcrumbSetter
 				crumbs={[
 					{

@@ -131,22 +131,24 @@ export const TasksView = ({
 	);
 
 	return (
-		<TasksViewProvider
-			value={{
-				filters,
-				setFilters: (newFilters) =>
-					setFilters((prev) => ({ ...prev, ...newFilters })),
-				tasks,
-				fetchNextPage,
-				hasNextPage,
-				viewId,
-				isLoading,
-			}}
-		>
-			<TasksFilters showFilters={showFilters} projectId={projectId} />
-			{filters.viewType === "board" && <TasksBoard />}
-			{filters.viewType === "list" && <TasksList />}
-			{filters.viewType === "calendar" && <TasksCalendar />}
-		</TasksViewProvider>
+		<div className="flex grow-1 flex-col">
+			<TasksViewProvider
+				value={{
+					filters,
+					setFilters: (newFilters) =>
+						setFilters((prev) => ({ ...prev, ...newFilters })),
+					tasks,
+					fetchNextPage,
+					hasNextPage,
+					viewId,
+					isLoading,
+				}}
+			>
+				<TasksFilters showFilters={showFilters} projectId={projectId} />
+				{filters.viewType === "board" && <TasksBoard />}
+				{filters.viewType === "list" && <TasksList />}
+				{filters.viewType === "calendar" && <TasksCalendar />}
+			</TasksViewProvider>
+		</div>
 	);
 };
