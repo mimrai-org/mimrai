@@ -61,7 +61,7 @@ export const useTasksViewContext = () => {
 };
 
 const DEFAULT_FILTERS: TasksViewContextFilters = {
-	viewType: "board" as TasksViewType,
+	viewType: "list" as TasksViewType,
 	properties: [
 		"assignee",
 		"priority",
