@@ -1,7 +1,6 @@
 "use client";
 
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
-import { Button } from "@ui/components/ui/button";
 import {
 	CircularProgress,
 	CircularProgressIndicator,
@@ -19,27 +18,16 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@ui/components/ui/tooltip";
-import {
-	CopyPlusIcon,
-	FolderIcon,
-	PlusIcon,
-	PlusSquareIcon,
-	TrashIcon,
-} from "lucide-react";
+import { CopyPlusIcon, TrashIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { toast } from "sonner";
-import {
-	EmptyState,
-	EmptyStateAction,
-	EmptyStateDescription,
-	EmptyStateTitle,
-} from "@/components/empty-state";
 import { ProjectIcon } from "@/components/project-icon";
 import { useUser } from "@/components/user-provider";
 import { useProjectParams } from "@/hooks/use-project-params";
 import { queryClient, trpc } from "@/utils/trpc";
+import { AssigneeAvatar } from "../asignee-avatar";
 import {
 	NavItem,
 	NavItemContent,
@@ -147,14 +135,22 @@ export const ProjectsList = ({
 											</NavItemIconSecondary>
 										</NavItemIcon>
 										<NavItemContent>
-											<NavItemTitle>{project.name}</NavItemTitle>
+											<NavItemTitle className="flex items-center gap-1">
+												{project.name}
+											</NavItemTitle>
 											<NavItemSubtitle>
 												<div className="flex items-center gap-1 text-xs">
-													<span>
-														{Number(project.progress.completed) +
-															Number(project.progress.inProgress)}
-													</span>
-													Tasks
+													<AssigneeAvatar
+														{...project.lead}
+														className="size-4"
+													/>
+													<div className="flex items-center gap-1 rounded-sm px-1">
+														<span>
+															{Number(project.progress.completed) +
+																Number(project.progress.inProgress)}
+														</span>
+														Tasks
+													</div>
 												</div>
 											</NavItemSubtitle>
 										</NavItemContent>

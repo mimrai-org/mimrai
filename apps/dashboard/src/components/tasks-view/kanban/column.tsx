@@ -95,6 +95,10 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 							setTaskParams({
 								createTask: true,
 								taskStatusId: column.id,
+								taskProjectId:
+									filters.projectId?.length > 0
+										? filters.projectId[0]
+										: undefined,
 							});
 						}}
 					>

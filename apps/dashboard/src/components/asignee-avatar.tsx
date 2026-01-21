@@ -23,7 +23,7 @@ export const AssigneeAvatar = ({
 		return (
 			<div
 				className={cn(
-					"flex size-6 min-h-6 min-w-6 items-center justify-center rounded-full border-1 border-dashed text-muted-foreground",
+					"flex size-6 items-center justify-center rounded-full border-1 border-dashed text-muted-foreground",
 					className,
 				)}
 			>

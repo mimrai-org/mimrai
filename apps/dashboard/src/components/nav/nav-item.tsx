@@ -27,8 +27,14 @@ export const NavItemContent = ({ children }: { children: React.ReactNode }) => {
 	return <div className="flex flex-col">{children}</div>;
 };
 
-export const NavItemTitle = ({ children }: { children: React.ReactNode }) => {
-	return <span className="font-medium">{children}</span>;
+export const NavItemTitle = ({
+	children,
+	className,
+}: {
+	children: React.ReactNode;
+	className?: string;
+}) => {
+	return <span className={cn("font-medium", className)}>{children}</span>;
 };
 
 export const NavItemSubtitle = ({
