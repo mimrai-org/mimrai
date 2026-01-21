@@ -262,19 +262,11 @@ export const TaskForm = ({
 								{id && (
 									<div>
 										<hr className="my-6" />
-										<Collapsible>
-											<CollapsibleTrigger asChild className="">
-												<div className="mb-4 flex items-center justify-between">
-													<span className="collapsible-chevron font-medium text-sm">
-														Activity
-													</span>
-													{id && <SubscribersList taskId={id!} />}
-												</div>
-											</CollapsibleTrigger>
-											<CollapsibleContent>
-												<TaskActivitiesList taskId={id} />
-											</CollapsibleContent>
-										</Collapsible>
+										<div className="mb-4 flex items-center justify-between">
+											<span className="font-medium text-sm">Activity</span>
+											{id && <SubscribersList taskId={id!} />}
+										</div>
+										<TaskActivitiesList taskId={id} />
 										<div className="mt-4">
 											<CommentInput taskId={id} />
 										</div>
