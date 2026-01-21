@@ -25,7 +25,15 @@ export const createInbox = async (input: {
 	const [existing] = await db
 		.select()
 		.from(inbox)
-		.where(and(eq(inbox.userId, input.userId), eq(inbox.teamId, input.teamId)))
+		.where(
+			and(
+				eq(inbox.userId, input.userId),
+				eq(inbox.teamId, input.teamId),
+				eq(inbox.sourceId, input.sourceId),
+				eq(inbox.source, input.source),
+				eq(inbox.status, "pending"),
+			),
+		)
 		.limit(1);
 
 	if (existing) {

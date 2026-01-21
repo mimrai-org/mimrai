@@ -1,5 +1,12 @@
 import type { TaskView } from "./list";
 
+export interface DefaultTaskView {
+	id: string;
+	name: string;
+	description: string;
+	filters: TaskView["filters"];
+}
+
 const commonMeta = {
 	createdAt: new Date().toISOString(),
 	updatedAt: new Date().toISOString(),
@@ -10,7 +17,7 @@ const commonMeta = {
 	viewType: "board",
 };
 
-export const DEFAULT_VIEWS: TaskView[] = [
+export const DEFAULT_VIEWS: DefaultTaskView[] = [
 	{
 		id: "my-tasks",
 		name: "My Tasks",
