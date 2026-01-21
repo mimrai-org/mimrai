@@ -78,7 +78,7 @@ export const TaskActivitiesList = ({ taskId }: { taskId: string }) => {
 	);
 };
 
-const ActivityItem = ({
+export const ActivityItem = ({
 	activity,
 }: {
 	activity: RouterOutputs["activities"]["get"]["data"][number];

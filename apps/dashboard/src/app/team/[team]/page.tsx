@@ -1,4 +1,5 @@
 import { SunIcon } from "lucide-react";
+import { FeedView } from "@/components/feed/view";
 import { NavTopTasks } from "@/components/nav/nav-top-tasks";
 import { NavWorkspace } from "@/components/nav/nav-workspace";
 import { NavSearch } from "@/components/nav-search";
@@ -18,8 +19,8 @@ export default async function Page({ searchParams }: Props) {
 	const session = await getSession();
 
 	return (
-		<div className="flex h-screen w-screen flex-col items-center justify-center pb-4">
-			<div className="w-4xl animate-blur-in space-y-8">
+		<div className="flex h-screen w-screen flex-col items-center overflow-y-auto pb-4">
+			<div className="w-4xl animate-blur-in space-y-8 pt-[calc(100vh/6)]">
 				<div className="space-y-1">
 					<div className="w-fit">
 						<TeamSwitcher />
@@ -43,6 +44,9 @@ export default async function Page({ searchParams }: Props) {
 				<div>
 					<h2 className="mb-2 font-header">Your workspace</h2>
 					<NavWorkspace />
+				</div>
+				<div>
+					<FeedView />
 				</div>
 			</div>
 		</div>
