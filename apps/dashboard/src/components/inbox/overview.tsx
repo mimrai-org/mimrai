@@ -8,7 +8,13 @@ import {
 	CollapsibleTrigger,
 } from "@ui/components/ui/collapsible";
 import { cn } from "@ui/lib/utils";
-import { EyeIcon, PlusIcon, SparklesIcon, XIcon } from "lucide-react";
+import {
+	CheckIcon,
+	EyeIcon,
+	PlusIcon,
+	SparklesIcon,
+	XIcon,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { queryClient, trpc } from "@/utils/trpc";
@@ -199,23 +205,69 @@ export const InboxOverview = ({ className }: { className?: string }) => {
 						No intakes found.
 					</p>
 				)}
-				{intakes.map((intake) => (
-					<div
-						key={intake.id}
-						className="space-y-2 rounded-sm border bg-card p-4"
-					>
-						<div className="space-y-2">
-							<div className="flex items-center justify-between">
-								<h2 className="font-normal text-base">
+
+				<div className="space-y-2">
+					{intakes.map((intake) => (
+						<div
+							key={intake.id}
+							className="group space-y-2 rounded-sm border p-2 transition-all hover:bg-accent dark:hover:bg-accent/30"
+						>
+							<div className="flex items-center justify-between gap-2">
+								<h2 className="flex items-center gap-1 font-normal text-sm">
+									{intake.payload.priority &&
+										propertiesComponents.priority({
+											priority: intake.payload.priority,
+										})}
 									{intake.payload.title}
 								</h2>
+
+								<div className="flex items-center gap-2">
+									{intake.payload.dueDate &&
+										propertiesComponents.dueDate({
+											dueDate: intake.payload.dueDate,
+										})}
+									{intake.payload.assigneeId &&
+										intakesAssignees[intake.payload.assigneeId] && (
+											<AssigneeAvatar
+												{...intakesAssignees[intake.payload.assigneeId]}
+												className="size-5"
+											/>
+										)}
+								</div>
+							</div>
+
+							<div className="flex justify-between gap-4">
+								{intake.payload.description && (
+									<Collapsible>
+										<CollapsibleTrigger className="collapsible-chevron text-muted-foreground text-xs">
+											Description
+										</CollapsibleTrigger>
+										<CollapsibleContent>
+											<p className="mt-2 rounded-sm border p-2 text-muted-foreground text-xs">
+												<SparklesIcon className="mr-2 inline-block size-3.5" />
+												{intake.reasoning}
+											</p>
+											<p className="p-2 text-sm">
+												{intake.payload.description}
+											</p>
+										</CollapsibleContent>
+									</Collapsible>
+								)}
+							</div>
+							<div
+								className={cn(
+									"overflow-hidden transition-all duration-300 ease-in-out",
+									// "max-h-0 group-hover:max-h-40",
+									// "opacity-0 group-hover:opacity-100",
+								)}
+							>
 								{intake.taskId ? (
 									<div className="flex gap-2">
 										<Button
 											variant="default"
 											type="button"
 											size="sm"
-											className="size-6 rounded-full"
+											className="h-6 text-xs"
 											onClick={() => {
 												setParams({
 													taskId: intake.taskId,
@@ -223,6 +275,7 @@ export const InboxOverview = ({ className }: { className?: string }) => {
 											}}
 										>
 											<EyeIcon />
+											View Task
 										</Button>
 									</div>
 								) : intake.status === "pending" ? (
@@ -231,7 +284,7 @@ export const InboxOverview = ({ className }: { className?: string }) => {
 											variant="default"
 											type="button"
 											size="sm"
-											className="size-6 rounded-full"
+											className="h-6 text-xs"
 											disabled={isAccepting || isDismissing}
 											onClick={() =>
 												accept({
@@ -239,13 +292,14 @@ export const InboxOverview = ({ className }: { className?: string }) => {
 												})
 											}
 										>
-											{isAccepting ? <Loader /> : <PlusIcon />}
+											{isAccepting ? <Loader /> : <CheckIcon />}
+											Accept
 										</Button>
 										<Button
 											variant="ghost"
 											type="button"
 											size="sm"
-											className="size-6 rounded-full"
+											className="h-6 text-xs"
 											disabled={isAccepting || isDismissing}
 											onClick={() => {
 												dismiss({
@@ -255,46 +309,16 @@ export const InboxOverview = ({ className }: { className?: string }) => {
 											}}
 										>
 											{isDismissing ? <Loader /> : <XIcon />}
+											Dismiss
 										</Button>
 									</div>
 								) : (
 									<div />
 								)}
 							</div>
-							<div className="flex items-center gap-2">
-								{intake.payload.priority &&
-									propertiesComponents.priority({
-										priority: intake.payload.priority,
-									})}
-								{intake.payload.dueDate &&
-									propertiesComponents.dueDate({
-										dueDate: intake.payload.dueDate,
-									})}
-								{intake.payload.assigneeId &&
-									intakesAssignees[intake.payload.assigneeId] && (
-										<AssigneeAvatar
-											{...intakesAssignees[intake.payload.assigneeId]}
-											className="size-5"
-										/>
-									)}
-							</div>
 						</div>
-						{intake.payload.description && (
-							<Collapsible>
-								<CollapsibleTrigger className="collapsible-chevron text-muted-foreground text-xs">
-									Description
-								</CollapsibleTrigger>
-								<CollapsibleContent>
-									<p className="mt-2 rounded-sm border p-2 text-muted-foreground text-xs">
-										<SparklesIcon className="mr-2 inline-block size-3.5" />
-										{intake.reasoning}
-									</p>
-									<p className="p-2 text-sm">{intake.payload.description}</p>
-								</CollapsibleContent>
-							</Collapsible>
-						)}
-					</div>
-				))}
+					))}
+				</div>
 			</div>
 		</div>
 	);

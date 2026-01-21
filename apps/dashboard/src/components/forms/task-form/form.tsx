@@ -175,11 +175,13 @@ export const TaskForm = ({
 							<div className="pt-4">
 								<div className="space-y-1 py-2">
 									<input className="hidden size-0 opacity-0" />
-									<div className="flex gap-2 px-4 text-muted-foreground text-xs">
-										<span>
-											{user?.team?.prefix}-{defaultValues?.sequence}
-										</span>
-									</div>
+									{defaultValues?.sequence && (
+										<div className="flex gap-2 px-4 text-muted-foreground text-xs">
+											<span>
+												{user?.team?.prefix}-{defaultValues?.sequence}
+											</span>
+										</div>
+									)}
 									<div className="flex items-center justify-between gap-4 px-4">
 										<Title />
 									</div>
@@ -189,12 +191,13 @@ export const TaskForm = ({
 										</div>
 									)}
 								</div>
-								<div className="mx-4 mb-4">
-									<TaskFormProperties />
-								</div>
+
 								<div className="gap-4 px-4">
 									<div className="space-y-4">
 										<Description editorRef={editorRef} />
+										<div className="mb-4">
+											<TaskFormProperties />
+										</div>
 
 										<div className="flex flex-wrap items-center justify-end gap-2">
 											{id && (
@@ -238,6 +241,7 @@ export const TaskForm = ({
 
 											{id && <ActionsMenu />}
 										</div>
+
 										<hr className="my-6" />
 										<div className="flex flex-col justify-between sm:flex-row">
 											<div className="space-y-4">
