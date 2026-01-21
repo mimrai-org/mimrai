@@ -1,28 +1,28 @@
 {
-  "name": "@mimir/embedding",
-  "private": true,
-  "scripts": {
-    "clean": "rm -rf .turbo node_modules",
-    "lint": "biome check .",
-    "format": "biome format --write .",
-    "typecheck": "tsc --noEmit",
-    "db:push": "drizzle-kit push"
-  },
-  "exports": {
-    "./embeddings/*": "./src/embeddings/*.ts",
-    "./constants": "./src/constants.ts"
-  },
-  "dependencies": {
-    "@date-fns/utc": "^2.1.1",
-    "@mimir/cache": "workspace:*",
-    "@mimir/logger": "workspace:*",
-    "@mimir/utils": "workspace:*",
-    "ai": "^5.0.56",
-    "date-fns": "^4.1.0",
-    "string-strip-html": "^13.5.0"
-  },
-  "devDependencies": {
-    "@mimir/tsconfig": "workspace:*",
-    "@types/bun": "latest"
-  }
+	"name": "@mimir/embedding",
+	"private": true,
+	"scripts": {
+		"clean": "rm -rf .turbo node_modules",
+		"lint": "biome check .",
+		"format": "biome format --write .",
+		"typecheck": "tsc --noEmit",
+		"db:push": "drizzle-kit push"
+	},
+	"exports": {
+		"./embeddings/*": "./src/embeddings/*.ts",
+		"./constants": "./src/constants.ts"
+	},
+	"dependencies": {
+		"@date-fns/utc": "^2.1.1",
+		"@mimir/cache": "workspace:*",
+		"@mimir/logger": "workspace:*",
+		"@mimir/utils": "workspace:*",
+		"ai": "^5.0.56",
+		"date-fns": "^4.1.0",
+		"string-strip-html": "^13.5.0"
+	},
+	"devDependencies": {
+		"@mimir/tsconfig": "workspace:*",
+		"@types/bun": "latest"
+	}
 }

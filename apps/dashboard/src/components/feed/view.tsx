@@ -1,32 +1,53 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { format, isToday, isYesterday } from "date-fns";
+import { Loader2 } from "lucide-react";
+import { useEffect } from "react";
+import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { trpc } from "@/utils/trpc";
 import { ActivityItem as TaskActivityItem } from "../forms/task-form/activities-list";
-import { useUser } from "../user-provider";
+import Loader from "../loader";
 
 export const FeedView = () => {
-	const user = useUser();
+	const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+		useInfiniteQuery(
+			trpc.activities.get.infiniteQueryOptions(
+				{
+					type: ["task_assigned", "task_comment", "mention"],
+					pageSize: 10,
+				},
+				{
+					getNextPageParam: (lastPage) => lastPage.meta.cursor,
+				},
+			),
+		);
 
-	const { data: activities, isLoading } = useQuery(
-		trpc.activities.get.queryOptions({
-			onlyForUser: true,
-			type: ["task_assigned", "task_comment", "mention"],
-			pageSize: 20,
-		}),
-	);
+	const { ref, hasIntersected, reset } =
+		useIntersectionObserver<HTMLDivElement>({
+			threshold: 0.1,
+			rootMargin: "100px",
+		});
 
-	if (isLoading) {
+	useEffect(() => {
+		if (hasIntersected && hasNextPage && !isFetchingNextPage) {
+			fetchNextPage();
+			reset();
+		}
+	}, [hasIntersected, hasNextPage, isFetchingNextPage, fetchNextPage, reset]);
+
+	const activities = data?.pages.flatMap((page) => page.data) ?? [];
+
+	if (isLoading && activities.length === 0) {
 		return <div>Loading...</div>;
 	}
 
-	if (!activities?.data.length) {
+	if (activities.length === 0) {
 		return <div>No activities yet.</div>;
 	}
 
-	const groupedActivities = activities.data.reduce(
-		(acc, activity) => {
+	const groupedActivities = activities.reduce(
+		(acc: Record<string, typeof activities>, activity) => {
 			const date = new Date(activity.createdAt);
 			let key: string;
 			if (isToday(date)) {
@@ -42,7 +63,7 @@ export const FeedView = () => {
 			acc[key].push(activity);
 			return acc;
 		},
-		{} as Record<string, typeof activities.data>,
+		{},
 	);
 
 	return (
@@ -59,6 +80,11 @@ export const FeedView = () => {
 					</div>
 				</div>
 			))}
+			{hasNextPage && (
+				<div ref={ref} className="flex justify-center py-4">
+					{isFetchingNextPage ? <Loader /> : <div className="w- h-6" />}
+				</div>
+			)}
 		</div>
 	);
 };

@@ -1,27 +1,27 @@
 {
-  "name": "@mimir/cache",
-  "version": "0.0.1",
-  "private": true,
-  "scripts": {
-    "clean": "rm -rf .turbo node_modules",
-    "lint": "biome check .",
-    "format": "biome format --write .",
-    "typecheck": "tsc --noEmit"
-  },
-  "exports": {
-    "./redis-client": "./src/redis-client.ts",
-    "./integrations-cache": "./src/integrations-cache.ts",
-    "./users-cache": "./src/users-cache.ts",
-    "./teams-cache": "./src/teams-cache.ts",
-    "./chat-feedback-cache": "./src/chat-feedback-cache.ts",
-    "./shared-redis": "./src/shared-redis.ts"
-  },
-  "dependencies": {
-    "@mimir/tsconfig": "workspace:*",
-    "@mimir/utils": "workspace:*",
-    "@types/redis": "^4.0.11",
-    "redis": "^5.8.2",
-    "redlock-universal": "^0.6.3"
-  },
-  "devDependencies": {}
+	"name": "@mimir/cache",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"clean": "rm -rf .turbo node_modules",
+		"lint": "biome check .",
+		"format": "biome format --write .",
+		"typecheck": "tsc --noEmit"
+	},
+	"exports": {
+		"./redis-client": "./src/redis-client.ts",
+		"./integrations-cache": "./src/integrations-cache.ts",
+		"./users-cache": "./src/users-cache.ts",
+		"./teams-cache": "./src/teams-cache.ts",
+		"./chat-feedback-cache": "./src/chat-feedback-cache.ts",
+		"./shared-redis": "./src/shared-redis.ts"
+	},
+	"dependencies": {
+		"@mimir/tsconfig": "workspace:*",
+		"@mimir/utils": "workspace:*",
+		"@types/redis": "^4.0.11",
+		"redis": "^5.8.2",
+		"redlock-universal": "^0.6.3"
+	},
+	"devDependencies": {}
 }

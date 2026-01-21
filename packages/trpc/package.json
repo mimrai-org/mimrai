@@ -1,27 +1,27 @@
 {
-  "name": "@mimir/trpc",
-  "version": "1.0.0",
-  "types": "./dist/packages/trpc/src/index.d.ts",
-  "private": true,
-  "sideEffects": false,
-  "scripts": {
-    "clean": "rm -rf .turbo node_modules",
-    "lint": "biome check .",
-    "format": "biome format --write .",
-    "build": "bun tsc -p tsconfig.json",
-    "dev": "bun tsc --watch -p tsconfig.json",
-    "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {},
-  "devDependencies": {
-    "@mimir/tsconfig": "workspace:*",
-    "@mimir/db": "workspace:*",
-    "drizzle-orm": "catalog:",
-    "@trpc/server": "^11.6.0",
-    "zod": "catalog:",
-    "typescript": "^5.9.2"
-  },
-  "exports": {
-    ".": "./dist/packages/trpc/src/index.d.ts"
-  }
+	"name": "@mimir/trpc",
+	"version": "1.0.0",
+	"types": "./dist/packages/trpc/src/index.d.ts",
+	"private": true,
+	"sideEffects": false,
+	"scripts": {
+		"clean": "rm -rf .turbo node_modules",
+		"lint": "biome check .",
+		"format": "biome format --write .",
+		"build": "bun tsc -p tsconfig.json",
+		"dev": "bun tsc --watch -p tsconfig.json",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"@mimir/tsconfig": "workspace:*",
+		"@mimir/db": "workspace:*",
+		"drizzle-orm": "catalog:",
+		"@trpc/server": "^11.6.0",
+		"zod": "catalog:",
+		"typescript": "^5.9.2"
+	},
+	"exports": {
+		".": "./dist/packages/trpc/src/index.d.ts"
+	}
 }

@@ -1,37 +1,37 @@
 {
-  "name": "@mimir/email",
-  "version": "1.0.0",
-  "private": true,
-  "exports": {
-    "./emails/*": "./emails/*.tsx",
-    "./locales": "./locales/index.ts"
-  },
-  "scripts": {
-    "clean": "rm -rf .turbo node_modules",
-    "lint": "biome check .",
-    "format": "biome format --write .",
-    "typecheck": "tsc --noEmit",
-    "dev": "bunx react-email dev -p 3002",
-    "build": "email build",
-    "start": "email start"
-  },
-  "dependencies": {
-    "@mimir/utils": "workspace:*",
-    "@mimir/tsconfig": "workspace:*",
-    "@react-email/components": "1.0.1",
-    "@react-email/render": "2.0.0",
-    "@react-email/tailwind": "2.0.1",
-    "hono": "^4.8.2",
-    "date-fns": "^4.1.0",
-    "react-email": "5.0.4",
-    "responsive-react-email": "^0.0.5"
-  },
-  "devDependencies": {
-    "@react-email/preview-server": "5.0.4",
-    "@types/react": "19.2.1",
-    "@types/react-dom": "19.2.1",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "typescript": "^5.9.2"
-  }
+	"name": "@mimir/email",
+	"version": "1.0.0",
+	"private": true,
+	"exports": {
+		"./emails/*": "./emails/*.tsx",
+		"./locales": "./locales/index.ts"
+	},
+	"scripts": {
+		"clean": "rm -rf .turbo node_modules",
+		"lint": "biome check .",
+		"format": "biome format --write .",
+		"typecheck": "tsc --noEmit",
+		"dev": "bunx react-email dev -p 3002",
+		"build": "email build",
+		"start": "email start"
+	},
+	"dependencies": {
+		"@mimir/utils": "workspace:*",
+		"@mimir/tsconfig": "workspace:*",
+		"@react-email/components": "1.0.1",
+		"@react-email/render": "2.0.0",
+		"@react-email/tailwind": "2.0.1",
+		"hono": "^4.8.2",
+		"date-fns": "^4.1.0",
+		"react-email": "5.0.4",
+		"responsive-react-email": "^0.0.5"
+	},
+	"devDependencies": {
+		"@react-email/preview-server": "5.0.4",
+		"@types/react": "19.2.1",
+		"@types/react-dom": "19.2.1",
+		"react": "19.2.3",
+		"react-dom": "19.2.3",
+		"typescript": "^5.9.2"
+	}
 }
