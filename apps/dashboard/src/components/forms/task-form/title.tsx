@@ -18,7 +18,7 @@ export const Title = () => {
 				<FormItem className="flex-1">
 					<FormControl>
 						<Input
-							className="h-12 w-full resize-none break-words border-0 bg-transparent px-0 font-medium hover:bg-transparent focus:border-0 focus:outline-none focus-visible:ring-0 md:text-3xl dark:bg-transparent dark:hover:bg-transparent"
+							className="h-12 w-full resize-none break-words border-0 bg-transparent px-0 font-medium hover:bg-transparent focus:border-0 focus:outline-none focus-visible:ring-0 md:text-2xl dark:bg-transparent dark:hover:bg-transparent"
 							placeholder="Task title"
 							autoFocus={false}
 							{...field}

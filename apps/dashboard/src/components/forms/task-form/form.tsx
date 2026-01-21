@@ -175,7 +175,7 @@ export const TaskForm = ({
 							<div className="pt-4">
 								<div className="space-y-1 py-2">
 									<input className="hidden size-0 opacity-0" />
-									{defaultValues?.sequence && (
+									{defaultValues?.sequence >= 0 && (
 										<div className="flex gap-2 px-4 text-muted-foreground text-xs">
 											<span>
 												{user?.team?.prefix}-{defaultValues?.sequence}
