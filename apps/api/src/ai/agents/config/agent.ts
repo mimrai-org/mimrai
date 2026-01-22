@@ -19,6 +19,7 @@ import type { AppContext } from "./shared";
 export interface AgentConfig extends ToolLoopAgentSettings {
 	name: string;
 	description: string;
+	buildInstructions?: (ctx: AppContext) => string;
 }
 
 export interface AgentGenerateParams {
@@ -28,7 +29,6 @@ export interface AgentGenerateParams {
 }
 
 export interface Agent {
-	_agent: ToolLoopAgent;
 	generate(params: AgentGenerateParams): Promise<UIChatMessage>;
 	toUIMessageStreamResponse(params: AgentGenerateParams): Promise<Response>;
 	toUIMessageStream(
@@ -41,10 +41,6 @@ export interface Agent {
 }
 
 export const createAgent = (config: AgentConfig): Agent => {
-	const agent = new ToolLoopAgent({
-		...config,
-	});
-
 	const saveConversation = async (
 		message: UIMessage | UIChatMessage,
 		context: AppContext,
@@ -107,14 +103,33 @@ export const createAgent = (config: AgentConfig): Agent => {
 		return { messages: uiMessages as UIChatMessage[] };
 	};
 
+	const buildAgent = (params: AgentGenerateParams) => {
+		const ctx = params.context;
+		const instructions = config.buildInstructions?.(ctx) ?? "";
+
+		const agent = new ToolLoopAgent({
+			...config,
+			experimental_context: params.context,
+			instructions: instructions,
+		});
+
+		return agent;
+	};
+
 	return {
-		_agent: agent,
 		toUIMessageStreamResponse: async (params: AgentGenerateParams) => {
+			const agent = buildAgent(params);
 			const { messages: uiMessages } = await loadHistory(params);
 
 			return createAgentUIStreamResponse({
 				agent,
 				uiMessages,
+				onError: (error) => {
+					console.error("Agent stream error:", error);
+					const message =
+						error instanceof Error ? error.message : String(error);
+					return message;
+				},
 				onFinish: async ({ responseMessage }) => {
 					params.onFinish?.({ responseMessage });
 					await saveConversation(
@@ -126,11 +141,18 @@ export const createAgent = (config: AgentConfig): Agent => {
 			});
 		},
 		async toUIMessageStream(params: AgentGenerateParams) {
+			const agent = buildAgent(params);
 			const { messages: uiMessages } = await loadHistory(params);
 
 			return createAgentUIStream({
 				agent,
 				uiMessages,
+				onError: (error) => {
+					console.error("Agent stream error:", error);
+					const message =
+						error instanceof Error ? error.message : String(error);
+					return message;
+				},
 				onFinish: async ({ responseMessage }) => {
 					params.onFinish?.({ responseMessage });
 					await saveConversation(

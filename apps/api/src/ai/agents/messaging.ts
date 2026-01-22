@@ -1,58 +1,16 @@
 import { openai } from "@ai-sdk/openai";
-import type { UIChatMessage } from "@api/ai/types";
 import { db } from "@mimir/db/client";
-import {
-	getChatById,
-	saveChat,
-	saveChatMessage,
-} from "@mimir/db/queries/chats";
 import { getProjects } from "@mimir/db/queries/projects";
 import { createTask, getTasks } from "@mimir/db/queries/tasks";
 import { getMembers } from "@mimir/db/queries/teams";
 import { statuses, statusTypeEnum } from "@mimir/db/schema";
 import { trackTaskCreated } from "@mimir/events/server";
 import { getTaskPermalink } from "@mimir/utils/tasks";
-import { convertToModelMessages, generateText, stepCountIs, tool } from "ai";
+import { tool } from "ai";
 import { eq } from "drizzle-orm";
 import z from "zod";
 import { createAgent } from "./config/agent";
 import type { AppContext } from "./config/shared";
-
-/**
- * Truncate messages while ensuring tool call/result pairs are not split
- * This prevents incomplete tool invocations that would confuse the model
- */
-function truncateMessages(
-	messages: UIChatMessage[],
-	maxMessages = 20,
-): UIChatMessage[] {
-	if (messages.length <= maxMessages) {
-		return messages;
-	}
-
-	// Start from the end and work backwards to find a safe truncation point
-	const truncated = messages.slice(-maxMessages);
-
-	// Check if first message has incomplete tool invocations
-	const firstMsg = truncated[0];
-	if (firstMsg?.role === "assistant" && firstMsg.parts) {
-		const hasIncompleteToolCall = firstMsg.parts.some((part) => {
-			if (part.type === "tool-invocation") {
-				const toolPart = part as { state?: string };
-				// If tool call is not in "result" state, it's incomplete
-				return toolPart.state !== "result";
-			}
-			return false;
-		});
-
-		// If first message has incomplete tool calls, skip it to avoid confusion
-		if (hasIncompleteToolCall) {
-			return truncated.slice(1);
-		}
-	}
-
-	return truncated;
-}
 
 /**
  * Messaging Agent - Optimized for chat integrations (Mattermost, WhatsApp, Slack)
@@ -73,7 +31,7 @@ const findProjectsSchema = z.object({
 
 const findProjectsTool = tool({
 	description:
-		"Search for projects by name. Use this FIRST to get a valid project ID before creating tasks.",
+		"Search for wide team projects. Use this FIRST to get a valid project ID before creating tasks.",
 	inputSchema: findProjectsSchema,
 	execute: async (input, executionOptions) => {
 		const { teamId } = executionOptions.experimental_context as AppContext;
@@ -172,17 +130,16 @@ const createTaskSchema = z.object({
 	description: z.string().optional().describe("Task description"),
 	projectId: z
 		.string()
-		.uuid()
-		.describe("Project ID - MUST be a valid UUID from findProjects"),
+		.describe(
+			"Project ID - MUST be a valid UUID from findProjects {project.id}",
+		),
 	statusId: z
 		.string()
-		.uuid()
-		.describe("Status ID - MUST be a valid UUID from findStatuses"),
+		.describe("Status ID - MUST be a valid UUID from findStatuses {status.id}"),
 	assigneeId: z
 		.string()
-		.uuid()
 		.optional()
-		.describe("Assignee ID - MUST be a valid UUID from findUsers"),
+		.describe("Assignee ID - MUST be a valid UUID from findUsers {user.id}"),
 	priority: z
 		.enum(["low", "medium", "high", "urgent"])
 		.default("medium")
@@ -195,6 +152,7 @@ const createTaskMessagingTool = tool({
 Never guess or make up IDs - always retrieve them from the system first.`,
 	inputSchema: createTaskSchema,
 	execute: async (input, executionOptions) => {
+		console.log("Creating task with input:", input);
 		const { userId, teamId, teamName } =
 			executionOptions.experimental_context as AppContext;
 
@@ -252,16 +210,18 @@ Current time: ${ctx.currentDateTime}
 </context>
 
 <critical-rules>
-1. ALWAYS use tools to get real data - NEVER make up IDs or names
-2. Before creating a task, you MUST:
-  - Call findProjects to get the available projects, always select the most relevant project
+- Analyse the user's message carefully to determine intent, if the message looks like a task description, bug, or issue, consider it as a task creation request
+- ALWAYS use tools to get real data - NEVER make up IDs or names
+- Before creating a task, you MUST:
+  - Call findProjects to get the available projects (if unspecified, call the tool without search to get all projects)
+	- Select the most relevant based on the description if unspecified
   - Call findStatuses to get a valid statusId
-  - Optionally call findUsers if assignment is needed
-3. Keep responses SHORT - max 3-4 sentences
-4. Use bullet points for lists, max 5 items
-5. Include task URLs when relevant
-6. Never expose raw UUIDs to the user
-7. Write in the user's language (locale: ${ctx.locale})
+  - Call findUsers to get a valid assigneeId, select assignee based on description if unspecified
+- Keep responses SHORT - max 3-4 sentences
+- Use bullet points for lists, max 5 items
+- Include task URLs when relevant
+- Never expose raw UUIDs to the user
+- Write in the user's language (locale: ${ctx.locale})
 </critical-rules>
 
 <response-format>
@@ -289,5 +249,6 @@ export const messagingAgent = createAgent({
 	description:
 		"Agent optimized for chat applications to assist with task management.",
 	tools: messagingTools,
+	buildInstructions: buildSystemPrompt,
 	model: openai("gpt-4o-mini"),
 });

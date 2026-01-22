@@ -1,47 +1,47 @@
 {
-	"name": "mimir",
-	"private": true,
-	"workspaces": {
-		"catalog": {
-			"drizzle-orm": "0.45.1",
-			"@trigger.dev/sdk": "4.3.1",
-			"zod": "4.3.5"
-		},
-		"packages": [
-			"apps/*",
-			"!apps/desktop",
-			"packages/*",
-			"packages/email/*"
-		]
-	},
-	"scripts": {
-		"clean": "git clean -xdf node_modules",
-		"check": "biome check --write .",
-		"dev": "turbo dev -F @mimir/dashboard -F @mimir/api -F @mimir/trpc",
-		"build": "turbo build",
-		"check-types": "turbo check-types",
-		"dev:dashboard": "turbo -F @mimir/dashboard dev",
-		"dev:api": "turbo -F @mimir/api -F @mimir/trpc dev",
-		"dev:website": "turbo -F @mimir/website dev",
-		"db:push": "turbo -F @mimir/db db:push"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "^2.2.0",
-		"@mimir/tsconfig": "workspace:*",
-		"turbo": "^2.7.3",
-		"typescript": "^5.9.2"
-	},
-	"packageManager": "bun@1.2.21",
-	"trustedDependencies": [
-		"@depot/cli",
-		"@sentry/cli",
-		"@tailwindcss/oxide",
-		"es5-ext",
-		"esbuild",
-		"protobufjs",
-		"sharp"
-	],
-	"dependencies": {
-		"@trpc/next": "^11.6.0"
-	}
+  "name": "mimir",
+  "private": true,
+  "workspaces": {
+    "catalog": {
+      "drizzle-orm": "0.45.1",
+      "@trigger.dev/sdk": "4.3.1",
+      "zod": "4.3.5"
+    },
+    "packages": [
+      "apps/*",
+      "!apps/desktop",
+      "packages/*",
+      "packages/email/*"
+    ]
+  },
+  "scripts": {
+    "clean": "git clean -xdf node_modules",
+    "check": "biome check --write .",
+    "dev": "turbo dev -F @mimir/dashboard -F @mimir/api -F @mimir/trpc",
+    "build": "turbo build",
+    "check-types": "turbo check-types",
+    "dev:dashboard": "turbo -F @mimir/dashboard dev",
+    "dev:api": "turbo -F @mimir/api -F @mimir/trpc dev",
+    "dev:website": "turbo -F @mimir/website dev",
+    "db:push": "turbo -F @mimir/db db:push"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.2.0",
+    "@mimir/tsconfig": "workspace:*",
+    "turbo": "^2.7.3",
+    "typescript": "^5.9.2"
+  },
+  "packageManager": "bun@1.2.21",
+  "trustedDependencies": [
+    "@depot/cli",
+    "@sentry/cli",
+    "@tailwindcss/oxide",
+    "es5-ext",
+    "esbuild",
+    "protobufjs",
+    "sharp"
+  ],
+  "dependencies": {
+    "@trpc/next": "^11.6.0"
+  }
 }
