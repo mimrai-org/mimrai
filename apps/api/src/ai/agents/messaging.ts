@@ -145,6 +145,7 @@ const createTaskSchema = z.object({
 		.default("medium")
 		.describe("Task priority"),
 	dueDate: z.string().optional().describe("Due date in ISO format"),
+	attachments: z.array(z.url()).optional().describe("List of attachment URLs"),
 });
 
 const createTaskMessagingTool = tool({
@@ -168,7 +169,7 @@ Never guess or make up IDs - always retrieve them from the system first.`,
 				: undefined,
 			teamId,
 			userId,
-			attachments: [],
+			attachments: input.attachments,
 			labels: [],
 		});
 

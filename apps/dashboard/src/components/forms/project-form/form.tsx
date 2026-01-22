@@ -36,7 +36,7 @@ export const ProjectForm = ({
 		defaultValues: {
 			name: "",
 			description: "",
-			color: "#264653",
+			color: "#587e42",
 			...defaultValues,
 		},
 	});

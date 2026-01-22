@@ -306,7 +306,7 @@ ${recommendation.topPriorities
 ✨ Suggested focus for today
 ${recommendation.focusMessage}
 
-Enter Zen Mode to tackle your top priority tasks: ${getAppUrl()}/team/${team.slug}/zen
+Start your day ${getAppUrl()}/team/${team.slug}
 `;
 
 		logger.info(content);

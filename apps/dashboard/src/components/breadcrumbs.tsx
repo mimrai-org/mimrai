@@ -215,7 +215,7 @@ export const Breadcrumbs = () => {
 										className="flex items-center gap-2 capitalize"
 									>
 										{crumb.icon && <crumb.icon className="mr-1 size-4" />}
-										{crumb.label}
+										<span className="max-w-48 truncate">{crumb.label}</span>
 									</Link>
 									<DropdownMenuTrigger asChild>
 										<div>
@@ -246,7 +246,7 @@ export const Breadcrumbs = () => {
 									size="sm"
 								>
 									{crumb.icon && <crumb.icon className="mr-1 size-4" />}
-									{crumb.label}
+									<span className="max-w-48 truncate">{crumb.label}</span>
 								</Button>
 							</Link>
 						)}
