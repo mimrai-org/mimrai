@@ -136,6 +136,20 @@ export const ActivityItem = ({
 				</div>
 			);
 		}
+		case "daily_team_summary": {
+			return (
+				<div className="space-y-4 rounded-sm border border-dashed p-4 text-muted-foreground">
+					<div className="flex items-center gap-2">
+						<AssigneeAvatar {...activity.user} className="size-4 text-xs" />
+						<span className="font-medium text-xs">{activity.user!.name}</span>
+					</div>
+
+					<div className="whitespace-pre-wrap text-xs">
+						{activity.metadata?.content}
+					</div>
+				</div>
+			);
+		}
 		case "task_comment": {
 			return (
 				<CommentActivityItem activity={activity} taskId={activity.groupId!} />

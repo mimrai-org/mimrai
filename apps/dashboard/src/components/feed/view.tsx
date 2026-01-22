@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useEffect } from "react";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { trpc } from "@/utils/trpc";
-import { ActivityItem as TaskActivityItem } from "../forms/task-form/activities-list";
+import { ActivityItem } from "../forms/task-form/activities-list";
 import Loader from "../loader";
 import { useUser } from "../user-provider";
 
@@ -17,7 +17,12 @@ export const FeedView = () => {
 		useInfiniteQuery(
 			trpc.activities.get.infiniteQueryOptions(
 				{
-					type: ["task_assigned", "task_comment", "mention"],
+					type: [
+						"task_assigned",
+						"task_comment",
+						"mention",
+						"daily_team_summary",
+					],
 					pageSize: 10,
 				},
 				{
@@ -79,7 +84,7 @@ export const FeedView = () => {
 					<div className="space-y-8">
 						{acts.map((activity) => (
 							<div key={activity.id} className="">
-								<TaskActivityItem key={activity.id} activity={activity} />
+								<ActivityItem key={activity.id} activity={activity} />
 								{activity.task && (
 									<div className="mt-2 flex items-center gap-2 ps-4 text-muted-foreground text-xs">
 										<Link
