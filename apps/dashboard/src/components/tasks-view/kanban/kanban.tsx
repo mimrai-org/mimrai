@@ -2,12 +2,14 @@
 
 import * as Kanban from "@mimir/ui/kanban";
 import { AnimatePresence } from "motion/react";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { BoardColumn } from "./column";
+import { KanbanMinimap } from "./kanban-minimap";
 import { type Task, useKanbanBoard, useKanbanStore } from "./use-kanban-board"; // The hook we created above
 
 export function TasksBoard() {
 	const { setActiveTaskId, setOverColumnName } = useKanbanStore();
+	const scrollContainerRef = useRef<HTMLDivElement>(null);
 
 	// Use our custom hook for logic
 	const { boardData, reorderTask, columns } = useKanbanBoard();
@@ -83,17 +85,22 @@ export function TasksBoard() {
 				}}
 			>
 				<AnimatePresence mode="popLayout">
-					<Kanban.Board className="flex items-stretch gap-4 overflow-x-auto py-2">
-						{columnsArray.map(({ name: columnName, column, tasks }) => {
-							return (
-								<BoardColumn
-									key={columnName}
-									column={column}
-									columnName={columnName}
-									tasks={tasks}
-								/>
-							);
-						})}
+					<Kanban.Board asChild>
+						<div
+							ref={scrollContainerRef}
+							className="scrollbar-hide flex items-stretch gap-4 overflow-x-auto py-2"
+						>
+							{columnsArray.map(({ name: columnName, column, tasks }) => {
+								return (
+									<BoardColumn
+										key={columnName}
+										column={column}
+										columnName={columnName}
+										tasks={tasks}
+									/>
+								);
+							})}
+						</div>
 					</Kanban.Board>
 				</AnimatePresence>
 
@@ -101,6 +108,11 @@ export function TasksBoard() {
 					<div className="size-full bg-primary/10" />
 				</Kanban.Overlay>
 			</Kanban.Root>
+
+			<KanbanMinimap
+				scrollContainerRef={scrollContainerRef}
+				columnsCount={columnsArray.length}
+			/>
 		</div>
 	);
 }
