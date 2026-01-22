@@ -76,9 +76,9 @@ export const FeedView = () => {
 			{Object.entries(groupedActivities).map(([date, acts]) => (
 				<div key={date}>
 					<h2 className="mb-4 font-header">{date}</h2>
-					<div className="space-y-2">
+					<div className="space-y-8">
 						{acts.map((activity) => (
-							<div key={activity.id}>
+							<div key={activity.id} className="">
 								<TaskActivityItem key={activity.id} activity={activity} />
 								{activity.task && (
 									<div className="mt-2 flex items-center gap-2 ps-4 text-muted-foreground text-xs">
