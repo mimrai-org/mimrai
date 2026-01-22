@@ -271,6 +271,7 @@ export const tasks = pgTable(
 		index("tasks_order_index").on(table.order),
 		index("tasks_sequence_index").on(table.sequence),
 		index("tasks_permalink_id_index").on(table.permalinkId),
+		index("tasks_team_id_index").using("btree", table.teamId),
 		foreignKey({
 			columns: [table.assigneeId],
 			foreignColumns: [users.id],
@@ -618,6 +619,7 @@ export const labels = pgTable(
 			.defaultNow(),
 	},
 	(table) => [
+		index("labels_name_team_id_index").using("btree", table.teamId),
 		foreignKey({
 			columns: [table.teamId],
 			foreignColumns: [teams.id],
@@ -633,6 +635,7 @@ export const labelsOnTasks = pgTable(
 		taskId: text("task_id").notNull(),
 	},
 	(table) => [
+		index("labels_on_tasks_task_id_index").using("btree", table.labelId),
 		primaryKey({
 			columns: [table.labelId, table.taskId],
 			name: "labels_on_tasks_pkey",
@@ -714,6 +717,8 @@ export const activities = pgTable(
 			table.status,
 			table.userId,
 		),
+		index("activity_team_id_index").using("btree", table.teamId),
+		index("activity_created_at_index").using("btree", table.createdAt),
 		foreignKey({
 			columns: [table.userId],
 			foreignColumns: [users.id],
@@ -1012,6 +1017,7 @@ export const projects = pgTable(
 	},
 	(table) => [
 		unique("unique_project_name_per_team").on(table.name, table.teamId),
+		index("projects_team_id_index").using("btree", table.teamId),
 		foreignKey({
 			columns: [table.teamId],
 			foreignColumns: [teams.id],
