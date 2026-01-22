@@ -1,38 +1,38 @@
 {
-	"name": "@mimir/notifications",
-	"version": "0.0.1",
-	"private": true,
-	"scripts": {
-		"clean": "rm -rf .turbo node_modules",
-		"lint": "biome check .",
-		"format": "biome format --write .",
-		"typecheck": "tsc --noEmit"
-	},
-	"exports": {
-		"./types": "./src/notifications-types.ts",
-		".": "./src/index.ts"
-	},
-	"dependencies": {
-		"@mimir/cache": "workspace:*",
-		"@mimir/db": "workspace:*",
-		"@mimir/email": "workspace:*",
-		"@mimir/integration": "workspace:*",
-		"@mimir/utils": "workspace:*",
-		"ai": "^5.0.56",
-		"drizzle-orm": "catalog:",
-		"html-to-text": "^9.0.5",
-		"redis": "^5.8.2",
-		"resend": "^6.1.2",
-		"snakecase-keys": "^9.0.2",
-		"ws": "^8.18.3",
-		"zod": "catalog:"
-	},
-	"devDependencies": {
-		"@mattermost/types": "^10.12.0",
-		"@mimir/tsconfig": "workspace:*",
-		"@types/bun": "latest",
-		"@types/html-to-text": "^9.0.4",
-		"@types/redis": "^4.0.11",
-		"@types/ws": "^8.18.1"
-	}
+  "name": "@mimir/notifications",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf .turbo node_modules",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    "./types": "./src/notifications-types.ts",
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@mimir/cache": "workspace:*",
+    "@mimir/db": "workspace:*",
+    "@mimir/email": "workspace:*",
+    "@mimir/integration": "workspace:*",
+    "@mimir/utils": "workspace:*",
+    "ai": "6.0.45",
+    "drizzle-orm": "catalog:",
+    "html-to-text": "^9.0.5",
+    "redis": "^5.8.2",
+    "resend": "^6.1.2",
+    "snakecase-keys": "^9.0.2",
+    "ws": "^8.18.3",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@mattermost/types": "^10.12.0",
+    "@mimir/tsconfig": "workspace:*",
+    "@types/bun": "latest",
+    "@types/html-to-text": "^9.0.4",
+    "@types/redis": "^4.0.11",
+    "@types/ws": "^8.18.1"
+  }
 }

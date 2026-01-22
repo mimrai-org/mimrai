@@ -24,31 +24,9 @@ export function formatContextForLLM(context: AppContext): string {
 <locale>${context.locale}</locale>
 </team-info>
 
-<channel-instructions>
-VERT IMPORTANT: You are communicating with the user via ${context.integrationType}. Respect the limitations and conventions of this platform.
-
-${
-	context.integrationType === "web"
-		? ""
-		: context.integrationType === "whatsapp"
-			? `
-	- Keep your responses concise and to the point, as WhatsApp messages have character limits.
-	- Truncate overly long responses. 2000 characters is the maximum length for a WhatsApp message. THIS IS VERY IMPORTANT otherwise the message will not be delivered.
-	- Do no use markdown or any special formatting, as WhatsApp does not support it.
-	- Use simple lists with dashes or numbers for multiple items.
-	- Keep large list responses to a maximum of 5 items.
-	- Share links as full URLs without hyperlinking or any special formatting.
-	- Always send on top of the message the name of the team "${context.teamName}" to remind the user which team they are interacting with.
-	`
-			: ""
-}
-
-${context.additionalContext}
-</channel-instructions>
-
 ${formatLLMContextItems(context.contextItems ?? [])}
 
-Important: Use the current date/time above for time-sensitive operations. User-specific information is maintained in your working memory.`;
+Important: Use the current date/time above for time-sensitive operations.`;
 }
 
 export const COMMON_AGENT_RULES = `<behavior-rules>

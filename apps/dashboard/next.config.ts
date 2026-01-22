@@ -7,6 +7,21 @@ const nextConfig: NextConfig = {
 	typescript: {
 		ignoreBuildErrors: true,
 	},
+	experimental: {
+		optimizePackageImports: [
+			"@mimir/ui",
+			"@mimir/integration",
+			"@mimir/trpc",
+			"lucide-react",
+			"react-icons",
+			"date-fns",
+			"framer-motion",
+			"recharts",
+			"@dnd-kit/core",
+			"@dnd-kit/sortable",
+			"usehooks-ts",
+		],
+	},
 	transpilePackages: ["@mimir/integration", "@mimir/trpc", "@mimir/ui"],
 	images: {
 		remotePatterns: [

@@ -19,7 +19,7 @@ export default async function TaskPage({ params }: Props) {
 	});
 
 	return (
-		<div className="animate-blur-in">
+		<div className="mx-auto max-w-6xl animate-blur-in">
 			<BreadcrumbSetter
 				crumbs={[
 					{

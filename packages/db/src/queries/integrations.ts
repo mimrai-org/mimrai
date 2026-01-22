@@ -97,7 +97,7 @@ export const getIntegrationByType = async ({
 }: {
 	type: IntegrationName;
 	externalTeamId?: string;
-	teamId: string;
+	teamId?: string;
 }) => {
 	const whereClause: SQL[] = [eq(integrations.type, type)];
 	if (externalTeamId)

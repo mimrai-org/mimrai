@@ -4,13 +4,8 @@ import { Form } from "@mimir/ui/form";
 import { getTaskPermalink } from "@mimir/utils/tasks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Editor as EditorInstance } from "@tiptap/react";
-import {
-	Collapsible,
-	CollapsibleContent,
-	CollapsibleTrigger,
-} from "@ui/components/ui/collapsible";
 import { format } from "date-fns";
-import { Link2Icon, Loader2, SparklesIcon } from "lucide-react";
+import { Link2Icon, Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useDebounceValue } from "usehooks-ts";
@@ -165,7 +160,7 @@ export const TaskForm = ({
 	const showSmartInput = createMode && formShowSmartInput;
 
 	return (
-		<div className="">
+		<div>
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)}>
 					{showSmartInput ? (
