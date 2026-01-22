@@ -1,3 +1,4 @@
+import { BreadcrumbSetter } from "@/components/breadcrumbs";
 import { TaskForm } from "@/components/forms/task-form/form";
 import { trpcClient } from "@/utils/trpc";
 
@@ -14,6 +15,14 @@ export default async function Page({ params }: Props) {
 
 	return (
 		<div className="mx-auto max-w-5xl">
+			<BreadcrumbSetter
+				crumbs={[
+					{
+						label: task?.title || "Task",
+						segments: ["tasks", taskId],
+					},
+				]}
+			/>
 			{/* <WorkSession task={task} /> */}
 			<TaskForm
 				defaultValues={{ ...task, labels: task?.labels?.map((l) => l.id) }}
