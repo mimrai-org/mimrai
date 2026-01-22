@@ -221,8 +221,9 @@ Current time: ${ctx.currentDateTime}
 - ALWAYS use tools to get real data - NEVER make up IDs or names
 - Before creating a task, you MUST:
   - Call findProjects to get the available projects (if unspecified, call the tool without search to get all projects)
-	- Select the most relevant based on the description if unspecified
+		- Select the most relevant based on the description if unspecified
   - Call findStatuses to get a valid statusId
+		- Prefer "to do" or equivalent for new tasks if unspecified
   - Call findUsers to get a valid assigneeId, select assignee based on description if unspecified
 - Keep responses SHORT - max 3-4 sentences
 - Use bullet points for lists, max 5 items
