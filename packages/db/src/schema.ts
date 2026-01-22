@@ -1239,6 +1239,8 @@ export const taskSuggestions = pgTable(
 		}).defaultNow(),
 	},
 	(table) => [
+		index("task_suggestions_team_id_index").using("btree", table.teamId),
+		index("task_suggestions_created_at_index").using("btree", table.createdAt),
 		foreignKey({
 			columns: [table.teamId],
 			foreignColumns: [teams.id],
@@ -1564,6 +1566,8 @@ export const taskViews = pgTable(
 		}).defaultNow(),
 	},
 	(table) => [
+		index("task_views_team_id_index").using("btree", table.teamId),
+		index("task_views_project_id_index").using("btree", table.projectId),
 		foreignKey({
 			columns: [table.teamId],
 			foreignColumns: [teams.id],
