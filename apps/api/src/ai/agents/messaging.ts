@@ -228,6 +228,8 @@ Current time: ${ctx.currentDateTime}
 For task creation:
 ✅ Created: "[title]"
 📁 Project: [project name]
+🚦 Status: [status name]
+👤 Assignee: [assignee name]
 🔗 [task url]
 
 For task search:
