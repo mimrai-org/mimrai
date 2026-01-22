@@ -363,12 +363,17 @@ export const getActivities = async ({
 				email: users.email,
 				color: users.color,
 			},
+			task: {
+				id: tasks.id,
+				title: tasks.title,
+			},
 			groupId: activities.groupId,
 			teamId: activities.teamId,
 		})
 		.from(activities)
 		.where(and(...whereClause))
 		.leftJoin(users, eq(activities.userId, users.id))
+		.leftJoin(tasks, eq(activities.groupId, tasks.id))
 		.orderBy(desc(activities.createdAt))
 		.limit(pageSize ?? 20)
 		.offset(offset);

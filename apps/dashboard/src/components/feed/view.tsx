@@ -2,14 +2,17 @@
 
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { format, isToday, isYesterday } from "date-fns";
-import { Loader2 } from "lucide-react";
+import { LayersIcon } from "lucide-react";
+import Link from "next/link";
 import { useEffect } from "react";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { trpc } from "@/utils/trpc";
 import { ActivityItem as TaskActivityItem } from "../forms/task-form/activities-list";
 import Loader from "../loader";
+import { useUser } from "../user-provider";
 
 export const FeedView = () => {
+	const user = useUser();
 	const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
 		useInfiniteQuery(
 			trpc.activities.get.infiniteQueryOptions(
@@ -43,7 +46,9 @@ export const FeedView = () => {
 	}
 
 	if (activities.length === 0) {
-		return <div>No activities yet.</div>;
+		return (
+			<div className="text-muted-foreground text-sm">No activities yet.</div>
+		);
 	}
 
 	const groupedActivities = activities.reduce(
@@ -75,6 +80,17 @@ export const FeedView = () => {
 						{acts.map((activity) => (
 							<div key={activity.id}>
 								<TaskActivityItem key={activity.id} activity={activity} />
+								{activity.task && (
+									<div className="mt-2 flex items-center gap-2 ps-4 text-muted-foreground text-xs">
+										<Link
+											href={`${user.basePath}/tasks/${activity.task?.id}`}
+											className="flex items-center gap-1"
+										>
+											<LayersIcon className="size-3.5" />
+											{activity.task?.title}
+										</Link>
+									</div>
+								)}
 							</div>
 						))}
 					</div>

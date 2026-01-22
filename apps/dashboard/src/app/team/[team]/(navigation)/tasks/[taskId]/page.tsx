@@ -14,7 +14,7 @@ export default async function Page({ params }: Props) {
 	});
 
 	return (
-		<div className="mx-auto max-w-5xl">
+		<div className="mx-auto max-w-5xl animate-blur-in">
 			<BreadcrumbSetter
 				crumbs={[
 					{
