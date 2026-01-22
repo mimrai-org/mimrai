@@ -16,7 +16,7 @@ import { ProjectIcon } from "@/components/project-icon";
 import type { ProjectFormValues } from "./form-type";
 
 const presetColors = [
-	"#f4f1de",
+	"#d4a373",
 	"#e07a5f",
 	"#4852ad",
 	"#81b29a",
