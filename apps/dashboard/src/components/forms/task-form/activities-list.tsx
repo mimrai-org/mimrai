@@ -137,6 +137,8 @@ export const ActivityItem = ({
 			);
 		}
 		case "daily_team_summary": {
+			const summary = activity.metadata?.content.split("\n")?.reverse()?.[1];
+			if (!summary) return null;
 			return (
 				<div className="space-y-4 rounded-sm border border-dashed p-4 text-muted-foreground">
 					<div className="flex items-center gap-2">
@@ -144,9 +146,7 @@ export const ActivityItem = ({
 						<span className="font-medium text-xs">{activity.user!.name}</span>
 					</div>
 
-					<div className="whitespace-pre-wrap text-xs">
-						{activity.metadata?.content}
-					</div>
+					<div className="whitespace-pre-wrap text-xs">{summary}</div>
 				</div>
 			);
 		}
