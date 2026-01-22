@@ -5,7 +5,6 @@ import {
 	Command,
 	CommandGroup,
 	CommandInput,
-	CommandItem,
 	CommandList,
 } from "@ui/components/ui/command";
 import {
@@ -14,44 +13,21 @@ import {
 	DialogFooter,
 	DialogHeader,
 } from "@ui/components/ui/dialog";
-import {
-	ArrowDownIcon,
-	ArrowUpIcon,
-	BoxIcon,
-	ChevronRight,
-	CornerDownLeftIcon,
-	LayersIcon,
-	TargetIcon,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
+import { cn } from "@ui/lib/utils";
+import { ArrowDownIcon, ArrowUpIcon, CornerDownLeftIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
 import { useUser } from "@/components/user-provider";
-import { useProjectParams } from "@/hooks/use-project-params";
-import { useTaskParams } from "@/hooks/use-task-params";
 import { trpc } from "@/utils/trpc";
-
-export type GlobalSearchItem = {
-	id: string;
-	type: string;
-	title: string;
-	color?: string;
-	parentId?: string | null;
-	href?: string;
-	teamId: string;
-};
+import { GlobalSearchProvider, useGlobalSearch } from "./global-search-context";
+import { SearchResultItem } from "./search-result-item";
+import type { GlobalSearchItem } from "./types";
 
 const defaultSearchState: GlobalSearchItem[] = [
 	{
 		id: "action:create-task",
 		type: "task",
 		title: "Create a new task",
-		teamId: "",
-	},
-	{
-		id: "action:view-board",
-		type: "task",
-		title: "View board",
 		teamId: "",
 	},
 	{
@@ -124,13 +100,7 @@ const defaultSearchState: GlobalSearchItem[] = [
 	},
 ];
 
-export const GlobalSearchDialog = ({
-	open,
-	onOpenChange,
-	onSelect,
-	defaultValues,
-	defaultState = defaultSearchState,
-}: {
+export type GlobalSearchDialogProps = {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	onSelect?: (item: GlobalSearchItem) => void;
@@ -139,13 +109,18 @@ export const GlobalSearchDialog = ({
 		type?: string[];
 	};
 	defaultState?: GlobalSearchItem[];
-}) => {
-	const router = useRouter();
+};
+
+export const GlobalSearchDialog = ({
+	open,
+	onOpenChange,
+	onSelect,
+	defaultValues,
+	defaultState = defaultSearchState,
+}: GlobalSearchDialogProps) => {
 	const user = useUser();
 	const [search, setSearch] = useState(defaultValues?.search || "");
 	const [debouncedSearch] = useDebounceValue(search, 300);
-	const { setParams: setTaskParams } = useTaskParams();
-	const { setParams: setProjectParams } = useProjectParams();
 
 	const { data } = useQuery(
 		trpc.globalSearch.search.queryOptions({
@@ -155,7 +130,7 @@ export const GlobalSearchDialog = ({
 	);
 
 	const groupedData = useMemo(() => {
-		const dataToGroup = data;
+		const dataToGroup = data as GlobalSearchItem[] | undefined;
 		const showEmptyState =
 			defaultState && defaultState.length > 0 && debouncedSearch.length === 0;
 
@@ -168,7 +143,7 @@ export const GlobalSearchDialog = ({
 					acc[item.type]!.push(item);
 					return acc;
 				},
-				{} as Record<string, typeof data>,
+				{} as Record<string, GlobalSearchItem[]>,
 			) ?? {};
 
 		if (showEmptyState) {
@@ -199,7 +174,7 @@ export const GlobalSearchDialog = ({
 		}
 
 		return grouped;
-	}, [data, debouncedSearch.length, defaultState]);
+	}, [data, debouncedSearch, defaultState]);
 
 	const handleOpenChange = (isOpen: boolean) => {
 		if (!isOpen) {
@@ -208,89 +183,66 @@ export const GlobalSearchDialog = ({
 		onOpenChange(isOpen);
 	};
 
-	const handleSelect = (item: {
-		id: string;
-		type: string;
-		parentId?: string | null;
-		href?: string;
-	}) => {
-		if (onSelect) {
-			onSelect(item as GlobalSearchItem);
-			return;
-		}
-		const isAction = item.id === "action" || item.id.startsWith("action:");
-
-		if (isAction) {
-			switch (item.id) {
-				case "action:view-board": {
-					// navigate to board view
-					router.push(`${user?.basePath}/board`);
-					return;
+	const handleItemOpenChange = onSelect
+		? (open: boolean) => {
+				if (!open) {
+					// When using custom onSelect, we don't close automatically
 				}
-				case "action:view-projects": {
-					// navigate to projects view
-					router.push(`${user?.basePath}/projects`);
-					return;
-				}
-				case "action:create-task": {
-					// navigate to create task
-					setTaskParams({ createTask: true });
-					return;
-				}
-				case "action:create-project": {
-					// navigate to create project
-					setProjectParams({ createProject: true });
-					return;
-				}
-				default:
-					break;
 			}
-		}
-
-		switch (item.type) {
-			case "task": {
-				// navigate to task
-				setTaskParams({ taskId: item.id });
-				break;
-			}
-			case "project": {
-				// navigate to project
-				router.push(`${user?.basePath}/projects/${item.id}/detail`);
-				break;
-			}
-			case "milestone": {
-				// navigate to milestone
-				router.push(
-					`${user?.basePath}/projects/${item.parentId}/tasks?mId=${item.id}`,
-				);
-				break;
-			}
-			case "navigation": {
-				if (item.href) {
-					// navigate to href
-					router.push(`${user?.basePath}${item.href}`);
-				}
-				break;
-			}
-			default:
-				break;
-		}
-	};
+		: handleOpenChange;
 
 	return (
 		<Dialog open={open} onOpenChange={handleOpenChange}>
-			<DialogContent className="p-4" showCloseButton={false}>
+			<DialogContent
+				className="h-[calc(100vh-8rem)] p-0 transition-all duration-200 sm:max-w-6xl"
+				showCloseButton={false}
+			>
 				<DialogHeader className="hidden">
 					<DialogTitle />
 				</DialogHeader>
-				<Command shouldFilter={false} className="bg-transparent">
+				<GlobalSearchProvider
+					onOpenChange={handleItemOpenChange}
+					basePath={user?.basePath || ""}
+				>
+					<GlobalSearchContent
+						search={search}
+						setSearch={setSearch}
+						groupedData={groupedData}
+					/>
+				</GlobalSearchProvider>
+			</DialogContent>
+		</Dialog>
+	);
+};
+
+const GlobalSearchContent = ({
+	search,
+	setSearch,
+	groupedData,
+}: {
+	search: string;
+	setSearch: (search: string) => void;
+	groupedData: Record<string, GlobalSearchItem[]>;
+}) => {
+	const { preview } = useGlobalSearch();
+	const hasPreview = preview !== null;
+
+	return (
+		<div className="flex h-full" data-has-preview={hasPreview}>
+			<div
+				className={cn(
+					"flex h-full flex-1 flex-col p-4",
+					hasPreview && "border-border border-r",
+				)}
+			>
+				<Command shouldFilter={false} className="h-full bg-transparent">
 					<CommandInput
 						value={search}
 						onValueChange={setSearch}
 						containerClassName="h-11"
 						placeholder="Search..."
 					/>
-					<CommandList>
+					<CommandList className="max-h-[calc(100vh-16rem)] overflow-y-auto">
 						{groupedData &&
 							Object.entries(groupedData).map(([type, items]) => {
 								if (!items || items.length === 0) {
@@ -302,44 +254,15 @@ export const GlobalSearchDialog = ({
 										heading={type}
 										className="[&_[cmdk-group-heading]]:capitalize"
 									>
-										{items?.map((item) => {
-											let Icon =
-												searchIcons[item.type as keyof typeof searchIcons];
-											const isAction =
-												item.id === "action" || item.id.startsWith("action:");
-
-											if (isAction) {
-												Icon = CornerDownLeftIcon;
-											}
-											return (
-												<CommandItem
-													key={item.id}
-													className="group flex w-full cursor-pointer items-center rounded-sm px-4 py-2 text-sm transition-colors duration-200 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/30"
-													onSelect={() => {
-														// @ts-expect-error -- type matches
-														handleSelect(item);
-														onOpenChange(false);
-													}}
-												>
-													<Icon
-														className="mr-2 size-4 text-muted-foreground"
-														style={{
-															color: item.color || "inherit",
-														}}
-													/>
-													{item.title}
-													<div className="ml-auto inline opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-														<ChevronRight className="size-4 text-muted-foreground" />
-													</div>
-												</CommandItem>
-											);
-										})}
+										{items?.map((item) => (
+											<SearchResultItem key={item.id} item={item} />
+										))}
 									</CommandGroup>
 								);
 							})}
 					</CommandList>
 				</Command>
-				<DialogFooter className="flex justify-between px-2">
+				<DialogFooter className="mt-auto flex justify-between px-2 pt-2">
 					<div />
 					<div className="flex items-center gap-4 text-muted-foreground">
 						<ArrowDownIcon className="size-4" />
@@ -347,13 +270,14 @@ export const GlobalSearchDialog = ({
 						<CornerDownLeftIcon className="size-4" />
 					</div>
 				</DialogFooter>
-			</DialogContent>
-		</Dialog>
+			</div>
+			{hasPreview && (
+				<div className="w-xl p-4">
+					<div className="max-h-[calc(100vh-10rem)] overflow-y-auto">
+						{preview}
+					</div>
+				</div>
+			)}
+		</div>
 	);
-};
-
-const searchIcons = {
-	task: LayersIcon,
-	project: BoxIcon,
-	milestone: TargetIcon,
 };

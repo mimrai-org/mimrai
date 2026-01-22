@@ -1,4 +1,3 @@
-import { GlobalSearchDialog } from "../global-search-dialog";
 import { TasksSuggestions } from "../tasks-suggestions/tasks-suggestions";
 import { IntegrationInstallSheet } from "./integration-install-sheet";
 import { LabelCreateSheet } from "./label-create-sheet";

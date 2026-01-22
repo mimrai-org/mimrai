@@ -4,7 +4,7 @@ import { cn } from "@ui/lib/utils";
 import { SearchIcon } from "lucide-react";
 import { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { GlobalSearchDialog } from "./global-search-dialog";
+import { GlobalSearchDialog } from "./global-search/global-search-dialog";
 
 export const NavSearch = ({
 	placeholder,
@@ -16,7 +16,7 @@ export const NavSearch = ({
 	const [open, setOpen] = useState(false);
 
 	useHotkeys(
-		"ctrl+p, meta+p",
+		"ctrl+p, meta+p, ctrl+k, meta+k",
 		(e) => {
 			e.preventDefault();
 			setOpen((o) => !o);

@@ -490,6 +490,14 @@ The API includes AI agents with the following tools:
 
 ---
 
+## AI Agent Guidelines
+
+### Do NOT Create
+
+- **index.ts barrel files**: Do not create `index.ts` files to re-export all modules from a folder. Import directly from the source file instead.
+
+---
+
 ## License
 
 AGPL-3.0 for non-commercial use. Commercial license available upon request.
