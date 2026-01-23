@@ -7,7 +7,7 @@ import { generateTeamSuggestionsJob } from "./generate-team-suggestions-job";
 
 export const scheduleDailyTeamsSuggestions = schedules.task({
 	id: "schedule-daily-teams-suggestions",
-	cron: "0 1 * * *", // Every day at 1 AM
+	cron: "0 1 */2 * *", // Every 2 days at 1 AM
 	description: "Schedule daily follow-up tasks for users",
 	run: async (payload, ctx) => {
 		const db = getDb();

@@ -272,6 +272,7 @@ export const tasks = pgTable(
 		index("tasks_sequence_index").on(table.sequence),
 		index("tasks_permalink_id_index").on(table.permalinkId),
 		index("tasks_team_id_index").using("btree", table.teamId),
+		index("tasks_assignee_id_index").using("btree", table.assigneeId),
 		foreignKey({
 			columns: [table.assigneeId],
 			foreignColumns: [users.id],
@@ -323,6 +324,7 @@ export const tasksDependencies = pgTable(
 			columns: [table.taskId, table.dependsOnTaskId],
 			name: "tasks_dependencies_pkey",
 		}),
+		index("tasks_dependencies_task_id_index").using("btree", table.taskId),
 		foreignKey({
 			columns: [table.taskId],
 			foreignColumns: [tasks.id],
@@ -986,6 +988,8 @@ export const checklistItems = pgTable(
 		}).defaultNow(),
 	},
 	(table) => [
+		index("checklist_items_task_id_index").using("btree", table.taskId),
+		index("checklist_items_team_id_index").using("btree", table.teamId),
 		foreignKey({
 			columns: [table.taskId],
 			foreignColumns: [tasks.id],
