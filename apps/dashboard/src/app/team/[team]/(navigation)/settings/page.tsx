@@ -9,7 +9,7 @@ type Props = {
 export default async function Page({ params }: Props) {
 	const { team } = await params;
 	return (
-		<div className="animate-blur-in">
+		<div className="container mx-auto animate-blur-in">
 			<NavList />
 		</div>
 	);

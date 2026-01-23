@@ -16,7 +16,7 @@ export default async function DashboardLayout({
 			<Suspense>
 				<BreadcrumbsProvider session={session}>
 					<Header />
-					<div className="flex flex-col rounded-lg bg-background px-12 pb-4">
+					<div className="container mx-auto flex flex-col rounded-lg bg-background pb-4">
 						{children}
 					</div>
 					{/* <ChatWidget /> */}
