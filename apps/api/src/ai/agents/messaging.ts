@@ -1,7 +1,7 @@
 import { openai } from "@ai-sdk/openai";
 import { db } from "@mimir/db/client";
 import { getProjects } from "@mimir/db/queries/projects";
-import { createTask, getTasks } from "@mimir/db/queries/tasks";
+import { createTask, getTasks, updateTask } from "@mimir/db/queries/tasks";
 import { getMembers } from "@mimir/db/queries/teams";
 import { statuses, statusTypeEnum } from "@mimir/db/schema";
 import { trackTaskCreated } from "@mimir/events/server";
@@ -191,12 +191,77 @@ Never guess or make up IDs - always retrieve them from the system first.`,
 	},
 });
 
+const updateTaskSchema = z.object({
+	id: z.string().describe("Task ID - MUST be a valid UUID from findTasks"),
+	title: z.string().optional().describe("Task title - be concise but clear"),
+	description: z.string().optional().describe("Task description"),
+	projectId: z
+		.string()
+		.optional()
+		.describe(
+			"Project ID - MUST be a valid UUID from findProjects {project.id}",
+		),
+	statusId: z
+		.string()
+		.optional()
+		.describe("Status ID - MUST be a valid UUID from findStatuses {status.id}"),
+	assigneeId: z
+		.string()
+		.optional()
+		.describe(
+			"Assignee ID - MUST be a valid UUID from findUsers {user.id}, use null to unassign",
+		),
+	priority: z
+		.enum(["low", "medium", "high", "urgent"])
+		.optional()
+		.describe("Task priority"),
+	dueDate: z.string().optional().describe("Due date in ISO format"),
+	attachments: z.array(z.url()).optional().describe("List of attachment URLs"),
+});
+
+const updateTaskMessagingTool = tool({
+	description: `Update an existing task. IMPORTANT: You MUST first use findTasks to get the task ID, and use findProjects/findStatuses/findUsers to get valid IDs for any fields you're updating.
+Never guess or make up IDs - always retrieve them from the system first.`,
+	inputSchema: updateTaskSchema,
+	execute: async (input, executionOptions) => {
+		console.log("Updating task with input:", input);
+		const { userId, teamId } =
+			executionOptions.experimental_context as AppContext;
+
+		const updatedTask = await updateTask({
+			id: input.id,
+			title: input.title,
+			description: input.description,
+			projectId: input.projectId,
+			statusId: input.statusId,
+			assigneeId: input.assigneeId,
+			priority: input.priority,
+			dueDate: input.dueDate
+				? new Date(input.dueDate).toISOString()
+				: undefined,
+			teamId,
+			userId,
+			attachments: input.attachments,
+		});
+
+		return {
+			success: true,
+			task: {
+				id: updatedTask.id,
+				title: updatedTask.title,
+				url: getTaskPermalink(updatedTask.permalinkId),
+			},
+		};
+	},
+});
+
 const messagingTools = {
 	findProjects: findProjectsTool,
 	findStatuses: findStatusesTool,
 	findUsers: findUsersTool,
 	findTasks: findTasksTool,
 	createTask: createTaskMessagingTool,
+	updateTask: updateTaskMessagingTool,
 };
 
 const buildSystemPrompt = (
@@ -217,10 +282,12 @@ Current time: ${ctx.currentDateTime}
 	- feature request: create a new task
 	- issue: create a new task
 	- task search: find existing tasks
+	- task update request: update an existing task
 	- greetings or casual chat: respond naturally like another member of the team based on the context.
 	- other: respond with a brief explanation that only task management is supported
 - ALWAYS use tools to get real data - NEVER make up IDs or names
-- Before creating a task, you MUST:
+- Before creating or updating a task, you MUST:
+  - Call findTasks to get the task ID (for updates)
   - Call findProjects to get the available projects (if unspecified, call the tool without search to get all projects)
 		- Select the most relevant based on the description if unspecified
   - Call findStatuses to get a valid statusId
@@ -241,6 +308,11 @@ For task creation:
 👤 Assignee: [assignee name]
 🔗 [task url]
 
+For task update:
+✅ Updated: "[title]"
+[list of changed fields with old -> new]
+🔗 [task url]
+
 For task search:
 Found [n] tasks:
 • [title] - [status] - [url]
@@ -252,6 +324,7 @@ For errors:
 <capabilities>
 - Find tasks by title, assignee, or status
 - Create new tasks (with proper project/status lookup)
+- Update existing tasks (with proper ID lookup)
 - List projects and team members
 </capabilities>`;
 
