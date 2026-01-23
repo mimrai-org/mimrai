@@ -74,6 +74,7 @@ export const updateTaskSchema = z.object({
 	projectId: z.string().optional().nullable(),
 	repositoryName: z.string().nullable().optional(),
 	branchName: z.string().nullable().optional(),
+	attachments: z.array(z.string()).nullable().optional(),
 	recurring: z
 		.object({
 			frequency: z.enum(["daily", "weekly", "monthly", "yearly"]),

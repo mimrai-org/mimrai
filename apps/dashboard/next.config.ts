@@ -24,6 +24,7 @@ const nextConfig: NextConfig = {
 	},
 	transpilePackages: ["@mimir/integration", "@mimir/trpc", "@mimir/ui"],
 	images: {
+		dangerouslyAllowLocalIP: process.env.NODE_ENV !== "production",
 		remotePatterns: [
 			{
 				protocol: "https",

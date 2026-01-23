@@ -13,6 +13,16 @@ export const taskFormSchema = z.object({
 	labels: z.array(z.string()).nullable().optional(),
 	priority: z.enum(["low", "medium", "high", "urgent"]).nullable().optional(),
 	attachments: z.array(z.string()).nullable().optional(),
+	attachmentsUploadingState: z
+		.array(
+			z.custom<{
+				id: string;
+				url: string;
+				progress?: number;
+			}>(),
+		)
+		.nullable()
+		.optional(),
 	projectId: z.string(),
 	repositoryName: z.string().nullable().optional(),
 	branchName: z.string().nullable().optional(),

@@ -1,5 +1,6 @@
 import { Dialog, DialogContent, DialogTrigger } from "@mimir/ui/dialog";
 import { FormField, FormLabel } from "@mimir/ui/form";
+import { getApiUrl } from "@mimir/utils/envs";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import {
 	ContextMenu,
@@ -7,7 +8,8 @@ import {
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "@ui/components/ui/context-menu";
-import { FileTextIcon } from "lucide-react";
+import { Skeleton } from "@ui/components/ui/skeleton";
+import { FileTextIcon, PlusIcon } from "lucide-react";
 import Image from "next/image";
 import { useMemo } from "react";
 import { useFormContext } from "react-hook-form";
@@ -16,14 +18,69 @@ import type { TaskFormValues } from "./form-type";
 export const Attachments = () => {
 	const form = useFormContext<TaskFormValues>();
 
+	const uploadingState = form.watch("attachmentsUploadingState");
+
+	const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const files = event.target.files;
+		if (files && files.length > 0) {
+			const fileUrls = Array.from(files).map((file) =>
+				URL.createObjectURL(file),
+			);
+
+			const currentUploading =
+				form.getValues("attachmentsUploadingState") || [];
+			const newUploading = fileUrls.map((url) => ({
+				url,
+				progress: 0,
+				id: crypto.randomUUID(),
+			}));
+			form.setValue("attachmentsUploadingState", [
+				...currentUploading,
+				...newUploading,
+			]);
+
+			// Handle upload logic
+			Promise.all(
+				Array.from(files).map(async (file, index) => {
+					const formData = new FormData();
+					formData.append("file", file);
+					console.log("Uploading file:", file.name);
+
+					const response = await fetch(
+						`${getApiUrl()}/api/attachments/upload`,
+						{
+							method: "POST",
+							body: formData,
+							credentials: "include",
+						},
+					);
+
+					const data = await response.json();
+					const url = data.url as string;
+
+					// Update attachments field
+					const currentAttachments = form.getValues("attachments") || [];
+					form.setValue("attachments", [...currentAttachments, url], {
+						shouldDirty: true,
+					});
+
+					// Remove from uploading state
+					const updatedUploading = form
+						.getValues("attachmentsUploadingState")
+						?.filter((item) => item.id !== newUploading[index].id);
+					form.setValue("attachmentsUploadingState", updatedUploading);
+				}),
+			);
+		}
+	};
+
 	return (
 		<FormField
 			control={form.control}
 			name="attachments"
 			render={({ field }) => (
 				<div className="">
-					<FormLabel className="mb-4">Attachments</FormLabel>
-					<ul className="flex items-center gap-2 p-1">
+					<ul className="flex flex-wrap items-center gap-2 p-1">
 						{field.value?.map((attachment, index) => (
 							<li key={attachment} className="flex items-center">
 								<TaskAttachmentPreview
@@ -35,6 +92,28 @@ export const Attachments = () => {
 								/>
 							</li>
 						))}
+
+						{uploadingState?.map((upload) => (
+							<li key={upload.id} className="flex items-center">
+								<Skeleton className="size-8 animate-pulse rounded-sm" />
+							</li>
+						))}
+						<input
+							type="file"
+							className="hidden"
+							id="attachment-input"
+							multiple
+							onChange={handleInputChange}
+						/>
+						<label htmlFor="attachment-input">
+							<div
+								className="flex size-8 items-center justify-center rounded-sm border border-dashed hover:bg-accent dark:hover:bg-accent/30"
+								// type="button"
+								title="Add Attachment"
+							>
+								<PlusIcon className="size-4 text-muted-foreground" />
+							</div>
+						</label>
 					</ul>
 				</div>
 			)}
@@ -68,7 +147,7 @@ export const TaskAttachmentPreview = ({
 			<DialogTrigger>
 				<ContextMenu>
 					<ContextMenuTrigger>
-						<div className="size-8 items-center justify-center overflow-hidden rounded-md bg-muted">
+						<div className="size-8 items-center justify-center overflow-hidden rounded-md border bg-muted">
 							{isImage ? (
 								<Image
 									src={attachment}
