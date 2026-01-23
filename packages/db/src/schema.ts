@@ -732,6 +732,42 @@ export const activities = pgTable(
 	],
 );
 
+export const activityReactions = pgTable(
+	"activity_reactions",
+	{
+		id: text("id")
+			.$defaultFn(() => randomUUID())
+			.primaryKey()
+			.notNull(),
+		activityId: text("activity_id").notNull(),
+		userId: text("user_id").notNull(),
+		reaction: text("reaction").notNull(), // emoji like 👍, ❤️, 😂
+		createdAt: timestamp("created_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
+	},
+	(table) => [
+		index("activity_reactions_activity_id_index").on(table.activityId),
+		index("activity_reactions_user_id_index").on(table.userId),
+		unique("unique_activity_user_reaction").on(
+			table.activityId,
+			table.userId,
+			table.reaction,
+		),
+		foreignKey({
+			columns: [table.activityId],
+			foreignColumns: [activities.id],
+			name: "activity_reactions_activity_id_fkey",
+		}).onDelete("cascade"),
+		foreignKey({
+			columns: [table.userId],
+			foreignColumns: [users.id],
+			name: "activity_reactions_user_id_fkey",
+		}).onDelete("cascade"),
+	],
+);
+
 export const githubRepositoryConnected = pgTable(
 	"github_repository_connected",
 	{

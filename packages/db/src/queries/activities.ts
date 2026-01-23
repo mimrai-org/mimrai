@@ -370,6 +370,26 @@ export const getActivities = async ({
 			},
 			groupId: activities.groupId,
 			teamId: activities.teamId,
+			reactions: sql<
+				Array<{
+					reaction: string;
+					count: number;
+					users: Array<{ id: string; name: string; image: string | null }>;
+				}>
+			>`COALESCE(
+				(
+					SELECT JSON_AGG(reaction_summary ORDER BY reaction_summary.count DESC)
+					FROM (
+						SELECT 
+							ar.reaction,
+							COUNT(*)::int as count
+						FROM activity_reactions ar
+						WHERE ar.activity_id = ${activities.id}
+						GROUP BY ar.reaction
+					) as reaction_summary
+				),
+				'[]'::json
+			)`,
 		})
 		.from(activities)
 		.where(and(...whereClause))

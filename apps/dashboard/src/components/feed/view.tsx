@@ -5,9 +5,9 @@ import { format, isToday, isYesterday } from "date-fns";
 import { LayersIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
+import { ActivityItem } from "@/components/activities/activity-item";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { trpc } from "@/utils/trpc";
-import { ActivityItem } from "../forms/task-form/activities-list";
 import Loader from "../loader";
 import { useUser } from "../user-provider";
 

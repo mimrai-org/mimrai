@@ -1,6 +1,7 @@
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { protectedProcedure, publicProcedure, router } from "../init";
 import { activitiesRouter } from "./activities";
+import { activitiesReactionsRouter } from "./activities-reactions";
 import { autopilotSettingsRouter } from "./autopilot-settings";
 import { billingRouter } from "./billing";
 import { chatRouter } from "./chats";
@@ -50,6 +51,7 @@ export const appRouter = router({
 	billing: billingRouter,
 	labels: labelsRouter,
 	activities: activitiesRouter,
+	activitiesReactions: activitiesReactionsRouter,
 	github: githubRouter,
 	imports: importsRouter,
 	inbox: inboxRouter,

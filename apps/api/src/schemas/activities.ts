@@ -26,3 +26,22 @@ export const bulkUpdateActivitiesSchema = z.object({
 export const getActivitiesCountSchema = z.object({
 	status: z.array(z.enum(activityStatusEnum.enumValues).optional()).optional(),
 });
+
+export const createActivityReactionSchema = z.object({
+	activityId: z.string(),
+	reaction: z.string().min(1).max(10), // emoji or short text
+});
+
+export const deleteActivityReactionSchema = z.object({
+	activityId: z.string(),
+	reaction: z.string().min(1).max(10),
+});
+
+export const toggleActivityReactionSchema = z.object({
+	activityId: z.string(),
+	reaction: z.string().min(1).max(10),
+});
+
+export const getActivityReactionsSchema = z.object({
+	activityId: z.string(),
+});
