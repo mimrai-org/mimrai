@@ -311,7 +311,6 @@ For task creation:
 
 For task update:
 ✅ Updated: "[title]"
-[list of changed fields with old -> new]
 🔗 [task url]
 
 For task search:

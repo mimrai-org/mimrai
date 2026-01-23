@@ -596,6 +596,7 @@ export const getTaskByPermalinkId = async (
 		.select({
 			id: tasks.id,
 			teamId: tasks.teamId,
+			projectId: tasks.projectId,
 		})
 		.from(tasks)
 		.where(and(...whereClause))
