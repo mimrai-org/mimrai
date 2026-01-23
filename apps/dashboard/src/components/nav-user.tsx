@@ -10,7 +10,8 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@ui/components/ui/dropdown-menu";
-import { LogOut } from "lucide-react";
+import { LogOut, Settings, User } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/components/user-provider";
 import { authClient } from "@/lib/auth-client";
@@ -78,6 +79,21 @@ export function NavUser() {
 				</DropdownMenuLabel>
 				<DropdownMenuSeparator />
 
+				<Link href={`${user.basePath}/settings/profile`}>
+					<DropdownMenuItem>
+						<User />
+						Profile
+					</DropdownMenuItem>
+				</Link>
+
+				<Link href={`${user.basePath}/settings`}>
+					<DropdownMenuItem>
+						<Settings />
+						Settings
+					</DropdownMenuItem>
+				</Link>
+
+				<DropdownMenuSeparator />
 				<DropdownMenuItem
 					onClick={() => {
 						authClient.signOut({

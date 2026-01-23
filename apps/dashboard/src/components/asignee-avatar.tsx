@@ -49,7 +49,7 @@ export const AssigneeAvatar = ({
 						<AvatarImage
 							src={image}
 							alt={name ?? "Assignee Avatar"}
-							className="size-full object-contain"
+							className="size-full object-cover"
 						/>
 					)}
 				</Avatar>

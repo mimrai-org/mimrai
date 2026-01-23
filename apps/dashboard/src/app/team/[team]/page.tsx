@@ -3,6 +3,7 @@ import { FeedView } from "@/components/feed/view";
 import { NavTopTasks } from "@/components/nav/nav-top-tasks";
 import { NavWorkspace } from "@/components/nav/nav-workspace";
 import { NavSearch } from "@/components/nav-search";
+import { NavUser } from "@/components/nav-user";
 import { ProjectsList } from "@/components/projects/list";
 import { TeamSwitcher } from "@/components/team-switcher";
 import { getSession } from "@/lib/get-session";
@@ -25,9 +26,13 @@ export default async function Page({ searchParams }: Props) {
 					<div className="w-fit">
 						<TeamSwitcher />
 					</div>
-					<h1 className="flex items-center gap-2 font-header text-4xl">
-						Jump into your work
-					</h1>
+					<div className="flex items-center justify-between">
+						<h1 className="flex items-center gap-2 font-header text-4xl">
+							Jump into your work
+						</h1>
+
+						<NavUser />
+					</div>
 					<p className="text-muted-foreground text-sm">
 						Hello, {session?.user?.name.split(" ")[0]}
 					</p>

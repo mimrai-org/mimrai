@@ -17,6 +17,8 @@ export const Profile = () => {
 						defaultValues={{
 							name: user.name,
 							locale: user.locale || undefined,
+							email: user.email,
+							image: user.image || undefined,
 						}}
 					/>
 				)}

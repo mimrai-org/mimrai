@@ -108,7 +108,6 @@ export const Attachments = () => {
 						<label htmlFor="attachment-input">
 							<div
 								className="flex size-8 items-center justify-center rounded-sm border border-dashed hover:bg-accent dark:hover:bg-accent/30"
-								// type="button"
 								title="Add Attachment"
 							>
 								<PlusIcon className="size-4 text-muted-foreground" />

@@ -198,9 +198,11 @@ export const getSystemUser = async () => {
 export const updateUser = async ({
 	userId,
 	name,
+	image,
 	locale,
 }: {
 	userId: string;
+	image?: string | null;
 	name?: string;
 	locale?: string;
 }) => {
@@ -209,6 +211,7 @@ export const updateUser = async ({
 		.set({
 			name: name,
 			locale: locale,
+			image: image,
 			updatedAt: new Date(),
 		})
 		.where(eq(users.id, userId))
