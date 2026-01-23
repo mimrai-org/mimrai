@@ -361,6 +361,7 @@ export const getActivities = async ({
 				id: users.id,
 				name: users.name,
 				email: users.email,
+				image: users.image,
 				color: users.color,
 			},
 			task: {
