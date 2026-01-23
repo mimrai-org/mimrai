@@ -82,6 +82,7 @@ const findUsersTool = tool({
 			id: u.id,
 			name: u.name,
 			email: u.email,
+			description: u.description,
 		}));
 	},
 });
