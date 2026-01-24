@@ -69,6 +69,7 @@ export const useTasksViewContext = () => {
 const DEFAULT_FILTERS: TasksViewContextFilters = {
 	viewType: "list" as TasksViewType,
 	properties: [
+		"statusChangedAt",
 		"assignee",
 		"priority",
 		"dependencies",

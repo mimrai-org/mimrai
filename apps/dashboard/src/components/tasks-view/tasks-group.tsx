@@ -364,6 +364,7 @@ export const useTasksGrouped = () => {
 				id: activeTask.id,
 				[columnUpdateKey]: targetColumn.id,
 				order: DEFAULT_EMPTY_COLUMN_ORDER,
+				statusChangedAt: new Date().toISOString(),
 			};
 			options.updateData(newTaskPayload, targetColumn.data);
 
@@ -396,6 +397,7 @@ export const useTasksGrouped = () => {
 			id: activeTask.id,
 			[columnUpdateKey]: overTask[columnUpdateKey],
 			order: newOrder,
+			statusChangedAt: new Date().toISOString(),
 		};
 		options.updateData(newTaskPayload, options.getData(overTask));
 

@@ -24,6 +24,11 @@ export const getTasksSchema = z.object({
 	milestoneId: z.array(z.string()).optional().nullable(),
 	search: z.string().optional().nullable(),
 	labels: z.array(z.string()).optional().nullable(),
+	statusChangedAt: z
+		.tuple([z.coerce.date(), z.coerce.date()])
+		.optional()
+		.nullable(),
+	completedBy: z.array(z.string()).optional().nullable(),
 	view: z.enum(["board", "list", "calendar"]).optional().nullable(),
 	recurring: z.boolean().optional().nullable(),
 });

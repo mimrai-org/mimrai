@@ -10,6 +10,7 @@ import {
 	inArray,
 	isNotNull,
 	isNull,
+	lte,
 	notInArray,
 	or,
 	type SQL,
@@ -104,6 +105,8 @@ export const getTasks = async ({
 	projectId?: string[];
 	milestoneId?: string[];
 	nProjectId?: string[];
+	statusChangedAt?: [Date, Date];
+	completedBy?: string[];
 	search?: string;
 	recurring?: boolean;
 	view?: "board" | "list" | "calendar";
@@ -133,6 +136,16 @@ export const getTasks = async ({
 	input.milestoneId &&
 		input.milestoneId.length > 0 &&
 		whereClause.push(inArray(tasks.milestoneId, input.milestoneId));
+	input.statusChangedAt &&
+		whereClause.push(
+			and(
+				gte(tasks.statusChangedAt, input.statusChangedAt[0]),
+				lte(tasks.statusChangedAt, input.statusChangedAt[1]),
+			),
+		);
+	input.completedBy &&
+		input.completedBy.length > 0 &&
+		whereClause.push(inArray(tasks.completedBy, input.completedBy));
 
 	input.recurring && whereClause.push(isNotNull(tasks.recurringJobId));
 	input.projectId &&
@@ -283,6 +296,9 @@ export const getTasks = async ({
 			permalinkId: tasks.permalinkId,
 			milestoneId: tasks.milestoneId,
 			subscribers: tasks.subscribers,
+			statusChangedAt: tasks.statusChangedAt,
+			completedAt: tasks.completedAt,
+			completedBy: tasks.completedBy,
 			milestone: {
 				id: milestones.id,
 				name: milestones.name,
@@ -724,6 +740,9 @@ export const getTaskById = async (id: string, userId?: string) => {
 			sequence: tasks.sequence,
 			projectId: tasks.projectId,
 			subscribers: tasks.subscribers,
+			statusChangedAt: tasks.statusChangedAt,
+			completedAt: tasks.completedAt,
+			completedBy: tasks.completedBy,
 			project: {
 				id: projects.id,
 				name: projects.name,

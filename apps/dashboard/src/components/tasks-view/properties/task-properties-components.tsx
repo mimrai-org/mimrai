@@ -1,6 +1,7 @@
 import type { RouterOutputs } from "@mimir/trpc";
 import { LabelBadge } from "@ui/components/ui/label-badge";
 import { cn } from "@ui/lib/utils";
+import { formatRelative } from "date-fns";
 import { CheckSquareIcon } from "lucide-react";
 import { useMemo } from "react";
 import { DependencyIcon } from "../../dependency-icon";
@@ -14,6 +15,12 @@ import { TaskPropertyStatus } from "./status";
 
 export type Task = RouterOutputs["tasks"]["get"]["data"][number];
 export const propertiesComponents = {
+	statusChangedAt: (task: Pick<Task, "statusChangedAt">) =>
+		task.statusChangedAt ? (
+			<span className="text-muted-foreground text-xs opacity-0 transition-opacity group-hover/task:opacity-100">
+				{formatRelative(new Date(task.statusChangedAt), new Date())}
+			</span>
+		) : null,
 	priority: (task: Pick<Task, "priority">) =>
 		task.priority && (
 			<div className="flex size-5.5 items-center justify-center rounded-sm px-2 text-xs">

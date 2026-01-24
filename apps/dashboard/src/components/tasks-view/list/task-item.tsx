@@ -36,7 +36,7 @@ export const TaskItem = ({
 	return (
 		<div
 			className={cn(
-				"group flex items-center gap-2 rounded-sm px-4 py-2 transition-colors hover:bg-accent dark:hover:bg-accent/30",
+				"group/task flex items-center gap-2 rounded-sm px-4 py-2 transition-colors hover:bg-accent dark:hover:bg-accent/30",
 				{
 					"z-50 opacity-50": isDragging,
 				},
@@ -93,6 +93,7 @@ export const TaskItem = ({
 					<h3 className="font-medium">{task.title}</h3>
 				</div>
 				<div className="hidden flex-wrap items-center justify-end gap-2 md:flex">
+					<TaskProperty property="statusChangedAt" task={task} />
 					<TaskProperty property="dependencies" task={task} />
 					<TaskProperty property="dueDate" task={task} />
 					<TaskProperty property="project" task={task} />

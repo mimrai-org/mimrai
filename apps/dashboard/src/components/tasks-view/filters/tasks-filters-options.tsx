@@ -1,5 +1,5 @@
 import { getContrast } from "@mimir/utils/random";
-import { TagsIcon, UserIcon } from "lucide-react";
+import { TagsIcon, UserCheckIcon, UserIcon } from "lucide-react";
 import { AssigneeAvatar } from "@/components/asignee-avatar";
 import { MilestoneIcon } from "@/components/milestone-icon";
 import { ProjectIcon } from "@/components/project-icon";
@@ -21,6 +21,24 @@ export const tasksFilterOptions = {
 						label: status.name.charAt(0).toUpperCase() + status.name.slice(1),
 						icon: <StatusIcon {...status} className="size-4!" />,
 						original: status,
+					})),
+			},
+		),
+	},
+	completedBy: {
+		label: "Completed By",
+		multiple: true,
+		icon: <UserCheckIcon className="size-4!" />,
+		filterKey: "completedBy",
+		queryOptions: trpc.teams.getMembers.queryOptions(
+			{},
+			{
+				select: (members) =>
+					members.map((member) => ({
+						value: member.id,
+						label: member.name,
+						icon: <AssigneeAvatar {...member} className="size-4!" />,
+						original: member,
 					})),
 			},
 		),

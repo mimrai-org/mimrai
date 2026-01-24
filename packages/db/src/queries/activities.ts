@@ -244,6 +244,15 @@ export const createTaskUpdateActivity = async ({
 					subscribers: newTask.subscribers,
 				},
 			});
+
+			await db
+				.update(tasks)
+				.set({
+					completedAt: new Date(),
+					completedBy: definedUserId,
+					statusChangedAt: new Date(),
+				})
+				.where(eq(tasks.id, newTask.id));
 		} else {
 			// Delete task completed activity for the same task since only one can exist
 			await db
@@ -254,6 +263,15 @@ export const createTaskUpdateActivity = async ({
 						eq(activities.type, "task_completed"),
 					),
 				);
+
+			await db
+				.update(tasks)
+				.set({
+					completedAt: null,
+					completedBy: null,
+					statusChangedAt: new Date(),
+				})
+				.where(eq(tasks.id, newTask.id));
 		}
 
 		delete changes.columnId;

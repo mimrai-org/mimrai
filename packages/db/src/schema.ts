@@ -254,6 +254,15 @@ export const tasks = pgTable(
 			mode: "string",
 		}),
 
+		completedAt: timestamp("completed_at", {
+			withTimezone: true,
+		}),
+		completedBy: text("completed_by"),
+
+		statusChangedAt: timestamp("status_changed_at", {
+			withTimezone: true,
+		}).defaultNow(),
+
 		createdAt: timestamp("created_at", {
 			withTimezone: true,
 			mode: "string",
@@ -273,6 +282,11 @@ export const tasks = pgTable(
 		index("tasks_permalink_id_index").on(table.permalinkId),
 		index("tasks_team_id_index").using("btree", table.teamId),
 		index("tasks_assignee_id_index").using("btree", table.assigneeId),
+		foreignKey({
+			columns: [table.completedBy],
+			foreignColumns: [users.id],
+			name: "tasks_completed_by_fkey",
+		}),
 		foreignKey({
 			columns: [table.assigneeId],
 			foreignColumns: [users.id],
