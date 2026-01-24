@@ -11,12 +11,20 @@ import {
 	CollapsibleContent,
 	CollapsibleTrigger,
 } from "@ui/components/ui/collapsible";
+import {
+	ContextMenu,
+	ContextMenuContent,
+	ContextMenuItem,
+	ContextMenuTrigger,
+} from "@ui/components/ui/context-menu";
 import { cn } from "@ui/lib/utils";
 import {
+	CheckSquareIcon,
 	ChevronDownIcon,
 	ChevronRightIcon,
 	ListPlusIcon,
 	PlusIcon,
+	SquareCheckIcon,
 } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import { useState } from "react";
@@ -110,20 +118,22 @@ export const TaskGroupItem = ({
 			className="flex flex-col gap-2"
 			ref={setDroppableNodeRef}
 		>
-			<Collapsible open={open} onOpenChange={setOpen}>
-				<CollapsibleTrigger asChild>
-					<h2 className="group mb-2 flex cursor-pointer items-center gap-2 rounded-sm py-2 text-sm opacity-50 transition-colors hover:opacity-100">
-						<div className="text-muted-foreground group-hover:text-foreground">
-							<ChevronRightIcon className="size-4 group-[&[data-state=open]]:hidden" />
-							<ChevronDownIcon className="hidden size-4 group-[&[data-state=open]]:inline" />
-						</div>
-						{taskGroup.column.icon}
-						{taskGroup.column.name}
-						<span className="rounded-sm border px-1 text-muted-foreground text-xs">
-							{taskGroup.tasks.length}
-						</span>
-					</h2>
-				</CollapsibleTrigger>
+			<Collapsible open={open} onOpenChange={setOpen} className="group">
+				<TaskGroupItemContextMenu taskGroup={taskGroup}>
+					<CollapsibleTrigger asChild>
+						<h2 className="mb-2 flex cursor-pointer items-center gap-2 rounded-sm bg-accent/30 px-4 py-2 text-sm opacity-70 transition-colors hover:opacity-100">
+							<div className="text-muted-foreground group-hover:text-foreground">
+								<ChevronRightIcon className="size-4 group-[&[data-state=open]]:hidden" />
+								<ChevronDownIcon className="hidden size-4 group-[&[data-state=open]]:inline" />
+							</div>
+							{taskGroup.column.icon}
+							{taskGroup.column.name}
+							<span className="rounded-sm border px-1 text-muted-foreground text-xs">
+								{taskGroup.tasks.length}
+							</span>
+						</h2>
+					</CollapsibleTrigger>
+				</TaskGroupItemContextMenu>
 
 				<CollapsibleContent
 					className={cn({
@@ -157,5 +167,36 @@ export const TaskGroupItem = ({
 				</CollapsibleContent>
 			</Collapsible>
 		</div>
+	);
+};
+
+export const TaskGroupItemContextMenu = ({
+	children,
+	className,
+	taskGroup,
+}: {
+	children: React.ReactNode;
+	className?: string;
+	taskGroup: { column: GenericGroup; tasks: Task[] };
+}) => {
+	const { setTaskSelection } = useTasksViewContext();
+
+	const handleSelectAll = () => {
+		const allTaskIds = taskGroup.tasks.map((task) => task.id);
+		setTaskSelection(allTaskIds);
+	};
+
+	return (
+		<ContextMenu>
+			<ContextMenuTrigger asChild className={className}>
+				{children}
+			</ContextMenuTrigger>
+			<ContextMenuContent>
+				<ContextMenuItem onSelect={handleSelectAll}>
+					<CheckSquareIcon />
+					Select {taskGroup.tasks.length} tasks
+				</ContextMenuItem>
+			</ContextMenuContent>
+		</ContextMenu>
 	);
 };

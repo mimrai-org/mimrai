@@ -30,6 +30,7 @@ export type TasksViewContextValue = {
 
 	selectedTaskIds: string[];
 	toggleTaskSelection: (taskId: string) => void;
+	setTaskSelection: (taskIds: string[]) => void;
 	clearTaskSelection: () => void;
 
 	fetchNextPage: () => void;
@@ -163,6 +164,7 @@ export const TasksView = ({
 					selectedTaskIds,
 					toggleTaskSelection,
 					clearTaskSelection,
+					setTaskSelection: setSelectedTaskIds,
 				}}
 			>
 				<TasksFilters showFilters={showFilters} projectId={projectId} />
