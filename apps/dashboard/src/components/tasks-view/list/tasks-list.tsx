@@ -121,7 +121,7 @@ export const TaskGroupItem = ({
 			<Collapsible open={open} onOpenChange={setOpen} className="group">
 				<TaskGroupItemContextMenu taskGroup={taskGroup}>
 					<CollapsibleTrigger asChild>
-						<h2 className="mb-2 flex cursor-pointer items-center gap-2 rounded-sm bg-accent/30 px-4 py-2 text-sm opacity-70 transition-colors hover:opacity-100">
+						<h2 className="mb-2 flex cursor-pointer items-center gap-2 rounded-sm bg-accent/30 px-4 py-2 text-muted-foreground text-sm transition-colors hover:text-foreground">
 							<div className="text-muted-foreground group-hover:text-foreground">
 								<ChevronRightIcon className="size-4 group-[&[data-state=open]]:hidden" />
 								<ChevronDownIcon className="hidden size-4 group-[&[data-state=open]]:inline" />

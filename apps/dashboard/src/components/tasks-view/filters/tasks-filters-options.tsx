@@ -1,5 +1,6 @@
 import { getContrast } from "@mimir/utils/random";
-import { TagsIcon, UserCheckIcon, UserIcon } from "lucide-react";
+import { subDays, subHours } from "date-fns";
+import { CalendarIcon, TagsIcon, UserCheckIcon, UserIcon } from "lucide-react";
 import { AssigneeAvatar } from "@/components/asignee-avatar";
 import { MilestoneIcon } from "@/components/milestone-icon";
 import { ProjectIcon } from "@/components/project-icon";
@@ -25,24 +26,7 @@ export const tasksFilterOptions = {
 			},
 		),
 	},
-	completedBy: {
-		label: "Completed By",
-		multiple: true,
-		icon: <UserCheckIcon className="size-4!" />,
-		filterKey: "completedBy",
-		queryOptions: trpc.teams.getMembers.queryOptions(
-			{},
-			{
-				select: (members) =>
-					members.map((member) => ({
-						value: member.id,
-						label: member.name,
-						icon: <AssigneeAvatar {...member} className="size-4!" />,
-						original: member,
-					})),
-			},
-		),
-	},
+
 	assignee: {
 		label: "Assignee",
 		multiple: true,
@@ -124,5 +108,77 @@ export const tasksFilterOptions = {
 					})),
 			},
 		),
+	},
+	completedBy: {
+		label: "Completed By",
+		multiple: true,
+		icon: <UserCheckIcon className="size-4!" />,
+		filterKey: "completedBy",
+		queryOptions: trpc.teams.getMembers.queryOptions(
+			{},
+			{
+				select: (members) =>
+					members.map((member) => ({
+						value: member.id,
+						label: member.name,
+						icon: <AssigneeAvatar {...member} className="size-4!" />,
+						original: member,
+					})),
+			},
+		),
+	},
+	statusChangedAt: {
+		label: "Status Changed At",
+		multiple: false,
+		type: "date-range",
+		icon: <CalendarIcon className="size-4!" />,
+		filterKey: "statusChangedAt",
+		options: [
+			{
+				label: "Last 1 hour",
+				value: [
+					subHours(new Date(), 1).toISOString(),
+					new Date().toISOString(),
+				],
+			},
+			{
+				label: "Last 6 hours",
+				value: [
+					subHours(new Date(), 6).toISOString(),
+					new Date().toISOString(),
+				],
+			},
+			{
+				label: "Last 12 hours",
+				value: [
+					subHours(new Date(), 12).toISOString(),
+					new Date().toISOString(),
+				],
+			},
+		],
+	},
+	createdAt: {
+		label: "Created At",
+		multiple: false,
+		type: "date-range",
+		icon: <CalendarIcon className="size-4!" />,
+		filterKey: "createdAt",
+		options: [
+			{
+				label: "Last 1 day",
+				value: [subDays(new Date(), 1).toISOString(), new Date().toISOString()],
+			},
+			{
+				label: "Last 7 days",
+				value: [subDays(new Date(), 7).toISOString(), new Date().toISOString()],
+			},
+			{
+				label: "Last 30 days",
+				value: [
+					subDays(new Date(), 30).toISOString(),
+					new Date().toISOString(),
+				],
+			},
+		],
 	},
 };

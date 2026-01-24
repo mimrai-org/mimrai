@@ -105,7 +105,8 @@ export const getTasks = async ({
 	projectId?: string[];
 	milestoneId?: string[];
 	nProjectId?: string[];
-	statusChangedAt?: [Date, Date];
+	statusChangedAt?: [Date?, Date?, ...unknown[]];
+	createdAt?: [Date?, Date?, ...unknown[]];
 	completedBy?: string[];
 	search?: string;
 	recurring?: boolean;
@@ -136,7 +137,8 @@ export const getTasks = async ({
 	input.milestoneId &&
 		input.milestoneId.length > 0 &&
 		whereClause.push(inArray(tasks.milestoneId, input.milestoneId));
-	input.statusChangedAt &&
+	input.statusChangedAt?.[0] &&
+		input.statusChangedAt?.[1] &&
 		whereClause.push(
 			and(
 				gte(tasks.statusChangedAt, input.statusChangedAt[0]),
@@ -146,6 +148,15 @@ export const getTasks = async ({
 	input.completedBy &&
 		input.completedBy.length > 0 &&
 		whereClause.push(inArray(tasks.completedBy, input.completedBy));
+
+	input.createdAt?.[0] &&
+		input.createdAt?.[1] &&
+		whereClause.push(
+			and(
+				gte(tasks.createdAt, input.createdAt[0].toISOString()),
+				lte(tasks.createdAt, input.createdAt[1].toISOString()),
+			),
+		);
 
 	input.recurring && whereClause.push(isNotNull(tasks.recurringJobId));
 	input.projectId &&
