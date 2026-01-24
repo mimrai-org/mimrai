@@ -1,5 +1,6 @@
 import { openai } from "@ai-sdk/openai";
 import {
+	bulkUpdateTaskSchema,
 	cloneTaskSchema,
 	commentTaskSchema,
 	createTaskSchema,
@@ -20,6 +21,7 @@ import {
 	smartCompleteResponseSchema,
 } from "@api/utils/smart-complete";
 import {
+	bulkUpdateTask,
 	cloneTask,
 	createTask,
 	createTaskComment,
@@ -165,6 +167,15 @@ export const tasksRouter = router({
 			}
 
 			return task;
+		}),
+	bulkUpdate: protectedProcedure
+		.input(bulkUpdateTaskSchema)
+		.mutation(async ({ ctx, input }) => {
+			return bulkUpdateTask({
+				...input,
+				userId: ctx.user.id,
+				teamId: ctx.user.teamId!,
+			});
 		}),
 	delete: protectedProcedure
 		.input(deleteTaskSchema.omit({ teamId: true }))

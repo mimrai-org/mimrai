@@ -27,6 +27,11 @@ export type TasksViewContextValue = {
 	setFilters: (filters: Partial<TasksViewContextFilters>) => void;
 
 	tasks: RouterOutputs["tasks"]["get"]["data"];
+
+	selectedTaskIds: string[];
+	toggleTaskSelection: (taskId: string) => void;
+	clearTaskSelection: () => void;
+
 	fetchNextPage: () => void;
 	hasNextPage?: boolean;
 	isLoading?: boolean;
@@ -93,6 +98,7 @@ export const TasksView = ({
 	defaultFilters,
 }: TasksViewProps) => {
 	const user = useUser();
+	const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
 	const { params } = useTasksFilterParams();
 
 	const assigneeIdWithMe = useMemo(() => {
@@ -125,6 +131,18 @@ export const TasksView = ({
 		),
 	);
 
+	const toggleTaskSelection = (taskId: string) => {
+		setSelectedTaskIds((prev) =>
+			prev.includes(taskId)
+				? prev.filter((id) => id !== taskId)
+				: [...prev, taskId],
+		);
+	};
+
+	const clearTaskSelection = () => {
+		setSelectedTaskIds([]);
+	};
+
 	const tasks = useMemo(
 		() => data?.pages.flatMap((page) => page.data) || [],
 		[data],
@@ -142,6 +160,9 @@ export const TasksView = ({
 					hasNextPage,
 					viewId,
 					isLoading,
+					selectedTaskIds,
+					toggleTaskSelection,
+					clearTaskSelection,
 				}}
 			>
 				<TasksFilters showFilters={showFilters} projectId={projectId} />

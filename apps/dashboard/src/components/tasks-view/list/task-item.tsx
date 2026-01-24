@@ -1,24 +1,17 @@
 "use client";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import type { RouterOutputs } from "@mimir/trpc";
-import { motion } from "motion/react";
-import Link from "next/link";
+import { Checkbox } from "@ui/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@ui/components/ui/radio-group";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/components/user-provider";
-import { useTaskParams } from "@/hooks/use-task-params";
 import { cn } from "@/lib/utils";
-import { queryClient, trpc } from "@/utils/trpc";
 import { TaskProperty } from "../properties/task-properties";
-import type { propertiesComponents } from "../properties/task-properties-components";
-
-type Property = keyof typeof propertiesComponents;
+import { useTasksViewContext } from "../tasks-view";
 
 export const TaskItem = ({
 	task,
 	className,
-	dialog = false,
-	disableEvent = false,
-	onClick,
 }: {
 	task: RouterOutputs["tasks"]["get"]["data"][number];
 	className?: string;
@@ -26,6 +19,9 @@ export const TaskItem = ({
 	dialog?: boolean;
 	disableEvent?: boolean;
 }) => {
+	const { selectedTaskIds, toggleTaskSelection } = useTasksViewContext();
+	const isSelected = selectedTaskIds.includes(task.id);
+
 	const { listeners, attributes, setNodeRef, transform, isDragging } =
 		useDraggable({
 			id: task.id,
@@ -36,12 +32,11 @@ export const TaskItem = ({
 
 	const router = useRouter();
 	const user = useUser();
-	const { setParams } = useTaskParams();
 
 	return (
 		<div
 			className={cn(
-				"flex items-center gap-2 rounded-sm transition-colors hover:bg-accent dark:hover:bg-accent/30",
+				"group flex items-center gap-2 rounded-sm px-4 py-2 transition-colors hover:bg-accent dark:hover:bg-accent/30",
 				{
 					"z-50 opacity-50": isDragging,
 				},
@@ -58,11 +53,25 @@ export const TaskItem = ({
 					: undefined,
 			}}
 		>
-			{/* <Checkbox /> */}
+			<Checkbox
+				checked={isSelected}
+				onCheckedChange={() => {
+					toggleTaskSelection(task.id);
+				}}
+				onClick={(e) => e.stopPropagation()}
+			/>
+			{/* <RadioGroup
+				value={isSelected ? "true" : "false"}
+				onValueChange={(v) => {
+					toggleTaskSelection(task.id);
+				}}
+			>
+				<RadioGroupItem value="true" />
+			</RadioGroup> */}
 			<button
 				type="button"
 				className={cn(
-					"flex w-full flex-col justify-between gap-2 bg-transparent px-4 py-2 sm:flex-row",
+					"flex w-full flex-col justify-between gap-2 bg-transparent sm:flex-row",
 					className,
 				)}
 				onClick={(e) => {

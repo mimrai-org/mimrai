@@ -1,7 +1,6 @@
 import {
 	DndContext,
 	PointerSensor,
-	useDraggable,
 	useDroppable,
 	useSensor,
 	useSensors,
@@ -14,9 +13,9 @@ import {
 } from "@ui/components/ui/collapsible";
 import { cn } from "@ui/lib/utils";
 import {
+	ChevronDownIcon,
+	ChevronRightIcon,
 	ListPlusIcon,
-	Maximize2Icon,
-	Minimize2Icon,
 	PlusIcon,
 } from "lucide-react";
 import { AnimatePresence } from "motion/react";
@@ -26,6 +25,7 @@ import Loader from "../../loader";
 import { TaskContextMenu } from "../../task-context-menu";
 import { type GenericGroup, type Task, useTasksGrouped } from "../tasks-group";
 import { useTasksViewContext } from "../tasks-view";
+import { TaskListBulkActions } from "./bulk-actions";
 import { TaskItem } from "./task-item";
 
 export const TasksList = () => {
@@ -43,7 +43,7 @@ export const TasksList = () => {
 	);
 
 	return (
-		<AnimatePresence mode="popLayout">
+		<>
 			<DndContext
 				sensors={sensors}
 				onDragEnd={async ({ active, over }) => {
@@ -59,11 +59,16 @@ export const TasksList = () => {
 				}}
 			>
 				<div className="flex flex-col gap-2 py-4">
-					{Object.entries(tasks).map(([_, taskGroup]) => {
-						return (
-							<TaskGroupItem key={taskGroup.column.id} taskGroup={taskGroup} />
-						);
-					})}
+					<AnimatePresence mode="popLayout">
+						{Object.entries(tasks).map(([_, taskGroup]) => {
+							return (
+								<TaskGroupItem
+									key={taskGroup.column.id}
+									taskGroup={taskGroup}
+								/>
+							);
+						})}
+					</AnimatePresence>
 
 					{hasNextPage && (
 						<li className="flex items-center justify-center">
@@ -81,7 +86,8 @@ export const TasksList = () => {
 					)}
 				</div>
 			</DndContext>
-		</AnimatePresence>
+			<TaskListBulkActions />
+		</>
 	);
 };
 
@@ -106,16 +112,16 @@ export const TaskGroupItem = ({
 		>
 			<Collapsible open={open} onOpenChange={setOpen}>
 				<CollapsibleTrigger asChild>
-					<h2 className="group mb-2 flex items-center gap-2 rounded-sm border bg-card/60 px-4 py-2 text-sm transition-colors hover:bg-card dark:border-none">
+					<h2 className="group mb-2 flex cursor-pointer items-center gap-2 rounded-sm py-2 text-sm opacity-50 transition-colors hover:opacity-100">
+						<div className="text-muted-foreground group-hover:text-foreground">
+							<ChevronRightIcon className="size-4 group-[&[data-state=open]]:hidden" />
+							<ChevronDownIcon className="hidden size-4 group-[&[data-state=open]]:inline" />
+						</div>
 						{taskGroup.column.icon}
 						{taskGroup.column.name}
-						<span className="text-muted-foreground text-xs">
+						<span className="rounded-sm border px-1 text-muted-foreground text-xs">
 							{taskGroup.tasks.length}
 						</span>
-						<div className="ml-auto text-muted-foreground group-hover:text-foreground">
-							<Maximize2Icon className="size-4 group-[&[data-state=open]]:hidden" />
-							<Minimize2Icon className="hidden size-4 group-[&[data-state=open]]:inline" />
-						</div>
 					</h2>
 				</CollapsibleTrigger>
 
@@ -132,7 +138,7 @@ export const TaskGroupItem = ({
 						</TaskContextMenu>
 					))}
 					<Button
-						className="w-full justify-start border border-transparent border-dashed text-start text-muted-foreground text-xs hover:border-input"
+						className="w-full justify-start text-start text-muted-foreground text-xs"
 						variant={"ghost"}
 						onClick={() => {
 							setTaskParams({

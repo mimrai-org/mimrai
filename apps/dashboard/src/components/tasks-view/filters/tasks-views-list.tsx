@@ -2,27 +2,25 @@
 import type { RouterOutputs } from "@mimir/trpc";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/ui/button";
-import {
-	ContextMenu,
-	ContextMenuContent,
-	ContextMenuItem,
-	ContextMenuTrigger,
-} from "@ui/components/ui/context-menu";
 import { cn } from "@ui/lib/utils";
 import {
 	FolderKanbanIcon,
 	FolderPlusIcon,
-	PencilIcon,
+	FolderSearchIcon,
+	FolderSymlinkIcon,
+	KanbanIcon,
 	SaveAllIcon,
-	SaveIcon,
-	TrashIcon,
+	ViewIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import { TaskViewForm } from "@/components/forms/task-view/form";
 import { useUser } from "@/components/user-provider";
 import { TaskViewContextMenu } from "@/components/views/context-menu";
-import { DEFAULT_VIEWS } from "@/components/views/default-views";
+import {
+	DEFAULT_VIEWS,
+	type DefaultTaskView,
+} from "@/components/views/default-views";
 import { useTaskViewParams } from "@/hooks/use-task-view-params";
 import { queryClient, trpc } from "@/utils/trpc";
 import { useTasksViewContext } from "../tasks-view";
@@ -92,7 +90,7 @@ const TasksViewItem = ({
 	selectedViewId,
 	projectId,
 }: {
-	view: View;
+	view: DefaultTaskView | View;
 	selectedViewId: string;
 	projectId: string;
 }) => {
@@ -102,21 +100,23 @@ const TasksViewItem = ({
 		? `${user.basePath}/projects/${projectId}/views/${view.id}`
 		: `${user.basePath}/views/${view.id}`;
 
+	const project = "project" in view ? view.project : null;
+
 	return (
 		<TaskViewContextMenu view={view}>
 			<Link href={viewLink}>
 				<div
 					className={cn(
-						"flex w-fit items-center gap-1 rounded-sm px-2 py-1 text-xs hover:bg-accent dark:hover:bg-accent/30",
+						"flex w-fit items-center gap-2 rounded-sm px-2 py-1 text-xs hover:bg-accent dark:hover:bg-accent/30",
 						{
 							"border bg-accent dark:bg-accent/30": view.id === selectedViewId,
 						},
 					)}
 				>
 					<FolderKanbanIcon
-						className="size-3.5 text-muted-foreground"
+						className="size-4 text-muted-foreground"
 						style={{
-							color: view.project?.color ?? undefined,
+							color: project?.color ?? undefined,
 						}}
 					/>
 					{view.name}

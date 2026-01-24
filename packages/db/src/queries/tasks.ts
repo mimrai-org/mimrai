@@ -580,6 +580,75 @@ export const updateTask = async ({
 	return task;
 };
 
+export const bulkUpdateTask = async ({
+	ids,
+	userId,
+	teamId,
+	...input
+}: {
+	ids: string[];
+	title?: string;
+	description?: string;
+	assigneeId?: string | null;
+	statusId?: string;
+	projectId?: string | null;
+	milestoneId?: string | null;
+	priority?: "low" | "medium" | "high" | "urgent";
+	repositoryName?: string;
+	branchName?: string;
+	dueDate?: string;
+	userId: string;
+	teamId: string;
+}) => {
+	const whereClause: SQL[] = [inArray(tasks.id, ids), eq(tasks.teamId, teamId)];
+
+	// Get old tasks for activity logging
+	const oldTasks = await db
+		.select()
+		.from(tasks)
+		.where(and(...whereClause));
+
+	if (oldTasks.length === 0) {
+		throw new Error("No tasks found");
+	}
+
+	const updateData: any = {
+		...input,
+		milestoneId: input.projectId === null ? null : input.milestoneId,
+		updatedAt: new Date().toISOString(),
+	};
+
+	// Handle subscribers: add assignee if set
+	if (input.assigneeId) {
+		updateData.subscribers = sql`array_cat(subscribers, ARRAY[${input.assigneeId}])`;
+	}
+
+	const updatedTasks = await db
+		.update(tasks)
+		.set(updateData)
+		.where(and(...whereClause))
+		.returning();
+
+	if (updatedTasks.length !== ids.length) {
+		throw new Error("Failed to update all tasks");
+	}
+
+	// Create activities for each updated task
+	for (const oldTask of oldTasks) {
+		const newTask = updatedTasks.find((t) => t.id === oldTask.id);
+		if (newTask) {
+			createTaskUpdateActivity({
+				oldTask,
+				newTask,
+				teamId,
+				userId,
+			});
+		}
+	}
+
+	return updatedTasks;
+};
+
 export const getTaskByPermalinkId = async (
 	permalinkId: string,
 	userId?: string,

@@ -86,6 +86,21 @@ export const updateTaskSchema = z.object({
 });
 export type UpdateTaskInput = z.infer<typeof updateTaskSchema>;
 
+export const bulkUpdateTaskSchema = z.object({
+	ids: z.array(z.string()),
+	title: z.string().min(1).max(255).optional(),
+	description: z.string().max(50_000).nullable().optional(),
+	assigneeId: z.string().nullable().optional(),
+	priority: z.enum(priorityEnum.enumValues).nullable().optional(),
+	dueDate: z.string().nullable().optional(),
+	statusId: z.string().optional(),
+	milestoneId: z.string().nullable().optional(),
+	projectId: z.string().optional().nullable(),
+	repositoryName: z.string().nullable().optional(),
+	branchName: z.string().nullable().optional(),
+});
+export type BulkUpdateTaskInput = z.infer<typeof bulkUpdateTaskSchema>;
+
 export const deleteTaskSchema = z.object({
 	id: z.string(),
 	teamId: z.string().optional(),

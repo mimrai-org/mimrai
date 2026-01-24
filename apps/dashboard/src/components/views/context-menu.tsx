@@ -8,14 +8,14 @@ import {
 import { CopyPlusIcon, PencilIcon, SaveIcon, TrashIcon } from "lucide-react";
 import { useTaskViewParams } from "@/hooks/use-task-view-params";
 import { queryClient, trpc } from "@/utils/trpc";
-import { DEFAULT_VIEWS } from "./default-views";
+import { DEFAULT_VIEWS, type DefaultTaskView } from "./default-views";
 import type { TaskView } from "./list";
 
 export const TaskViewContextMenu = ({
 	view,
 	children,
 }: {
-	view: TaskView;
+	view: TaskView | DefaultTaskView;
 	children: React.ReactNode;
 }) => {
 	const { setParams } = useTaskViewParams();
@@ -42,7 +42,7 @@ export const TaskViewContextMenu = ({
 		<ContextMenu key={view.id}>
 			<ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
 			<ContextMenuContent>
-				{editable && (
+				{editable && "createdAt" in view && (
 					<>
 						<ContextMenuItem
 							onSelect={() => {
