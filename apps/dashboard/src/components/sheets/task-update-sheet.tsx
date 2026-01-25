@@ -2,12 +2,12 @@
 import {
 	Dialog,
 	DialogContent,
-	DialogFooter,
 	DialogHeader,
 	DialogTitle,
 } from "@mimir/ui/dialog";
 import { Skeleton } from "@mimir/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
+import { cn } from "@ui/lib/utils";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { trpc } from "@/utils/trpc";
 import { TaskForm } from "../forms/task-form/form";
@@ -36,8 +36,13 @@ export const TaskUpdateSheet = () => {
 	return (
 		<Dialog open={isOpen} onOpenChange={() => setParams({ taskId: null })}>
 			<DialogContent
-				showCloseButton={false}
-				className="max-h-[85vh] overflow-y-auto pt-0 sm:min-w-[60vw]"
+				showCloseButton={true}
+				overlayClassName="hidden pointer-events-none"
+				className={cn(
+					"right-8 bottom-0 left-auto max-h-[85vh] translate-x-0 overflow-y-auto rounded-b-none pt-0 sm:min-w-[800px]",
+					"translate-y-48 data-[state=closed]:translate-y-48 data-[state=open]:translate-y-0",
+					"border-x border-t shadow-2xl shadow-secondary/10",
+				)}
 			>
 				<DialogHeader className="hidden">
 					<DialogTitle />

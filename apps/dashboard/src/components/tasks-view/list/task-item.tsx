@@ -2,9 +2,11 @@
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import type { RouterOutputs } from "@mimir/trpc";
 import { Checkbox } from "@ui/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@ui/components/ui/radio-group";
 import { useRouter } from "next/navigation";
+import { usePanel } from "@/components/panels/panel-context";
+import { TASK_PANEL_TYPE } from "@/components/panels/task-panel";
 import { useUser } from "@/components/user-provider";
+import { useTaskParams } from "@/hooks/use-task-params";
 import { cn } from "@/lib/utils";
 import { TaskProperty } from "../properties/task-properties";
 import { useTasksViewContext } from "../tasks-view";
@@ -21,6 +23,8 @@ export const TaskItem = ({
 }) => {
 	const { selectedTaskIds, toggleTaskSelection } = useTasksViewContext();
 	const isSelected = selectedTaskIds.includes(task.id);
+	const { setParams } = useTaskParams();
+	const taskPanel = usePanel(TASK_PANEL_TYPE);
 
 	const { listeners, attributes, setNodeRef, transform, isDragging } =
 		useDraggable({
@@ -36,7 +40,7 @@ export const TaskItem = ({
 	return (
 		<div
 			className={cn(
-				"group/task flex items-center gap-2 rounded-sm px-4 py-2 transition-colors hover:bg-accent dark:hover:bg-accent/30",
+				"group/task flex items-center gap-2 rounded-sm px-4 transition-colors hover:bg-accent dark:hover:bg-accent/30",
 				{
 					"z-50 opacity-50": isDragging,
 				},
@@ -71,15 +75,17 @@ export const TaskItem = ({
 			<button
 				type="button"
 				className={cn(
-					"flex w-full flex-col justify-between gap-2 bg-transparent sm:flex-row",
+					"flex w-full flex-col justify-between gap-2 bg-transparent py-2 sm:flex-row",
 					className,
 				)}
 				onClick={(e) => {
 					if (isDragging) return;
 					e.preventDefault();
-					router.push(
-						`${user?.basePath}/projects/${task.projectId}/${task.id}`,
-					);
+					taskPanel.open(task.id);
+					// setParams({ taskId: task.id });
+					// router.push(
+					// 	`${user?.basePath}/projects/${task.projectId}/${task.id}`,
+					// );
 				}}
 			>
 				<div className="flex items-center gap-2 text-start text-sm">

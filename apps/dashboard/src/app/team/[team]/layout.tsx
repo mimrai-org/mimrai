@@ -2,12 +2,11 @@ import { Provider as OpenPanelProvider } from "@mimir/events/client";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { PanelProvider } from "@/components/panels/panel-context";
+import { PanelStack } from "@/components/panels/panel-stack";
 // import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { GlobalSheets } from "@/components/sheets/global-sheets";
-import {
-	STICKY_SIDEBAR_COOKIE,
-	StickySidebarProvider,
-} from "@/components/sticky-sidebar";
+import { StickySidebarProvider } from "@/components/sticky-sidebar";
 import { UserProvider } from "@/components/user-provider";
 import { trpcClient } from "@/utils/trpc";
 
@@ -47,13 +46,16 @@ export default async function Layout({ children, params }: Props) {
 				defaultOpen={cookieStore.get("sticky-sidebar-open")?.value === "true"}
 			>
 				<UserProvider user={user}>
-					<GlobalSheets />
-					{children}
+					<PanelProvider>
+						<GlobalSheets />
+						{children}
 
-					{/* {process.env.NODE_ENV === "development" && (
+						{/* {process.env.NODE_ENV === "development" && (
 							<ReactQueryDevtools buttonPosition="bottom-left" />
 						)} */}
-					<OpenPanelProvider profileId={user.id} />
+						<OpenPanelProvider profileId={user.id} />
+						<PanelStack />
+					</PanelProvider>
 				</UserProvider>
 			</StickySidebarProvider>
 		</Suspense>

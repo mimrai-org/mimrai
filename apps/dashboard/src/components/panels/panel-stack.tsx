@@ -1,0 +1,34 @@
+"use client";
+import { AnimatePresence } from "motion/react";
+import { usePanels } from "./panel-context";
+import { TASK_PANEL_TYPE, TaskPanel } from "./task-panel";
+
+/**
+ * Renders all open panels.
+ * Add new panel type renderers here.
+ */
+export function PanelStack() {
+	const { panels } = usePanels();
+
+	return (
+		<AnimatePresence mode="sync">
+			{panels.map((panel, index) => {
+				switch (panel.type) {
+					case TASK_PANEL_TYPE:
+						return (
+							<TaskPanel
+								key={`${panel.type}-${panel.id}`}
+								panel={panel}
+								index={index}
+							/>
+						);
+					// Add more panel types here:
+					// case PROJECT_PANEL_TYPE:
+					//   return <ProjectPanel key={`${panel.type}-${panel.id}`} panel={panel} index={index} />;
+					default:
+						return null;
+				}
+			})}
+		</AnimatePresence>
+	);
+}
