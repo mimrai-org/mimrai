@@ -42,7 +42,7 @@ export function TaskMentionListItem({
 			)}
 			<span
 				className={cn(
-					"truncate",
+					"max-w-[400px] truncate",
 					isCompleted && "text-muted-foreground line-through",
 				)}
 			>
@@ -101,7 +101,7 @@ function TaskMentionNodeComponent({ node }: NodeViewProps) {
 				)}
 				<span
 					className={cn(
-						"truncate",
+						"max-w-[350px] truncate",
 						isCompleted && "text-muted-foreground line-through",
 					)}
 				>
@@ -150,7 +150,7 @@ export function TaskMentionNode({ id, label, attrs }: MentionNodeProps) {
 			)}
 			<span
 				className={cn(
-					"truncate",
+					"max-w-[350px] truncate",
 					isCompleted && "text-muted-foreground line-through",
 				)}
 			>

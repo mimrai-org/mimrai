@@ -32,7 +32,7 @@ import { TaskItem } from "./task-item";
 
 const ESTIMATED_TASK_HEIGHT = 44;
 const ESTIMATED_GROUP_HEADER_HEIGHT = 48;
-const ESTIMATED_CREATE_BUTTON_HEIGHT = 36;
+const ESTIMATED_CREATE_BUTTON_HEIGHT = 44;
 
 type VirtualItem =
 	| { type: "group-header"; group: GenericGroup; taskCount: number }
@@ -267,7 +267,7 @@ const CreateTaskButton = memo(function CreateTaskButton({
 
 	return (
 		<Button
-			className="w-full justify-start text-start text-muted-foreground text-xs"
+			className="mb-2 w-full justify-start text-start text-muted-foreground text-xs"
 			variant={"ghost"}
 			onClick={handleCreateTask}
 		>
