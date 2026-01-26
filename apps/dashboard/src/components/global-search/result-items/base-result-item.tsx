@@ -30,7 +30,6 @@ export const BaseResultItem = ({
 
 		const updatePreview = () => {
 			const isSelected = element.getAttribute("data-selected") === "true";
-			console.log({ isSelected, isSelectedRef: isSelectedRef.current });
 			if (isSelectedRef.current === isSelected) return;
 			isSelectedRef.current = isSelected;
 			if (isSelected) {

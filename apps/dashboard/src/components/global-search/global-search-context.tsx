@@ -1,5 +1,11 @@
 "use client";
-import { createContext, type ReactNode, useContext, useState } from "react";
+import {
+	createContext,
+	type ReactNode,
+	useContext,
+	useMemo,
+	useState,
+} from "react";
 
 type GlobalSearchContextValue = {
 	onOpenChange: (open: boolean) => void;
@@ -23,10 +29,18 @@ export const GlobalSearchProvider = ({
 }) => {
 	const [preview, setPreview] = useState<ReactNode | null>(null);
 
+	const contextValue = useMemo<GlobalSearchContextValue>(
+		() => ({
+			onOpenChange,
+			basePath,
+			preview,
+			setPreview,
+		}),
+		[onOpenChange, basePath, preview],
+	);
+
 	return (
-		<GlobalSearchContext.Provider
-			value={{ onOpenChange, basePath, preview, setPreview }}
-		>
+		<GlobalSearchContext.Provider value={contextValue}>
 			{children}
 		</GlobalSearchContext.Provider>
 	);

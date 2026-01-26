@@ -18,7 +18,15 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useSelectedLayoutSegments } from "next/navigation";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import {
+	createContext,
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import type { getSession } from "@/lib/get-session";
 import { TeamSwitcher } from "./team-switcher";
 
@@ -155,18 +163,25 @@ export const BreadcrumbsProvider = ({
 		return result;
 	}, [segments, overrideCrumbs]);
 
-	const setCrumb = (crumb: BreadcrumpItem) => {
-		const exists = overrideCrumbs.find(
-			(c) =>
-				c.segments.length >= crumb.segments.length &&
-				c.segments.every((seg, i) => seg === crumb.segments[i]),
-		);
-		if (exists) return;
-		setOverrideCrumbs((prev) => [...prev, crumb]);
-	};
+	const setCrumb = useCallback((crumb: BreadcrumpItem) => {
+		setOverrideCrumbs((prev) => {
+			const exists = prev.find(
+				(c) =>
+					c.segments.length >= crumb.segments.length &&
+					c.segments.every((seg, i) => seg === crumb.segments[i]),
+			);
+			if (exists) return prev;
+			return [...prev, crumb];
+		});
+	}, []);
+
+	const contextValue = useMemo(
+		() => ({ setCrumb, crumbs, basePath }),
+		[setCrumb, crumbs, basePath],
+	);
 
 	return (
-		<BreadcrumbsContext.Provider value={{ setCrumb, crumbs, basePath }}>
+		<BreadcrumbsContext.Provider value={contextValue}>
 			{children}
 		</BreadcrumbsContext.Provider>
 	);

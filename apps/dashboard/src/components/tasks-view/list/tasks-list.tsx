@@ -218,34 +218,32 @@ const GroupHeader = memo(function GroupHeader({
 
 	return (
 		<div ref={setDroppableNodeRef}>
-			<Collapsible open={!isCollapsed} onOpenChange={() => onToggle()}>
-				<ContextMenu>
-					<ContextMenuTrigger asChild>
-						<CollapsibleTrigger asChild>
-							<button
-								type="button"
-								className="group mb-2 flex w-full cursor-pointer items-center gap-2 rounded-sm bg-accent/30 px-4 py-2 text-muted-foreground text-sm transition-colors hover:text-foreground"
-							>
-								<div className="text-muted-foreground group-hover:text-foreground">
-									<ChevronRightIcon className="size-4 group-data-[state=open]:hidden" />
-									<ChevronDownIcon className="hidden size-4 group-data-[state=open]:block" />
-								</div>
-								{group.icon}
-								{group.name}
-								<span className="rounded-sm border px-1 text-muted-foreground text-xs">
-									{taskCount}
-								</span>
-							</button>
-						</CollapsibleTrigger>
-					</ContextMenuTrigger>
-					<ContextMenuContent>
-						<ContextMenuItem onSelect={handleSelectAll}>
-							<CheckSquareIcon />
-							Select {taskCount} tasks
-						</ContextMenuItem>
-					</ContextMenuContent>
-				</ContextMenu>
-			</Collapsible>
+			<ContextMenu>
+				<ContextMenuTrigger asChild>
+					<button
+						type="button"
+						data-state={isCollapsed ? "closed" : "open"}
+						onClick={onToggle}
+						className="group mb-2 flex w-full cursor-pointer items-center gap-2 rounded-sm bg-accent/30 px-4 py-2 text-muted-foreground text-sm transition-colors hover:text-foreground"
+					>
+						<div className="text-muted-foreground group-hover:text-foreground">
+							<ChevronRightIcon className="size-4 group-data-[state=open]:hidden" />
+							<ChevronDownIcon className="hidden size-4 group-data-[state=open]:block" />
+						</div>
+						{group.icon}
+						{group.name}
+						<span className="rounded-sm border px-1 text-muted-foreground text-xs">
+							{taskCount}
+						</span>
+					</button>
+				</ContextMenuTrigger>
+				<ContextMenuContent>
+					<ContextMenuItem onSelect={handleSelectAll}>
+						<CheckSquareIcon />
+						Select {taskCount} tasks
+					</ContextMenuItem>
+				</ContextMenuContent>
+			</ContextMenu>
 		</div>
 	);
 });

@@ -15,7 +15,7 @@ import {
 } from "@ui/components/ui/dialog";
 import { cn } from "@ui/lib/utils";
 import { ArrowDownIcon, ArrowUpIcon, CornerDownLeftIcon } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
 import { useUser } from "@/components/user-provider";
 import { trpc } from "@/utils/trpc";
@@ -43,56 +43,63 @@ const defaultSearchState: GlobalSearchItem[] = [
 		teamId: "",
 	},
 	{
-		id: "action:navigate:inbox",
+		id: "navigate:inbox",
 		type: "navigation",
 		title: "Inbox",
 		teamId: "",
 		href: "/inbox",
 	},
 	{
-		id: "action:navigate:reviews",
+		id: "navigate:reviews",
 		type: "navigation",
 		title: "Reviews",
 		teamId: "",
 		href: "/pr-reviews",
 	},
 	{
-		id: "action:navigate:settings",
+		id: "navigate:settings",
 		type: "navigation",
 		title: "Settings",
 		teamId: "",
 		href: "/settings",
 	},
 	{
-		id: "action:navigate:general",
+		id: "navigate:general",
 		type: "navigation",
 		title: "General",
 		teamId: "",
 		href: "/settings/general",
 	},
 	{
-		id: "action:navigate:profile",
+		id: "navigate:profile",
 		type: "navigation",
 		title: "Profile",
 		teamId: "",
 		href: "/settings/profile",
 	},
 	{
-		id: "action:navigate:billing",
+		id: "navigate:billing",
 		type: "navigation",
 		title: "Billing",
 		teamId: "",
 		href: "/settings/billing",
 	},
 	{
-		id: "action:navigate:members",
+		id: "navigate:labels",
+		type: "navigation",
+		title: "Labels",
+		teamId: "",
+		href: "/settings/labels",
+	},
+	{
+		id: "navigate:members",
 		type: "navigation",
 		title: "Members",
 		teamId: "",
 		href: "/settings/members",
 	},
 	{
-		id: "action:navigate:integrations",
+		id: "navigate:integrations",
 		type: "navigation",
 		title: "Integrations",
 		teamId: "",
@@ -183,13 +190,16 @@ export const GlobalSearchDialog = ({
 		onOpenChange(isOpen);
 	};
 
-	const handleItemOpenChange = onSelect
-		? (open: boolean) => {
-				if (!open) {
-					// When using custom onSelect, we don't close automatically
+	const handleItemOpenChange = useCallback(
+		onSelect
+			? (open: boolean) => {
+					if (!open) {
+						// When using custom onSelect, we don't close automatically
+					}
 				}
-			}
-		: handleOpenChange;
+			: handleOpenChange,
+		[],
+	);
 
 	return (
 		<Dialog open={open} onOpenChange={handleOpenChange}>
