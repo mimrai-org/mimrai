@@ -10,6 +10,7 @@ import {
 } from "@tiptap/react";
 import { CheckCircle2Icon, CircleIcon, Loader2Icon } from "lucide-react";
 import { useTaskPanel } from "@/components/panels/task-panel";
+import { StatusIcon } from "@/components/status-icon";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/utils/trpc";
 import type {
@@ -90,12 +91,10 @@ function TaskMentionNodeComponent({ node }: NodeViewProps) {
 			>
 				{isLoading ? (
 					<Loader2Icon className="size-3.5 shrink-0 animate-spin text-muted-foreground" />
-				) : isCompleted ? (
-					<CheckCircle2Icon className="size-3.5 shrink-0 text-green-500" />
 				) : (
-					<CircleIcon className="size-3.5 shrink-0 text-muted-foreground" />
+					<StatusIcon {...task.status} className="size-3.5 shrink-0" />
 				)}
-				{currentSequence && (
+				{currentSequence >= 0 && (
 					<span className="text-muted-foreground text-xs">
 						#{currentSequence}
 					</span>

@@ -1,9 +1,9 @@
 "use client";
 import type { RouterInputs, RouterOutputs } from "@mimir/trpc";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";
-import { trpc } from "@/utils/trpc";
+import { queryClient, trpc } from "@/utils/trpc";
 import { useUser } from "../user-provider";
 import { TasksCalendar } from "./calendar/calendar";
 import { TasksFilters, type TasksFiltersProps } from "./filters/tasks-filters";
@@ -149,6 +149,17 @@ export const TasksView = ({
 		() => data?.pages.flatMap((page) => page.data) || [],
 		[data],
 	);
+
+	useEffect(() => {
+		// set query data
+
+		for (const task of tasks) {
+			queryClient.setQueryData(
+				trpc.tasks.getById.queryKey({ id: task.id }),
+				task,
+			);
+		}
+	}, [tasks]);
 
 	return (
 		<div className="flex grow-1 flex-col">
