@@ -18,12 +18,12 @@ export const ZenModeEmpty = () => {
 				Take a breath, or choose what deserves your attention next.
 			</p>
 			<div className="flex items-center gap-4">
-				<Link href={`${user?.basePath}/board`} className="mt-6">
+				<Link href={`${user?.basePath}`} className="mt-6">
 					<Button variant="ghost" type="button">
 						Back to Board
 					</Button>
 				</Link>
-				<Link href={`${user?.basePath}/board?createTask=true`} className="mt-6">
+				<Link href={`${user?.basePath}?createTask=true`} className="mt-6">
 					<Button type="button">
 						<PlusIcon />
 						Create a new task

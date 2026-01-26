@@ -61,9 +61,7 @@ const toolsList = [
 
 export default function Page() {
 	const router = useRouter();
-	const user = useUser({
-		refetchOnMount: true,
-	});
+	const user = useUser();
 	const form = useZodForm(schema, {
 		defaultValues: {
 			whatYourTeamDoes: "",
@@ -100,7 +98,7 @@ export default function Page() {
 	const { mutate: skipWorkflowSetup, isPending: isSkipping } = useMutation(
 		trpc.onboarding.defaultWorkflow.mutationOptions({
 			onSuccess: () => {
-				router.push(`/team/${user?.team?.slug}/board`);
+				router.push(`/team/${user?.team?.slug}`);
 			},
 			onError: (error) => {
 				toast.error("Failed to skip workflow setup. Please try again.");

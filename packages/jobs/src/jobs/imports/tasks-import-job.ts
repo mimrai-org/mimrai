@@ -1,11 +1,13 @@
+import { openai } from "@ai-sdk/openai";
 import { getImportById, updateImportStatus } from "@mimir/db/queries/imports";
 import { createLabel, getLabelByName } from "@mimir/db/queries/labels";
+import { getProjects } from "@mimir/db/queries/projects";
 import { getBacklogStatus } from "@mimir/db/queries/statuses";
 import { createTask, getTaskByTitle } from "@mimir/db/queries/tasks";
 import { getMemberByEmail } from "@mimir/db/queries/teams";
 import { randomColor } from "@mimir/utils/random";
 import { logger, schemaTask } from "@trigger.dev/sdk";
-import { generateObject } from "ai";
+import { generateObject, generateText, Output } from "ai";
 import * as cptable from "xlsx/dist/cpexcel.full.mjs";
 import * as XLSX from "xlsx/xlsx.mjs";
 import z from "zod";
@@ -74,8 +76,8 @@ export const tasksImportJob = schemaTask({
 		const dataRows = rows.slice(1);
 		const firstRow = dataRows[0] as string[];
 
-		const headersMapResponse = await generateObject({
-			model: "openai/gpt-4o",
+		const headersMapResponse = await generateText({
+			model: openai("gpt-4o"),
 			prompt: `Generate a mapping of the following headers to the schema fields
 			Headers: 
 			${JSON.stringify(headers, null, 2)}
@@ -83,39 +85,41 @@ export const tasksImportJob = schemaTask({
 			First Row (Example Data):
 			${JSON.stringify(firstRow, null, 2)}
 			`,
-			schema: z.object({
-				title: z.string().describe("The header name for the task title"),
-				description: z
-					.string()
-					.optional()
-					.describe("The header name for the task description"),
-				dueDate: z
-					.string()
-					.optional()
-					.describe("The header name for the task due date"),
-				dueDateFormat: z
-					.string()
-					.optional()
-					.describe(
-						"Extract the due date format from the example data. Use date-fns format. https://date-fns.org/v2.30.0/docs/format",
-					),
-				priority: z
-					.string()
-					.optional()
-					.describe(
-						"The header name for the task priority. Must be one of [low, medium, high, urgent]",
-					),
-				assignee: z
-					.string()
-					.optional()
-					.describe("The header name for the assignee email, or name"),
-				labels: z
-					.string()
-					.optional()
-					.describe("The header name for the task labels"),
+			output: Output.object({
+				schema: z.object({
+					title: z.string().describe("The header name for the task title"),
+					description: z
+						.string()
+						.optional()
+						.describe("The header name for the task description"),
+					dueDate: z
+						.string()
+						.optional()
+						.describe("The header name for the task due date"),
+					dueDateFormat: z
+						.string()
+						.optional()
+						.describe(
+							"Extract the due date format from the example data. Use date-fns format. https://date-fns.org/v2.30.0/docs/format",
+						),
+					priority: z
+						.string()
+						.optional()
+						.describe(
+							"The header name for the task priority. Must be one of [low, medium, high, urgent]",
+						),
+					assignee: z
+						.string()
+						.optional()
+						.describe("The header name for the assignee email, or name"),
+					labels: z
+						.string()
+						.optional()
+						.describe("The header name for the task labels"),
+				}),
 			}),
 		});
-		const headersMap = headersMapResponse.object;
+		const headersMap = headersMapResponse.output;
 
 		const titleIndex = headers.indexOf(headersMap.title);
 		const descriptionIndex = headersMap.description
@@ -222,8 +226,14 @@ export const tasksImportJob = schemaTask({
 					}
 				}
 
+				const projects = await getProjects({
+					teamId: importJob.teamId,
+					pageSize: 5,
+				});
+
 				await createTask({
 					title: title!,
+					projectId: projects.data.length > 0 ? projects.data[0].id : undefined,
 					description: description,
 					statusId: backlogColumn.id,
 					teamId: importJob.teamId,

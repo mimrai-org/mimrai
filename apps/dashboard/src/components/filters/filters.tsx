@@ -35,11 +35,17 @@ export const FiltersSearchInput = ({
 			firstRender.current = false;
 		}, 1000);
 	}, []);
+
 	useEffect(() => {
 		debouncedSetFilters({
 			search: search,
 		});
-	}, [search]);
+		// Cleanup: cancel pending debounced call on unmount or when search changes
+		return () => {
+			debouncedSetFilters.cancel();
+		};
+	}, [search, debouncedSetFilters]);
+
 	return (
 		<div className="relative flex items-center">
 			<SearchIcon className="absolute left-2 size-4 text-muted-foreground" />

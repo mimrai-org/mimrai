@@ -5,29 +5,23 @@ import {
 	useSensor,
 	useSensors,
 } from "@dnd-kit/core";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { Button } from "@ui/components/ui/button";
-import {
-	Collapsible,
-	CollapsibleContent,
-	CollapsibleTrigger,
-} from "@ui/components/ui/collapsible";
+import { Collapsible, CollapsibleTrigger } from "@ui/components/ui/collapsible";
 import {
 	ContextMenu,
 	ContextMenuContent,
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "@ui/components/ui/context-menu";
-import { cn } from "@ui/lib/utils";
 import {
 	CheckSquareIcon,
 	ChevronDownIcon,
 	ChevronRightIcon,
 	ListPlusIcon,
 	PlusIcon,
-	SquareCheckIcon,
 } from "lucide-react";
-import { AnimatePresence } from "motion/react";
-import { useState } from "react";
+import { memo, useCallback, useMemo, useRef, useState } from "react";
 import { useTaskParams } from "@/hooks/use-task-params";
 import Loader from "../../loader";
 import { TaskContextMenu } from "../../task-context-menu";
@@ -36,9 +30,21 @@ import { useTasksViewContext } from "../tasks-view";
 import { TaskListBulkActions } from "./bulk-actions";
 import { TaskItem } from "./task-item";
 
+const ESTIMATED_TASK_HEIGHT = 44;
+const ESTIMATED_GROUP_HEADER_HEIGHT = 48;
+const ESTIMATED_CREATE_BUTTON_HEIGHT = 36;
+
+type VirtualItem =
+	| { type: "group-header"; group: GenericGroup; taskCount: number }
+	| { type: "task"; task: Task; groupId: string }
+	| { type: "create-button"; groupId: string };
+
 export const TasksList = () => {
-	const { fetchNextPage, hasNextPage, isLoading, filters } =
-		useTasksViewContext();
+	const { fetchNextPage, hasNextPage, isLoading } = useTasksViewContext();
+	const scrollContainerRef = useRef<HTMLDivElement>(null);
+	const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
+		new Set(),
+	);
 
 	const { tasks, reorderTask } = useTasksGrouped();
 
@@ -50,15 +56,68 @@ export const TasksList = () => {
 		}),
 	);
 
+	// Flatten groups and tasks into a single list for virtualization
+	const flattenedItems = useMemo(() => {
+		const items: VirtualItem[] = [];
+		for (const taskGroup of Object.values(tasks)) {
+			const isCollapsed = collapsedGroups.has(taskGroup.column.id);
+
+			// Add group header
+			items.push({
+				type: "group-header",
+				group: taskGroup.column,
+				taskCount: taskGroup.tasks.length,
+			});
+
+			// Add tasks only if group is not collapsed
+			if (!isCollapsed) {
+				for (const task of taskGroup.tasks) {
+					items.push({
+						type: "task",
+						task,
+						groupId: taskGroup.column.id,
+					});
+				}
+				// Add create button at end of group
+				items.push({
+					type: "create-button",
+					groupId: taskGroup.column.id,
+				});
+			}
+		}
+		return items;
+	}, [tasks, collapsedGroups]);
+
+	const virtualizer = useVirtualizer({
+		count: flattenedItems.length,
+		getScrollElement: () => scrollContainerRef.current,
+		estimateSize: (index) => {
+			const item = flattenedItems[index];
+			if (item.type === "group-header") return ESTIMATED_GROUP_HEADER_HEIGHT;
+			if (item.type === "create-button") return ESTIMATED_CREATE_BUTTON_HEIGHT;
+			return ESTIMATED_TASK_HEIGHT;
+		},
+		overscan: 5,
+	});
+
+	const toggleGroup = useCallback((groupId: string) => {
+		setCollapsedGroups((prev) => {
+			const next = new Set(prev);
+			if (next.has(groupId)) {
+				next.delete(groupId);
+			} else {
+				next.add(groupId);
+			}
+			return next;
+		});
+	}, []);
+
 	return (
 		<>
 			<DndContext
 				sensors={sensors}
 				onDragEnd={async ({ active, over }) => {
 					if (!over) return;
-
-					// It is a task drag
-					// "over.id" might be a task ID, OR a column name (if dropping on empty column)
 					await reorderTask(
 						active.id as string,
 						over.id as string,
@@ -66,20 +125,54 @@ export const TasksList = () => {
 					);
 				}}
 			>
-				<div className="flex flex-col gap-2 py-4">
-					<AnimatePresence mode="popLayout">
-						{Object.entries(tasks).map(([_, taskGroup]) => {
+				<div
+					ref={scrollContainerRef}
+					className="h-[calc(100vh-150px)] overflow-y-auto py-4"
+				>
+					<div
+						style={{
+							height: `${virtualizer.getTotalSize()}px`,
+							width: "100%",
+							position: "relative",
+						}}
+					>
+						{virtualizer.getVirtualItems().map((virtualRow) => {
+							const item = flattenedItems[virtualRow.index];
 							return (
-								<TaskGroupItem
-									key={taskGroup.column.id}
-									taskGroup={taskGroup}
-								/>
+								<div
+									key={virtualRow.key}
+									style={{
+										position: "absolute",
+										top: 0,
+										left: 0,
+										width: "100%",
+										transform: `translateY(${virtualRow.start}px)`,
+									}}
+								>
+									{item.type === "group-header" && (
+										<GroupHeader
+											group={item.group}
+											taskCount={item.taskCount}
+											isCollapsed={collapsedGroups.has(item.group.id)}
+											onToggle={() => toggleGroup(item.group.id)}
+										/>
+									)}
+									{item.type === "task" && (
+										<TaskContextMenu task={item.task}>
+											<div>
+												<TaskItem task={item.task} />
+											</div>
+										</TaskContextMenu>
+									)}
+									{item.type === "create-button" && (
+										<CreateTaskButton groupId={item.groupId} />
+									)}
+								</div>
 							);
 						})}
-					</AnimatePresence>
-
+					</div>
 					{hasNextPage && (
-						<li className="flex items-center justify-center">
+						<div className="flex items-center justify-center py-2">
 							<Button
 								type="button"
 								size={"sm"}
@@ -90,7 +183,7 @@ export const TasksList = () => {
 								{isLoading ? <Loader /> : <ListPlusIcon />}
 								Load more
 							</Button>
-						</li>
+						</div>
 					)}
 				</div>
 			</DndContext>
@@ -99,104 +192,89 @@ export const TasksList = () => {
 	);
 };
 
-export const TaskGroupItem = ({
-	taskGroup,
+const GroupHeader = memo(function GroupHeader({
+	group,
+	taskCount,
+	isCollapsed,
+	onToggle,
 }: {
-	taskGroup: { column: GenericGroup; tasks: Task[] };
-}) => {
-	const [open, setOpen] = useState(true);
-	const { filters } = useTasksViewContext();
-	const { setParams: setTaskParams } = useTaskParams();
+	group: GenericGroup;
+	taskCount: number;
+	isCollapsed: boolean;
+	onToggle: () => void;
+}) {
+	const { setTaskSelection } = useTasksViewContext();
+	const { tasks } = useTasksGrouped();
+
+	const handleSelectAll = useCallback(() => {
+		const groupTasks = tasks[group.id]?.tasks || [];
+		const allTaskIds = groupTasks.map((task) => task.id);
+		setTaskSelection(allTaskIds);
+	}, [tasks, group.id, setTaskSelection]);
 
 	const { setNodeRef: setDroppableNodeRef } = useDroppable({
-		id: taskGroup.column.name,
+		id: group.name,
 	});
 
 	return (
-		<div
-			key={taskGroup.column.id}
-			className="flex flex-col gap-2"
-			ref={setDroppableNodeRef}
-		>
-			<Collapsible open={open} onOpenChange={setOpen} className="group">
-				<TaskGroupItemContextMenu taskGroup={taskGroup}>
-					<CollapsibleTrigger asChild>
-						<h2 className="mb-2 flex cursor-pointer items-center gap-2 rounded-sm bg-accent/30 px-4 py-2 text-muted-foreground text-sm transition-colors hover:text-foreground">
-							<div className="text-muted-foreground group-hover:text-foreground">
-								<ChevronRightIcon className="size-4 group-[&[data-state=open]]:hidden" />
-								<ChevronDownIcon className="hidden size-4 group-[&[data-state=open]]:inline" />
-							</div>
-							{taskGroup.column.icon}
-							{taskGroup.column.name}
-							<span className="rounded-sm border px-1 text-muted-foreground text-xs">
-								{taskGroup.tasks.length}
-							</span>
-						</h2>
-					</CollapsibleTrigger>
-				</TaskGroupItemContextMenu>
-
-				<CollapsibleContent
-					className={cn({
-						"overflow-visible!": open,
-					})}
-				>
-					{taskGroup.tasks.map((task) => (
-						<TaskContextMenu key={task.id} task={task}>
-							<div>
-								<TaskItem task={task} />
-							</div>
-						</TaskContextMenu>
-					))}
-					<Button
-						className="w-full justify-start text-start text-muted-foreground text-xs"
-						variant={"ghost"}
-						onClick={() => {
-							setTaskParams({
-								createTask: true,
-								taskStatusId: taskGroup.column.id,
-								taskProjectId:
-									filters.projectId?.length > 0
-										? filters.projectId[0]
-										: undefined,
-							});
-						}}
-					>
-						<PlusIcon className="size-3.5" />
-						Create Task
-					</Button>
-				</CollapsibleContent>
+		<div ref={setDroppableNodeRef}>
+			<Collapsible open={!isCollapsed} onOpenChange={() => onToggle()}>
+				<ContextMenu>
+					<ContextMenuTrigger asChild>
+						<CollapsibleTrigger asChild>
+							<button
+								type="button"
+								className="group mb-2 flex w-full cursor-pointer items-center gap-2 rounded-sm bg-accent/30 px-4 py-2 text-muted-foreground text-sm transition-colors hover:text-foreground"
+							>
+								<div className="text-muted-foreground group-hover:text-foreground">
+									<ChevronRightIcon className="size-4 group-data-[state=open]:hidden" />
+									<ChevronDownIcon className="hidden size-4 group-data-[state=open]:block" />
+								</div>
+								{group.icon}
+								{group.name}
+								<span className="rounded-sm border px-1 text-muted-foreground text-xs">
+									{taskCount}
+								</span>
+							</button>
+						</CollapsibleTrigger>
+					</ContextMenuTrigger>
+					<ContextMenuContent>
+						<ContextMenuItem onSelect={handleSelectAll}>
+							<CheckSquareIcon />
+							Select {taskCount} tasks
+						</ContextMenuItem>
+					</ContextMenuContent>
+				</ContextMenu>
 			</Collapsible>
 		</div>
 	);
-};
+});
 
-export const TaskGroupItemContextMenu = ({
-	children,
-	className,
-	taskGroup,
+const CreateTaskButton = memo(function CreateTaskButton({
+	groupId,
 }: {
-	children: React.ReactNode;
-	className?: string;
-	taskGroup: { column: GenericGroup; tasks: Task[] };
-}) => {
-	const { setTaskSelection } = useTasksViewContext();
+	groupId: string;
+}) {
+	const { filters } = useTasksViewContext();
+	const { setParams: setTaskParams } = useTaskParams();
 
-	const handleSelectAll = () => {
-		const allTaskIds = taskGroup.tasks.map((task) => task.id);
-		setTaskSelection(allTaskIds);
-	};
+	const handleCreateTask = useCallback(() => {
+		setTaskParams({
+			createTask: true,
+			taskStatusId: groupId,
+			taskProjectId:
+				filters.projectId?.length > 0 ? filters.projectId[0] : undefined,
+		});
+	}, [setTaskParams, groupId, filters.projectId]);
 
 	return (
-		<ContextMenu>
-			<ContextMenuTrigger asChild className={className}>
-				{children}
-			</ContextMenuTrigger>
-			<ContextMenuContent>
-				<ContextMenuItem onSelect={handleSelectAll}>
-					<CheckSquareIcon />
-					Select {taskGroup.tasks.length} tasks
-				</ContextMenuItem>
-			</ContextMenuContent>
-		</ContextMenu>
+		<Button
+			className="w-full justify-start text-start text-muted-foreground text-xs"
+			variant={"ghost"}
+			onClick={handleCreateTask}
+		>
+			<PlusIcon className="size-3.5" />
+			Create Task
+		</Button>
 	);
-};
+});

@@ -1,7 +1,15 @@
 "use client";
 import type { RouterInputs, RouterOutputs } from "@mimir/trpc";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import {
+	createContext,
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";
 import { queryClient, trpc } from "@/utils/trpc";
 import { useUser } from "../user-provider";
@@ -133,52 +141,78 @@ export const TasksView = ({
 		),
 	);
 
-	const toggleTaskSelection = (taskId: string) => {
+	const toggleTaskSelection = useCallback((taskId: string) => {
 		setSelectedTaskIds((prev) =>
 			prev.includes(taskId)
 				? prev.filter((id) => id !== taskId)
 				: [...prev, taskId],
 		);
-	};
+	}, []);
 
-	const clearTaskSelection = () => {
+	const clearTaskSelection = useCallback(() => {
 		setSelectedTaskIds([]);
-	};
+	}, []);
+
+	const handleSetFilters = useCallback(
+		(newFilters: Partial<TasksViewContextFilters>) => {
+			setFilters((prev) => ({ ...prev, ...newFilters }));
+		},
+		[],
+	);
 
 	const tasks = useMemo(
 		() => data?.pages.flatMap((page) => page.data) || [],
 		[data],
 	);
 
-	useEffect(() => {
-		// set query data
+	// Track previously cached task IDs to avoid redundant setQueryData calls
+	const cachedTaskIds = useRef<Set<string>>(new Set());
 
+	useEffect(() => {
+		// Only cache new tasks that haven't been cached yet
 		for (const task of tasks) {
-			queryClient.setQueryData(
-				trpc.tasks.getById.queryKey({ id: task.id }),
-				task,
-			);
+			if (!cachedTaskIds.current.has(task.id)) {
+				queryClient.setQueryData(
+					trpc.tasks.getById.queryKey({ id: task.id }),
+					task,
+				);
+				cachedTaskIds.current.add(task.id);
+			}
 		}
 	}, [tasks]);
 
+	const contextValue = useMemo<TasksViewContextValue>(
+		() => ({
+			filters,
+			setFilters: handleSetFilters,
+			tasks,
+			fetchNextPage,
+			hasNextPage,
+			viewId,
+			isLoading,
+			selectedTaskIds,
+			toggleTaskSelection,
+			clearTaskSelection,
+			setTaskSelection: setSelectedTaskIds,
+		}),
+		[
+			filters,
+			handleSetFilters,
+			tasks,
+			fetchNextPage,
+			hasNextPage,
+			viewId,
+			isLoading,
+			selectedTaskIds,
+			toggleTaskSelection,
+			clearTaskSelection,
+			setSelectedTaskIds,
+		],
+	);
+
 	return (
 		<div className="flex grow-1 flex-col">
-			<TasksViewProvider
-				value={{
-					filters,
-					setFilters: (newFilters) =>
-						setFilters((prev) => ({ ...prev, ...newFilters })),
-					tasks,
-					fetchNextPage,
-					hasNextPage,
-					viewId,
-					isLoading,
-					selectedTaskIds,
-					toggleTaskSelection,
-					clearTaskSelection,
-					setTaskSelection: setSelectedTaskIds,
-				}}
-			>
+			<TasksViewProvider value={contextValue}>
 				<TasksFilters showFilters={showFilters} projectId={projectId} />
 				{filters.viewType === "board" && <TasksBoard />}
 				{filters.viewType === "list" && <TasksList />}

@@ -3,6 +3,7 @@ import type { RouterOutputs } from "@mimir/trpc";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/ui/button";
 import { cn } from "@ui/lib/utils";
+import isEqual from "fast-deep-equal";
 import { FolderPlusIcon, KanbanIcon, SaveAllIcon } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
@@ -127,8 +128,7 @@ export const TasksViewCreate = () => {
 
 	const initialFilters = useRef(filters);
 	const hasFiltersChanged = useMemo(() => {
-		console.log("comparing", initialFilters.current, filters);
-		return JSON.stringify(initialFilters.current) !== JSON.stringify(filters);
+		return !isEqual(initialFilters.current, filters);
 	}, [filters]);
 
 	const { mutate: updateView, isPending: isUpdating } = useMutation(

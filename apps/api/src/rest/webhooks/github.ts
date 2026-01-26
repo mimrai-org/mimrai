@@ -11,6 +11,7 @@ import {
 } from "@mimir/db/queries/integrations";
 import { syncPrReview } from "@mimir/db/queries/pr-reviews";
 import { updateTask } from "@mimir/db/queries/tasks";
+import { getTeamById } from "@mimir/db/queries/teams";
 import { log } from "@mimir/integration/logger";
 import { getAppUrl } from "@mimir/utils/envs";
 import type {
@@ -412,6 +413,11 @@ app.get("/setup", ...protectedMiddleware, async (c) => {
 	const code = c.req.query("code");
 	const installationId = c.req.query("installation_id");
 
+	const team = await getTeamById(teamId!);
+	if (!team) {
+		return c.json({ error: "Team not found" }, 404);
+	}
+
 	// get github access token
 	const response = await fetch("https://github.com/login/oauth/access_token", {
 		method: "POST",
@@ -463,7 +469,7 @@ app.get("/setup", ...protectedMiddleware, async (c) => {
 	});
 
 	return c.redirect(
-		`${getAppUrl()}/dashboard/settings/integrations/${integration.type}`,
+		`${getAppUrl()}/team/${team.slug}/settings/integrations/${integration.type}`,
 	);
 });
 

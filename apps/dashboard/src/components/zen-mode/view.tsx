@@ -93,7 +93,7 @@ export const ZenModeClose = () => {
 	const user = useUser();
 
 	const handleExit = () => {
-		router.push(`${user?.basePath}/board`);
+		router.push(`${user?.basePath}`);
 	};
 
 	return (

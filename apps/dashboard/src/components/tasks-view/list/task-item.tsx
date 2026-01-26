@@ -2,16 +2,15 @@
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import type { RouterOutputs } from "@mimir/trpc";
 import { Checkbox } from "@ui/components/ui/checkbox";
-import { useRouter } from "next/navigation";
+import { memo } from "react";
 import { usePanel } from "@/components/panels/panel-context";
 import { TASK_PANEL_TYPE } from "@/components/panels/task-panel";
 import { useUser } from "@/components/user-provider";
-import { useTaskParams } from "@/hooks/use-task-params";
 import { cn } from "@/lib/utils";
 import { TaskProperty } from "../properties/task-properties";
 import { useTasksViewContext } from "../tasks-view";
 
-export const TaskItem = ({
+export const TaskItem = memo(function TaskItem({
 	task,
 	className,
 }: {
@@ -20,10 +19,9 @@ export const TaskItem = ({
 	onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 	dialog?: boolean;
 	disableEvent?: boolean;
-}) => {
+}) {
 	const { selectedTaskIds, toggleTaskSelection } = useTasksViewContext();
 	const isSelected = selectedTaskIds.includes(task.id);
-	const { setParams } = useTaskParams();
 	const taskPanel = usePanel(TASK_PANEL_TYPE);
 
 	const { listeners, attributes, setNodeRef, transform, isDragging } =
@@ -34,7 +32,6 @@ export const TaskItem = ({
 		id: task.id,
 	});
 
-	const router = useRouter();
 	const user = useUser();
 
 	return (
@@ -109,4 +106,4 @@ export const TaskItem = ({
 			</button>
 		</div>
 	);
-};
+});

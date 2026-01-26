@@ -119,7 +119,7 @@ export const billingRouter = router({
 
 				return {
 					isUpgradeDowngrade: true,
-					url: `${getAppUrl()}/dashboard/settings/billing`,
+					url: `${getAppUrl()}/team/${team.slug}/settings/billing`,
 				};
 			}
 
@@ -141,7 +141,7 @@ export const billingRouter = router({
 						teamId: team!.id,
 					},
 				},
-				success_url: `${getAppUrl()}/dashboard/settings/billing?checkout=success`,
+				success_url: `${getAppUrl()}/team/${team.slug}/settings/billing?checkout=success`,
 			});
 
 			return {

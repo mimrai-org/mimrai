@@ -1,5 +1,6 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { installIntegration } from "@mimir/db/queries/integrations";
+import { getTeamById } from "@mimir/db/queries/teams";
 import { getApiUrl, getAppUrl } from "@mimir/utils/envs";
 import { webApi } from "@slack/bolt";
 import type { Context } from "../types";
@@ -8,6 +9,10 @@ const app = new OpenAPIHono<Context>();
 
 app.get("/oauth/callback", async (c) => {
 	const teamId = c.get("teamId");
+	const team = await getTeamById(teamId!);
+	if (!team) {
+		return c.json({ error: "Team not found" }, 404);
+	}
 
 	const code = c.req.query("code");
 
@@ -36,7 +41,7 @@ app.get("/oauth/callback", async (c) => {
 		externalTeamId: externalTeamId!,
 	});
 
-	return c.redirect(`${getAppUrl()}/dashboard/settings/integrations`);
+	return c.redirect(`${getAppUrl()}/team/${team.slug}/settings/integrations`);
 });
 
 export { app as slackRouter };

@@ -18,7 +18,7 @@ export const ZenModeNotFound = () => {
 				<p className="max-w-sm text-muted-foreground">
 					The task you are looking for is not assigned to you or does not exist.
 				</p>
-				<Link href={`${user?.basePath}/board`}>
+				<Link href={`${user?.basePath}`}>
 					<Button>
 						<ChevronLeftIcon />
 						Go Back to Board

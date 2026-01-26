@@ -60,7 +60,7 @@ export const getTasksTool = tool({
 			}));
 
 			yield {
-				boardUrl: `${getAppUrl()}/team/${teamSlug}/board`,
+				boardUrl: `${getAppUrl()}/team/${teamSlug}`,
 				data: mappedData,
 			};
 		} catch (error) {

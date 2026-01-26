@@ -29,6 +29,7 @@ export const PlanSelectSheet = () => {
 		subscription &&
 		subscription.status !== "active" &&
 		subscription.status !== "trialing" &&
+		!pathname.startsWith(`${user?.basePath}/onboarding`) &&
 		!pathname.startsWith(`${user?.basePath}/settings`);
 
 	const isOpen = Boolean(selectPlan || forceOpen);

@@ -56,7 +56,7 @@ export const ZenModeDoneButton = () => {
 			setDialogOpen(false);
 			return;
 		}
-		router.push(`${user?.basePath}/board`);
+		router.push(`${user?.basePath}`);
 	}, [dialogOpen, router, user]);
 
 	useHotkeys(

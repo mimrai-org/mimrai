@@ -75,7 +75,7 @@ export const ZenModeProvider = ({
 			const nextTask = tasks.data[nextTaskIndex]!;
 			router.push(`${user?.basePath}/zen/${nextTask.id}`);
 		} else {
-			router.push(`${user?.basePath}/board`);
+			router.push(`${user?.basePath}`);
 		}
 	};
 

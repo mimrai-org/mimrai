@@ -1,9 +1,8 @@
 import type { RouterOutputs } from "@mimir/trpc";
-import { LabelBadge } from "@ui/components/ui/label-badge";
 import { cn } from "@ui/lib/utils";
 import { formatRelative } from "date-fns";
 import { CheckSquareIcon } from "lucide-react";
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import { DependencyIcon } from "../../dependency-icon";
 import { MilestoneIcon } from "../../milestone-icon";
 import { ProjectIcon } from "../../project-icon";
@@ -14,6 +13,57 @@ import { Priority } from "./priority";
 import { TaskPropertyStatus } from "./status";
 
 export type Task = RouterOutputs["tasks"]["get"]["data"][number];
+
+// Extract dependencies component to follow React's rules of hooks
+const TaskPropertyDependencies = memo(function TaskPropertyDependencies({
+	task,
+}: {
+	task: Pick<Task, "dependencies" | "id">;
+}) {
+	const group = useMemo(() => {
+		if (!task.dependencies) return {};
+		const record: Record<string, number> = {};
+		for (const dependency of task.dependencies) {
+			const type =
+				dependency.type === "blocks" && dependency.statusType === "done"
+					? "relates_to"
+					: dependency.type;
+			const direction = dependency.dependsOnTaskId === task.id ? "from" : "to";
+			const key = `${type}:${direction}`;
+
+			record[key] = (record[key] || 0) + 1;
+		}
+		return record;
+	}, [task.dependencies, task.id]);
+
+	if (!task.dependencies || task.dependencies.length === 0) return null;
+
+	return (
+		<div className="flex gap-2">
+			{Object.entries(group).map(([key, count]) => {
+				const [type, direction] = key.split(":") as [
+					(typeof task.dependencies)[number]["type"],
+					"to" | "from",
+				];
+				return (
+					<span
+						key={key}
+						className="flex h-5.5 items-center justify-center gap-2 rounded-sm bg-secondary px-1.5 text-xs"
+					>
+						<DependencyIcon
+							type={type}
+							direction={direction}
+							className="size-3.5"
+						/>
+
+						{count > 1 ? count : null}
+					</span>
+				);
+			})}
+		</div>
+	);
+});
+
 export const propertiesComponents = {
 	statusChangedAt: (task: Pick<Task, "statusChangedAt">) =>
 		task.statusChangedAt ? (
@@ -27,51 +77,9 @@ export const propertiesComponents = {
 				<Priority value={task.priority} />
 			</div>
 		),
-	dependencies: (task: Pick<Task, "dependencies" | "id">) => {
-		const group = useMemo(() => {
-			if (!task.dependencies) return {};
-			const record: Record<string, number> = {};
-			for (const dependency of task.dependencies) {
-				const type =
-					dependency.type === "blocks" && dependency.statusType === "done"
-						? "relates_to"
-						: dependency.type;
-				const direction =
-					dependency.dependsOnTaskId === task.id ? "from" : "to";
-				const key = `${type}:${direction}`;
-
-				record[key] = (record[key] || 0) + 1;
-			}
-			return record;
-		}, [task.dependencies, task.id]);
-
-		if (!task.dependencies || task.dependencies.length === 0) return null;
-
-		return (
-			<div className="flex gap-2">
-				{Object.entries(group).map(([key, count]) => {
-					const [type, direction] = key.split(":") as [
-						(typeof task.dependencies)[number]["type"],
-						"to" | "from",
-					];
-					return (
-						<span
-							key={key}
-							className="flex h-5.5 items-center justify-center gap-2 rounded-sm bg-secondary px-1.5 text-xs"
-						>
-							<DependencyIcon
-								type={type}
-								direction={direction}
-								className="size-3.5"
-							/>
-
-							{count > 1 ? count : null}
-						</span>
-					);
-				})}
-			</div>
-		);
-	},
+	dependencies: (task: Pick<Task, "dependencies" | "id">) => (
+		<TaskPropertyDependencies task={task} />
+	),
 	status: (task: Pick<Task, "status" | "id">) => (
 		<TaskPropertyStatus status={task.status} id={task.id} />
 	),

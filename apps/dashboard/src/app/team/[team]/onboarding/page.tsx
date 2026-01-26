@@ -47,5 +47,5 @@ export default async function Page() {
 	}
 
 	// If all checks pass, redirect to the main dashboard
-	return redirect(`/team/${teamSlug}/overview`);
+	return redirect(`/team/${teamSlug}`);
 }
