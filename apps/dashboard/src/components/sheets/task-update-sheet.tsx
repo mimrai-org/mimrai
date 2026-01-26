@@ -37,12 +37,7 @@ export const TaskUpdateSheet = () => {
 		<Dialog open={isOpen} onOpenChange={() => setParams({ taskId: null })}>
 			<DialogContent
 				showCloseButton={true}
-				overlayClassName="hidden pointer-events-none"
-				className={cn(
-					"right-8 bottom-0 left-auto max-h-[85vh] translate-x-0 overflow-y-auto rounded-b-none pt-0 sm:min-w-[800px]",
-					"translate-y-48 data-[state=closed]:translate-y-48 data-[state=open]:translate-y-0",
-					"border-x border-t shadow-2xl shadow-secondary/10",
-				)}
+				className={cn("max-h-[85vh] overflow-y-auto pt-0 sm:min-w-[800px]")}
 			>
 				<DialogHeader className="hidden">
 					<DialogTitle />

@@ -3,6 +3,7 @@
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import type { RouterOutputs } from "@mimir/trpc";
+import { useTaskPanel } from "@/components/panels/task-panel";
 import { TaskProperty } from "@/components/tasks-view/properties/task-properties";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { cn } from "@/lib/utils";
@@ -35,7 +36,7 @@ export const CalendarTask = ({
 	className?: string;
 	isDragging?: boolean;
 }) => {
-	const { setParams } = useTaskParams();
+	const taskPanel = useTaskPanel();
 
 	return (
 		<button
@@ -50,11 +51,7 @@ export const CalendarTask = ({
 				className,
 			)}
 			onClick={() => {
-				queryClient.setQueryData(
-					trpc.tasks.getById.queryKey({ id: task.id }),
-					task,
-				);
-				setParams({ taskId: task.id });
+				taskPanel.open(task.id);
 			}}
 		>
 			<div className="flex items-center gap-1">
@@ -72,7 +69,7 @@ export const DraggableCalendarTask = ({
 	task: CalendarTaskType;
 	className?: string;
 }) => {
-	const { setParams } = useTaskParams();
+	const taskPanel = useTaskPanel();
 	const { attributes, listeners, setNodeRef, transform, isDragging } =
 		useDraggable({
 			id: task.id,
@@ -100,11 +97,7 @@ export const DraggableCalendarTask = ({
 			)}
 			onClick={() => {
 				if (isDragging) return;
-				queryClient.setQueryData(
-					trpc.tasks.getById.queryKey({ id: task.id }),
-					task,
-				);
-				setParams({ taskId: task.id });
+				taskPanel.open(task.id);
 			}}
 			{...listeners}
 			{...attributes}
