@@ -1,6 +1,7 @@
 import type { RouterOutputs } from "@mimir/trpc";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
+import { useTaskPanel } from "@/components/panels/task-panel";
 import { TaskProperty } from "@/components/tasks-view/properties/task-properties";
 import { useUser } from "@/components/user-provider";
 import { useTaskParams } from "@/hooks/use-task-params";
@@ -20,12 +21,12 @@ export const KanbanTask = ({
 	ref?: React.Ref<HTMLDivElement>;
 }) => {
 	const user = useUser();
-	const { setParams } = useTaskParams();
+	const taskPanel = useTaskPanel();
 
 	return (
 		<motion.div
 			className={cn(
-				"relative flex min-h-14 cursor-pointer flex-col rounded-md border bg-accent transition-colors hover:bg-accent dark:border-none dark:bg-accent/30 dark:hover:bg-accent/50",
+				"group/task relative flex min-h-14 cursor-pointer flex-col rounded-md border bg-accent transition-colors hover:bg-accent dark:border-none dark:bg-accent/30 dark:hover:bg-accent/50",
 				{
 					"opacity-50!": task.status?.type === "done",
 				},
@@ -37,11 +38,7 @@ export const KanbanTask = ({
 			animate={{ opacity: 1, y: 0 }}
 			exit={{ opacity: 0, y: 10 }}
 			onClick={(e) => {
-				queryClient.setQueryData(
-					trpc.tasks.getById.queryKey({ id: task.id }),
-					task,
-				);
-				setParams({ taskId: task.id });
+				taskPanel.open(task.id);
 				// router.push(`${user?.basePath}/tasks/${task.id}`);
 			}}
 			{...props}

@@ -99,9 +99,9 @@ const TasksViewItem = ({
 			<Link href={viewLink}>
 				<div
 					className={cn(
-						"flex w-fit items-center gap-2 rounded-sm px-2 py-1 text-xs hover:bg-accent dark:hover:bg-accent/30",
+						"flex w-fit items-center gap-2 rounded-sm px-2 py-1 text-xs hover:bg-accent dark:hover:bg-accent/50",
 						{
-							"border bg-accent dark:bg-accent/30": view.id === selectedViewId,
+							"bg-accent dark:bg-accent/50": view.id === selectedViewId,
 						},
 					)}
 				>

@@ -5,13 +5,10 @@ import * as Kanban from "@mimir/ui/kanban";
 import { Badge } from "@ui/components/ui/badge";
 import { Minimize2Icon, PlusIcon } from "lucide-react";
 import type { GenericGroup } from "@/components/tasks-view/tasks-group";
-// UI & Logic
 import { useTaskParams } from "@/hooks/use-task-params";
 import { cn } from "@/lib/utils";
-import { queryClient, trpc } from "@/utils/trpc";
 import { TaskContextMenu } from "../../task-context-menu";
 import { useTasksViewContext } from "../tasks-view";
-// Local Components
 import { KanbanTask } from "./kanban-task";
 import { type Task, useKanbanStore } from "./use-kanban-board";
 
@@ -57,7 +54,7 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 	return (
 		<Kanban.Column
 			className={cn(
-				"flex h-[calc(100vh-200px)] min-h-[200px] min-w-86 max-w-86 flex-1 grow-1 flex-col rounded-sm border-0 bg-card/30 shadow-none",
+				"flex h-[calc(100vh-200px)] min-h-[200px] min-w-86 max-w-86 flex-1 grow-1 flex-col rounded-sm bg-card/30 shadow-none",
 			)}
 			value={columnName}
 		>
