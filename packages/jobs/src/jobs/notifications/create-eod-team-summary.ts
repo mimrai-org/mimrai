@@ -10,7 +10,8 @@ import {
 } from "@mimir/db/schema";
 import { logger, schemaTask } from "@trigger.dev/sdk";
 import { generateText } from "ai";
-import { and, desc, eq } from "drizzle-orm";
+import { startOfDay } from "date-fns";
+import { and, desc, eq, gte, lte } from "drizzle-orm";
 import z from "zod";
 import { getDb } from "../../init";
 
@@ -61,6 +62,8 @@ export const createEODTeamSummaryActivityJob = schemaTask({
 					eq(activities.teamId, teamId),
 					eq(activities.type, "task_completed"),
 					eq(statuses.type, "done"),
+					gte(activities.createdAt, startOfDay(currentDate).toISOString()),
+					lte(activities.createdAt, currentDate.toISOString()),
 				),
 			)
 			.limit(20)
