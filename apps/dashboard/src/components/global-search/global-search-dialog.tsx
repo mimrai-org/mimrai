@@ -150,7 +150,7 @@ export const GlobalSearchDialog = ({
 			// slice to avoid too many items when showing empty state
 			for (const key in grouped) {
 				if (grouped[key]!.length > 1) {
-					grouped[key] = grouped[key]!.slice(0, 1);
+					grouped[key] = grouped[key]!.slice(0, 5);
 				}
 			}
 		}

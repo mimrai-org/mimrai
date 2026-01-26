@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { LayersIcon } from "lucide-react";
 import { Response } from "@/components/chat/response";
-import { useTaskParams } from "@/hooks/use-task-params";
+import { useTaskPanel } from "@/components/panels/task-panel";
 import { trpc } from "@/utils/trpc";
 import { useGlobalSearch } from "../global-search-context";
 import type { ResultItemProps } from "../types";
@@ -9,10 +9,10 @@ import { BaseResultItem } from "./base-result-item";
 
 export const TaskResultItem = ({ item }: ResultItemProps) => {
 	const { onOpenChange } = useGlobalSearch();
-	const { setParams: setTaskParams } = useTaskParams();
+	const taskPanel = useTaskPanel();
 
 	const handleSelect = () => {
-		setTaskParams({ taskId: item.id });
+		taskPanel.open(item.id);
 		onOpenChange(false);
 	};
 

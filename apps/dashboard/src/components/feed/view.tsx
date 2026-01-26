@@ -9,10 +9,12 @@ import { ActivityItem } from "@/components/activities/activity-item";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { trpc } from "@/utils/trpc";
 import Loader from "../loader";
+import { useTaskPanel } from "../panels/task-panel";
 import { useUser } from "../user-provider";
 
 export const FeedView = () => {
 	const user = useUser();
+	const taskPanel = useTaskPanel();
 	const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
 		useInfiniteQuery(
 			trpc.activities.get.infiniteQueryOptions(
@@ -86,14 +88,17 @@ export const FeedView = () => {
 							<div key={activity.id} className="">
 								<ActivityItem key={activity.id} activity={activity} />
 								{activity.task && (
-									<div className="mt-2 flex items-center gap-2 ps-4 text-muted-foreground text-xs">
-										<Link
-											href={`${user.basePath}/tasks/${activity.task?.id}`}
-											className="flex items-center gap-1"
+									<div className="mt-2 flex items-center gap-2 ps-4 text-xs">
+										<button
+											type="button"
+											onClick={() => {
+												taskPanel.open(activity.task!.id);
+											}}
+											className="flex items-center gap-1 text-muted-foreground hover:text-foreground"
 										>
 											<LayersIcon className="size-3.5" />
 											{activity.task?.title}
-										</Link>
+										</button>
 									</div>
 								)}
 							</div>
