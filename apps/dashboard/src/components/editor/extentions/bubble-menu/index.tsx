@@ -21,19 +21,30 @@ export function BubbleMenu({
 
 	const state = useEditorState({
 		editor,
-		selector: (ctx) => ({
-			isBold: ctx.editor.isActive("bold"),
-			isItalic: ctx.editor.isActive("italic"),
-			isStrike: ctx.editor.isActive("strike"),
-			isComment: ctx.editor.isActive("comment"),
-		}),
+		selector: (ctx) => {
+			// Guard against destroyed editor to prevent flushSync errors
+			if (ctx.editor.isDestroyed) {
+				return {
+					isBold: false,
+					isItalic: false,
+					isStrike: false,
+					isComment: false,
+				};
+			}
+			return {
+				isBold: ctx.editor.isActive("bold"),
+				isItalic: ctx.editor.isActive("italic"),
+				isStrike: ctx.editor.isActive("strike"),
+				isComment: ctx.editor.isActive("comment"),
+			};
+		},
 		equalityFn: (prev, next) => {
 			if (!next) return false;
 			return eq(prev, next);
 		},
 	});
 
-	if (!editor) {
+	if (!editor || editor.isDestroyed) {
 		return null;
 	}
 

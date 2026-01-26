@@ -1,6 +1,7 @@
 "use client";
-import { XIcon } from "lucide-react";
+import { Maximize2Icon, XIcon } from "lucide-react";
 import { motion } from "motion/react";
+import Link from "next/link";
 import { useCallback, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
@@ -14,6 +15,7 @@ interface PanelContainerProps {
 	children: React.ReactNode;
 	className?: string;
 	showCloseButton?: boolean;
+	maximizeLink?: string;
 	onClose?: () => void;
 }
 
@@ -23,10 +25,15 @@ export function PanelContainer({
 	children,
 	className,
 	showCloseButton = true,
+	maximizeLink,
 	onClose,
 }: PanelContainerProps) {
 	const panelRef = useRef<HTMLDivElement>(null);
 	const { closePanel, bringToFront, panels } = usePanels();
+
+	// Calculate offset based on index
+	const offset = index * PANEL_OFFSET;
+	const isTopPanel = index === panels.length - 1;
 
 	const handleClose = useCallback(() => {
 		closePanel(panel.type, panel.id);
@@ -34,8 +41,9 @@ export function PanelContainer({
 	}, [closePanel, panel.type, panel.id, onClose]);
 
 	const handlePanelClick = useCallback(() => {
+		if (isTopPanel) return;
 		bringToFront(panel.type, panel.id);
-	}, [bringToFront, panel.type, panel.id]);
+	}, [bringToFront, panel.type, panel.id, isTopPanel]);
 
 	// Handle escape key to close the topmost panel (last in array)
 	useEffect(() => {
@@ -57,10 +65,6 @@ export function PanelContainer({
 		return () => document.removeEventListener("keydown", handleKeyDown);
 	}, [panels, panel.type, panel.id, handleClose]);
 
-	// Calculate offset based on index
-	const offset = index * PANEL_OFFSET;
-	const isTopPanel = index === panels.length - 1;
-
 	const portalContent = (
 		<motion.div
 			ref={panelRef}
@@ -71,13 +75,17 @@ export function PanelContainer({
 			initial={{ opacity: 0, y: 50 }}
 			animate={{ opacity: 1, y: 0 }}
 			exit={{ opacity: 0, y: 50 }}
-			transition={{ duration: 0.2 }}
+			whileHover={{
+				y: isTopPanel ? 0 : -5,
+			}}
+			transition={{ duration: 0.2, ease: "easeInOut" }}
 			style={{
-				right: `calc(2rem + ${offset}px)`,
-				zIndex: 40 + index,
+				right: "2rem",
+				zIndex: 45 + index,
+				height: `calc(80vh - ${offset}px)`,
 			}}
 			className={cn(
-				"fixed bottom-0 left-auto h-[80vh] overflow-y-auto rounded-t-lg border-x border-t bg-background pt-0 shadow-lg shadow-secondary/20 sm:w-[700px]",
+				"fixed bottom-0 left-auto overflow-y-auto rounded-t-lg border-x border-t bg-background pt-0 shadow-lg shadow-secondary/20 sm:w-[700px]",
 				className,
 			)}
 			onClick={handlePanelClick}
@@ -88,17 +96,35 @@ export function PanelContainer({
 			}}
 		>
 			{showCloseButton && (
-				<button
-					type="button"
-					onClick={(e) => {
-						e.stopPropagation();
-						handleClose();
-					}}
-					className="absolute top-4 right-4 z-10 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-				>
-					<XIcon className="size-4" />
-					<span className="sr-only">Close</span>
-				</button>
+				<div className="absolute top-4 right-4 z-10 flex items-center gap-4">
+					{maximizeLink && (
+						<Link
+							href={maximizeLink}
+							onClick={() => {
+								handleClose();
+							}}
+						>
+							<button
+								type="button"
+								className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+							>
+								<Maximize2Icon className="size-3.5" />
+								<span className="sr-only">Maximize</span>
+							</button>
+						</Link>
+					)}
+					<button
+						type="button"
+						onClick={(e) => {
+							e.stopPropagation();
+							handleClose();
+						}}
+						className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+					>
+						<XIcon className="size-4" />
+						<span className="sr-only">Close</span>
+					</button>
+				</div>
 			)}
 			{isTopPanel ? children : null}
 		</motion.div>

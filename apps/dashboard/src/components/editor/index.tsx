@@ -8,6 +8,7 @@ import {
 	type JSONContent,
 	useEditor,
 } from "@tiptap/react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { BubbleMenu } from "./extentions/bubble-menu";
 import { registerExtensions } from "./extentions/register";
 
@@ -15,6 +16,7 @@ type EditorProps = {
 	value?: string;
 	placeholder?: string;
 	autoFocus?: boolean;
+	readOnly?: boolean;
 	shouldInsertImage?: boolean;
 	onUpdate?: (editor: EditorInstance) => void;
 	onChange?: (value: string) => void;
@@ -33,6 +35,7 @@ type EditorProps = {
 export function Editor({
 	value,
 	placeholder,
+	readOnly,
 	shouldInsertImage,
 	ref,
 	onUpdate,
@@ -45,24 +48,28 @@ export function Editor({
 	tabIndex,
 	taskId,
 }: EditorProps) {
-	const editor = useEditor({
-		extensions: registerExtensions({
-			placeholder,
-			onUpload,
-			shouldInsertImage,
-		}),
-		content: value,
-		immediatelyRender: false,
-		onBlur,
-		onFocus,
-		autofocus: autoFocus,
-		onUpdate: ({ editor }) => {
-			// @ts-expect-error
-			if (ref) ref.current = editor;
-			onChange?.(editor.getHTML());
-			onUpdate?.(editor);
+	const editor = useEditor(
+		{
+			extensions: registerExtensions({
+				placeholder,
+				onUpload,
+				shouldInsertImage,
+			}),
+			content: value,
+			immediatelyRender: false,
+			editable: !readOnly,
+			onBlur,
+			onFocus,
+			autofocus: autoFocus,
+			onUpdate: ({ editor }) => {
+				// @ts-expect-error
+				if (ref) ref.current = editor;
+				onChange?.(editor.getHTML());
+				onUpdate?.(editor);
+			},
 		},
-	});
+		[],
+	);
 
 	if (!editor) return null;
 

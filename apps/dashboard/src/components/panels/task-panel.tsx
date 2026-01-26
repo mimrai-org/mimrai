@@ -3,6 +3,7 @@ import { Skeleton } from "@mimir/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import { TaskForm } from "@/components/forms/task-form/form";
 import { trpc } from "@/utils/trpc";
+import { useUser } from "../user-provider";
 import { PanelContainer } from "./panel-container";
 import { type PanelInstance, usePanel } from "./panel-context";
 
@@ -45,8 +46,13 @@ function TaskPanelContent({ panel }: { panel: PanelInstance }) {
 }
 
 export function TaskPanel({ panel, index }: TaskPanelProps) {
+	const user = useUser();
 	return (
-		<PanelContainer panel={panel} index={index}>
+		<PanelContainer
+			panel={panel}
+			index={index}
+			maximizeLink={`${user.basePath}/tasks/${panel.id}`}
+		>
 			<TaskPanelContent panel={panel} />
 		</PanelContainer>
 	);

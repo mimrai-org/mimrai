@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { AssigneeAvatar } from "@/components/asignee-avatar";
 import { Response } from "@/components/chat/response";
 import { queryClient, trpc } from "@/utils/trpc";
+import { Editor } from "../editor";
 import { CommentInput } from "../forms/task-form/comment-input";
 import { ActivityReactions } from "./activity-reactions";
 
@@ -126,7 +127,7 @@ export const TaskCommentActivity = ({
 							/>
 						</div>
 						<div className="whitespace-pre-wrap break-words pt-1 text-foreground">
-							<Response>{metadata.comment}</Response>
+							<Editor value={metadata.comment} readOnly />
 						</div>
 						<div className="flex justify-end opacity-0 transition-opacity group-hover:opacity-100">
 							<Button

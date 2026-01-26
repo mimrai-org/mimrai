@@ -1,6 +1,5 @@
 // You can find the list of extensions here: https://tiptap.dev/docs/editor/extensions/functionality
 
-import { computePosition, flip, shift } from "@floating-ui/dom";
 import { getApiUrl } from "@mimir/utils/envs";
 import CodeBlock from "@tiptap/extension-code-block";
 import FileHandler from "@tiptap/extension-file-handler";
@@ -9,38 +8,13 @@ import Link from "@tiptap/extension-link";
 import Mention from "@tiptap/extension-mention";
 import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
-import {
-	type Editor,
-	mergeAttributes,
-	posToDOMRect,
-	ReactRenderer,
-} from "@tiptap/react";
+import { mergeAttributes } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Markdown } from "tiptap-markdown";
 import { CommentMark } from "./comment-mark";
-import { suggestionsOptions } from "./suggestions";
-
-const updatePosition = (editor: Editor, element: HTMLElement) => {
-	const virtualElement = {
-		getBoundingClientRect: () =>
-			posToDOMRect(
-				editor.view,
-				editor.state.selection.from,
-				editor.state.selection.to,
-			),
-	};
-
-	computePosition(virtualElement, element, {
-		placement: "bottom-start",
-		strategy: "fixed",
-		middleware: [shift(), flip()],
-	}).then(({ x, y, strategy }) => {
-		element.style.width = "max-content";
-		element.style.position = strategy;
-		element.style.left = `${x}px`;
-		element.style.top = `${y}px`;
-	});
-};
+import { buildUnifiedSuggestionOptions } from "./mentions/mention-suggestions";
+import { TaskMentionExtension } from "./mentions/task-mention";
+import { UserMentionExtension } from "./mentions/user-mention";
 
 // Add your extensions here
 const extensions = ({
@@ -49,7 +23,7 @@ const extensions = ({
 	shouldInsertImage,
 }: {
 	onUpload?: (fileUrl: string) => Promise<void>;
-	onMention?: (id: string, label: string) => void;
+	onMention?: (id: string, label: string, type: string) => void;
 	shouldInsertImage?: boolean;
 }) => [
 	StarterKit,
@@ -72,6 +46,10 @@ const extensions = ({
 		autolink: true,
 		defaultProtocol: "https",
 	}),
+	// Custom mention node extensions for rendering mentions as React components
+	UserMentionExtension,
+	TaskMentionExtension,
+	// Unified mention extension with single @ trigger for all entity types
 	Mention.configure({
 		renderHTML: ({ options, node }) => {
 			return [
@@ -83,79 +61,16 @@ const extensions = ({
 					},
 					options.HTMLAttributes,
 				),
-				`${node.attrs.mentionSuggestionChar}${node.attrs.label}`,
+				`@${node.attrs.label}`,
 			];
 		},
 		deleteTriggerWithBackspace: true,
-		suggestions: suggestionsOptions.map((suggestion) => ({
-			char: suggestion.char,
-			items: suggestion.fetcher,
-			command: ({ props, editor, range }) => {
-				if (props.id) onMention?.(props.id, props.label ?? "");
-				editor
-					.chain()
-					.focus()
-					.insertContentAt(range, {
-						type: "mention",
-						attrs: {
-							...props,
-							mentionSuggestionChar: suggestion.char,
-							type: suggestion.type,
-						},
-					})
-					.run();
-			},
-
-			render: () => {
-				let component: ReactRenderer | null = null;
-
-				return {
-					onStart: (props) => {
-						component = new ReactRenderer(suggestion.listComponent, {
-							props,
-							editor: props.editor,
-						});
-						if (!props.clientRect) {
-							return;
-						}
-						component.element.style.position = "fixed";
-						component.element.style.zIndex = "50";
-						component.element.style.pointerEvents = "auto";
-						document.body.appendChild(component.element);
-
-						updatePosition(props.editor, component.element);
-					},
-
-					onUpdate: (props) => {
-						component?.updateProps(props);
-						if (!props.clientRect) {
-							return;
-						}
-						updatePosition(props.editor, component?.element!);
-					},
-
-					onKeyDown: (props) => {
-						if (props.event.key === "Escape") {
-							component?.destroy();
-							return true;
-						}
-						// @ts-expect-error
-						return component?.ref?.onKeyDown(props) ?? false;
-					},
-
-					onExit: () => {
-						component?.element.remove();
-						component?.destroy();
-					},
-				};
-			},
-		})),
+		suggestion: buildUnifiedSuggestionOptions(onMention),
 	}),
 	CommentMark,
 
 	FileHandler.configure({
 		onDrop: async (currentEditor, files, pos) => {
-			const fileReader = new FileReader();
 			for (const file of files) {
 				const formData = new FormData();
 				formData.append("file", file);
@@ -228,7 +143,7 @@ const extensions = ({
 export function registerExtensions(options?: {
 	placeholder?: string;
 	onUpload?: (fileUrl: string) => Promise<void>;
-	onMention?: (id: string, label: string) => void;
+	onMention?: (id: string, label: string, type: string) => void;
 	shouldInsertImage?: boolean;
 }) {
 	const { placeholder, onUpload, shouldInsertImage, onMention } = options ?? {};

@@ -3,15 +3,7 @@ import type { RouterOutputs } from "@mimir/trpc";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/ui/button";
 import { cn } from "@ui/lib/utils";
-import {
-	FolderKanbanIcon,
-	FolderPlusIcon,
-	FolderSearchIcon,
-	FolderSymlinkIcon,
-	KanbanIcon,
-	SaveAllIcon,
-	ViewIcon,
-} from "lucide-react";
+import { FolderPlusIcon, KanbanIcon, SaveAllIcon } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import { TaskViewForm } from "@/components/forms/task-view/form";
@@ -113,7 +105,7 @@ const TasksViewItem = ({
 						},
 					)}
 				>
-					<FolderKanbanIcon
+					<KanbanIcon
 						className="size-4 text-muted-foreground"
 						style={{
 							color: project?.color ?? undefined,

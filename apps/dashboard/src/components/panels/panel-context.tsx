@@ -90,10 +90,16 @@ export function PanelProvider({ children }: PanelProviderProps) {
 				);
 
 				if (existingIndex >= 0) {
+					console.log("Panel already open, bringing to front:", type, id);
 					// Panel already open, move to end (bring to front) and update data
 					const panel = current[existingIndex];
 					const withoutPanel = current.filter((_, i) => i !== existingIndex);
-					return [...withoutPanel, { ...panel, data: data ?? panel.data }];
+					const newArray = [
+						...withoutPanel,
+						{ ...panel, data: data ?? panel.data },
+					];
+					console.log("New panel order:", newArray);
+					return newArray;
 				}
 
 				if (current.length >= MAX_PANELS) {

@@ -2,8 +2,19 @@
 @source "../../packages/ui";
 
 @theme {
-	--animate-fade-in: fade-in 0.3s ease-in-out both;
+	--animate-slide-in-top: slide-in-top 0.3s ease-in-out both;
+	@keyframes slide-in-top {
+		0% {
+			opacity: 0;
+			transform: translateY(-5px);
+		}
+		100% {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
 
+	--animate-fade-in: fade-in 0.3s ease-in-out both;
 	@keyframes fade-in {
 		0% {
 			opacity: 0;

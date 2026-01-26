@@ -92,6 +92,9 @@ export const TaskForm = ({
 			onSuccess: (task) => {
 				toast.success("Task updated successfully", { id: "update-task" });
 				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
+				queryClient.invalidateQueries(
+					trpc.tasks.getById.queryOptions({ id: task.id }),
+				);
 				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
 				queryClient.invalidateQueries(
 					trpc.tasks.getSubscribers.queryOptions({ id: task.id }),
