@@ -80,7 +80,7 @@ export function PanelContainer({
 			}}
 			transition={{ duration: 0.2, ease: "easeInOut" }}
 			style={{
-				right: "2rem",
+				right: `calc(2rem + ${offset}px)`,
 				zIndex: 45 + index,
 				height: `calc(80vh - ${offset}px)`,
 			}}
