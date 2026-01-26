@@ -119,8 +119,6 @@ export const getTasks = async ({
 		?.map((id) => (id === "me" ? input.userId : id))
 		.filter(Boolean) as string[];
 
-	console.log(assigneeIdsWithMe);
-
 	assigneeIdsWithMe &&
 		assigneeIdsWithMe.length > 0 &&
 		whereClause.push(
@@ -225,13 +223,13 @@ export const getTasks = async ({
 	}
 
 	// exclude done tasks with more than 3 days
-	if (input.view === "board") {
+	if (!input.statusType || !input.statusType?.includes("done")) {
 		whereClause.push(
 			or(
 				notInArray(statuses.type, ["done"]),
 				and(
 					eq(statuses.type, "done"),
-					gte(tasks.updatedAt, subDays(new Date(), 3).toISOString()),
+					gte(tasks.statusChangedAt, subDays(new Date(), 1)),
 				),
 			),
 		);
@@ -367,28 +365,15 @@ export const getTasks = async ({
 		.leftJoin(milestones, eq(tasks.milestoneId, milestones.id))
 		.leftJoinLateral(dependenciesSubquery, sql`true`);
 
-	if (input.view === "board") {
-		query.orderBy(
-			asc(
-				sql`CASE ${tasks.priority} WHEN 'urgent' THEN 1 WHEN 'high' THEN 2 WHEN 'medium' THEN 3 WHEN 'low' THEN 4 END`,
-			),
-			asc(tasks.focusOrder),
-			desc(tasks.dueDate),
-			tasks.order,
-			tasks.sequence,
-		);
-	} else if (input.view === "list") {
-		query.orderBy(
-			asc(
-				sql`CASE ${tasks.priority} WHEN 'urgent' THEN 1 WHEN 'high' THEN 2 WHEN 'medium' THEN 3 WHEN 'low' THEN 4 END`,
-			),
-			asc(tasks.focusOrder),
-			desc(tasks.dueDate),
-			desc(tasks.createdAt),
-		);
-	} else {
-		query.orderBy(desc(tasks.createdAt));
-	}
+	query.orderBy(
+		asc(
+			sql`CASE ${tasks.priority} WHEN 'urgent' THEN 1 WHEN 'high' THEN 2 WHEN 'medium' THEN 3 WHEN 'low' THEN 4 END`,
+		),
+		asc(tasks.focusOrder),
+		desc(tasks.dueDate),
+		tasks.order,
+		desc(tasks.createdAt),
+	);
 
 	// Apply pagination
 	const offset = cursor ? Number.parseInt(cursor, 10) : 0;
