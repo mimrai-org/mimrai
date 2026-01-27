@@ -2,7 +2,7 @@ import { openai } from "@ai-sdk/openai";
 import { getLabels } from "@mimir/db/queries/labels";
 import { getProjects } from "@mimir/db/queries/projects";
 import { getMembers, getTeamById } from "@mimir/db/queries/teams";
-import { generateObject } from "ai";
+import { generateObject, generateText, Output } from "ai";
 import z from "zod";
 import type { DecodedEmail } from "./decode";
 
@@ -32,7 +32,7 @@ export const processEmail = async ({
 		pageSize: 50,
 	});
 
-	const response = await generateObject({
+	const response = await generateText({
 		model: openai("gpt-4o-mini"),
 		system: `
 IMPORTANT: Follow the guidelines strictly. Do not make any assumptions outside of the provided context. And do not make up any data.
@@ -103,7 +103,7 @@ ${labels
 <body>${decodedEmail.body}</body>
 </email>
       `,
-		schema,
+		output: Output.object({ schema: schema }),
 	});
 	return response;
 };

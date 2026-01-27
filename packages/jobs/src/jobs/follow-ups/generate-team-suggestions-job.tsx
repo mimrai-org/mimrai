@@ -12,7 +12,7 @@ import {
 	usersOnTeams,
 } from "@mimir/db/schema";
 import { logger, schemaTask } from "@trigger.dev/sdk";
-import { generateObject } from "ai";
+import { generateObject, generateText, Output } from "ai";
 import {
 	and,
 	arrayContains,
@@ -270,48 +270,50 @@ export const generateTeamSuggestionsJob = schemaTask({
 </team-statuses>
       `;
 
-		const output = await generateObject({
+		const output = await generateText({
 			model: openai("gpt-4o-mini"),
-			schema: z.object({
-				suggestions: z.array(
-					z.object({
-						taskId: z.string().describe("Task ID (uuid) to update"),
-						action: z
-							.enum(["assign", "move", "comment"])
-							.describe("The action to take on the task"),
-						reason: z
-							.string()
-							.optional()
-							.describe(
-								"Reason for the action taken. Include any readable context like task title.",
-							),
-						assigneeId: z
-							.string()
-							.optional()
-							.describe(
-								"User ID (uuid) to assign the task to, if action is 'assign'",
-							),
-						statusId: z
-							.string()
-							.optional()
-							.describe(
-								"Status ID (uuid) to move the task to, if action is 'move'",
-							),
-						comment: z
-							.string()
-							.optional()
-							.describe("Comment to add to the task, if action is 'comment'"),
-					}),
-				),
+			output: Output.object({
+				schema: z.object({
+					suggestions: z.array(
+						z.object({
+							taskId: z.string().describe("Task ID (uuid) to update"),
+							action: z
+								.enum(["assign", "move", "comment"])
+								.describe("The action to take on the task"),
+							reason: z
+								.string()
+								.optional()
+								.describe(
+									"Reason for the action taken. Include any readable context like task title.",
+								),
+							assigneeId: z
+								.string()
+								.optional()
+								.describe(
+									"User ID (uuid) to assign the task to, if action is 'assign'",
+								),
+							statusId: z
+								.string()
+								.optional()
+								.describe(
+									"Status ID (uuid) to move the task to, if action is 'move'",
+								),
+							comment: z
+								.string()
+								.optional()
+								.describe("Comment to add to the task, if action is 'comment'"),
+						}),
+					),
+				}),
 			}),
 			prompt,
 		});
 
 		console.log(output.usage);
 		console.log(prompt);
-		console.log(output.object);
+		console.log(output.output);
 
-		for (const suggestion of output.object.suggestions) {
+		for (const suggestion of output.output.suggestions) {
 			// Create task updates based on the suggestions
 			await createTaskSuggestion({
 				taskId: suggestion.taskId,

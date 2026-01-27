@@ -12,7 +12,7 @@ import {
 } from "@mimir/db/schema";
 import { getAppUrl } from "@mimir/utils/envs";
 import { logger, schemaTask } from "@trigger.dev/sdk";
-import { generateObject } from "ai";
+import { generateObject, generateText, Output } from "ai";
 import { format } from "date-fns";
 import {
 	and,
@@ -255,38 +255,40 @@ ${project.milestones.map((milestone) => `    - Name: ${milestone.name}, ID: ${mi
 		console.log(prompt);
 
 		const {
-			object: recommendation,
+			output: recommendation,
 			usage,
 			request,
-		} = await generateObject({
+		} = await generateText({
 			model: openai("gpt-4o-mini"),
 			temperature: 0.7,
-			schema: z.object({
-				greetings: z
-					.string()
-					.describe(
-						"A friendly greeting message to start the digest. Do not include the salutation or user's name.",
-					),
-				focusMessage: z
-					.string()
-					.describe(
-						"A focus message for the user to concentrate on today. Mention the most important task and why it matters.",
-					),
-				topPriorities: z
-					.array(
-						z.object({
-							taskId: z.string().describe("The ID (uuid) of the task"),
-							title: z.string().describe("The title of the task"),
-							whyImportant: z
-								.string()
-								.describe(
-									"brief explanation of why this task is important. follow the rules strictly.",
-								),
-						}),
-					)
-					.describe(
-						"The top 3 most important tasks for the user. in order for today focus. first in the array is the most important",
-					),
+			output: Output.object({
+				schema: z.object({
+					greetings: z
+						.string()
+						.describe(
+							"A friendly greeting message to start the digest. Do not include the salutation or user's name.",
+						),
+					focusMessage: z
+						.string()
+						.describe(
+							"A focus message for the user to concentrate on today. Mention the most important task and why it matters.",
+						),
+					topPriorities: z
+						.array(
+							z.object({
+								taskId: z.string().describe("The ID (uuid) of the task"),
+								title: z.string().describe("The title of the task"),
+								whyImportant: z
+									.string()
+									.describe(
+										"brief explanation of why this task is important. follow the rules strictly.",
+									),
+							}),
+						)
+						.describe(
+							"The top 3 most important tasks for the user. in order for today focus. first in the array is the most important",
+						),
+				}),
 			}),
 			prompt,
 		});

@@ -22,13 +22,15 @@ export const buildSmartCompletePrompt = async ({
 		teamId,
 	});
 
-	return `You are the responsible for generating task details based on a user's prompt. Use the context provided to you to generate the most accurate and relevant task details possible.
+	return `You are the responsible for generating task details based on a description given by the user. Use the context provided to you to generate the most accurate and relevant task details possible.
+
+<task-description>
+${userPrompt}
+</task-description>
 
 <rules>
 - Keep the title concise and self-explanatory.
 - The description should provide enough detail for someone to understand the task without further clarification.
-- If the user prompt lacks clarity, use the context to fill in the gaps.
-- If the user prompt is less than 4 words, use it as the title and do not generate a description unless there is relevant context.
 - return dates in UTC ISO 8601 format.
 </rules>
 

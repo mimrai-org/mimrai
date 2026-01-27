@@ -98,6 +98,7 @@ export const TaskItem = memo(function TaskItem({
 				<div className="hidden flex-wrap items-center justify-end gap-2 md:flex">
 					<TaskProperty property="statusChangedAt" task={task} />
 					<TaskProperty property="dependencies" task={task} />
+					<TaskProperty property="labels" task={task} />
 					<TaskProperty property="dueDate" task={task} />
 					<TaskProperty property="project" task={task} />
 					<TaskProperty property="milestone" task={task} />

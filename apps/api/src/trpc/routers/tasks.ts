@@ -44,7 +44,7 @@ import { syncGoogleCalendarTaskEvent } from "@mimir/integration/google-calendar"
 import { handleTaskComment } from "@mimir/integration/task-comments";
 import { createRecurringTaskJob } from "@mimir/jobs/tasks/create-recurring-task-job";
 import { runs } from "@trigger.dev/sdk";
-import { generateObject } from "ai";
+import { generateObject, generateText, Output } from "ai";
 import z from "zod";
 
 export const tasksRouter = router({
@@ -258,10 +258,10 @@ export const tasksRouter = router({
 				teamId: ctx.user.teamId!,
 			});
 
-			const response = await generateObject({
+			const response = await generateText({
 				system: systemPrompt,
 				model: openai("gpt-4o-mini"),
-				schema: smartCompleteResponseSchema,
+				output: Output.object({ schema: smartCompleteResponseSchema }),
 				prompt: `Create a task based on the user's prompt: "${input.prompt}"`,
 			});
 
@@ -271,7 +271,7 @@ export const tasksRouter = router({
 				source: "smart-complete",
 			});
 
-			return response.object;
+			return response.output;
 		}),
 
 	getSubscribers: protectedProcedure
