@@ -54,7 +54,7 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 	return (
 		<Kanban.Column
 			className={cn(
-				"flex h-[calc(100vh-200px)] min-h-[200px] min-w-86 max-w-86 flex-1 grow-1 flex-col rounded-sm bg-card/30 shadow-none",
+				"flex h-[calc(100vh-200px)] min-h-[200px] min-w-86 max-w-86 flex-1 grow-1 flex-col rounded-sm shadow-none",
 			)}
 			value={columnName}
 		>
@@ -70,7 +70,7 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 						{column.icon}
 					</Badge>
 					<span className="font-medium text-sm">{columnName}</span>
-					<span className="font-mono text-muted-foreground text-xs">
+					<span className="rounded-sm border px-1 font-mono text-muted-foreground text-xs">
 						{tasks.length}
 					</span>
 				</div>

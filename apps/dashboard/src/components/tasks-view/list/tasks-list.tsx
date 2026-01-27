@@ -127,7 +127,7 @@ export const TasksList = () => {
 			>
 				<div
 					ref={scrollContainerRef}
-					className="h-[calc(100vh-150px)] overflow-y-auto py-4"
+					className="h-[calc(100vh-150px)] overflow-y-auto overflow-x-hidden py-4"
 				>
 					<div
 						style={{
@@ -207,10 +207,10 @@ const GroupHeader = memo(function GroupHeader({
 	const { tasks } = useTasksGrouped();
 
 	const handleSelectAll = useCallback(() => {
-		const groupTasks = tasks[group.id]?.tasks || [];
+		const groupTasks = tasks[group.name]?.tasks || [];
 		const allTaskIds = groupTasks.map((task) => task.id);
 		setTaskSelection(allTaskIds);
-	}, [tasks, group.id, setTaskSelection]);
+	}, [tasks, group.name, setTaskSelection]);
 
 	const { setNodeRef: setDroppableNodeRef } = useDroppable({
 		id: group.name,

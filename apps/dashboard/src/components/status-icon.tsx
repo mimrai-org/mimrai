@@ -4,7 +4,6 @@ import {
 	CircleCheckIcon,
 	CircleDashedIcon,
 	CircleDotIcon,
-	CircleGaugeIcon,
 	CircleStarIcon,
 } from "lucide-react";
 
@@ -19,7 +18,7 @@ export const StatusIcon = ({
 		case "backlog":
 			return <CircleDotIcon className={className} />;
 		case "in_progress":
-			return <CircleGaugeIcon className={cn(className, "text-yellow-400")} />;
+			return <CircleDotIcon className={cn(className, "text-yellow-400")} />;
 		case "review":
 			return <CircleStarIcon className={cn(className)} />;
 		case "to_do":

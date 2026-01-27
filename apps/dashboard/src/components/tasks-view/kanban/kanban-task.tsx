@@ -24,19 +24,16 @@ export const KanbanTask = ({
 	const taskPanel = useTaskPanel();
 
 	return (
-		<motion.div
+		<div
 			className={cn(
 				"group/task relative flex min-h-14 cursor-pointer flex-col rounded-md border bg-accent transition-colors hover:bg-accent dark:border-none dark:bg-accent/30 dark:hover:bg-accent/50",
 				{
 					"opacity-50!": task.status?.type === "done",
 				},
+				"slide-in-from-bottom-5 fade-in animate-in ease-in",
 				className,
 			)}
 			ref={ref}
-			// transition={{ duration: 0.2 }}
-			initial={{ opacity: 0, y: 10 }}
-			animate={{ opacity: 1, y: 0 }}
-			exit={{ opacity: 0, y: 10 }}
 			onClick={(e) => {
 				taskPanel.open(task.id);
 				// router.push(`${user?.basePath}/tasks/${task.id}`);
@@ -47,7 +44,8 @@ export const KanbanTask = ({
 			<div className="p-3">
 				<div className="flex h-full grow-1 flex-col justify-between gap-2">
 					<div className="flex items-center justify-between gap-2">
-						<div className={"flex items-center gap-1 text-xs"}>
+						<div className={"flex items-center gap-2 text-xs"}>
+							<TaskProperty property="priority" task={task} />
 							{task.sequence !== null && (
 								<span className="mr-2 text-muted-foreground tabular-nums">
 									{user?.team?.prefix}-{task.sequence}
@@ -65,7 +63,6 @@ export const KanbanTask = ({
 					</div>
 
 					<div className="flex flex-wrap items-center gap-1.5">
-						<TaskProperty property="priority" task={task} />
 						<TaskProperty property="dependencies" task={task} />
 
 						<TaskProperty property="project" task={task} />
@@ -78,6 +75,6 @@ export const KanbanTask = ({
 			{/* </Link> */}
 			{/* Too much visual noise */}
 			{/* <KanbanTaskStamp task={task} /> */}
-		</motion.div>
+		</div>
 	);
 };
