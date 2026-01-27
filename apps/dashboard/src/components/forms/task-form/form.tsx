@@ -10,11 +10,9 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useDebounceValue } from "usehooks-ts";
 import type z from "zod";
-import { useChatContext } from "@/components/chat/chat-context/store";
-import { useChatWidget } from "@/components/chat/chat-widget";
 import { useUser } from "@/components/user-provider";
 import { useTaskParams } from "@/hooks/use-task-params";
-import { useZodForm } from "@/hooks/use-zod-form";
+import { useFormAutoSave, useZodForm } from "@/hooks/use-zod-form";
 import { trpc } from "@/utils/trpc";
 import { ActionsMenu } from "./actions-menu";
 import { TaskActivitiesList } from "./activities-list";
@@ -42,9 +40,6 @@ export const TaskForm = ({
 	} | null;
 }) => {
 	const user = useUser();
-
-	const { setItems } = useChatContext();
-	const { toggle } = useChatWidget();
 	const editorRef = useRef<EditorInstance | null>(null);
 	const [lastSavedDate, setLastSavedDate] = useState<Date>(new Date());
 	const { setParams } = useTaskParams();
@@ -111,26 +106,6 @@ export const TaskForm = ({
 	const title = form.watch("title");
 	const [debouncedTitle] = useDebounceValue(title, 500);
 
-	useEffect(() => {
-		return () => {
-			const { isValid, isDirty } = form.formState;
-			if (isDirty) {
-				const values = form.getValues();
-				if (!values.id) return;
-
-				if (!isValid) return;
-
-				const mentions = parseMentions(editorRef.current?.getJSON() || {});
-				// Auto save for existing tasks
-				updateTask({
-					id: values.id,
-					...values,
-					mentions,
-				});
-			}
-		};
-	}, []);
-
 	const parseMentions = (data: any) => {
 		const mentions: string[] = (data.content || []).flatMap(parseMentions);
 		if (data.type === "mention") {
@@ -157,6 +132,11 @@ export const TaskForm = ({
 			});
 		}
 	};
+
+	useFormAutoSave(form, onSubmit, {
+		enabled: Boolean(id),
+		ignoreFields: ["showSmartInput"],
+	});
 
 	const createMode = !id;
 	const formShowSmartInput = form.watch("showSmartInput");
