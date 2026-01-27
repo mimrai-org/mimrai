@@ -1,7 +1,9 @@
-import { Textarea } from "@mimir/ui/textarea";
 import { useMutation } from "@tanstack/react-query";
 import type { Editor as EditorInstance } from "@tiptap/react";
+import { Button } from "@ui/components/ui/button";
+import { Kbd, KbdGroup } from "@ui/components/ui/kbd";
 import { cn } from "@ui/lib/utils";
+import { CommandIcon, CornerDownLeft, CornerDownLeftIcon } from "lucide-react";
 import { useRef, useState } from "react";
 import { Editor } from "@/components/editor";
 import { queryClient, trpc } from "@/utils/trpc";
@@ -25,6 +27,7 @@ export const CommentInput = ({
 	onBlur?: () => void;
 	metadata?: Record<string, string | number | boolean>;
 }) => {
+	const [focused, setFocused] = useState(false);
 	const editorRef = useRef<EditorInstance | null>(null);
 	const [comment, setComment] = useState("");
 
@@ -57,8 +60,8 @@ export const CommentInput = ({
 		}),
 	);
 
-	const handleSubmit = (e: React.KeyboardEvent<HTMLDivElement>) => {
-		if (comment.trim().length === 0) return;
+	const handleSubmit = () => {
+		if (comment.replace(/\s|\n/g, "").length === 0) return;
 		const mentions = parseMentions(editorRef.current?.getJSON() || {});
 		commentTask({ id: taskId, comment, mentions, replyTo, metadata });
 
@@ -78,24 +81,50 @@ export const CommentInput = ({
 	return (
 		<div
 			onKeyDown={(e) => {
-				if (e.key === "Enter" && !e.shiftKey) {
+				if (e.key === "Enter" && e.ctrlKey) {
 					e.preventDefault();
-					handleSubmit(e);
+					handleSubmit();
 				}
 			}}
+			className="group relative"
 		>
 			<Editor
 				value={comment}
 				ref={editorRef}
 				autoFocus={autoFocus}
 				onChange={(e) => setComment(e)}
-				onBlur={onBlur}
+				onBlur={() => {
+					setFocused(false);
+					onBlur?.();
+				}}
+				onFocus={() => setFocused(true)}
 				placeholder="Leave a comment..."
 				className={cn(
-					"rounded-sm border border-input px-4 py-2 [&_div]:min-h-[60px]",
+					"rounded-sm border border-input px-4 py-2 [&_div]:min-h-[80px]",
 					className,
 				)}
 			/>
+
+			{focused && (
+				<div className="fade-in absolute right-2 bottom-2 flex animate-in items-center gap-2">
+					<Button
+						size="sm"
+						className="h-7"
+						variant="ghost"
+						onClick={() => {
+							handleSubmit();
+						}}
+					>
+						<span className="hidden">Submit</span>
+						<KbdGroup>
+							<Kbd className="bg-transparent text-current">
+								<CommandIcon className="size-3.5" />
+								<CornerDownLeftIcon className="size-3.5" />
+							</Kbd>
+						</KbdGroup>
+					</Button>
+				</div>
+			)}
 		</div>
 	);
 };

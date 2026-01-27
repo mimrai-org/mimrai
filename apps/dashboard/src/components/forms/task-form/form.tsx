@@ -235,7 +235,7 @@ export const TaskForm = ({
 									</div>
 								)}
 								{id && (
-									<div>
+									<div className="pb-6">
 										<hr className="my-6" />
 										<div className="mb-4 flex items-center justify-between">
 											<span className="font-medium text-sm">Activity</span>
