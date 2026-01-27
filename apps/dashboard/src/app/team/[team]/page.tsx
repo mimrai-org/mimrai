@@ -1,4 +1,3 @@
-import { SunIcon } from "lucide-react";
 import { FeedView } from "@/components/feed/view";
 import { NavTopTasks } from "@/components/nav/nav-top-tasks";
 import { NavWorkspace } from "@/components/nav/nav-workspace";
@@ -6,9 +5,7 @@ import { NavSearch } from "@/components/nav-search";
 import { NavUser } from "@/components/nav-user";
 import { ProjectsList } from "@/components/projects/list";
 import { TeamSwitcher } from "@/components/team-switcher";
-import { getSession } from "@/lib/get-session";
-import { trpc } from "@/utils/trpc";
-import { getQueryClient, HydrateClient } from "@/utils/trpc-server";
+import { trpcClient } from "@/utils/trpc";
 
 type Props = {
 	searchParams: Promise<{
@@ -17,7 +14,7 @@ type Props = {
 };
 
 export default async function Page({ searchParams }: Props) {
-	const session = await getSession();
+	const user = await trpcClient.users.getCurrent.query();
 
 	return (
 		<div className="flex h-screen w-screen flex-col items-center overflow-y-auto pb-4">
@@ -34,7 +31,7 @@ export default async function Page({ searchParams }: Props) {
 						<NavUser />
 					</div>
 					<p className="text-muted-foreground text-sm">
-						Hello, {session?.user?.name.split(" ")[0]}
+						Hello, {user?.name.split(" ")[0]}
 					</p>
 				</div>
 				<NavTopTasks />
