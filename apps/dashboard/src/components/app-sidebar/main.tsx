@@ -9,6 +9,7 @@ import {
 } from "@ui/components/ui/sidebar";
 import { cn } from "@ui/lib/utils";
 import { Logo } from "@/components/logo";
+import { SidebarFocus } from "./sidebar-focus";
 import { SidebarProjects } from "./sidebar-projects";
 import { SidebarWorkspace } from "./sidebar-workspace";
 
@@ -41,6 +42,7 @@ export function AppSidebar() {
 				</div>
 			</SidebarHeader>
 			<SidebarContent>
+				<SidebarFocus />
 				<SidebarProjects />
 				<SidebarWorkspace />
 			</SidebarContent>
