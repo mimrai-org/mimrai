@@ -61,6 +61,7 @@ export const CommentInput = ({
 	);
 
 	const handleSubmit = () => {
+		console.log("Submitting comment:", comment);
 		if (comment.replace(/\s|\n/g, "").length === 0) return;
 		const mentions = parseMentions(editorRef.current?.getJSON() || {});
 		commentTask({ id: taskId, comment, mentions, replyTo, metadata });
@@ -86,7 +87,7 @@ export const CommentInput = ({
 					handleSubmit();
 				}
 			}}
-			className="group relative"
+			className="group/comment relative"
 		>
 			<Editor
 				value={comment}
@@ -105,26 +106,32 @@ export const CommentInput = ({
 				)}
 			/>
 
-			{focused && (
-				<div className="fade-in absolute right-2 bottom-2 flex animate-in items-center gap-2">
-					<Button
-						size="sm"
-						className="h-7"
-						variant="ghost"
-						onClick={() => {
-							handleSubmit();
-						}}
-					>
-						<span className="hidden">Submit</span>
-						<KbdGroup>
-							<Kbd className="bg-transparent text-current">
-								<CommandIcon className="size-3.5" />
-								<CornerDownLeftIcon className="size-3.5" />
-							</Kbd>
-						</KbdGroup>
-					</Button>
-				</div>
-			)}
+			<div
+				className={cn(
+					"fade-in absolute right-2 bottom-2 flex animate-in items-center gap-2",
+					{
+						invisible: !focused,
+					},
+				)}
+			>
+				<Button
+					size="sm"
+					className="h-7"
+					variant="ghost"
+					type="button"
+					onClick={() => {
+						handleSubmit();
+					}}
+				>
+					<span className="hidden">Submit</span>
+					<KbdGroup>
+						<Kbd className="bg-transparent text-current">
+							<CommandIcon className="size-3.5" />
+							<CornerDownLeftIcon className="size-3.5" />
+						</Kbd>
+					</KbdGroup>
+				</Button>
+			</div>
 		</div>
 	);
 };
