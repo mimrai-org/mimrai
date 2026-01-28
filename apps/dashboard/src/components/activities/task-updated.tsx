@@ -3,8 +3,7 @@
 import { t } from "@mimir/locale";
 import type { RouterOutputs } from "@mimir/trpc";
 import { BaseActivity } from "./base-activity";
-
-type Activity = RouterOutputs["activities"]["get"]["data"][number];
+import type { Activity } from "./types";
 
 interface TaskUpdatedActivityProps {
 	activity: Activity;

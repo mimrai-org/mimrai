@@ -1,13 +1,27 @@
 {
-  "servers": {
-    "playwright-test": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "playwright",
-        "run-test-mcp-server"
-      ]
-    }
-  },
-  "inputs": []
+	"servers": {
+		"playwright-test": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"playwright",
+				"run-test-mcp-server"
+			]
+		},
+		"mimrai": {
+			"url": "http://localhost:3003/mcp",
+			"type": "http",
+			"headers": {
+				"x-api-key": "${input:mimrai-api-key}"
+			}
+		}
+	},
+	"inputs": [
+		{
+			"id": "mimrai-api-key",
+			"type": "promptString",
+			"description": "Enter your Mimrai API key (create one in your dashboard settings)",
+			"password": true
+		}
+	]
 }

@@ -3,8 +3,7 @@
 import type { RouterOutputs } from "@mimir/trpc";
 import { AssigneeAvatar } from "@/components/asignee-avatar";
 import { ActivityReactions } from "./activity-reactions";
-
-type Activity = RouterOutputs["activities"]["get"]["data"][number];
+import type { Activity } from "./types";
 
 interface DailyTeamSummaryActivityProps {
 	activity: Activity;

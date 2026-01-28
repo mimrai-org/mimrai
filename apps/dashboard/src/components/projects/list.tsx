@@ -1,6 +1,7 @@
 "use client";
 
-import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
+import type { RouterOutputs } from "@mimir/trpc";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import {
 	CircularProgress,
 	CircularProgressIndicator,
@@ -8,25 +9,16 @@ import {
 	CircularProgressTrack,
 } from "@ui/components/ui/circular-progress";
 import {
-	ContextMenu,
-	ContextMenuContent,
-	ContextMenuItem,
-	ContextMenuTrigger,
-} from "@ui/components/ui/context-menu";
-import {
 	Tooltip,
 	TooltipContent,
 	TooltipTrigger,
 } from "@ui/components/ui/tooltip";
-import { CopyPlusIcon, TrashIcon } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useMemo } from "react";
-import { toast } from "sonner";
 import { ProjectIcon } from "@/components/project-icon";
 import { useUser } from "@/components/user-provider";
 import { useProjectParams } from "@/hooks/use-project-params";
-import { queryClient, trpc } from "@/utils/trpc";
+import { trpc } from "@/utils/trpc";
 import { AssigneeAvatar } from "../asignee-avatar";
 import {
 	NavItem,
@@ -36,20 +28,22 @@ import {
 	NavItemSubtitle,
 	NavItemTitle,
 } from "../nav/nav-item";
+import { ProjectContextMenu } from "./context-menu";
 import { ProjectsFilters } from "./filters";
 import { useProjectsFilterParams } from "./use-projects-filter-params";
+
+export type Project = RouterOutputs["projects"]["get"]["data"][number];
 
 export const ProjectsList = ({
 	showFilters = true,
 }: {
 	showFilters?: boolean;
 }) => {
-	const router = useRouter();
 	const user = useUser();
 	const { setParams } = useProjectParams();
 	const { params } = useProjectsFilterParams();
 
-	const { data, isLoading } = useInfiniteQuery(
+	const { data } = useInfiniteQuery(
 		trpc.projects.get.infiniteQueryOptions(
 			{
 				pageSize: 20,
@@ -59,37 +53,6 @@ export const ProjectsList = ({
 				getNextPageParam: (lastPage) => lastPage.meta.cursor,
 			},
 		),
-	);
-
-	const { mutate: deleteProject, isPending: isDeleting } = useMutation(
-		trpc.projects.delete.mutationOptions({
-			onMutate: () => {
-				toast.loading("Deleting project...", { id: "delete-project" });
-			},
-			onSuccess: () => {
-				queryClient.invalidateQueries(trpc.projects.get.infiniteQueryOptions());
-				toast.success("Project deleted successfully", { id: "delete-project" });
-			},
-			onError: (error) => {
-				toast.error("Failed to delete project", { id: "delete-project" });
-			},
-		}),
-	);
-
-	const { mutate: cloneProject } = useMutation(
-		trpc.projects.clone.mutationOptions({
-			onMutate: () => {
-				toast.loading("Cloning project...", { id: "clone-project" });
-			},
-			onSuccess: (project) => {
-				queryClient.invalidateQueries(trpc.projects.get.infiniteQueryOptions());
-				toast.success("Project cloned successfully", { id: "clone-project" });
-				setParams({ projectId: project.id });
-			},
-			onError: (error) => {
-				toast.error("Failed to clone project", { id: "clone-project" });
-			},
-		}),
 	);
 
 	const listData = useMemo(() => {
@@ -109,75 +72,50 @@ export const ProjectsList = ({
 							? Math.round((project.progress.completed / total) * 100)
 							: 0;
 					return (
-						<ContextMenu key={project.id}>
-							<ContextMenuTrigger asChild>
-								<Link href={`${user?.basePath}/projects/${project.id}`}>
-									<NavItem>
-										<NavItemIcon>
-											<ProjectIcon hasTasks={total > 0} color={project.color} />
-											<NavItemIconSecondary className="flex items-center justify-center">
-												<CircularProgress
-													size={12}
-													thickness={2}
-													value={progress ?? 0}
-													min={0}
-													max={100}
-												>
-													<CircularProgressIndicator>
-														<CircularProgressTrack />
-														<CircularProgressRange
-															style={{
-																color: project.color || undefined,
-															}}
-														/>
-													</CircularProgressIndicator>
-												</CircularProgress>
-											</NavItemIconSecondary>
-										</NavItemIcon>
-										<NavItemContent>
-											<NavItemTitle className="flex items-center gap-1">
-												{project.name}
-											</NavItemTitle>
-											<NavItemSubtitle>
-												<div className="flex items-center gap-1 text-xs">
-													<AssigneeAvatar
-														{...project.lead}
-														className="size-4"
+						<ProjectContextMenu key={project.id} project={project}>
+							<Link href={`${user?.basePath}/projects/${project.id}`}>
+								<NavItem>
+									<NavItemIcon>
+										<ProjectIcon hasTasks={total > 0} color={project.color} />
+										<NavItemIconSecondary className="flex items-center justify-center">
+											<CircularProgress
+												size={12}
+												thickness={2}
+												value={progress ?? 0}
+												min={0}
+												max={100}
+											>
+												<CircularProgressIndicator>
+													<CircularProgressTrack />
+													<CircularProgressRange
+														style={{
+															color: project.color || undefined,
+														}}
 													/>
-													<div className="flex items-center gap-1 rounded-sm px-1">
-														<span>
-															{Number(project.progress.completed) +
-																Number(project.progress.inProgress)}
-														</span>
-														Tasks
-													</div>
+												</CircularProgressIndicator>
+											</CircularProgress>
+										</NavItemIconSecondary>
+									</NavItemIcon>
+									<NavItemContent>
+										<NavItemTitle className="flex items-center gap-1">
+											{project.name}
+										</NavItemTitle>
+										<NavItemSubtitle>
+											<div className="flex items-center gap-1 text-xs">
+												<AssigneeAvatar {...project.lead} className="size-4" />
+												<div className="flex items-center gap-1 rounded-sm px-1">
+													<span>
+														{Number(project.progress.completed) +
+															Number(project.progress.inProgress)}
+													</span>
+													Tasks
 												</div>
-											</NavItemSubtitle>
-										</NavItemContent>
-									</NavItem>
-								</Link>
-							</ContextMenuTrigger>
-							<ContextMenuContent>
-								<ContextMenuItem
-									onClick={() => {
-										cloneProject({ id: project.id });
-									}}
-								>
-									<CopyPlusIcon />
-									Clone
-								</ContextMenuItem>
-								<ContextMenuItem
-									variant="destructive"
-									disabled={isDeleting}
-									onClick={() => {
-										deleteProject({ id: project.id });
-									}}
-								>
-									<TrashIcon />
-									Delete
-								</ContextMenuItem>
-							</ContextMenuContent>
-						</ContextMenu>
+											</div>
+										</NavItemSubtitle>
+									</NavItemContent>
+								</NavItem>
+							</Link>
+						</ProjectContextMenu>
 					);
 				})}
 

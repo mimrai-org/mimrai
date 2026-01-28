@@ -7,7 +7,10 @@ import { logger } from "hono/logger";
 import { auth } from "./lib/auth";
 import { createContext } from "./lib/context";
 import "./lib/instrument";
+import { HTTPException } from "hono/http-exception";
 import { routers } from "./rest/routers";
+import { mcpRouter } from "./rest/routers/mcp";
+import { wellKnownRouter } from "./rest/routers/well-known";
 import type { Context } from "./rest/types";
 import { webhooksRouters } from "./rest/webhooks";
 import { appRouter } from "./trpc/routers/index";
@@ -46,7 +49,13 @@ app.use(
 	}),
 );
 
+// Well-known endpoints for OAuth/OIDC discovery at root
+app.route("/.well-known", wellKnownRouter);
+
+// Better Auth handler (must come after .well-known routes)
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
+
+app.route("/api/auth/.well-known", wellKnownRouter);
 
 app.use(
 	"/trpc/*",
@@ -59,7 +68,22 @@ app.use(
 );
 
 app.route("/api", routers);
+app.route("/mcp", mcpRouter);
 app.route("/webhooks", webhooksRouters);
+
+app.onError((err, c) => {
+	console.error("Unhandled Error:", err);
+	if (err instanceof HTTPException) {
+		return err.getResponse();
+	}
+	return c.json(
+		{
+			error: "Internal Server Error",
+			message: err.message,
+		},
+		500,
+	);
+});
 
 initIntegrations()
 	.catch((err) => {

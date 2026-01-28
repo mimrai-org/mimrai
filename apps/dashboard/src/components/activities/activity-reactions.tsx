@@ -11,8 +11,8 @@ import {
 import { SmilePlusIcon } from "lucide-react";
 import { useState } from "react";
 import { trpc } from "@/utils/trpc";
+import type { Activity } from "./types";
 
-type Activity = RouterOutputs["activities"]["get"]["data"][number];
 type ReactionSummary = Activity["reactions"][number];
 
 interface ActivityReactionsProps {

@@ -47,6 +47,7 @@ export const ProjectUpdateSheet = () => {
 							defaultValues={{
 								...project,
 							}}
+							propertiesLayout="compact"
 						/>
 					</div>
 				) : (

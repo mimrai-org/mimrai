@@ -5,8 +5,7 @@ import { formatRelative } from "date-fns";
 import { DotIcon } from "lucide-react";
 import { AssigneeAvatar } from "@/components/asignee-avatar";
 import { ActivityReactions } from "./activity-reactions";
-
-type Activity = RouterOutputs["activities"]["get"]["data"][number];
+import type { Activity } from "./types";
 
 interface MentionActivityProps {
 	activity: Activity;

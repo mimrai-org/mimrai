@@ -42,22 +42,18 @@ export default async function Layout({ children, params }: Props) {
 
 	return (
 		<Suspense>
-			<StickySidebarProvider
-				defaultOpen={cookieStore.get("sticky-sidebar-open")?.value === "true"}
-			>
-				<UserProvider user={user}>
-					<PanelProvider>
-						<GlobalSheets />
-						{children}
+			<UserProvider user={user}>
+				<PanelProvider>
+					<GlobalSheets />
+					{children}
 
-						{/* {process.env.NODE_ENV === "development" && (
+					{/* {process.env.NODE_ENV === "development" && (
 							<ReactQueryDevtools buttonPosition="bottom-left" />
 						)} */}
-						<OpenPanelProvider profileId={user.id} />
-						<PanelStack />
-					</PanelProvider>
-				</UserProvider>
-			</StickySidebarProvider>
+					<OpenPanelProvider profileId={user.id} />
+					<PanelStack />
+				</PanelProvider>
+			</UserProvider>
 		</Suspense>
 	);
 }

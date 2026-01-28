@@ -20,8 +20,7 @@ import { queryClient, trpc } from "@/utils/trpc";
 import { Editor } from "../editor";
 import { CommentInput } from "../forms/task-form/comment-input";
 import { ActivityReactions } from "./activity-reactions";
-
-type Activity = RouterOutputs["activities"]["get"]["data"][number];
+import type { Activity } from "./types";
 
 interface TaskCommentActivityProps {
 	activity: Activity;

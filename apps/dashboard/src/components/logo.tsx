@@ -1,3 +1,4 @@
+import { cn } from "@ui/lib/utils";
 import Image from "next/image";
 
 export const Logo = ({ className }: { className?: string }) => {
@@ -8,7 +9,7 @@ export const Logo = ({ className }: { className?: string }) => {
 			width={32}
 			height={32}
 			loading="lazy"
-			className={className}
+			className={cn(className, "rounded-sm object-contain")}
 		/>
 	);
 };

@@ -22,6 +22,7 @@ export const FeedView = () => {
 					type: [
 						"task_assigned",
 						"task_comment",
+						"task_completed",
 						"mention",
 						"daily_team_summary",
 					],

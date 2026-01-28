@@ -7,11 +7,11 @@ import { MentionActivity } from "./mention";
 import { TaskAssignedActivity } from "./task-assigned";
 import { TaskColumnChangedActivity } from "./task-column-changed";
 import { TaskCommentActivity } from "./task-comment";
+import { TaskCompletedActivity } from "./task-completed";
 import { TaskCreatedActivity } from "./task-created";
 import { TaskUpdatedActivity } from "./task-updated";
+import type { Activity } from "./types";
 import { UnknownActivity } from "./unknown-activity";
-
-type Activity = RouterOutputs["activities"]["get"]["data"][number];
 
 interface ActivityItemProps {
 	activity: Activity;
@@ -41,6 +41,8 @@ export const ActivityItem = ({ activity, taskId }: ActivityItemProps) => {
 			return <ChecklistItemCreatedActivity activity={activity} />;
 		case "daily_team_summary":
 			return <DailyTeamSummaryActivity activity={activity} />;
+		case "task_completed":
+			return <TaskCompletedActivity activity={activity} />;
 		default:
 			return <UnknownActivity activity={activity} />;
 	}

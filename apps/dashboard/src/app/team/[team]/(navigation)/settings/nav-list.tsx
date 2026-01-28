@@ -7,6 +7,7 @@ import {
 	CloudUploadIcon,
 	CreditCardIcon,
 	FolderIcon,
+	KeyRoundIcon,
 	MaximizeIcon,
 	SettingsIcon,
 	SparklesIcon,
@@ -15,20 +16,16 @@ import {
 	UsersIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useMemo } from "react";
 import {
 	NavItem,
 	NavItemContent,
-	NavItemSubtitle,
 	NavItemTitle,
 } from "@/components/nav/nav-item";
 import { useUser } from "@/components/user-provider";
-import { cn } from "@/lib/utils";
 
 export const NavList = () => {
 	const user = useUser();
-	const pathname = usePathname();
 
 	const addTeamToUrl = (url: string) => {
 		if (!user?.team) return url;
@@ -88,6 +85,11 @@ export const NavList = () => {
 				icon: CableIcon,
 				to: addTeamToUrl("/settings/integrations"),
 				label: t("settings.sidebar.integrations"),
+			},
+			{
+				icon: KeyRoundIcon,
+				to: addTeamToUrl("/settings/api-keys"),
+				label: "API Keys",
 			},
 			{
 				icon: CloudUploadIcon,

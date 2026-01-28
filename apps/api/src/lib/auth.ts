@@ -1,12 +1,22 @@
 import { db } from "@mimir/db/client";
-import { account, session, users, verification } from "@mimir/db/schema";
+import {
+	account,
+	apikey,
+	session,
+	users,
+	verification,
+} from "@mimir/db/schema";
 import { EmailVerificationEmail } from "@mimir/email/emails/email-verification";
 import { ResetPasswordEmail } from "@mimir/email/emails/reset-password";
 import { op } from "@mimir/events/server";
 import { getAppUrl, getEmailFrom } from "@mimir/utils/envs";
 import { type BetterAuthOptions, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { createAuthMiddleware, customSession } from "better-auth/plugins";
+import {
+	apiKey,
+	createAuthMiddleware,
+	customSession,
+} from "better-auth/plugins";
 import { resend } from "./resend";
 
 export const auth = betterAuth<BetterAuthOptions>({
@@ -17,6 +27,7 @@ export const auth = betterAuth<BetterAuthOptions>({
 			account,
 			verification,
 			users,
+			apikey,
 		},
 	}),
 	trustedOrigins: (process.env.ALLOWED_API_ORIGINS || "").split(","),
@@ -36,7 +47,7 @@ export const auth = betterAuth<BetterAuthOptions>({
 		}),
 	},
 	emailVerification: {
-		async sendVerificationEmail({ user, url }, request) {
+		async sendVerificationEmail({ user, url }, _request) {
 			const parsedUrl = new URL(url);
 			parsedUrl.searchParams.set("callbackURL", `${getAppUrl()}/redirect`);
 			await resend.emails.send({
@@ -66,6 +77,11 @@ export const auth = betterAuth<BetterAuthOptions>({
 					token,
 				}),
 			});
+		},
+	},
+	session: {
+		cookieCache: {
+			enabled: true,
 		},
 	},
 	socialProviders: {
@@ -105,12 +121,6 @@ export const auth = betterAuth<BetterAuthOptions>({
 			},
 		},
 	},
-	session: {
-		cookieCache: {
-			enabled: true,
-			maxAge: 60, // seconds
-		},
-	},
 	advanced: {
 		useSecureCookies: true,
 		crossSubDomainCookies: {
@@ -119,12 +129,38 @@ export const auth = betterAuth<BetterAuthOptions>({
 		},
 	},
 	plugins: [
+		apiKey({
+			// API key configuration for MCP authentication
+			defaultPrefix: "mimir_",
+			enableMetadata: true,
+			// Enable session creation from API keys for MCP requests
+			enableSessionForAPIKeys: true,
+			// Default rate limiting: 1000 requests per day
+			rateLimit: {
+				enabled: true,
+				timeWindow: 1000 * 60 * 60 * 24, // 1 day
+				maxRequests: 1000,
+			},
+			// Custom permissions for MCP scopes
+			permissions: {
+				defaultPermissions: {
+					tasks: ["read", "write"],
+					projects: ["read", "write"],
+					milestones: ["read", "write"],
+					labels: ["read", "write"],
+				},
+			},
+		}),
 		customSession(async ({ user, session }) => {
+			const userWithTeam = user as unknown as {
+				teamId?: string;
+				teamSlug?: string;
+			};
 			return {
 				user: {
 					...user,
-					teamId: ((user as any).teamId as string) || null,
-					teamSlug: ((user as any).teamSlug as string) || null,
+					teamId: userWithTeam.teamId || null,
+					teamSlug: userWithTeam.teamSlug || null,
 				},
 				session,
 			};

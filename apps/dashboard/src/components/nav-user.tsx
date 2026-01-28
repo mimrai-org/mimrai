@@ -24,7 +24,7 @@ export function NavUser() {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger>
-				<Avatar className="size-8 rounded-full ring-6 ring-secondary/50">
+				<Avatar className="size-6 rounded-full ring-4 ring-secondary/50">
 					<AvatarImage src={user.image!} alt={user.name} />
 					<AvatarFallback
 						className="rounded-none"
