@@ -12,6 +12,7 @@ import {
 	getActivitiesCount,
 	hasNewActivities,
 } from "@mimir/db/queries/activities";
+import { subscribeToEvents } from "@mimir/realtime";
 
 export const activitiesRouter = router({
 	get: protectedProcedure
@@ -59,5 +60,14 @@ export const activitiesRouter = router({
 			teamId: ctx.user.teamId!,
 			userId: ctx.user.id,
 		});
+	}),
+
+	onCreated: protectedProcedure.subscription(async function* (opts) {
+		for await (const comment of subscribeToEvents(["activities.created"], {
+			signal: opts.signal,
+		})) {
+			console.log("Activity created event received in subscription:", comment);
+			yield comment;
+		}
 	}),
 });

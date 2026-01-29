@@ -1,0 +1,14 @@
+{
+	"extends": "@mimir/tsconfig/base.json",
+	"include": ["src"],
+	"exclude": ["**/node_modules", "**/.*/"],
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"@notifications/*": ["src/*"]
+		},
+		"types": ["@types/bun"],
+		"jsx": "react-jsx",
+		"jsxImportSource": "react"
+	}
+}

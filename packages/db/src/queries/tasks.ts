@@ -42,6 +42,7 @@ import {
 	createActivity,
 	createTaskUpdateActivity,
 	deleteActivity,
+	getActivityById,
 	updateActivity,
 } from "./activities";
 import { getStatuses } from "./statuses";
