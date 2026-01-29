@@ -97,7 +97,7 @@ export const TasksList = () => {
 			if (item.type === "create-button") return ESTIMATED_CREATE_BUTTON_HEIGHT;
 			return ESTIMATED_TASK_HEIGHT;
 		},
-		overscan: 5,
+		overscan: 10,
 	});
 
 	const toggleGroup = useCallback((groupId: string) => {

@@ -30,7 +30,6 @@ const extensions = ({
 	Underline,
 	Image.configure({
 		inline: true,
-		// @ts-expect-error missing resize package
 		resize: {
 			enabled: true,
 			directions: ["top", "right", "bottom", "left"],

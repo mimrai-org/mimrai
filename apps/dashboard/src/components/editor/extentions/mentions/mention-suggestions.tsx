@@ -51,6 +51,7 @@ export function buildUnifiedSuggestionOptions(
 ): Partial<SuggestionOptions<AnyMentionEntity>> {
 	return {
 		char: "@",
+		allowSpaces: true,
 		items: async ({ query }) => {
 			return fetchAllMentions(query);
 		},

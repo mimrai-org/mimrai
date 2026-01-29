@@ -77,7 +77,7 @@ export const TeamSwitcher = () => {
 		<DropdownMenu>
 			<button
 				type="button"
-				className="flex w-full items-center justify-between gap-2 py-2 opacity-90 hover:bg-transparent hover:opacity-100 focus:outline-none dark:hover:bg-transparent"
+				className="flex w-full items-center justify-between py-2 opacity-90 hover:bg-transparent hover:opacity-100 focus:outline-none dark:hover:bg-transparent"
 			>
 				<Link href={`/team/${user?.team?.slug}`}>
 					<div className="flex items-center gap-2">
@@ -95,7 +95,7 @@ export const TeamSwitcher = () => {
 				</Link>
 
 				<DropdownMenuTrigger asChild>
-					<div>
+					<div className="px-2">
 						<ChevronsUpDownIcon className="size-4 text-muted-foreground" />
 					</div>
 				</DropdownMenuTrigger>
