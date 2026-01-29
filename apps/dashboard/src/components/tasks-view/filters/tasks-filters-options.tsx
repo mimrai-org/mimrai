@@ -155,6 +155,21 @@ export const tasksFilterOptions = {
 					new Date().toISOString(),
 				],
 			},
+			{
+				label: "Last 24 hours",
+				value: [
+					subHours(new Date(), 24).toISOString(),
+					new Date().toISOString(),
+				],
+			},
+			{
+				label: "Last 3 days",
+				value: [subDays(new Date(), 3).toISOString(), new Date().toISOString()],
+			},
+			{
+				label: "Last 7 days",
+				value: [subDays(new Date(), 7).toISOString(), new Date().toISOString()],
+			},
 		],
 	},
 	createdAt: {

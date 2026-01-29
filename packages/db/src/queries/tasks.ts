@@ -223,7 +223,13 @@ export const getTasks = async ({
 	}
 
 	// exclude done tasks with more than 3 days
-	if (!input.statusType || !input.statusType?.includes("done")) {
+	if (
+		(!input.statusType ||
+			!input.statusType?.includes("done") ||
+			!input.statusId) &&
+		!input.statusChangedAt &&
+		!input.completedBy
+	) {
 		whereClause.push(
 			or(
 				notInArray(statuses.type, ["done"]),
