@@ -3,18 +3,13 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { cn } from "@ui/lib/utils";
 import { format, isToday, isYesterday } from "date-fns";
-import { LayersIcon } from "lucide-react";
 import { useEffect } from "react";
 import { ActivityItem } from "@/components/activities/activity-item";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { trpc } from "@/utils/trpc";
 import Loader from "../loader";
-import { useTaskPanel } from "../panels/task-panel";
-
-const highlightedTypes = ["task_comment", "mention", "daily_team_summary"];
 
 export const FeedView = () => {
-	const taskPanel = useTaskPanel();
 	const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
 		useInfiniteQuery(
 			trpc.activities.get.infiniteQueryOptions(
