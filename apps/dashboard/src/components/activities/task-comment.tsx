@@ -10,7 +10,7 @@ import {
 	ContextMenuTrigger,
 } from "@ui/components/ui/context-menu";
 import { formatRelative } from "date-fns";
-import { DotIcon } from "lucide-react";
+import { DotIcon, TrashIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -20,6 +20,7 @@ import { queryClient, trpc } from "@/utils/trpc";
 import { Editor } from "../editor";
 import { CommentInput } from "../forms/task-form/comment-input";
 import { ActivityReactions } from "./activity-reactions";
+import { BaseActivity } from "./base-activity";
 import type { Activity } from "./types";
 
 interface TaskCommentActivityProps {
@@ -73,13 +74,6 @@ export const TaskCommentActivity = ({
 		),
 	);
 
-	const replyCommentsCount = useMemo(() => {
-		if (!replyComments) return 0;
-		return replyComments.pages.reduce(
-			(total, page) => total + page.data.length,
-			0,
-		);
-	}, [replyComments]);
 	const replyCommentsArray = useMemo(() => {
 		if (!replyComments) return [];
 		return replyComments.pages.flatMap((page) => page.data).reverse();
@@ -111,24 +105,12 @@ export const TaskCommentActivity = ({
 		<div className="space-y-2">
 			<ContextMenu>
 				<ContextMenuTrigger>
-					<div className="group space-y-1 rounded-sm border px-4 py-4 text-muted-foreground text-sm">
-						<div className="flex flex-wrap items-center text-muted-foreground text-xs">
-							<AssigneeAvatar
-								{...activity.user}
-								className="mr-2 size-4 text-xs"
-							/>
-							<span className="mr-1 font-medium">{activity.user.name}</span>
-							<DotIcon />
-							{formatRelative(new Date(activity.createdAt!), new Date())}
-							<ActivityReactions
-								activityId={activity.id}
-								reactions={activity.reactions}
-							/>
-						</div>
-						<div className="whitespace-pre-wrap break-words pt-1 text-foreground">
+					<div className="group space-y-1 rounded-sm border py-4 text-muted-foreground text-sm">
+						<BaseActivity activity={activity} />
+						<div className="whitespace-pre-wrap break-words px-4 pt-1 text-foreground">
 							<Editor value={metadata.comment} readOnly />
 						</div>
-						<div className="flex justify-end opacity-0 transition-opacity group-hover:opacity-100">
+						<div className="flex justify-end px-4 opacity-0 transition-opacity group-hover:opacity-100">
 							<Button
 								variant={"ghost"}
 								size={"sm"}
@@ -148,7 +130,8 @@ export const TaskCommentActivity = ({
 						variant="destructive"
 						onClick={() => deleteComment({ id: activity.id })}
 					>
-						Delete Comment
+						<TrashIcon />
+						Delete
 					</ContextMenuItem>
 				</ContextMenuContent>
 			</ContextMenu>
@@ -163,7 +146,13 @@ export const TaskCommentActivity = ({
 						className="mt-4"
 						ref={replyContainerRef}
 					>
-						<CommentInput taskId={taskId} replyTo={activity.id} autoFocus />
+						<CommentInput
+							taskId={taskId}
+							replyTo={
+								activity.groupId === taskId ? activity.id : activity.groupId
+							}
+							autoFocus
+						/>
 					</motion.div>
 				)}
 			</AnimatePresence>

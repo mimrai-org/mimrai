@@ -123,6 +123,7 @@ export const InlineCommentItem = ({
 		const editor = editorRef.current;
 
 		// Unset the comment mark in the editor
+		// @ts-expect-error - comment mark command missing types
 		editor.commands.unsetCommentMark(comment.id);
 
 		// Update the task description to remove the comment mark

@@ -3,7 +3,7 @@ import type { Editor as EditorInstance } from "@tiptap/react";
 import { Button } from "@ui/components/ui/button";
 import { Kbd, KbdGroup } from "@ui/components/ui/kbd";
 import { cn } from "@ui/lib/utils";
-import { CommandIcon, CornerDownLeft, CornerDownLeftIcon } from "lucide-react";
+import { CommandIcon, CornerDownLeftIcon } from "lucide-react";
 import { useRef, useState } from "react";
 import { Editor } from "@/components/editor";
 import { queryClient, trpc } from "@/utils/trpc";

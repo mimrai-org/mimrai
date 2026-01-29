@@ -1,14 +1,26 @@
 import { buildAppContext } from "@api/ai/agents/config/shared";
-import { triageAgent } from "@api/ai/agents/triage";
+import {
+	type TaskCommentContext,
+	taskCommentAgent,
+} from "@api/ai/agents/task-comment";
 import type { UIChatMessage } from "@api/ai/types";
 import { getUserContext } from "@api/ai/utils/get-user-context";
 import { db } from "@mimir/db/client";
 import { getChatById, saveChatMessage } from "@mimir/db/queries/chats";
 import { createTaskComment } from "@mimir/db/queries/tasks";
 import { getSystemUser } from "@mimir/db/queries/users";
-import { activities, tasks } from "@mimir/db/schema";
+import {
+	activities,
+	labels,
+	labelsOnTasks,
+	milestones,
+	projects,
+	statuses,
+	tasks,
+	users,
+} from "@mimir/db/schema";
 import type { UIMessage } from "ai";
-import { and, eq } from "drizzle-orm";
+import { and, asc, eq, or } from "drizzle-orm";
 
 export const handleTaskComment = async ({
 	taskId,
@@ -29,8 +41,53 @@ export const handleTaskComment = async ({
 		throw new Error("System user not found");
 	}
 
-	// check if the comment has a mention of the system user
-	if (!comment.includes(`@${systemUser.name}`)) {
+	const [userComment] = await db
+		.select()
+		.from(activities)
+		.where(
+			and(
+				eq(activities.id, commentId),
+				eq(activities.teamId, teamId),
+				eq(activities.userId, userId),
+				eq(activities.type, "task_comment"),
+			),
+		)
+		.limit(1);
+
+	let shouldReply = false;
+	if (userComment?.metadata?.comment) {
+		const comment = userComment.metadata.comment as string;
+		// check if the comment has a mention of the system user
+		if (comment.includes(`@${systemUser.name}`)) {
+			shouldReply = true;
+		}
+
+		if (!shouldReply) {
+			// check if the comment is a reply to a previous mentioned comment
+			if (userComment.groupId !== taskId && userComment.groupId) {
+				const [parentComment] = await db
+					.select()
+					.from(activities)
+					.where(
+						and(
+							eq(activities.id, userComment.groupId),
+							eq(activities.teamId, teamId),
+							eq(activities.type, "task_comment"),
+						),
+					)
+					.limit(1);
+
+				if (parentComment?.metadata?.comment) {
+					const parentCommentText = parentComment.metadata.comment as string;
+					if (parentCommentText.includes(`@${systemUser.name}`)) {
+						shouldReply = true;
+					}
+				}
+			}
+		}
+	}
+
+	if (!shouldReply) {
 		return;
 	}
 
@@ -57,8 +114,26 @@ export const handleTaskComment = async ({
 	};
 
 	const [task] = await db
-		.select()
+		.select({
+			id: tasks.id,
+			title: tasks.title,
+			description: tasks.description,
+			priority: tasks.priority,
+			statusId: tasks.statusId,
+			assigneeId: tasks.assigneeId,
+			projectId: tasks.projectId,
+			milestoneId: tasks.milestoneId,
+			dueDate: tasks.dueDate,
+			statusName: statuses.name,
+			assigneeName: users.name,
+			projectName: projects.name,
+			milestoneName: milestones.name,
+		})
 		.from(tasks)
+		.leftJoin(statuses, eq(tasks.statusId, statuses.id))
+		.leftJoin(users, eq(tasks.assigneeId, users.id))
+		.leftJoin(projects, eq(tasks.projectId, projects.id))
+		.leftJoin(milestones, eq(tasks.milestoneId, milestones.id))
 		.where(and(eq(tasks.id, taskId), eq(tasks.teamId, teamId)))
 		.limit(1);
 
@@ -66,38 +141,35 @@ export const handleTaskComment = async ({
 		throw new Error("Task not found");
 	}
 
+	// Fetch task labels
+	const taskLabels = await db
+		.select({
+			id: labels.id,
+			name: labels.name,
+		})
+		.from(labelsOnTasks)
+		.innerJoin(labels, eq(labelsOnTasks.labelId, labels.id))
+		.where(eq(labelsOnTasks.taskId, taskId));
+
 	const unsavedMessages: {
 		message: UIChatMessage;
 		createdAt: string;
 	}[] = [];
 
-	const comments = await db
+	const taskComments = await db
 		.select()
 		.from(activities)
 		.where(
 			and(
-				eq(activities.groupId, taskId),
+				or(eq(activities.groupId, commentId), eq(activities.groupId, taskId)),
 				eq(activities.teamId, teamId),
 				eq(activities.type, "task_comment"),
 			),
 		)
-		.limit(20);
-
-	const replyComments = await db
-		.select()
-		.from(activities)
-		.where(
-			and(
-				eq(activities.groupId, commentId),
-				eq(activities.teamId, teamId),
-				eq(activities.type, "task_comment"),
-			),
-		)
+		.orderBy(asc(activities.createdAt))
 		.limit(10);
 
-	const allComments = [...comments, ...replyComments];
-
-	for (const oldComment of allComments) {
+	for (const oldComment of taskComments) {
 		if (allMessages.find((m) => m.id === oldComment.id)) {
 			continue;
 		}
@@ -112,7 +184,6 @@ export const handleTaskComment = async ({
 			parts: [{ type: "text", text: oldComment.metadata?.comment }],
 		};
 
-		allMessages.push(message);
 		unsavedMessages.push({
 			message,
 			createdAt: oldComment.createdAt!,
@@ -123,7 +194,6 @@ export const handleTaskComment = async ({
 		message: userMessage,
 		createdAt: new Date().toISOString(),
 	});
-	allMessages.push(userMessage);
 
 	await Promise.all(
 		unsavedMessages.map(({ message, createdAt }) =>
@@ -137,59 +207,57 @@ export const handleTaskComment = async ({
 		),
 	);
 
-	const appContext = buildAppContext(
+	// Build recent comments for context
+	const recentCommentsForContext = taskComments
+		.filter((c) => c.metadata?.comment)
+		.slice(-10)
+		.map((c) => ({
+			author: c.userId ?? "Unknown",
+			content: c.metadata?.comment as string,
+			createdAt: c.createdAt ?? new Date().toISOString(),
+		}));
+
+	const baseContext = buildAppContext(
 		{
 			...userContext,
-			integrationType: "whatsapp",
-			additionalContext: `
-				<IMPORTANT>
-					This message was posted as a comment on a task, THIS IS NOT A CHAT, your response will be posted as a comment for the task, you have to following context to answer appropriately.
-					<rules>
-						- Do not mention anything that you are working with this task, the user already knows that.
-						- Do not mention the task title or description unless specifically asked.
-						- Keep your answer focused on the task at hand.
-						- Provide clear and concise information relevant to the task.
-						- If the comment is a question, provide a direct answer based on the task information.
-						- Do not include any greetings or sign-offs in your response.
-					</rules>
-					<task-context>
-						id: ${taskId}
-						title: ${task.title}
-						description: ${task.description ?? "No description"}
-					</task-context>
-				</IMPORTANT>
-			`,
+			integrationType: "web",
 		},
 		chatId,
 	);
 
-	const text: UIChatMessage = await new Promise((resolve, reject) => {
-		const messageStream = triageAgent.toUIMessageStream({
-			message: userMessage,
-			strategy: "auto",
-			maxRounds: 5,
-			maxSteps: 20,
-			context: appContext,
-			sendFinish: true,
-			onFinish: ({ responseMessage }) => {
-				resolve(responseMessage as UIChatMessage);
-			},
-		});
+	// Build TaskCommentContext with task details
+	const taskCommentContext: TaskCommentContext = {
+		...baseContext,
+		task: {
+			id: task.id,
+			title: task.title,
+			description: task.description ?? undefined,
+			status: task.statusName ?? undefined,
+			statusId: task.statusId ?? undefined,
+			priority: task.priority ?? undefined,
+			assignee: task.assigneeName ?? undefined,
+			assigneeId: task.assigneeId ?? undefined,
+			project: task.projectName ?? undefined,
+			projectId: task.projectId ?? undefined,
+			milestone: task.milestoneName ?? undefined,
+			milestoneId: task.milestoneId ?? undefined,
+			dueDate: task.dueDate ?? undefined,
+			labels: taskLabels,
+		},
+		recentComments: recentCommentsForContext,
+	};
 
-		// read the stream to completion to avoid memory leaks
-		(async () => {
-			try {
-				await messageStream.json();
-			} catch (e) {
-				reject(e);
-			}
-		})();
+	const response = await taskCommentAgent.generate({
+		message: userMessage,
+		context: taskCommentContext,
 	});
 
 	const body =
-		text.parts[text.parts.length - 1]?.type === "text"
+		response.parts[response.parts.length - 1]?.type === "text"
 			? (
-					text.parts[text.parts.length - 1] as UIMessage["parts"][number] & {
+					response.parts[
+						response.parts.length - 1
+					] as UIMessage["parts"][number] & {
 						type: "text";
 					}
 				).text

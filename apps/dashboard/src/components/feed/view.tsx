@@ -1,19 +1,19 @@
 "use client";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { cn } from "@ui/lib/utils";
 import { format, isToday, isYesterday } from "date-fns";
 import { LayersIcon } from "lucide-react";
-import Link from "next/link";
 import { useEffect } from "react";
 import { ActivityItem } from "@/components/activities/activity-item";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { trpc } from "@/utils/trpc";
 import Loader from "../loader";
 import { useTaskPanel } from "../panels/task-panel";
-import { useUser } from "../user-provider";
+
+const highlightedTypes = ["task_comment", "mention", "daily_team_summary"];
 
 export const FeedView = () => {
-	const user = useUser();
 	const taskPanel = useTaskPanel();
 	const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
 		useInfiniteQuery(
@@ -84,24 +84,14 @@ export const FeedView = () => {
 			{Object.entries(groupedActivities).map(([date, acts]) => (
 				<div key={date}>
 					<h2 className="mb-4 font-header">{date}</h2>
-					<div className="space-y-8">
+					<div className="space-y-4">
 						{acts.map((activity) => (
-							<div key={activity.id} className="">
-								<ActivityItem key={activity.id} activity={activity} />
-								{activity.task && (
-									<div className="mt-2 flex items-center gap-2 ps-4 text-xs">
-										<button
-											type="button"
-											onClick={() => {
-												taskPanel.open(activity.task!.id);
-											}}
-											className="flex items-center gap-1 text-muted-foreground hover:text-foreground"
-										>
-											<LayersIcon className="size-3.5" />
-											{activity.task?.title}
-										</button>
-									</div>
-								)}
+							<div key={activity.id} className={cn("rounded-sm")}>
+								<ActivityItem
+									key={activity.id}
+									activity={activity}
+									showGroupInfo
+								/>
 							</div>
 						))}
 					</div>

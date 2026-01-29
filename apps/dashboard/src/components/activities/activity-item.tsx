@@ -1,6 +1,7 @@
 "use client";
 
 import type { RouterOutputs } from "@mimir/trpc";
+import { createContext, useContext } from "react";
 import { ChecklistItemCreatedActivity } from "./checklist-item-created";
 import { DailyTeamSummaryActivity } from "./daily-team-summary";
 import { MentionActivity } from "./mention";
@@ -18,7 +19,10 @@ interface ActivityItemProps {
 	taskId?: string;
 }
 
-export const ActivityItem = ({ activity, taskId }: ActivityItemProps) => {
+export const ActivityItemContainer = ({
+	activity,
+	taskId,
+}: ActivityItemProps) => {
 	switch (activity.type) {
 		case "task_created":
 			return <TaskCreatedActivity activity={activity} />;
@@ -46,4 +50,35 @@ export const ActivityItem = ({ activity, taskId }: ActivityItemProps) => {
 		default:
 			return <UnknownActivity activity={activity} />;
 	}
+};
+
+export const ActivityItem = ({
+	activity,
+	taskId,
+	...contextValues
+}: ActivityItemProps & ActivityItemContextValue) => {
+	return (
+		<ActivityItemProvider value={contextValues}>
+			<ActivityItemContainer activity={activity} taskId={taskId} />
+		</ActivityItemProvider>
+	);
+};
+
+interface ActivityItemContextValue {
+	showGroupInfo?: boolean;
+}
+
+export const ActivityItemContext =
+	createContext<null | ActivityItemContextValue>(null);
+
+export const ActivityItemProvider = ActivityItemContext.Provider;
+
+export const useActivityItemContext = () => {
+	const context = useContext(ActivityItemContext);
+	if (!context) {
+		throw new Error(
+			"useActivityItemContext must be used within an ActivityItemProvider",
+		);
+	}
+	return context;
 };

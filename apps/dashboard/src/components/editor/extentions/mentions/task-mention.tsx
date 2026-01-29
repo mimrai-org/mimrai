@@ -35,7 +35,7 @@ export function TaskMentionListItem({
 			) : (
 				<CircleIcon className="size-4 shrink-0 text-muted-foreground" />
 			)}
-			{entity.sequence && (
+			{entity.sequence >= 0 && (
 				<span className="shrink-0 text-muted-foreground text-xs">
 					#{entity.sequence}
 				</span>

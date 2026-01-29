@@ -868,6 +868,22 @@ export const createTaskComment = async ({
 	const whereClause: SQL[] = [eq(tasks.id, taskId)];
 
 	if (teamId) whereClause.push(eq(tasks.teamId, teamId));
+	let groupId = taskId;
+
+	if (replyTo) {
+		const [replyToComment] = await db
+			.select()
+			.from(activities)
+			.where(
+				and(eq(activities.id, replyTo), eq(activities.type, "task_comment")),
+			);
+
+		if (replyToComment?.groupId && replyToComment.groupId === taskId) {
+			groupId = replyToComment.id;
+		} else if (replyToComment?.groupId) {
+			groupId = replyToComment?.groupId;
+		}
+	}
 
 	const [task] = await db
 		.select()
@@ -895,7 +911,7 @@ export const createTaskComment = async ({
 		userId,
 		teamId: task.teamId,
 		type: "task_comment",
-		groupId: replyTo ?? task.id,
+		groupId: groupId,
 		metadata: {
 			comment,
 			title: task.title,
