@@ -78,7 +78,7 @@ export function PanelContainer({
 			whileHover={{
 				y: isTopPanel ? 0 : -5,
 			}}
-			transition={{ duration: 0.2, ease: "easeInOut" }}
+			transition={{ duration: 0.15, ease: "easeInOut" }}
 			style={{
 				right: `calc(2rem + ${offset}px)`,
 				zIndex: 45 + index,

@@ -44,7 +44,7 @@ import { syncGoogleCalendarTaskEvent } from "@mimir/integration/google-calendar"
 import { handleTaskComment } from "@mimir/integration/task-comments";
 import { createRecurringTaskJob } from "@mimir/jobs/tasks/create-recurring-task-job";
 import { runs } from "@trigger.dev/sdk";
-import { generateObject, generateText, Output } from "ai";
+import { generateText, Output } from "ai";
 import z from "zod";
 
 export const tasksRouter = router({

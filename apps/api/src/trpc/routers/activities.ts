@@ -12,6 +12,8 @@ import {
 	getActivitiesCount,
 	hasNewActivities,
 } from "@mimir/db/queries/activities";
+import { getChannelName, subscribeToEvents } from "@mimir/realtime";
+import z from "zod";
 
 export const activitiesRouter = router({
 	get: protectedProcedure
@@ -60,4 +62,29 @@ export const activitiesRouter = router({
 			userId: ctx.user.id,
 		});
 	}),
+
+	onCreated: protectedProcedure
+		.input(
+			z.object({
+				groupId: z.string().optional(),
+			}),
+		)
+		.subscription(async function* ({ input, signal, ctx }) {
+			for await (const activity of subscribeToEvents({
+				events: ["activities.created"],
+				channel: getChannelName(ctx.user.teamId, input.groupId),
+				signal: signal,
+			})) {
+				if (input.groupId && !input.groupId.includes(activity.groupId)) {
+					continue;
+				}
+
+				const activitiesList = await getActivities({
+					ids: [activity.id],
+				});
+				const [newActivity] = activitiesList.data;
+
+				yield newActivity;
+			}
+		}),
 });

@@ -1,6 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@mimir/ui/avatar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@mimir/ui/tooltip";
 import { getContrast } from "@mimir/utils/random";
+import { Facehash } from "facehash";
 import { UserIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -11,6 +12,19 @@ type Props = {
 	color?: string | null;
 	className?: string;
 };
+
+const colorClasses = [
+	"bg-yellow-500",
+	"bg-green-500",
+	"bg-blue-500",
+	"bg-purple-500",
+	"bg-red-500",
+	"bg-pink-500",
+	"bg-indigo-500",
+	"bg-teal-500",
+	"bg-orange-500",
+	"bg-cyan-500",
+];
 
 export const AssigneeAvatar = ({
 	name,
@@ -36,14 +50,14 @@ export const AssigneeAvatar = ({
 		<Tooltip delayDuration={500}>
 			<TooltipTrigger asChild>
 				<Avatar className={cn("size-6", className)}>
-					<AvatarFallback
-						className="bg-primary text-primary-foreground text-xs"
-						style={{
-							backgroundColor: color || undefined,
-							color: color ? getContrast(color) : undefined,
-						}}
-					>
-						{name ? name.charAt(0).toUpperCase() : null}
+					<AvatarFallback className="bg-transparent">
+						<Facehash
+							name={name || email || "unknown"}
+							variant="gradient"
+							intensity3d="medium"
+							className="size-full [&_svg]:text-current!"
+							colorClasses={colorClasses}
+						/>
 					</AvatarFallback>
 					{image && (
 						<AvatarImage

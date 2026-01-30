@@ -1,4 +1,5 @@
 import { openai } from "@ai-sdk/openai";
+import type { IntegrationName } from "@mimir/integration/registry";
 import { createChecklistItemTool } from "../tools/create-checklist-item";
 import { getChecklistItemsTool } from "../tools/get-checklist-item";
 import { getLabelsTool } from "../tools/get-labels";
@@ -13,16 +14,23 @@ import { createAgent } from "./config/agent";
 import type { AppContext } from "./config/shared";
 
 /**
- * Task Comment Agent - Specialized for in-task interactions
+ * Task Assistant Agent - Specialized for in-task interactions
  *
  * This agent is designed to:
  * - Operate within the context of a specific task
  * - Understand the task details and comment history
  * - Perform task-specific actions (update, subtasks, labels, etc.)
  * - Help users collaborate on and manage the current task
+ * - Execute integration-based tools (email, messaging, scheduling) when available
+ *
+ * Integration tools are added dynamically based on installed integrations:
+ * - Gmail: Send emails, create drafts
+ * - WhatsApp: Send messages
+ * - Slack: Send messages
+ * - Scheduler: Schedule tool calls for later execution
  */
 
-export interface TaskCommentContext extends AppContext {
+export interface TaskAssistantContext extends AppContext {
 	/** The current task being discussed */
 	task: {
 		id: string;
@@ -46,9 +54,29 @@ export interface TaskCommentContext extends AppContext {
 		content: string;
 		createdAt: string;
 	}>;
+	/** Available integrations for this team (user has linked their account) */
+	availableIntegrations?: Array<{
+		type: IntegrationName;
+		name: string;
+		integrationId: string;
+		userLinkId: string;
+	}>;
 }
 
-const taskCommentTools = {
+/**
+ * Integration info returned from getUserIntegrations
+ */
+export interface UserIntegrationInfo {
+	type: IntegrationName;
+	name: string;
+	integrationId: string;
+	userLinkId: string;
+}
+
+/**
+ * Core tools available to all task assistants
+ */
+const coreTools = {
 	// Task management
 	updateTask: updateTaskTool,
 
@@ -68,7 +96,46 @@ const taskCommentTools = {
 	getTasks: getTasksTool,
 };
 
-const buildSystemPrompt = (ctx: TaskCommentContext) => {
+/**
+ * Integration tool registry - tools are added here when integrations are installed
+ * This allows the agent to dynamically gain capabilities based on team configuration
+ */
+export const integrationTools: Partial<
+	Record<IntegrationName, Record<string, unknown>>
+> = {};
+
+/**
+ * Register integration tools dynamically
+ * Call this when an integration is installed/enabled for a team
+ */
+export const registerIntegrationTools = (
+	integrationType: IntegrationName,
+	tools: Record<string, unknown>,
+) => {
+	integrationTools[integrationType] = tools;
+};
+
+/**
+ * Get all available tools including integration tools
+ */
+export const getTaskAssistantTools = (
+	enabledIntegrations?: IntegrationName[],
+) => {
+	const tools = { ...coreTools };
+
+	if (enabledIntegrations) {
+		for (const integration of enabledIntegrations) {
+			const intTools = integrationTools[integration];
+			if (intTools) {
+				Object.assign(tools, intTools);
+			}
+		}
+	}
+
+	return tools;
+};
+
+const buildSystemPrompt = (ctx: TaskAssistantContext) => {
 	const taskContext = ctx.task;
 	const commentsContext =
 		ctx.recentComments && ctx.recentComments.length > 0
@@ -77,7 +144,14 @@ const buildSystemPrompt = (ctx: TaskCommentContext) => {
 					.join("\n")
 			: "No recent comments.";
 
-	return `You are an AI assistant helping with task "${taskContext.title}" in team "${ctx.teamName}".
+	const availableIntegrationsText =
+		ctx.availableIntegrations && ctx.availableIntegrations.length > 0
+			? ctx.availableIntegrations
+					.map((i) => `- ${i.name} (${i.type})`)
+					.join("\n")
+			: "No integrations configured.";
+
+	return `You are an AI task assistant helping with task "${taskContext.title}" in team "${ctx.teamName}".
 
 <context>
 User: ${ctx.fullName} (ID: ${ctx.userId})
@@ -103,9 +177,14 @@ Labels: ${taskContext.labels?.map((l) => l.name).join(", ") || "None"}
 ${commentsContext}
 </recent-comments>
 
+<available-integrations>
+${availableIntegrationsText}
+</available-integrations>
+
 <critical-rules>
-- You are operating in the context of THIS SPECIFIC TASK - all actions should relate to it
-- Analyze the user's comment to determine intent:
+- You are a task assistant operating in the context of THIS SPECIFIC TASK
+- All actions should help the user complete or manage this task effectively
+- Analyze the user's request to determine intent:
   - Status change request: update the task status
   - Assignment request: update the task assignee
   - Priority change: update the task priority
@@ -114,6 +193,8 @@ ${commentsContext}
   - Complete subtask: update checklist item as completed
   - Add label: update the task with new labels
   - Question about the task: answer based on task context
+  - Communication request: use available integration tools (email, messaging)
+  - Scheduling request: use scheduler tools if available
   - General discussion: respond naturally as a helpful team member
 - ALWAYS use tools to get real data - NEVER make up IDs
 - When updating THIS task, use the task ID from context: "${taskContext.id}"
@@ -139,6 +220,12 @@ For checklist/subtasks:
 
 For labels:
 - Use getLabels to see available labels and their IDs
+
+For integrations (when available):
+- Gmail: Send emails related to this task, create drafts
+- WhatsApp/Slack/Mattermost: Send messages to team members
+- Scheduler: Schedule reminders or follow-up actions
+- GitHub: Create issues, PRs, or link commits
 </tool-usage>
 
 <response-format>
@@ -153,6 +240,9 @@ Added subtask: "[description]"
 For subtask completion:
 Marked "[description]" as complete
 
+For integration actions:
+[Action performed] via [integration]
+
 For questions:
 Provide a brief, helpful answer based on task context
 
@@ -161,19 +251,42 @@ Respond naturally and helpfully
 </response-format>
 
 <capabilities>
+Core capabilities:
 - Update task properties (status, priority, assignee, due date, project, milestone)
 - Manage subtasks/checklist items (view, create, complete)
 - View and apply labels
 - Answer questions about the task
 - Find related tasks if needed
+
+Integration capabilities (when enabled):
+- Send emails (Gmail)
+- Send messages (WhatsApp, Slack, Mattermost)
+- Schedule actions (Scheduler)
+- Manage code links (GitHub)
 </capabilities>`;
 };
 
-export const taskCommentAgent = createAgent({
-	name: "Task Comment Agent",
+export const taskAssistantAgent = createAgent({
+	name: "Task Assistant",
 	description:
-		"Agent specialized for in-task interactions and task-specific operations.",
-	tools: taskCommentTools,
+		"AI assistant specialized for in-task interactions, task management, and integration-powered actions.",
+	tools: coreTools,
 	buildInstructions: buildSystemPrompt as (ctx: AppContext) => string,
 	model: openai("gpt-4o-mini"),
 });
+
+/**
+ * Create a task assistant with specific integration tools enabled
+ */
+export const createTaskAssistantWithIntegrations = (
+	enabledIntegrations: IntegrationName[],
+) => {
+	return createAgent({
+		name: "Task Assistant",
+		description:
+			"AI assistant specialized for in-task interactions, task management, and integration-powered actions.",
+		tools: getTaskAssistantTools(enabledIntegrations),
+		buildInstructions: buildSystemPrompt as (ctx: AppContext) => string,
+		model: openai("gpt-4o-mini"),
+	});
+};

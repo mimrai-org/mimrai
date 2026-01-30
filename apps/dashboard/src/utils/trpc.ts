@@ -4,6 +4,7 @@ import {
 	createTRPCClient,
 	httpBatchLink,
 	httpBatchStreamLink,
+	httpSubscriptionLink,
 	loggerLink,
 	splitLink,
 } from "@trpc/client";
@@ -32,41 +33,52 @@ export const queryClient = new QueryClient({
 export const trpcClient = createTRPCClient<AppRouter>({
 	links: [
 		splitLink({
-			condition: () => typeof window === "undefined",
-			// Server-side
-			true: httpBatchLink({
+			condition: (op) => op.type === "subscription",
+			true: httpSubscriptionLink({
 				url: `${process.env.NEXT_PUBLIC_SERVER_URL}/trpc`,
-				async fetch(url, options) {
-					const headersImport = await import("next/headers");
-					const cookieHeader = (await headersImport.headers()).get("cookie");
-
-					// Server-side, embed the request headers
-					const response = await fetch(url, {
-						...options,
-						headers: {
-							...options?.headers,
-							cookie: cookieHeader || "",
-						},
-						credentials: "include",
-					});
-
-					if (!response.ok) {
-						const errorJson = await response.clone().json();
-						console.error("tRPC Error:", errorJson);
-					}
-
-					return response;
+				eventSourceOptions() {
+					return {
+						withCredentials: true,
+					};
 				},
 			}),
-			// Client-side
-			false: httpBatchStreamLink({
-				url: `${process.env.NEXT_PUBLIC_SERVER_URL}/trpc`,
-				fetch(url, options) {
-					return fetch(url, {
-						...options,
-						credentials: "include",
-					});
-				},
+			false: splitLink({
+				condition: () => typeof window === "undefined",
+				// Server-side
+				true: httpBatchLink({
+					url: `${process.env.NEXT_PUBLIC_SERVER_URL}/trpc`,
+					async fetch(url, options) {
+						const headersImport = await import("next/headers");
+						const cookieHeader = (await headersImport.headers()).get("cookie");
+
+						// Server-side, embed the request headers
+						const response = await fetch(url, {
+							...options,
+							headers: {
+								...options?.headers,
+								cookie: cookieHeader || "",
+							},
+							credentials: "include",
+						});
+
+						if (!response.ok) {
+							const errorJson = await response.clone().json();
+							console.error("tRPC Error:", errorJson);
+						}
+
+						return response;
+					},
+				}),
+				// Client-side
+				false: httpBatchStreamLink({
+					url: `${process.env.NEXT_PUBLIC_SERVER_URL}/trpc`,
+					fetch(url, options) {
+						return fetch(url, {
+							...options,
+							credentials: "include",
+						});
+					},
+				}),
 			}),
 		}),
 		loggerLink({

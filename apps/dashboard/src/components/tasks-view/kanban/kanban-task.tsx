@@ -1,12 +1,8 @@
 import type { RouterOutputs } from "@mimir/trpc";
-import { motion } from "motion/react";
-import { useRouter } from "next/navigation";
 import { useTaskPanel } from "@/components/panels/task-panel";
 import { TaskProperty } from "@/components/tasks-view/properties/task-properties";
 import { useUser } from "@/components/user-provider";
-import { useTaskParams } from "@/hooks/use-task-params";
 import { cn } from "@/lib/utils";
-import { queryClient, trpc } from "@/utils/trpc";
 
 export type KanbanTask = RouterOutputs["tasks"]["get"]["data"][number];
 
@@ -26,7 +22,7 @@ export const KanbanTask = ({
 	return (
 		<div
 			className={cn(
-				"group/task relative flex min-h-14 cursor-pointer flex-col rounded-md border bg-accent transition-colors hover:bg-accent dark:border-none dark:bg-accent/30 dark:hover:bg-accent/50",
+				"group/task relative flex min-h-14 cursor-pointer flex-col rounded-md border bg-popover transition-colors hover:bg-accent/30",
 				{
 					"opacity-50!": task.status?.type === "done",
 				},
