@@ -8,6 +8,7 @@ import {
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "@ui/components/ui/context-menu";
+import { convert } from "html-to-text";
 import { ChevronRightIcon, TrashIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
@@ -92,9 +93,12 @@ export const TaskCommentActivity = ({
 										/>
 										{activity.replyToActivity.user.name}
 									</div>
-									<Response className="text-xs [&>*]:leading-4!">
-										{activity.replyToActivity.metadata.comment.slice(0, 200)}
-									</Response>
+									<p className="text-xs [&>*]:leading-4!">
+										{convert(activity.replyToActivity.metadata.comment).slice(
+											0,
+											200,
+										)}
+									</p>
 								</div>
 							</div>
 						)}

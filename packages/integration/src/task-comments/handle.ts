@@ -1,12 +1,17 @@
 import { buildAppContext } from "@api/ai/agents/config/shared";
 import {
-	type TaskCommentContext,
-	taskCommentAgent,
-} from "@api/ai/agents/task-comment";
+	createTaskAssistantWithIntegrations,
+	integrationTools,
+	type TaskAssistantContext,
+	taskAssistantAgent,
+	type UserIntegrationInfo,
+} from "@api/ai/agents/task-assistant";
 import type { UIChatMessage } from "@api/ai/types";
 import { getUserContext } from "@api/ai/utils/get-user-context";
+import type { IntegrationName } from "@integration/registry";
 import { db } from "@mimir/db/client";
 import { getChatById, saveChatMessage } from "@mimir/db/queries/chats";
+import { getLinkedUsers } from "@mimir/db/queries/integrations";
 import { createTaskComment } from "@mimir/db/queries/tasks";
 import { getSystemUser } from "@mimir/db/queries/users";
 import {
@@ -21,6 +26,29 @@ import {
 } from "@mimir/db/schema";
 import type { UIMessage } from "ai";
 import { and, asc, eq, or } from "drizzle-orm";
+
+/**
+ * Get all integrations available to a user (where they have linked their account)
+ */
+const getUserAvailableIntegrations = async ({
+	userId,
+	teamId,
+}: {
+	userId: string;
+	teamId: string;
+}): Promise<UserIntegrationInfo[]> => {
+	const linkedUsers = await getLinkedUsers({
+		userId,
+		teamId,
+	});
+
+	return linkedUsers.data.map((link) => ({
+		type: link.type as IntegrationName,
+		name: link.name,
+		integrationId: link.integrationId,
+		userLinkId: link.id,
+	}));
+};
 
 export const handleTaskComment = async ({
 	taskId,
@@ -41,64 +69,20 @@ export const handleTaskComment = async ({
 		throw new Error("System user not found");
 	}
 
-	const [userComment] = await db
-		.select()
-		.from(activities)
-		.where(
-			and(
-				eq(activities.id, commentId),
-				eq(activities.teamId, teamId),
-				eq(activities.userId, userId),
-				eq(activities.type, "task_comment"),
-			),
-		)
-		.limit(1);
-
-	let shouldReply = false;
-	if (userComment?.metadata?.comment) {
-		const comment = userComment.metadata.comment as string;
-		// check if the comment has a mention of the system user
-		if (comment.includes(`@${systemUser.name}`)) {
-			shouldReply = true;
-		}
-
-		if (!shouldReply) {
-			// check if the comment is a reply to a previous mentioned comment
-			if (userComment.groupId !== taskId && userComment.groupId) {
-				const [parentComment] = await db
-					.select()
-					.from(activities)
-					.where(
-						and(
-							eq(activities.id, userComment.groupId),
-							eq(activities.teamId, teamId),
-							eq(activities.type, "task_comment"),
-						),
-					)
-					.limit(1);
-
-				if (parentComment?.metadata?.comment) {
-					const parentCommentText = parentComment.metadata.comment as string;
-					if (parentCommentText.includes(`@${systemUser.name}`)) {
-						shouldReply = true;
-					}
-				}
-			}
-		}
-	}
-
-	if (!shouldReply) {
+	// check if the comment has a mention of the system user
+	if (!comment.includes(`@${systemUser.name}`)) {
 		return;
 	}
 
 	const chatId = `task-${taskId}-thread`;
 
-	const [userContext, chat] = await Promise.all([
+	const [userContext, chat, userIntegrations] = await Promise.all([
 		getUserContext({
 			userId: userId,
 			teamId: teamId,
 		}),
 		getChatById(chatId, teamId),
+		getUserAvailableIntegrations({ userId, teamId }),
 	]);
 	const previousMessages = chat ? chat.messages : [];
 	const allMessages = [...previousMessages];
@@ -225,8 +209,8 @@ export const handleTaskComment = async ({
 		chatId,
 	);
 
-	// Build TaskCommentContext with task details
-	const taskCommentContext: TaskCommentContext = {
+	// Build TaskAssistantContext with task details and available integrations
+	const taskAssistantContext: TaskAssistantContext = {
 		...baseContext,
 		task: {
 			id: task.id,
@@ -245,11 +229,23 @@ export const handleTaskComment = async ({
 			labels: taskLabels,
 		},
 		recentComments: recentCommentsForContext,
+		availableIntegrations: userIntegrations,
 	};
 
-	const response = await taskCommentAgent.generate({
+	// Get enabled integrations that have tools registered
+	const enabledIntegrations = userIntegrations
+		.map((i) => i.type)
+		.filter((type) => integrationTools[type] !== undefined);
+
+	// Use the appropriate agent based on available integrations
+	const agent =
+		enabledIntegrations.length > 0
+			? createTaskAssistantWithIntegrations(enabledIntegrations)
+			: taskAssistantAgent;
+
+	const response = await agent.generate({
 		message: userMessage,
-		context: taskCommentContext,
+		context: taskAssistantContext,
 	});
 
 	const body =
