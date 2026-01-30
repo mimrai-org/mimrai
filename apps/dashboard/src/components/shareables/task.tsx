@@ -1,3 +1,4 @@
+"use client";
 import type { RouterOutputs } from "@mimir/trpc";
 import { Checkbox } from "@ui/components/ui/checkbox";
 import { cn } from "@ui/lib/utils";

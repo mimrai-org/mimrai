@@ -1,3 +1,4 @@
+"use client";
 import type { RouterOutputs } from "@mimir/trpc";
 import { ProjectIcon } from "@/components/project-icon";
 import { Response } from "../../chat/response";
