@@ -1,6 +1,7 @@
 import { openai } from "@ai-sdk/openai";
 import type { IntegrationName } from "@mimir/integration/registry";
 import { createChecklistItemTool } from "../tools/create-checklist-item";
+import { createDraftEmailTool } from "../tools/create-draft-email";
 import { getChecklistItemsTool } from "../tools/get-checklist-item";
 import { getLabelsTool } from "../tools/get-labels";
 import { getMilestonesTool } from "../tools/get-milestones";
@@ -8,6 +9,7 @@ import { getProjectsTool } from "../tools/get-projects";
 import { getStatusesTool } from "../tools/get-statuses";
 import { getTasksTool } from "../tools/get-tasks";
 import { getUsersTool } from "../tools/get-users";
+import { sendDraftEmailTool } from "../tools/send-draft-email";
 import { updateChecklistItemTool } from "../tools/update-checklist-item";
 import { updateTaskTool } from "../tools/update-task";
 import { createAgent } from "./config/agent";
@@ -102,7 +104,12 @@ const coreTools = {
  */
 export const integrationTools: Partial<
 	Record<IntegrationName, Record<string, unknown>>
-> = {};
+> = {
+	gmail: {
+		createDraftEmail: createDraftEmailTool,
+		sendDraftEmail: sendDraftEmailTool,
+	},
+};
 
 /**
  * Register integration tools dynamically
@@ -259,10 +266,8 @@ Core capabilities:
 - Find related tasks if needed
 
 Integration capabilities (when enabled):
-- Send emails (Gmail)
-- Send messages (WhatsApp, Slack, Mattermost)
-- Schedule actions (Scheduler)
-- Manage code links (GitHub)
+- Create and send emails (Gmail)
+  - Always create drafts before sending
 </capabilities>`;
 };
 

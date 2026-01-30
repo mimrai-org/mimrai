@@ -19,6 +19,8 @@ export interface PanelInstance<T = Record<string, unknown>> {
 
 interface PanelContextValue {
 	panels: PanelInstance[];
+	minimized?: boolean;
+	setMinimized: (minimized: boolean) => void;
 	openPanel: (type: string, id: string, data?: Record<string, unknown>) => void;
 	closePanel: (type: string, id: string) => void;
 	closePanelsByType: (type: string) => void;
@@ -67,6 +69,7 @@ function persistState(panels: PanelInstance[]) {
 export function PanelProvider({ children }: PanelProviderProps) {
 	const [panels, setPanels] = useState<PanelInstance[]>([]);
 	const [isHydrated, setIsHydrated] = useState(false);
+	const [minimized, setMinimized] = useState(false);
 
 	// Hydrate from localStorage on mount
 	useEffect(() => {
@@ -172,6 +175,8 @@ export function PanelProvider({ children }: PanelProviderProps) {
 	const value = useMemo(
 		() => ({
 			panels,
+			minimized,
+			setMinimized,
 			openPanel,
 			closePanel,
 			closePanelsByType,
@@ -182,6 +187,8 @@ export function PanelProvider({ children }: PanelProviderProps) {
 		}),
 		[
 			panels,
+			minimized,
+			setMinimized,
 			openPanel,
 			closePanel,
 			closePanelsByType,
