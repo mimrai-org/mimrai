@@ -18,15 +18,17 @@ export async function* subscribeToEvents<
 	T extends EventPath<typeof opts>,
 	// @ts-expect-error upstash realtime types are broken
 	R extends EventData<typeof opts, T>,
->(
-	events: T[],
-	opts?: {
-		signal?: AbortSignal;
-	},
-): AsyncGenerator<R, void, unknown> {
+>(opts: {
+	events: T[];
+	channel?: string;
+	signal?: AbortSignal;
+}): AsyncGenerator<R, void, unknown> {
+	const { events, channel, signal } = opts;
 	const elements: R[] = [];
-	const unsubscribe = await realtime.subscribe({
+	const realtimeChannel = channel ? realtime.channel(channel) : realtime;
+	const unsubscribe = await realtimeChannel.subscribe({
 		events: events as never[],
+
 		onData: (data) => {
 			console.log("Event data received:", data);
 			// @ts-expect-error upstash realtime types are broken
@@ -34,10 +36,8 @@ export async function* subscribeToEvents<
 		},
 	});
 
-	console.log("Subscribed to events:", events);
-
-	if (opts?.signal) {
-		opts.signal.addEventListener("abort", () => {
+	if (signal) {
+		signal.addEventListener("abort", () => {
 			unsubscribe();
 		});
 	}
@@ -51,3 +51,10 @@ export async function* subscribeToEvents<
 		yield elements.shift()!;
 	}
 }
+
+export const getChannelName = (
+	teamId: string,
+	...keys: (string | undefined)[]
+) => {
+	return `team:${teamId}:${keys.filter(Boolean).sort().join(":")}`;
+};

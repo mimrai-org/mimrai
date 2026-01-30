@@ -1,7 +1,6 @@
 "use client";
 
-import type { RouterOutputs } from "@mimir/trpc";
-import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Button } from "@ui/components/ui/button";
 import {
 	ContextMenu,
@@ -9,17 +8,15 @@ import {
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "@ui/components/ui/context-menu";
-import { formatRelative } from "date-fns";
-import { DotIcon, TrashIcon } from "lucide-react";
+import { ChevronRightIcon, TrashIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { AssigneeAvatar } from "@/components/asignee-avatar";
-import { Response } from "@/components/chat/response";
 import { queryClient, trpc } from "@/utils/trpc";
+import { AssigneeAvatar } from "../asignee-avatar";
+import { Response } from "../chat/response";
 import { Editor } from "../editor";
 import { CommentInput } from "../forms/task-form/comment-input";
-import { ActivityReactions } from "./activity-reactions";
 import { BaseActivity } from "./base-activity";
 import type { Activity } from "./types";
 
@@ -58,27 +55,6 @@ export const TaskCommentActivity = ({
 		};
 	}, [replying]);
 
-	const {
-		data: replyComments,
-		fetchNextPage,
-		hasNextPage,
-	} = useInfiniteQuery(
-		trpc.activities.get.infiniteQueryOptions(
-			{
-				groupId: activity.id,
-				pageSize: 2,
-			},
-			{
-				getNextPageParam: (lastPage) => lastPage.meta.cursor,
-			},
-		),
-	);
-
-	const replyCommentsArray = useMemo(() => {
-		if (!replyComments) return [];
-		return replyComments.pages.flatMap((page) => page.data).reverse();
-	}, [replyComments]);
-
 	const { mutate: deleteComment } = useMutation(
 		trpc.activities.delete.mutationOptions({
 			onMutate: () => {
@@ -106,6 +82,22 @@ export const TaskCommentActivity = ({
 			<ContextMenu>
 				<ContextMenuTrigger>
 					<div className="group space-y-1 rounded-sm border py-4 text-muted-foreground text-sm">
+						{activity.replyToActivity && (
+							<div className="mx-4 mb-2 flex items-start gap-2 rounded-sm bg-muted/50 p-2 text-muted-foreground">
+								<div className="space-y-1">
+									<div className="flex items-center text-xs">
+										<AssigneeAvatar
+											{...activity.replyToActivity.user}
+											className="mr-1 size-4"
+										/>
+										{activity.replyToActivity.user.name}
+									</div>
+									<Response className="text-xs [&>*]:leading-4!">
+										{activity.replyToActivity.metadata.comment.slice(0, 200)}
+									</Response>
+								</div>
+							</div>
+						)}
 						<BaseActivity activity={activity} />
 						<div className="whitespace-pre-wrap break-words px-4 pt-1 text-foreground">
 							<Editor value={metadata.comment} readOnly />
@@ -156,28 +148,6 @@ export const TaskCommentActivity = ({
 					</motion.div>
 				)}
 			</AnimatePresence>
-
-			{replyCommentsArray && replyCommentsArray.length > 0 && (
-				<div className="space-y-4 pt-4 sm:ml-6 sm:border-l sm:pl-4">
-					{hasNextPage && (
-						<Button
-							variant={"ghost"}
-							size={"sm"}
-							className="text-muted-foreground text-xs"
-							onClick={() => fetchNextPage()}
-						>
-							Load more previous replies...
-						</Button>
-					)}
-					{replyCommentsArray.map((replyComment) => (
-						<TaskCommentActivity
-							key={replyComment.id}
-							activity={replyComment}
-							taskId={taskId}
-						/>
-					))}
-				</div>
-			)}
 		</div>
 	);
 };

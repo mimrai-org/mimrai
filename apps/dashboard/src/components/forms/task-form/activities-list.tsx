@@ -1,10 +1,11 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
+import { useSubscription } from "@trpc/tanstack-react-query";
 import { Button } from "@ui/components/ui/button";
 import { AnimatePresence } from "motion/react";
 import { useMemo, useState } from "react";
 import { ActivityItem } from "@/components/activities/activity-item";
-import { trpc } from "@/utils/trpc";
+import { queryClient, trpc } from "@/utils/trpc";
 
 export const TaskActivitiesList = ({ taskId }: { taskId: string }) => {
 	const [showAll, setShowAll] = useState(false);
@@ -14,6 +15,35 @@ export const TaskActivitiesList = ({ taskId }: { taskId: string }) => {
 			nStatus: ["archived"],
 			pageSize: 100,
 		}),
+	);
+
+	useSubscription(
+		trpc.activities.onCreated.subscriptionOptions(
+			{
+				groupId: taskId,
+			},
+			{
+				onData: (newActivity) => {
+					queryClient.setQueryData(
+						trpc.activities.get.queryKey({
+							groupId: taskId,
+							nStatus: ["archived"],
+							pageSize: 100,
+						}),
+						(oldData) => {
+							if (!oldData) return oldData;
+							if (oldData.data.find((a) => a.id === newActivity.id)) {
+								return oldData;
+							}
+							return {
+								...oldData,
+								data: [newActivity, ...oldData.data],
+							};
+						},
+					);
+				},
+			},
+		),
 	);
 
 	const reversedData = useMemo(() => {
@@ -27,8 +57,8 @@ export const TaskActivitiesList = ({ taskId }: { taskId: string }) => {
 		if (canShowAll) {
 			return reversedData;
 		}
-		const comments = reversedData.filter(
-			(activity) => activity.type === "task_comment",
+		const comments = reversedData.filter((activity) =>
+			["task_comment", "task_comment_reply"].includes(activity.type),
 		);
 
 		if (comments.length >= 3) {

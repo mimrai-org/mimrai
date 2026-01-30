@@ -1,6 +1,5 @@
 "use client";
 
-import type { RouterOutputs } from "@mimir/trpc";
 import { createContext, useContext } from "react";
 import { ChecklistItemCreatedActivity } from "./checklist-item-created";
 import { DailyTeamSummaryActivity } from "./daily-team-summary";
@@ -32,6 +31,7 @@ export const ActivityItemContainer = ({
 			return <TaskColumnChangedActivity activity={activity} />;
 		case "task_updated":
 			return <TaskUpdatedActivity activity={activity} />;
+		case "task_comment_reply":
 		case "task_comment":
 			return (
 				<TaskCommentActivity

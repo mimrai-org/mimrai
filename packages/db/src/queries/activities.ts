@@ -1,5 +1,5 @@
 import { sendNotificationJob } from "@jobs/jobs/notifications/send-notification-job";
-import { realtime } from "@mimir/realtime";
+import { getChannelName, realtime } from "@mimir/realtime";
 import {
 	and,
 	desc,
@@ -12,6 +12,8 @@ import {
 	type SQL,
 	sql,
 } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
+import { jsonAggBuildObject, jsonBuildObject } from "src/utils/drizzle";
 import { db } from "..";
 import {
 	activities,
@@ -34,6 +36,7 @@ export type CreateActivityInput = {
 	userId?: string | null;
 	teamId: string;
 	groupId?: string;
+	replyToActivityId?: string;
 	source?: (typeof activitySourceEnum.enumValues)[number];
 	type: (typeof activityTypeEnum.enumValues)[number];
 	metadata?: Record<string, any>;
@@ -83,6 +86,7 @@ export const createActivity = async (input: CreateActivityInput) => {
 			type: input.type,
 			groupId: input.groupId,
 			source: input.source,
+			replyToActivityId: input.replyToActivityId,
 			metadata: {
 				...input.metadata,
 				changes: metadataChanges,
@@ -117,6 +121,13 @@ export const createActivity = async (input: CreateActivityInput) => {
 				);
 			}
 		}
+
+		await realtime
+			.channel(getChannelName(input.teamId, input.groupId))
+			.emit("activities.created", {
+				id: result.id,
+				groupId: result.groupId ?? undefined,
+			});
 	}
 
 	return result;
@@ -323,6 +334,7 @@ export const createTaskUpdateActivity = async ({
 };
 
 export const getActivities = async ({
+	ids,
 	teamId,
 	type,
 	search,
@@ -334,6 +346,7 @@ export const getActivities = async ({
 	nStatus,
 	pageSize = 20,
 }: {
+	ids?: string[];
 	teamId?: string;
 	type?: (typeof activityTypeEnum.enumValues)[number][];
 	search?: string;
@@ -347,6 +360,7 @@ export const getActivities = async ({
 }) => {
 	const whereClause: SQL[] = [];
 
+	ids && whereClause.push(inArray(activities.id, ids));
 	teamId && whereClause.push(eq(activities.teamId, teamId));
 	type && whereClause.push(inArray(activities.type, type));
 	groupId && whereClause.push(eq(activities.groupId, groupId));
@@ -367,6 +381,9 @@ export const getActivities = async ({
 	// Convert cursor to offset
 	const offset = cursor ? Number.parseInt(cursor, 10) : 0;
 
+	const replyToActivity = alias(activities, "replyToActivity");
+	const replyToUser = alias(users, "replyToUser");
+
 	const data = await db
 		.select({
 			id: activities.id,
@@ -386,6 +403,19 @@ export const getActivities = async ({
 			task: {
 				id: tasks.id,
 				title: tasks.title,
+			},
+			replyToActivity: {
+				id: replyToActivity.id,
+				type: replyToActivity.type,
+				metadata: replyToActivity.metadata,
+				userId: replyToActivity.userId,
+				user: jsonBuildObject({
+					id: replyToUser.id,
+					name: replyToUser.name,
+					email: replyToUser.email,
+					image: replyToUser.image,
+					color: replyToUser.color,
+				}),
 			},
 			groupId: activities.groupId,
 			teamId: activities.teamId,
@@ -414,6 +444,11 @@ export const getActivities = async ({
 		.where(and(...whereClause))
 		.leftJoin(users, eq(activities.userId, users.id))
 		.leftJoin(tasks, eq(activities.groupId, tasks.id))
+		.leftJoin(
+			replyToActivity,
+			eq(activities.replyToActivityId, replyToActivity.id),
+		)
+		.leftJoin(replyToUser, eq(replyToActivity.userId, replyToUser.id))
 		.orderBy(desc(activities.createdAt))
 		.limit(pageSize ?? 20)
 		.offset(offset);
