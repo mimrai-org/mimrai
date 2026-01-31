@@ -1,16 +1,9 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-import { Agent, type AgentConfig } from "@ai-sdk-tools/agents";
 import type { ChatUserContext } from "@api/ai/chat-cache";
 import {
 	type ContextItem,
 	formatLLMContextItems,
 } from "@api/ai/utils/format-context-items";
 import { db } from "@mimir/db/client";
-import { DrizzleProvider } from "./drizzle-provider";
-import { memoryTemplate } from "./memory-template";
-import { suggestionsInstructions } from "./suggestions-instructions";
-import { titleInstructions } from "./title-instructions";
 
 export function formatContextForLLM(context: AppContext): string {
 	return `<team-info>
@@ -90,42 +83,3 @@ export function buildAppContext(
 		contextItems: context.contextItems ?? [],
 	};
 }
-
-// export const memoryProvider = new DrizzleProvider(db, {
-// 	messagesTable: chatMessages,
-// 	workingMemoryTable: chatWorkingMemory,
-// 	chatsTable: chats,
-// });
-
-export const memoryProvider = new DrizzleProvider(db);
-
-export const createAgent = (config: AgentConfig<AppContext>) => {
-	return new Agent({
-		...config,
-		memory: {
-			provider: memoryProvider,
-			history: {
-				enabled: true,
-				limit: 20,
-			},
-			workingMemory: {
-				enabled: false,
-				template: memoryTemplate,
-				scope: "user",
-			},
-			chats: {
-				enabled: true,
-				generateTitle: {
-					model: "gpt-4.1-nano",
-					instructions: titleInstructions,
-				},
-				generateSuggestions: {
-					enabled: false,
-					model: "gpt-4.1-nano",
-					limit: 4,
-					instructions: suggestionsInstructions,
-				},
-			},
-		},
-	});
-};

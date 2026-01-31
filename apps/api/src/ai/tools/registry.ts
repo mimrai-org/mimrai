@@ -1,4 +1,3 @@
-import type { artifact } from "@ai-sdk-tools/artifacts";
 import type z from "zod";
 
 // Tool metadata for title generation and UI display
@@ -37,9 +36,6 @@ export const toolMetadata: Record<
 } as const;
 
 export type ToolName = keyof typeof toolMetadata;
-export type ArtifactOutput<A extends ReturnType<typeof artifact>> = {
-	payload: z.infer<A["schema"]>;
-};
 
 export type MessageDataParts = {
 	title: {
