@@ -18,7 +18,7 @@ import { useDebounceValue } from "usehooks-ts";
 import { useTaskDependencyParams } from "@/hooks/use-task-dependency-params";
 import { queryClient, trpc } from "@/utils/trpc";
 import { DependencyIcon } from "../dependency-icon";
-import { propertiesComponents } from "../tasks-view/properties/task-properties-components";
+import { PropertyStatus } from "../tasks-view/properties/task-properties-components";
 
 const labels = {
 	blocks: {
@@ -132,7 +132,7 @@ export const TaskDependencyDialog = () => {
 								</div>
 
 								<div className="ml-auto flex items-center gap-2 text-muted-foreground text-sm">
-									{propertiesComponents.status(result)}
+									<PropertyStatus task={result} />
 								</div>
 							</CommandItem>
 						))}

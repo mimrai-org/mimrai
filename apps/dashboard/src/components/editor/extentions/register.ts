@@ -27,7 +27,6 @@ const extensions = ({
 	shouldInsertImage?: boolean;
 }) => [
 	StarterKit,
-	Underline,
 	Image.configure({
 		inline: true,
 		resize: {
@@ -38,13 +37,7 @@ const extensions = ({
 			alwaysPreserveAspectRatio: true,
 		},
 	}),
-	CodeBlock,
 	Markdown,
-	Link.configure({
-		openOnClick: false,
-		autolink: true,
-		defaultProtocol: "https",
-	}),
 	// Custom mention node extensions for rendering mentions as React components
 	UserMentionExtension,
 	TaskMentionExtension,

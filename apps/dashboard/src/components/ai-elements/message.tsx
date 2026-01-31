@@ -69,11 +69,8 @@ export const MessageAvatar = ({
 	className,
 	...props
 }: MessageAvatarProps) => (
-	console.log("Avatar render", { src, name, className, props }),
-	(
-		<Avatar className={cn("size-7", className)} {...props}>
-			<AvatarImage alt="" className="mt-0 mb-0" src={src} />
-			<AvatarFallback>{name?.slice(0, 1) || "ME"}</AvatarFallback>
-		</Avatar>
-	)
+	<Avatar className={cn("size-7", className)} {...props}>
+		<AvatarImage alt="" className="mt-0 mb-0" src={src} />
+		<AvatarFallback>{name?.slice(0, 1) || "ME"}</AvatarFallback>
+	</Avatar>
 );

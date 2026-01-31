@@ -17,7 +17,7 @@ import { TasksCalendar } from "./calendar/calendar";
 import { TasksFilters, type TasksFiltersProps } from "./filters/tasks-filters";
 import { TasksBoard } from "./kanban/kanban";
 import { TasksList } from "./list/tasks-list";
-import type { propertiesComponents } from "./properties/task-properties-components";
+import type { PropertiesComponents } from "./properties/task-properties-components";
 import type { TasksGroupBy } from "./tasks-group";
 
 export type TasksViewType = "board" | "list" | "calendar";
@@ -28,18 +28,13 @@ export type TasksViewContextFilters = Exclude<
 	showEmptyColumns?: boolean;
 	groupBy: TasksGroupBy;
 	viewType: TasksViewType;
-	properties?: Array<keyof typeof propertiesComponents>;
+	properties?: Array<keyof typeof PropertiesComponents>;
 };
 export type TasksViewContextValue = {
 	filters: TasksViewContextFilters;
 	setFilters: (filters: Partial<TasksViewContextFilters>) => void;
 
 	tasks: RouterOutputs["tasks"]["get"]["data"];
-
-	selectedTaskIds: string[];
-	toggleTaskSelection: (taskId: string) => void;
-	setTaskSelection: (taskIds: string[]) => void;
-	clearTaskSelection: () => void;
 
 	fetchNextPage: () => void;
 	hasNextPage?: boolean;
@@ -85,7 +80,7 @@ const DEFAULT_FILTERS: TasksViewContextFilters = {
 		"dueDate",
 		"labels",
 		"milestone",
-	] as Array<keyof typeof propertiesComponents>,
+	] as Array<keyof typeof PropertiesComponents>,
 	groupBy: "status" as TasksGroupBy,
 	search: "",
 	pageSize: 100,
@@ -108,7 +103,6 @@ export const TasksView = ({
 	defaultFilters,
 }: TasksViewProps) => {
 	const user = useUser();
-	const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
 	const { params } = useTasksFilterParams();
 
 	const assigneeIdWithMe = useMemo(() => {
@@ -140,18 +134,6 @@ export const TasksView = ({
 			},
 		),
 	);
-
-	const toggleTaskSelection = useCallback((taskId: string) => {
-		setSelectedTaskIds((prev) =>
-			prev.includes(taskId)
-				? prev.filter((id) => id !== taskId)
-				: [...prev, taskId],
-		);
-	}, []);
-
-	const clearTaskSelection = useCallback(() => {
-		setSelectedTaskIds([]);
-	}, []);
 
 	const handleSetFilters = useCallback(
 		(newFilters: Partial<TasksViewContextFilters>) => {
@@ -190,10 +172,6 @@ export const TasksView = ({
 			hasNextPage,
 			viewId,
 			isLoading,
-			selectedTaskIds,
-			toggleTaskSelection,
-			clearTaskSelection,
-			setTaskSelection: setSelectedTaskIds,
 		}),
 		[
 			filters,
@@ -203,10 +181,6 @@ export const TasksView = ({
 			hasNextPage,
 			viewId,
 			isLoading,
-			selectedTaskIds,
-			toggleTaskSelection,
-			clearTaskSelection,
-			setSelectedTaskIds,
 		],
 	);
 

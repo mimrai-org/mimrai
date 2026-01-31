@@ -7,7 +7,10 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { useUser } from "@/components/user-provider";
 import { trpc } from "@/utils/trpc";
-import { propertiesComponents } from "../tasks-view/properties/task-properties-components";
+import {
+	PropertyDueDate,
+	PropertyPriority,
+} from "../tasks-view/properties/task-properties-components";
 
 export const NavTopTasks = () => {
 	const user = useUser();
@@ -39,8 +42,8 @@ export const NavTopTasks = () => {
 								{task.title}
 
 								<div className="ml-auto flex items-center gap-1">
-									{propertiesComponents.priority(task)}
-									{propertiesComponents.dueDate(task)}
+									<PropertyPriority task={task} />
+									<PropertyDueDate task={task} />
 								</div>
 							</div>
 						</Link>

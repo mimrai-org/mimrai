@@ -3,6 +3,16 @@ import { and, desc, eq, ilike, or, type SQL, sql } from "drizzle-orm";
 import { db } from "..";
 import { chatMessages, chats } from "../schema";
 
+export const getOnlyChatById = async (chatId: string) => {
+	const [chat] = await db
+		.select()
+		.from(chats)
+		.where(eq(chats.id, chatId))
+		.limit(1);
+
+	return chat || null;
+};
+
 export const getChatById = async (chatId: string, teamId?: string) => {
 	const whereClause: SQL[] = [eq(chats.id, chatId)];
 	if (teamId) whereClause.push(eq(chats.teamId, teamId));
@@ -23,7 +33,8 @@ export const getChatById = async (chatId: string, teamId?: string) => {
 		.orderBy(
 			desc(chatMessages.createdAt),
 			desc(sql`CASE WHEN ${chatMessages.role} = 'assistant' THEN 1 ELSE 0 END`),
-		);
+		)
+		.limit(100);
 
 	return { ...chat, messages: messages.map((m) => m.content).reverse() };
 };

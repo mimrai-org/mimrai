@@ -1,10 +1,9 @@
 "use client";
 
-import { useArtifacts } from "@ai-sdk-tools/artifacts/client";
-import { useDataPart } from "@ai-sdk-tools/store";
 import type { ChatStatus, ToolUIPart, UIMessage } from "ai";
 import { useMemo } from "react";
 import type { AgentStatus } from "@/types/agents";
+import { useDataPart } from "./use-data-part";
 
 interface ChatStatusResult {
 	agentStatus: AgentStatus | null;
@@ -25,9 +24,6 @@ export function useChatStatus(
 	status: ChatStatus,
 ): ChatStatusResult {
 	const [agentStatusData] = useDataPart<AgentStatus>("agent-status");
-	const [{ current }] = useArtifacts({
-		exclude: ["chat-title", "suggestions"],
-	});
 
 	const result = useMemo(() => {
 		if (messages.length === 0) {
@@ -122,7 +118,7 @@ export function useChatStatus(
 			currentToolCall: finalToolCall,
 			hasTextContent,
 		};
-	}, [messages, status, agentStatusData, current]);
+	}, [messages, status, agentStatusData]);
 
 	return result;
 }

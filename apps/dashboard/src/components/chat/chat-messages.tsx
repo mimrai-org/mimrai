@@ -1,7 +1,3 @@
-import {
-	useChatMessages,
-	useChatStatus as useChatStoreStatus,
-} from "@ai-sdk-tools/store";
 import type { UIChatMessage } from "@api/ai/types";
 import { cn } from "@ui/lib/utils";
 import type { UIMessage } from "ai";
@@ -22,6 +18,7 @@ import { FaviconStack } from "../favicon-stack";
 import { ChatContextList } from "./chat-context/chat-context";
 import type { ContextItem } from "./chat-context/store";
 import { ChatMessageActions } from "./chat-message-actions";
+import { useAIChat } from "./chat-provider";
 import { ChatStatusIndicators } from "./chat-status-indicators";
 
 interface SourceItem {
@@ -83,8 +80,7 @@ function extractAiSdkSources(parts: UIMessage["parts"]): SourceItem[] {
 export const Messages = ({ isStreaming }: { isStreaming?: boolean }) => {
 	const user = useUser();
 
-	const messages = useChatMessages<UIChatMessage>();
-	const status = useChatStoreStatus();
+	const { messages, status } = useAIChat();
 	const { agentStatus, currentToolCall, hasTextContent } = useChatStatus(
 		messages,
 		status,
@@ -141,7 +137,7 @@ export const Messages = ({ isStreaming }: { isStreaming?: boolean }) => {
 
 						return (
 							<motion.div
-								key={message.id}
+								key={message.id || index}
 								className="group mb-4 flex flex-col px-1"
 								initial={{ opacity: 0, y: 10 }}
 								animate={{ opacity: 1 }}

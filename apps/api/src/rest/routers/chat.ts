@@ -1,5 +1,6 @@
 import { buildAppContext } from "@api/ai/agents/config/shared";
-import { taskAssistantAgent } from "@api/ai/agents/task-assistant";
+import { createWorkspaceAgent } from "@api/ai/agents/workspace-agent";
+import { getAllToolsForUser } from "@api/ai/tools/tool-registry";
 import { formatLLMContextItems } from "@api/ai/utils/format-context-items";
 import { getUserContext } from "@api/ai/utils/get-user-context";
 import type { Context } from "@api/rest/types";
@@ -61,7 +62,14 @@ app.post("/", withPlanFeatures(["ai"]), async (c) => {
 		id,
 	);
 
-	return taskAssistantAgent.toUIMessageStreamResponse({
+	const agent = createWorkspaceAgent({
+		tools: await getAllToolsForUser({
+			userId,
+			teamId,
+		}),
+	});
+
+	return agent.toUIMessageStreamResponse({
 		message,
 		context: appContext,
 	});

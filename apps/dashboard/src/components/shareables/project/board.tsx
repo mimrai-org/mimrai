@@ -1,7 +1,7 @@
 import type { RouterOutputs } from "@mimir/trpc";
 import { cn } from "@ui/lib/utils";
 import { StatusIcon } from "@/components/status-icon";
-import { propertiesComponents } from "@/components/tasks-view/properties/task-properties-components";
+import { PropertyChecklist } from "@/components/tasks-view/properties/task-properties-components";
 
 export const ProjectBoardShareable = ({
 	tasks,
@@ -66,7 +66,7 @@ export const ProjectBoardShareable = ({
 									{task.title}
 								</h4>
 								<div className="flex flex-wrap gap-2">
-									{propertiesComponents.checklist(task)}
+									<PropertyChecklist task={task} />
 								</div>
 							</li>
 						))}

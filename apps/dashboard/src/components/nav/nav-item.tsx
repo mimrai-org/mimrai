@@ -13,7 +13,7 @@ export const NavItem = ({
 		<button
 			type="button"
 			className={cn(
-				"flex w-fit items-center gap-2 rounded-sm px-4 py-2 text-left text-sm hover:bg-accent dark:hover:bg-accent/30",
+				"flex w-full items-center gap-2 rounded-sm px-4 py-2 text-left text-sm hover:bg-accent dark:hover:bg-accent/30",
 				className,
 			)}
 			onClick={onClick}
@@ -51,7 +51,7 @@ export const NavItemSubtitle = ({
 
 export const NavItemIcon = ({ children }: { children: React.ReactNode }) => {
 	return (
-		<div className="relative [&>svg]:size-10 [&>svg]:opacity-80">
+		<div className="relative [&>svg]:size-10 [&>svg]:stroke-1 [&>svg]:opacity-80">
 			{children}
 		</div>
 	);

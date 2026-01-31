@@ -11,7 +11,7 @@ import { StatusSelect } from "./status-select";
 
 export const TaskFormProperties = () => {
 	return (
-		<div>
+		<div className="space-y-2">
 			<Labels />
 
 			<div className="flex flex-wrap items-center gap-2">

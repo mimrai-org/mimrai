@@ -46,7 +46,7 @@ export const ProjectsList = ({
 	const { data } = useInfiniteQuery(
 		trpc.projects.get.infiniteQueryOptions(
 			{
-				pageSize: 20,
+				pageSize: 5,
 				search: params.search ?? "",
 			},
 			{
@@ -63,7 +63,7 @@ export const ProjectsList = ({
 		<div className="w-full">
 			{showFilters && <ProjectsFilters />}
 
-			<div className="flex flex-wrap gap-4">
+			<div className="grid grid-cols-3 gap-4">
 				{listData.map((project) => {
 					const total =
 						project.progress.inProgress + project.progress.completed;
@@ -73,7 +73,10 @@ export const ProjectsList = ({
 							: 0;
 					return (
 						<ProjectContextMenu key={project.id} project={project}>
-							<Link href={`${user?.basePath}/projects/${project.id}`}>
+							<Link
+								href={`${user?.basePath}/projects/${project.id}`}
+								className="w-full"
+							>
 								<NavItem>
 									<NavItemIcon>
 										<ProjectIcon hasTasks={total > 0} color={project.color} />
@@ -125,16 +128,10 @@ export const ProjectsList = ({
 						setParams({ createProject: true });
 					}}
 				>
-					{/* <NavItemIcon>
-						<FolderIcon className="stroke-1 [stroke-dasharray:5]" />
-						<NavItemIconSecondary>
-							<PlusIcon />
-						</NavItemIconSecondary>
-					</NavItemIcon> */}
 					<NavItemContent>
 						<NavItemTitle>Create Project</NavItemTitle>
 						<NavItemSubtitle>
-							Start a new project to organize your work
+							Organize your work on a new project
 						</NavItemSubtitle>
 					</NavItemContent>
 				</NavItem>

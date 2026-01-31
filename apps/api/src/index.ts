@@ -32,6 +32,7 @@ app.use(
 			"Authorization",
 			"Content-Type",
 			"accept",
+			"accept-encoding",
 			"accept-language",
 			"user-agent",
 			"priority",

@@ -20,7 +20,10 @@ import { useTaskParams } from "@/hooks/use-task-params";
 import { queryClient, trpc } from "@/utils/trpc";
 import { AssigneeAvatar } from "../asignee-avatar";
 import Loader from "../loader";
-import { propertiesComponents } from "../tasks-view/properties/task-properties-components";
+import {
+	PropertyDueDate,
+	PropertyPriority,
+} from "../tasks-view/properties/task-properties-components";
 import { InboxDropdown } from "./dropdown";
 import { InboxSourceIcon } from "./source-icon";
 import { useInbox } from "./use-inbox";
@@ -214,18 +217,20 @@ export const InboxOverview = ({ className }: { className?: string }) => {
 						>
 							<div className="flex items-center justify-between gap-2">
 								<h2 className="flex items-center gap-1 font-normal text-sm">
-									{intake.payload.priority &&
-										propertiesComponents.priority({
-											priority: intake.payload.priority,
-										})}
+									{intake.payload.priority && (
+										<PropertyPriority
+											task={{ priority: intake.payload.priority }}
+										/>
+									)}
 									{intake.payload.title}
 								</h2>
 
 								<div className="flex items-center gap-2">
-									{intake.payload.dueDate &&
-										propertiesComponents.dueDate({
-											dueDate: intake.payload.dueDate,
-										})}
+									{intake.payload.dueDate && (
+										<PropertyDueDate
+											task={{ dueDate: intake.payload.dueDate }}
+										/>
+									)}
 									{intake.payload.assigneeId &&
 										intakesAssignees[intake.payload.assigneeId] && (
 											<AssigneeAvatar

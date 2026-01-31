@@ -35,10 +35,10 @@ export const Assignee = () => {
 								</div>
 							)}
 							renderItem={(item) => (
-								<AssigneeItem {...item} className="size-5 text-sm" />
+								<AssigneeItem {...item} className="size-6 text-sm" />
 							)}
 							renderValue={(item) => (
-								<AssigneeItem {...item} className="size-4 text-xs" />
+								<AssigneeItem {...item} className="size-5 text-sm" />
 							)}
 						/>
 					</FormControl>

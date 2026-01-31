@@ -1,32 +1,23 @@
 "use client";
 import {
-	useChatActions,
-	useChatId,
-	useChatStatus,
-	useDataPart,
-} from "@ai-sdk-tools/store";
-import {
 	PromptInput,
 	PromptInputActionAddAttachments,
 	PromptInputAttachment,
 	PromptInputAttachments,
 	PromptInputBody,
-	// PromptInputAction,
-	// PromptInputActions,
 	type PromptInputMessage,
 	PromptInputSubmit,
 	PromptInputTextarea,
 	PromptInputToolbar,
 	PromptInputTools,
 } from "@mimir/ui/prompt-input-new";
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useChatParams } from "@/hooks/use-chat-params";
+import { useDataPart } from "@/hooks/use-data-part";
 import { useChatStore } from "@/store/chat";
-import { ChatContextList } from "./chat-context/chat-context";
-// import { suggestionsOptions } from "../editor/extentions/suggestions";
 import { type ContextItem, useChatContext } from "./chat-context/store";
+import { useAIChat } from "./chat-provider";
 import type { ChatTitleData } from "./chat-title";
-import { useChatWidget } from "./chat-widget";
 import { RecordButton } from "./record-button";
 import { WebSearchButton } from "./web-search-button";
 
@@ -40,16 +31,12 @@ export interface ChatInputMessage extends PromptInputMessage {
 
 export const ChatInput = () => {
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
-	const { setHover, toggle } = useChatWidget();
 	const { setParams, chatId: chatIdParam } = useChatParams();
 	const { setItems } = useChatContext();
 	const [value, setValue] = useState("");
-	const status = useChatStatus();
-	const chatId = useChatId();
-	const { items } = useChatContext();
-	const { sendMessage, stop } = useChatActions();
+	const { status, id: chatId, sendMessage, stop } = useAIChat();
 	const [data] = useDataPart<ChatTitleData>("chat-title");
-	const chatTitle = data as ChatTitleData;
+	const chatTitle = data;
 
 	const {
 		input,
@@ -87,11 +74,6 @@ export const ChatInput = () => {
 		sendMessage({
 			text: message.text || "Sent with attachments",
 			files: message.files,
-			metadata: {
-				contextItems: items,
-				agentChoice: message.metadata?.agentChoice,
-				toolChoice: message.metadata?.toolChoice,
-			},
 		});
 
 		setInput("");
@@ -100,25 +82,8 @@ export const ChatInput = () => {
 		setItems([]);
 	};
 
-	const contextPlaceholder = useMemo<string>(() => {
-		if (items.length === 0) return "";
-		return `Ask anything about ${items
-			.map((item) => `"${item.label}"`)
-			.join(", ")}`;
-	}, [items]);
-
 	return (
-		<div
-			onMouseEnter={() => {
-				setHover(true);
-			}}
-			onMouseLeave={() => {
-				setHover(false);
-			}}
-			onClick={() => {
-				toggle(true);
-			}}
-		>
+		<div>
 			<PromptInput
 				onSubmit={handleSubmit}
 				globalDrop
@@ -126,7 +91,6 @@ export const ChatInput = () => {
 				className="pointer-events-auto"
 			>
 				<PromptInputBody>
-					<ChatContextList disabled={false} items={items} className="pt-3" />
 					<PromptInputAttachments>
 						{(attachment) => <PromptInputAttachment data={attachment} />}
 					</PromptInputAttachments>
@@ -164,7 +128,7 @@ export const ChatInput = () => {
 								? "Search the web"
 								: chatTitle?.title
 									? `Continue "${chatTitle?.title}" conversation`
-									: contextPlaceholder || "Ask anything"
+									: "Type your message here..."
 						}
 					/>
 				</PromptInputBody>

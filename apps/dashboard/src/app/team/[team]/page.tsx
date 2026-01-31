@@ -1,3 +1,5 @@
+import { ChatInterface } from "@/components/chat/chat-interface";
+import { ChatProvider } from "@/components/chat/chat-provider";
 import { FeedView } from "@/components/feed/view";
 import { NavTopTasks } from "@/components/nav/nav-top-tasks";
 import { NavWorkspace } from "@/components/nav/nav-workspace";
@@ -18,7 +20,7 @@ export default async function Page({ searchParams }: Props) {
 
 	return (
 		<div className="flex h-screen w-screen flex-col items-center overflow-y-auto pb-4">
-			<div className="w-4xl animate-blur-in space-y-8 pt-[calc(100vh/6)]">
+			<div className="w-4xl animate-blur-in space-y-6 pt-[calc(100vh/6)]">
 				<div className="space-y-1">
 					<div className="w-fit">
 						<TeamSwitcher />
@@ -34,11 +36,11 @@ export default async function Page({ searchParams }: Props) {
 						Hello, {user?.name.split(" ")[0]}
 					</p>
 				</div>
-				<NavTopTasks />
 				<NavSearch
 					className="w-fit"
-					placeholder="Search any task, project, milestone and more"
+					placeholder="Search tasks, projects, milestones and more"
 				/>
+				<NavTopTasks />
 				<div>
 					<h2 className="mb-2 font-header">Pick a project</h2>
 					<ProjectsList showFilters={false} />
