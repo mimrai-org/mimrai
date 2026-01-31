@@ -21,9 +21,7 @@ import { useTasksViewContext } from "../tasks-view";
 type View = RouterOutputs["taskViews"]["get"]["data"][number];
 
 export const TasksViewsList = ({ projectId }: { projectId: string }) => {
-	const user = useUser();
 	const [open, setOpen] = useState(false);
-	const { setParams } = useTaskViewParams();
 	const { viewId, filters } = useTasksViewContext();
 	const { data: taskViews } = useQuery(
 		trpc.taskViews.get.queryOptions({
@@ -102,7 +100,8 @@ const TasksViewItem = ({
 					className={cn(
 						"flex w-fit items-center gap-2 rounded-sm px-2 py-1 text-xs hover:bg-accent dark:hover:bg-accent/50",
 						{
-							"bg-accent dark:bg-accent/50": view.id === selectedViewId,
+							"border dark:border-none dark:bg-accent/50":
+								view.id === selectedViewId,
 						},
 					)}
 				>

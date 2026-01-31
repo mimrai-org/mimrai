@@ -3,6 +3,17 @@ import { useTaskPanel } from "@/components/panels/task-panel";
 import { TaskProperty } from "@/components/tasks-view/properties/task-properties";
 import { useUser } from "@/components/user-provider";
 import { cn } from "@/lib/utils";
+import {
+	PropertyAssignee,
+	PropertyChecklist,
+	PropertyDependencies,
+	PropertyDueDate,
+	PropertyLabels,
+	PropertyMilestone,
+	PropertyPriority,
+	PropertyProject,
+	PropertyStatus,
+} from "../properties/task-properties-components";
 
 export type KanbanTask = RouterOutputs["tasks"]["get"]["data"][number];
 
@@ -41,30 +52,30 @@ export const KanbanTask = ({
 				<div className="flex h-full grow-1 flex-col justify-between gap-2">
 					<div className="flex items-center justify-between gap-2">
 						<div className={"flex items-center gap-2 text-xs"}>
-							<TaskProperty property="priority" task={task} />
+							<PropertyPriority task={task} />
 							{task.sequence !== null && (
 								<span className="mr-2 text-muted-foreground tabular-nums">
 									{user?.team?.prefix}-{task.sequence}
 								</span>
 							)}
-							<TaskProperty property="labels" task={task} />
+							<PropertyLabels task={task} />
 						</div>
-						<TaskProperty property="assignee" task={task} />
+						<PropertyAssignee task={task} />
 					</div>
 					<div className="flex items-start gap-2">
-						<TaskProperty property="status" task={task} />
+						<PropertyStatus task={task} />
 						<div className="line-clamp-3 break-words font-medium text-sm">
 							{task.title}
 						</div>
 					</div>
 
 					<div className="flex flex-wrap items-center gap-1.5">
-						<TaskProperty property="dependencies" task={task} />
+						<PropertyDependencies task={task} />
 
-						<TaskProperty property="project" task={task} />
-						<TaskProperty property="milestone" task={task} />
-						<TaskProperty property="dueDate" task={task} />
-						<TaskProperty property="checklist" task={task} />
+						<PropertyProject task={task} />
+						<PropertyMilestone task={task} />
+						<PropertyDueDate task={task} />
+						<PropertyChecklist task={task} />
 					</div>
 				</div>
 			</div>

@@ -9,24 +9,12 @@ type Props = {
 export default async function Page({ params }: Props) {
 	const { projectId, team } = await params;
 
-	const project = await trpcClient.projects.getById.query({
-		id: projectId,
-	});
-
 	const defaultView = await trpcClient.taskViews.getDefault.query({
 		projectId,
 	});
 
 	return (
 		<div className="h-full animate-blur-in">
-			<BreadcrumbSetter
-				crumbs={[
-					{
-						label: project.name,
-						segments: ["projects", project.id],
-					},
-				]}
-			/>
 			<TasksView
 				defaultFilters={{
 					...defaultView?.filters,

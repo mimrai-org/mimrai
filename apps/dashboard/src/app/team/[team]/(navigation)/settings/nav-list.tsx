@@ -20,6 +20,8 @@ import { useMemo } from "react";
 import {
 	NavItem,
 	NavItemContent,
+	NavItemIcon,
+	NavItemIconSecondary,
 	NavItemTitle,
 } from "@/components/nav/nav-item";
 import { useUser } from "@/components/user-provider";
@@ -102,8 +104,8 @@ export const NavList = () => {
 	if (!user) return null;
 
 	return (
-		<div className="h-fit w-full">
-			<ul className="flex flex-wrap gap-4">
+		<div className="mx-auto h-fit w-full max-w-5xl">
+			<ul className="grid grid-cols-5 gap-2">
 				{settingsLinks.map(({ to, label, scopes, icon: Icon }) => {
 					if (
 						scopes &&
@@ -115,10 +117,12 @@ export const NavList = () => {
 					return (
 						<Link href={to} key={to} className="min-w-[100px]">
 							<NavItem>
-								<div className="relative">
-									<FolderIcon className="size-10" />
-									<Icon className="absolute bottom-0 left-0 size-4 bg-background" />
-								</div>
+								<NavItemIcon>
+									<FolderIcon />
+									<NavItemIconSecondary>
+										<Icon />
+									</NavItemIconSecondary>
+								</NavItemIcon>
 								<NavItemContent>
 									<NavItemTitle>{label}</NavItemTitle>
 								</NavItemContent>

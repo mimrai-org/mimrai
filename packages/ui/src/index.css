@@ -99,7 +99,7 @@ body {
 	--sidebar-foreground: #afafaf;
 	--sidebar-primary: oklch(0.922 0 0);
 	--sidebar-primary-foreground: oklch(0.205 0 0);
-	--sidebar-accent: oklch(0.2739 0.0055 286.03);
+	--sidebar-accent: #363636;
 	--sidebar-accent-foreground: #ffffff;
 	--sidebar-border: oklch(1 0 0 / 10%);
 	--sidebar-ring: oklch(0.556 0 0);
