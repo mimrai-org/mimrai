@@ -1,6 +1,5 @@
 "use client";
 
-import { useChatActions, useChatId } from "@ai-sdk-tools/store";
 import { useMutation } from "@tanstack/react-query";
 import {
 	Tooltip,
@@ -18,6 +17,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { trpc } from "@/utils/trpc";
+import { useAIChat } from "./chat-provider";
 
 interface ChatMessageActionsProps {
 	messageId: string;
@@ -28,8 +28,7 @@ export function ChatMessageActions({
 	messageId,
 	messageContent,
 }: ChatMessageActionsProps) {
-	const chatId = useChatId();
-	const { regenerate } = useChatActions();
+	const { id: chatId, regenerate } = useAIChat();
 	const [feedbackGiven, setFeedbackGiven] = useState<
 		"positive" | "negative" | null
 	>(null);

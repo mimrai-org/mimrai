@@ -5,10 +5,8 @@ import "./styles.css";
 import {
 	EditorContent,
 	type Editor as EditorInstance,
-	type JSONContent,
 	useEditor,
 } from "@tiptap/react";
-import { useEffect, useLayoutEffect, useRef } from "react";
 import { BubbleMenu } from "./extentions/bubble-menu";
 import { registerExtensions } from "./extentions/register";
 
@@ -56,7 +54,9 @@ export function Editor({
 				shouldInsertImage,
 			}),
 			content: value,
+
 			immediatelyRender: false,
+			shouldRerenderOnTransaction: false,
 			editable: !readOnly,
 			onBlur,
 			onFocus,

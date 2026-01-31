@@ -1,8 +1,6 @@
-import { Badge } from "@mimir/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@mimir/ui/tooltip";
 import {
 	SignalHighIcon,
-	SignalLow,
 	SignalLowIcon,
 	SignalMediumIcon,
 	TriangleAlertIcon,

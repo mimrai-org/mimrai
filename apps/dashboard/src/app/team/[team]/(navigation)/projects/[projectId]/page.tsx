@@ -1,4 +1,3 @@
-import { FolderOpen } from "lucide-react";
 import { BreadcrumbSetter } from "@/components/breadcrumbs";
 import { TasksView } from "@/components/tasks-view/tasks-view";
 import { trpcClient } from "@/utils/trpc";
@@ -19,7 +18,7 @@ export default async function Page({ params }: Props) {
 	});
 
 	return (
-		<div className="h-full">
+		<div className="h-full animate-blur-in">
 			<BreadcrumbSetter
 				crumbs={[
 					{

@@ -1,5 +1,12 @@
 "use client";
-import { Maximize2Icon, XIcon } from "lucide-react";
+import {
+	ArrowDownIcon,
+	ArrowUpIcon,
+	Maximize2Icon,
+	Minimize2Icon,
+	MinusIcon,
+	XIcon,
+} from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef } from "react";
@@ -29,7 +36,8 @@ export function PanelContainer({
 	onClose,
 }: PanelContainerProps) {
 	const panelRef = useRef<HTMLDivElement>(null);
-	const { closePanel, bringToFront, panels } = usePanels();
+	const { closePanel, bringToFront, panels, setMinimized, minimized } =
+		usePanels();
 
 	// Calculate offset based on index
 	const offset = index * PANEL_OFFSET;
@@ -41,9 +49,13 @@ export function PanelContainer({
 	}, [closePanel, panel.type, panel.id, onClose]);
 
 	const handlePanelClick = useCallback(() => {
+		if (minimized) {
+			setMinimized(false);
+			return;
+		}
 		if (isTopPanel) return;
 		bringToFront(panel.type, panel.id);
-	}, [bringToFront, panel.type, panel.id, isTopPanel]);
+	}, [bringToFront, panel.type, panel.id, isTopPanel, minimized, setMinimized]);
 
 	// Handle escape key to close the topmost panel (last in array)
 	useEffect(() => {
@@ -72,8 +84,16 @@ export function PanelContainer({
 			aria-modal="false"
 			data-panel-type={panel.type}
 			data-panel-id={panel.id}
-			initial={{ opacity: 0, y: 50 }}
-			animate={{ opacity: 1, y: 0 }}
+			initial={{
+				opacity: 0,
+				y: 50,
+				height: minimized ? "100px" : `calc(80vh - ${offset}px)`,
+			}}
+			animate={{
+				opacity: 1,
+				y: 0,
+				height: minimized ? "100px" : `calc(80vh - ${offset}px)`,
+			}}
 			exit={{ opacity: 0, y: 50 }}
 			whileHover={{
 				y: isTopPanel ? 0 : -5,
@@ -82,7 +102,6 @@ export function PanelContainer({
 			style={{
 				right: `calc(2rem + ${offset}px)`,
 				zIndex: 45 + index,
-				height: `calc(80vh - ${offset}px)`,
 			}}
 			className={cn(
 				"fixed bottom-0 left-auto overflow-y-auto rounded-t-lg border-x border-t bg-background pt-0 shadow-lg shadow-secondary/20 sm:w-[700px]",
@@ -97,6 +116,28 @@ export function PanelContainer({
 		>
 			{showCloseButton && (
 				<div className="absolute top-4 right-4 z-10 flex items-center gap-4">
+					{minimized ? (
+						<button
+							type="button"
+							className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+							onClick={() => setMinimized(false)}
+						>
+							<ArrowUpIcon className="size-3.5" />
+							<span className="sr-only">Maximize</span>
+						</button>
+					) : (
+						<button
+							type="button"
+							className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+							onClick={(e) => {
+								e.stopPropagation();
+								setMinimized(true);
+							}}
+						>
+							<ArrowDownIcon className="size-3.5" />
+							<span className="sr-only">Minimize</span>
+						</button>
+					)}
 					{maximizeLink && (
 						<Link
 							href={maximizeLink}
@@ -109,7 +150,7 @@ export function PanelContainer({
 								className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
 							>
 								<Maximize2Icon className="size-3.5" />
-								<span className="sr-only">Maximize</span>
+								<span className="sr-only">Open</span>
 							</button>
 						</Link>
 					)}

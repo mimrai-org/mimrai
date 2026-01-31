@@ -4,12 +4,16 @@ import { Separator } from "@ui/components/ui/separator";
 import { CheckIcon, XIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Loader from "@/components/loader";
+import { useTaskSelectionStore } from "@/store/task-selection";
 import { queryClient, trpc } from "@/utils/trpc";
-import { useTasksViewContext } from "../tasks-view";
 
 export const TaskListBulkActions = () => {
-	const { selectedTaskIds, toggleTaskSelection, clearTaskSelection } =
-		useTasksViewContext();
+	const selectedTaskIds = useTaskSelectionStore(
+		(state) => state.selectedTaskIds,
+	);
+	const clearTaskSelection = useTaskSelectionStore(
+		(state) => state.clearTaskSelection,
+	);
 
 	const { data: statuses } = useQuery(
 		trpc.statuses.get.queryOptions({

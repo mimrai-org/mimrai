@@ -91,7 +91,7 @@ export const LabelInput = ({
 					variant={"ghost"}
 					className={cn(
 						className,
-						"group hover:bg-transparent dark:hover:bg-transparent",
+						"group h-5.5 hover:bg-transparent dark:hover:bg-transparent",
 					)}
 				>
 					{selectedLabels.length > 0 && (

@@ -8,10 +8,15 @@ import { getProjectsTool } from "../tools/get-projects";
 import { getStatusesTool } from "../tools/get-statuses";
 import { getTasksTool } from "../tools/get-tasks";
 import { getUsersTool } from "../tools/get-users";
+import { getAllTools, getIntegrationTools } from "../tools/tool-registry";
 import { updateChecklistItemTool } from "../tools/update-checklist-item";
 import { updateTaskTool } from "../tools/update-task";
-import { createAgent } from "./config/agent";
-import type { AppContext } from "./config/shared";
+import {
+	getEnabledIntegrationTypes,
+	getUserAvailableIntegrations,
+} from "./agent-factory";
+import { type AgentConfig, createAgent } from "./config/agent";
+import { type AppContext, COMMON_AGENT_RULES } from "./config/shared";
 
 /**
  * Task Assistant Agent - Specialized for in-task interactions
@@ -55,85 +60,15 @@ export interface TaskAssistantContext extends AppContext {
 		createdAt: string;
 	}>;
 	/** Available integrations for this team (user has linked their account) */
-	availableIntegrations?: Array<{
-		type: IntegrationName;
-		name: string;
-		integrationId: string;
-		userLinkId: string;
-	}>;
+	availableIntegrations?: Array<string>;
 }
 
-/**
- * Integration info returned from getUserIntegrations
- */
 export interface UserIntegrationInfo {
 	type: IntegrationName;
 	name: string;
 	integrationId: string;
 	userLinkId: string;
 }
-
-/**
- * Core tools available to all task assistants
- */
-const coreTools = {
-	// Task management
-	updateTask: updateTaskTool,
-
-	// Checklist/subtask management
-	getChecklistItems: getChecklistItemsTool,
-	createChecklistItem: createChecklistItemTool,
-	updateChecklistItem: updateChecklistItemTool,
-
-	// Reference data
-	getStatuses: getStatusesTool,
-	getUsers: getUsersTool,
-	getLabels: getLabelsTool,
-	getProjects: getProjectsTool,
-	getMilestones: getMilestonesTool,
-
-	// Find related tasks
-	getTasks: getTasksTool,
-};
-
-/**
- * Integration tool registry - tools are added here when integrations are installed
- * This allows the agent to dynamically gain capabilities based on team configuration
- */
-export const integrationTools: Partial<
-	Record<IntegrationName, Record<string, unknown>>
-> = {};
-
-/**
- * Register integration tools dynamically
- * Call this when an integration is installed/enabled for a team
- */
-export const registerIntegrationTools = (
-	integrationType: IntegrationName,
-	tools: Record<string, unknown>,
-) => {
-	integrationTools[integrationType] = tools;
-};
-
-/**
- * Get all available tools including integration tools
- */
-export const getTaskAssistantTools = (
-	enabledIntegrations?: IntegrationName[],
-) => {
-	const tools = { ...coreTools };
-
-	if (enabledIntegrations) {
-		for (const integration of enabledIntegrations) {
-			const intTools = integrationTools[integration];
-			if (intTools) {
-				Object.assign(tools, intTools);
-			}
-		}
-	}
-
-	return tools;
-};
 
 const buildSystemPrompt = (ctx: TaskAssistantContext) => {
 	const taskContext = ctx.task;
@@ -146,9 +81,7 @@ const buildSystemPrompt = (ctx: TaskAssistantContext) => {
 
 	const availableIntegrationsText =
 		ctx.availableIntegrations && ctx.availableIntegrations.length > 0
-			? ctx.availableIntegrations
-					.map((i) => `- ${i.name} (${i.type})`)
-					.join("\n")
+			? ctx.availableIntegrations.map((i) => `- ${i}`).join("\n")
 			: "No integrations configured.";
 
 	return `You are an AI task assistant helping with task "${taskContext.title}" in team "${ctx.teamName}".
@@ -180,6 +113,8 @@ ${commentsContext}
 <available-integrations>
 ${availableIntegrationsText}
 </available-integrations>
+
+${COMMON_AGENT_RULES}
 
 <critical-rules>
 - You are a task assistant operating in the context of THIS SPECIFIC TASK
@@ -259,34 +194,63 @@ Core capabilities:
 - Find related tasks if needed
 
 Integration capabilities (when enabled):
-- Send emails (Gmail)
-- Send messages (WhatsApp, Slack, Mattermost)
-- Schedule actions (Scheduler)
-- Manage code links (GitHub)
+- Create and send emails (Gmail)
+  - Always create drafts before sending
 </capabilities>`;
 };
-
-export const taskAssistantAgent = createAgent({
-	name: "Task Assistant",
-	description:
-		"AI assistant specialized for in-task interactions, task management, and integration-powered actions.",
-	tools: coreTools,
-	buildInstructions: buildSystemPrompt as (ctx: AppContext) => string,
-	model: openai("gpt-4o-mini"),
-});
 
 /**
  * Create a task assistant with specific integration tools enabled
  */
-export const createTaskAssistantWithIntegrations = (
-	enabledIntegrations: IntegrationName[],
-) => {
+export const createTaskAssistantAgent = (config: Partial<AgentConfig>) => {
 	return createAgent({
 		name: "Task Assistant",
 		description:
 			"AI assistant specialized for in-task interactions, task management, and integration-powered actions.",
-		tools: getTaskAssistantTools(enabledIntegrations),
+		tools: {
+			...config.tools,
+		},
 		buildInstructions: buildSystemPrompt as (ctx: AppContext) => string,
 		model: openai("gpt-4o-mini"),
 	});
+};
+
+export const createTaskAssistantAgentForUser = async ({
+	userId,
+	teamId,
+}: {
+	userId: string;
+	teamId: string;
+}) => {
+	const userIntegrations = await getUserAvailableIntegrations({
+		userId,
+		teamId,
+	});
+	const enabledIntegrations = getEnabledIntegrationTypes(userIntegrations);
+	const agent = createTaskAssistantAgent({
+		tools: {
+			updateTask: updateTaskTool,
+
+			// Checklist/subtask management
+			getChecklistItems: getChecklistItemsTool,
+			createChecklistItem: createChecklistItemTool,
+			updateChecklistItem: updateChecklistItemTool,
+
+			// Reference data
+			getStatuses: getStatusesTool,
+			getUsers: getUsersTool,
+			getLabels: getLabelsTool,
+			getProjects: getProjectsTool,
+			getMilestones: getMilestonesTool,
+
+			// Find related tasks
+			getTasks: getTasksTool,
+			...getIntegrationTools(enabledIntegrations),
+		},
+	});
+
+	return {
+		agent,
+		enabledIntegrations,
+	};
 };

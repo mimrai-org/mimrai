@@ -1,6 +1,6 @@
-import { Provider as ChatProvider } from "@ai-sdk-tools/store";
 import { queryClient, trpc } from "@/utils/trpc";
 import { ChatInterface } from "./chat-interface";
+import { ChatProvider } from "./chat-provider";
 
 export const ChatComponent = async ({ chatId }: { chatId?: string }) => {
 	const chat = chatId
@@ -9,7 +9,7 @@ export const ChatComponent = async ({ chatId }: { chatId?: string }) => {
 
 	return (
 		// @ts-expect-error Async Server Component
-		<ChatProvider initialMessages={chat?.messages || []}>
+		<ChatProvider initialMessages={chat?.messages || []} id={chatId || ""}>
 			<ChatInterface id={chatId} />
 		</ChatProvider>
 	);

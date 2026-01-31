@@ -28,11 +28,11 @@ export default function ErrorPage({
 					if (isAuthenticationError) {
 						window.location.href = "/sign-in";
 					} else {
-						reset();
+						window.location.reload();
 					}
 				}}
 			>
-				{isAuthenticationError ? "Sign In" : "Try Again"}
+				{isAuthenticationError ? "Sign In" : "Reload Page"}
 			</Button>
 		</div>
 	);

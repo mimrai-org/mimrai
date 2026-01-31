@@ -7,7 +7,6 @@ import {
 } from "@dnd-kit/core";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Button } from "@ui/components/ui/button";
-import { Collapsible, CollapsibleTrigger } from "@ui/components/ui/collapsible";
 import {
 	ContextMenu,
 	ContextMenuContent,
@@ -22,9 +21,13 @@ import {
 	PlusIcon,
 } from "lucide-react";
 import { memo, useCallback, useMemo, useRef, useState } from "react";
+import { usePanel } from "@/components/panels/panel-context";
+import { TASK_PANEL_TYPE } from "@/components/panels/task-panel";
 import { useTaskParams } from "@/hooks/use-task-params";
+import { useTaskSelectionStore } from "@/store/task-selection";
 import Loader from "../../loader";
 import { TaskContextMenu } from "../../task-context-menu";
+import type { PropertyKey } from "../properties/task-properties";
 import { type GenericGroup, type Task, useTasksGrouped } from "../tasks-group";
 import { useTasksViewContext } from "../tasks-view";
 import { TaskListBulkActions } from "./bulk-actions";
@@ -40,13 +43,29 @@ type VirtualItem =
 	| { type: "create-button"; groupId: string };
 
 export const TasksList = () => {
-	const { fetchNextPage, hasNextPage, isLoading } = useTasksViewContext();
+	const { fetchNextPage, hasNextPage, isLoading, filters } =
+		useTasksViewContext();
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
 		new Set(),
 	);
 
 	const { tasks, reorderTask } = useTasksGrouped();
+
+	// Get stable reference to panel opener - only this component subscribes to panel context
+	const taskPanel = usePanel(TASK_PANEL_TYPE);
+	const handleOpenTask = useCallback(
+		(taskId: string) => {
+			taskPanel.open(taskId);
+		},
+		[taskPanel],
+	);
+
+	// Memoize visible properties to prevent TaskItem rerenders
+	const visibleProperties = useMemo(
+		() => (filters.properties ?? []) as PropertyKey[],
+		[filters.properties],
+	);
 
 	const sensors = useSensors(
 		useSensor(PointerSensor, {
@@ -160,7 +179,11 @@ export const TasksList = () => {
 									{item.type === "task" && (
 										<TaskContextMenu task={item.task}>
 											<div>
-												<TaskItem task={item.task} />
+												<TaskItem
+													task={item.task}
+													onOpenTask={handleOpenTask}
+													visibleProperties={visibleProperties}
+												/>
 											</div>
 										</TaskContextMenu>
 									)}
@@ -203,7 +226,9 @@ const GroupHeader = memo(function GroupHeader({
 	isCollapsed: boolean;
 	onToggle: () => void;
 }) {
-	const { setTaskSelection } = useTasksViewContext();
+	const setTaskSelection = useTaskSelectionStore(
+		(state) => state.setTaskSelection,
+	);
 	const { tasks } = useTasksGrouped();
 
 	const handleSelectAll = useCallback(() => {

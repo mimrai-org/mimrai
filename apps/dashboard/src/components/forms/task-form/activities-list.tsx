@@ -1,5 +1,5 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useSubscription } from "@trpc/tanstack-react-query";
 import { Button } from "@ui/components/ui/button";
 import { AnimatePresence } from "motion/react";
@@ -8,13 +8,17 @@ import { ActivityItem } from "@/components/activities/activity-item";
 import { queryClient, trpc } from "@/utils/trpc";
 
 export const TaskActivitiesList = ({ taskId }: { taskId: string }) => {
-	const [showAll, setShowAll] = useState(false);
-	const { data } = useQuery(
-		trpc.activities.get.queryOptions({
-			groupId: taskId,
-			nStatus: ["archived"],
-			pageSize: 100,
-		}),
+	const { data, fetchNextPage, hasNextPage } = useInfiniteQuery(
+		trpc.activities.get.infiniteQueryOptions(
+			{
+				groupId: taskId,
+				nStatus: ["archived"],
+				pageSize: 10,
+			},
+			{
+				getNextPageParam: (lastPage) => lastPage.meta.cursor,
+			},
+		),
 	);
 
 	useSubscription(
@@ -48,42 +52,26 @@ export const TaskActivitiesList = ({ taskId }: { taskId: string }) => {
 
 	const reversedData = useMemo(() => {
 		if (!data) return [];
-		return [...data.data].reverse();
+		return [...data.pages.flatMap((page) => page.data)].reverse();
 	}, [data]);
-
-	const canShowAll = reversedData.length < 10 || showAll;
-
-	const dataToShow = useMemo(() => {
-		if (canShowAll) {
-			return reversedData;
-		}
-		const comments = reversedData.filter((activity) =>
-			["task_comment", "task_comment_reply"].includes(activity.type),
-		);
-
-		if (comments.length >= 3) {
-			return comments;
-		}
-
-		return reversedData.slice(-3);
-	}, [reversedData, canShowAll]);
 
 	return (
 		<ul className="space-y-2">
-			{!canShowAll && (
+			{hasNextPage && (
 				<li>
 					<Button
 						variant={"ghost"}
 						size={"sm"}
 						className="text-muted-foreground text-xs"
-						onClick={() => setShowAll(true)}
+						onClick={() => fetchNextPage()}
+						type="button"
 					>
-						Show all activities...
+						Load more activities
 					</Button>
 				</li>
 			)}
 			<AnimatePresence>
-				{dataToShow.map((activity) => {
+				{reversedData.map((activity) => {
 					return (
 						<li key={activity.id}>
 							<ActivityItem

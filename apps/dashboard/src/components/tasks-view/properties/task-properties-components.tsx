@@ -14,12 +14,36 @@ import { TaskPropertyStatus } from "./status";
 
 export type Task = RouterOutputs["tasks"]["get"]["data"][number];
 
-// Extract dependencies component to follow React's rules of hooks
-const TaskPropertyDependencies = memo(function TaskPropertyDependencies({
+/**
+ * Property component props - each component receives a task with the required fields
+ */
+type PropertyComponentProps<T> = { task: T };
+
+const PropertyStatusChangedAt = memo(function PropertyStatusChangedAt({
 	task,
-}: {
-	task: Pick<Task, "dependencies" | "id">;
-}) {
+}: PropertyComponentProps<Pick<Task, "statusChangedAt">>) {
+	if (!task.statusChangedAt) return null;
+	return (
+		<span className="text-muted-foreground text-xs opacity-0 transition-opacity group-hover/task:opacity-100">
+			{formatRelative(new Date(task.statusChangedAt), new Date())}
+		</span>
+	);
+});
+
+const PropertyPriority = memo(function PropertyPriority({
+	task,
+}: PropertyComponentProps<Pick<Task, "priority">>) {
+	if (!task.priority) return null;
+	return (
+		<div className="flex size-5.5 items-center justify-center rounded-sm px-2 text-xs">
+			<Priority value={task.priority} />
+		</div>
+	);
+});
+
+const PropertyDependencies = memo(function PropertyDependencies({
+	task,
+}: PropertyComponentProps<Pick<Task, "dependencies" | "id">>) {
 	const group = useMemo(() => {
 		if (!task.dependencies) return {};
 		const record: Record<string, number> = {};
@@ -30,7 +54,6 @@ const TaskPropertyDependencies = memo(function TaskPropertyDependencies({
 					: dependency.type;
 			const direction = dependency.dependsOnTaskId === task.id ? "from" : "to";
 			const key = `${type}:${direction}`;
-
 			record[key] = (record[key] || 0) + 1;
 		}
 		return record;
@@ -55,7 +78,6 @@ const TaskPropertyDependencies = memo(function TaskPropertyDependencies({
 							direction={direction}
 							className="size-3.5"
 						/>
-
 						{count > 1 ? count : null}
 					</span>
 				);
@@ -64,59 +86,108 @@ const TaskPropertyDependencies = memo(function TaskPropertyDependencies({
 	);
 });
 
-export const propertiesComponents = {
-	statusChangedAt: (task: Pick<Task, "statusChangedAt">) =>
-		task.statusChangedAt ? (
-			<span className="text-muted-foreground text-xs opacity-0 transition-opacity group-hover/task:opacity-100">
-				{formatRelative(new Date(task.statusChangedAt), new Date())}
-			</span>
-		) : null,
-	priority: (task: Pick<Task, "priority">) =>
-		task.priority && (
-			<div className="flex size-5.5 items-center justify-center rounded-sm px-2 text-xs">
-				<Priority value={task.priority} />
-			</div>
-		),
-	dependencies: (task: Pick<Task, "dependencies" | "id">) => (
-		<TaskPropertyDependencies task={task} />
-	),
-	status: (task: Pick<Task, "status" | "id">) => (
-		<TaskPropertyStatus status={task.status} id={task.id} />
-	),
-	labels: (task: Pick<Task, "labels">) => {
-		return <TaskPropertyLabels labels={task.labels} />;
-	},
-	dueDate: (task: Pick<Task, "dueDate">) =>
-		task.dueDate && <TaskPropertyDueDate task={task} />,
+const PropertyStatus = memo(function PropertyStatus({
+	task,
+}: PropertyComponentProps<Pick<Task, "status" | "id">>) {
+	return <TaskPropertyStatus status={task.status} id={task.id} />;
+});
 
-	checklist: (task: Pick<Task, "checklistSummary">) =>
-		task.checklistSummary?.total > 0 && (
-			<div
-				className={cn(
-					"flex h-5.5 items-center rounded-sm text-muted-foreground text-xs",
-					{
-						"bg-primary px-2 text-primary-foreground":
-							task.checklistSummary.completed === task.checklistSummary.total,
-					},
-				)}
-			>
-				<CheckSquareIcon className="mr-1 inline size-3.5" />
-				{task.checklistSummary.completed}/{task.checklistSummary.total}
-			</div>
-		),
-	project: (task: Pick<Task, "project">) =>
-		task.project && (
-			<span className="flex h-5.5 items-center gap-2 rounded-sm bg-secondary px-2 text-xs">
-				<ProjectIcon className="size-3.5" {...task.project} />
-				{task.project.name}
-			</span>
-		),
-	milestone: (task: Pick<Task, "milestone">) =>
-		task.milestone && (
-			<span className="flex h-5.5 items-center gap-2 rounded-sm bg-secondary px-2 text-xs">
-				<MilestoneIcon className="size-3.5" {...task.milestone} />
-				{task.milestone.name}
-			</span>
-		),
-	assignee: (task: Task) => <TaskPropertyAssignee task={task} />,
+const PropertyLabels = memo(function PropertyLabels({
+	task,
+}: PropertyComponentProps<Pick<Task, "labels">>) {
+	return <TaskPropertyLabels labels={task.labels} />;
+});
+
+const PropertyDueDate = memo(function PropertyDueDate({
+	task,
+}: PropertyComponentProps<Pick<Task, "dueDate">>) {
+	if (!task.dueDate) return null;
+	return <TaskPropertyDueDate task={task} />;
+});
+
+const PropertyChecklist = memo(function PropertyChecklist({
+	task,
+}: PropertyComponentProps<Pick<Task, "checklistSummary">>) {
+	if (!task.checklistSummary?.total || task.checklistSummary.total <= 0)
+		return null;
+	return (
+		<div
+			className={cn(
+				"flex h-5.5 items-center rounded-sm text-muted-foreground text-xs",
+				{
+					"bg-primary px-2 text-primary-foreground":
+						task.checklistSummary.completed === task.checklistSummary.total,
+				},
+			)}
+		>
+			<CheckSquareIcon className="mr-1 inline size-3.5" />
+			{task.checklistSummary.completed}/{task.checklistSummary.total}
+		</div>
+	);
+});
+
+const PropertyProject = memo(function PropertyProject({
+	task,
+}: PropertyComponentProps<Pick<Task, "project">>) {
+	if (!task.project) return null;
+	return (
+		<span className="flex h-5.5 items-center gap-2 rounded-sm bg-secondary px-2 text-xs">
+			<ProjectIcon className="size-3.5" {...task.project} />
+			{task.project.name}
+		</span>
+	);
+});
+
+const PropertyMilestone = memo(function PropertyMilestone({
+	task,
+}: PropertyComponentProps<Pick<Task, "milestone">>) {
+	if (!task.milestone) return null;
+	return (
+		<span className="flex h-5.5 items-center gap-2 rounded-sm bg-secondary px-2 text-xs">
+			<MilestoneIcon className="size-3.5" {...task.milestone} />
+			{task.milestone.name}
+		</span>
+	);
+});
+
+const PropertyAssignee = memo(function PropertyAssignee({
+	task,
+}: PropertyComponentProps<Task>) {
+	return <TaskPropertyAssignee task={task} />;
+});
+
+/**
+ * Map of property keys to their React components.
+ * All components are properly memoized for optimal rendering in virtualized lists.
+ */
+export const PropertiesComponents = {
+	statusChangedAt: PropertyStatusChangedAt,
+	priority: PropertyPriority,
+	dependencies: PropertyDependencies,
+	status: PropertyStatus,
+	labels: PropertyLabels,
+	dueDate: PropertyDueDate,
+	checklist: PropertyChecklist,
+	project: PropertyProject,
+	milestone: PropertyMilestone,
+	assignee: PropertyAssignee,
+} as const;
+
+// Re-export individual components for direct usage
+export {
+	PropertyStatusChangedAt,
+	PropertyPriority,
+	PropertyDependencies,
+	PropertyStatus,
+	PropertyLabels,
+	PropertyDueDate,
+	PropertyChecklist,
+	PropertyProject,
+	PropertyMilestone,
+	PropertyAssignee,
 };
+
+/**
+ * @deprecated Use PropertiesComponents instead
+ */
+export const propertiesComponents = PropertiesComponents;

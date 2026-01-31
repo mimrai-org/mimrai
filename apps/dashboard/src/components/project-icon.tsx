@@ -11,5 +11,10 @@ export const ProjectIcon = ({
 }) => {
 	const Icon = hasTasks ? FolderIcon : FolderIcon;
 
-	return <Icon className={className} style={{ color: color || "inherit" }} />;
+	return (
+		<Icon
+			className={className}
+			style={{ color: color || "inherit", fill: color || "inherit" }}
+		/>
+	);
 };

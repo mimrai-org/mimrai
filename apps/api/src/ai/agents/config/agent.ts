@@ -1,4 +1,5 @@
 import type { UIChatMessage } from "@api/ai/types";
+import { summarizeChat } from "@api/ai/utils/summarize-chat";
 import {
 	getChatById,
 	saveChat,
@@ -94,6 +95,12 @@ export const createAgent = (config: AgentConfig): Agent => {
 				userId: context.userId,
 			});
 		}
+
+		const summary = await summarizeChat({
+			chatId,
+			lastSummary: chat?.summary,
+			lastSummaryAt: chat?.lastSummaryAt || new Date(0).toISOString(),
+		});
 
 		previousMessages.push(...((chat?.messages || []) as UIChatMessage[]));
 		const slicedMessages = previousMessages.slice(-20);

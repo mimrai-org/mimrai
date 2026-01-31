@@ -22,7 +22,7 @@ import { NavPrReviewsItem } from "./nav-pr-reviews-item";
 export const NavWorkspace = () => {
 	const pathname = usePathname();
 	return (
-		<div className="flex flex-wrap">
+		<div className="grid grid-cols-4 gap-2">
 			<Link href={`${pathname}/overview`}>
 				<NavItem>
 					<NavItemIcon>

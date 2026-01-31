@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Editor as EditorInstance } from "@tiptap/react";
 import { format } from "date-fns";
 import { Link2Icon, Loader2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useDebounceValue } from "usehooks-ts";
 import type z from "zod";
@@ -78,14 +78,10 @@ export const TaskForm = ({
 
 	const { mutate: updateTask, isPending: isPendingUpdate } = useMutation(
 		trpc.tasks.update.mutationOptions({
-			onMutate: () => {
-				toast.loading("Updating task...", { id: "update-task" });
-			},
 			onError: (error) => {
 				toast.error("Failed to update task", { id: "update-task" });
 			},
 			onSuccess: (task) => {
-				toast.success("Task updated successfully", { id: "update-task" });
 				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
 				queryClient.invalidateQueries(
 					trpc.tasks.getById.queryOptions({ id: task.id }),

@@ -36,7 +36,7 @@ export const GlobalSheets = () => {
 			<PlanSelectSheet />
 			<TaskViewCreateSheet />
 			<TaskViewUpdateSheet />
-			<TasksSuggestions />
+			{/* <TasksSuggestions /> */}
 			<TaskDependencyDialog />
 		</>
 	);

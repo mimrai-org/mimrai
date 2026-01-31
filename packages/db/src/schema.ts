@@ -493,6 +493,11 @@ export const chats = pgTable(
 		teamId: text("team_id"),
 		userId: text("user_id").notNull(),
 		title: text("title"),
+		summary: text("summary"),
+		lastSummaryAt: timestamp("last_summary_at", {
+			withTimezone: true,
+			mode: "string",
+		}),
 		createdAt: timestamp("created_at", {
 			withTimezone: true,
 			mode: "string",

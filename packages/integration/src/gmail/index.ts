@@ -15,6 +15,7 @@ export const oauth2Client = createOAuth2Client();
 const scopes = [
 	"https://www.googleapis.com/auth/userinfo.email",
 	"https://www.googleapis.com/auth/gmail.readonly",
+	"https://www.googleapis.com/auth/gmail.compose",
 ];
 
 export const generateAuthUrl = () => {
@@ -30,7 +31,9 @@ export const generateAuthUrl = () => {
 	return { authorizationUrl, state };
 };
 
+export * from "./create-draft-email";
 export * from "./decode";
 export * from "./handle";
 export * from "./process";
+export * from "./send-draft-email";
 export * from "./watch";

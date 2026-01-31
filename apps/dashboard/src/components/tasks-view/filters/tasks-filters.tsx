@@ -12,7 +12,7 @@ import { cn } from "@ui/lib/utils";
 import { CalendarIcon, EyeIcon, KanbanIcon, ListIcon } from "lucide-react";
 import { Filters, FiltersSearchInput } from "@/components/filters/filters";
 import { FiltersProvider } from "@/components/filters/use-filters";
-import { propertiesComponents } from "../properties/task-properties-components";
+import { PropertiesComponents } from "../properties/task-properties-components";
 import { type TasksGroupBy, tasksGroupByItems } from "../tasks-group";
 import { useTasksViewContext } from "../tasks-view";
 import { tasksFilterOptions } from "./tasks-filters-options";
@@ -54,7 +54,7 @@ export const TasksFilters = ({
 										Show Properties
 									</div>
 									<div className="flex flex-wrap gap-1 text-xs">
-										{Object.entries(propertiesComponents).map(([key, _]) => (
+										{Object.entries(PropertiesComponents).map(([key, _]) => (
 											<button
 												key={key}
 												type="button"
@@ -63,7 +63,7 @@ export const TasksFilters = ({
 													{
 														"bg-accent hover:bg-accent/80":
 															filters.properties?.includes(
-																key as keyof typeof propertiesComponents,
+																key as keyof typeof PropertiesComponents,
 															),
 													},
 												)}
@@ -71,14 +71,14 @@ export const TasksFilters = ({
 													const currentProperties = filters.properties || [];
 													if (
 														currentProperties.includes(
-															key as keyof typeof propertiesComponents,
+															key as keyof typeof PropertiesComponents,
 														)
 													) {
 														// Remove property
 														const newProperties = currentProperties.filter(
 															(prop) =>
 																prop !==
-																(key as keyof typeof propertiesComponents),
+																(key as keyof typeof PropertiesComponents),
 														);
 														setFilters({
 															...filters,
@@ -90,7 +90,7 @@ export const TasksFilters = ({
 															...filters,
 															properties: [
 																...currentProperties,
-																key as keyof typeof propertiesComponents,
+																key as keyof typeof PropertiesComponents,
 															],
 														});
 													}

@@ -4,7 +4,10 @@ import { Checkbox } from "@ui/components/ui/checkbox";
 import { cn } from "@ui/lib/utils";
 import { LayersIcon } from "lucide-react";
 import { Response } from "../chat/response";
-import { propertiesComponents } from "../tasks-view/properties/task-properties-components";
+import {
+	PropertyChecklist,
+	PropertyStatus,
+} from "../tasks-view/properties/task-properties-components";
 
 export const TaskShareable = ({
 	task,
@@ -15,8 +18,8 @@ export const TaskShareable = ({
 		<div className="space-y-4">
 			<h1 className="font-medium text-2xl">{task.title}</h1>
 			<div className="flex flex-wrap gap-2">
-				{propertiesComponents.status(task)}
-				{propertiesComponents.checklist(task)}
+				<PropertyStatus task={task} />
+				<PropertyChecklist task={task} />
 			</div>
 			<Response>{task.description || "No description provided."}</Response>
 

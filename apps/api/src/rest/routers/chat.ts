@@ -1,11 +1,11 @@
 import { buildAppContext } from "@api/ai/agents/config/shared";
-import { triageAgent } from "@api/ai/agents/triage";
+import { createWorkspaceAgent } from "@api/ai/agents/workspace-agent";
+import { getAllToolsForUser } from "@api/ai/tools/tool-registry";
 import { formatLLMContextItems } from "@api/ai/utils/format-context-items";
 import { getUserContext } from "@api/ai/utils/get-user-context";
 import type { Context } from "@api/rest/types";
 import { chatRequestSchema } from "@api/schemas/chat";
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { smoothStream } from "ai";
 import { withPlanFeatures } from "../middleware/plan-feature";
 
 const app = new OpenAPIHono<Context>();
@@ -62,18 +62,16 @@ app.post("/", withPlanFeatures(["ai"]), async (c) => {
 		id,
 	);
 
-	return triageAgent.toUIMessageStream({
-		message,
-		strategy: "auto",
-		maxRounds: 5,
-		maxSteps: 20,
-		context: appContext,
-		agentChoice,
-		toolChoice,
-		experimental_transform: smoothStream({
-			chunking: "word",
+	const agent = createWorkspaceAgent({
+		tools: await getAllToolsForUser({
+			userId,
+			teamId,
 		}),
-		sendSources: true,
+	});
+
+	return agent.toUIMessageStreamResponse({
+		message,
+		context: appContext,
 	});
 });
 

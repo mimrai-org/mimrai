@@ -32,7 +32,6 @@ import { useTaskParams } from "@/hooks/use-task-params";
 import { queryClient, trpc } from "@/utils/trpc";
 import { Assignee, AssigneeAvatar } from "./asignee-avatar";
 import { useChatContext } from "./chat/chat-context/store";
-import { useChatWidget } from "./chat/chat-widget";
 import Loader from "./loader";
 import { MilestoneIcon } from "./milestone-icon";
 import { ProjectIcon } from "./project-icon";
@@ -52,7 +51,6 @@ export const TaskContextMenu = ({
 }) => {
 	const { setParams } = useTaskParams();
 	const { setItems } = useChatContext();
-	const { toggle } = useChatWidget();
 
 	const user = useUser();
 
@@ -224,7 +222,7 @@ export const TaskContextMenu = ({
 					Clone
 				</ContextMenuItem>
 
-				<ContextMenuItem
+				{/* <ContextMenuItem
 					onClick={() => {
 						setItems([
 							{
@@ -239,7 +237,7 @@ export const TaskContextMenu = ({
 				>
 					<SparklesIcon className="text-muted-foreground" />
 					Ask MIMIR
-				</ContextMenuItem>
+				</ContextMenuItem> */}
 
 				{task.assigneeId && task.assigneeId === user?.id && (
 					<Link href={`${user?.basePath}/zen/${task.id}`}>
