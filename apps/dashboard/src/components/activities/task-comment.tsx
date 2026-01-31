@@ -84,23 +84,7 @@ export const TaskCommentActivity = ({
 				<ContextMenuTrigger>
 					<div className="group space-y-1 rounded-sm border py-4 text-muted-foreground text-sm">
 						{activity.replyToActivity && (
-							<div className="mx-4 mb-2 flex items-start gap-2 rounded-sm bg-muted/50 p-2 text-muted-foreground">
-								<div className="space-y-1">
-									<div className="flex items-center text-xs">
-										<AssigneeAvatar
-											{...activity.replyToActivity.user}
-											className="mr-1 size-4"
-										/>
-										{activity.replyToActivity.user.name}
-									</div>
-									<p className="text-xs [&>*]:leading-4!">
-										{convert(activity.replyToActivity.metadata.comment).slice(
-											0,
-											200,
-										)}
-									</p>
-								</div>
-							</div>
+							<ReplyToActivityContent replyTo={activity.replyToActivity} />
 						)}
 						<BaseActivity activity={activity} />
 						<div className="whitespace-pre-wrap break-words px-4 pt-1 text-foreground">
@@ -139,11 +123,13 @@ export const TaskCommentActivity = ({
 						initial={{ opacity: 0, height: 0 }}
 						exit={{ opacity: 0, height: 0 }}
 						transition={{ duration: 0.2 }}
-						className="mt-4"
+						className="mt-4 rounded-sm border py-4 shadow-secondary shadow-sm"
 						ref={replyContainerRef}
 					>
+						<ReplyToActivityContent replyTo={activity} />
 						<CommentInput
 							taskId={taskId}
+							className="border-0"
 							replyTo={
 								activity.groupId === taskId ? activity.id : activity.groupId
 							}
@@ -152,6 +138,22 @@ export const TaskCommentActivity = ({
 					</motion.div>
 				)}
 			</AnimatePresence>
+		</div>
+	);
+};
+
+export const ReplyToActivityContent = ({ replyTo }: { replyTo: Activity }) => {
+	return (
+		<div className="mx-4 mb-2 flex items-start gap-2 rounded-sm bg-muted/50 p-2 text-muted-foreground">
+			<div className="space-y-1">
+				<div className="flex items-center text-xs">
+					<AssigneeAvatar {...replyTo.user} className="mr-1 size-4" />
+					{replyTo.user.name}
+				</div>
+				<p className="text-xs [&>*]:leading-4!">
+					{convert(replyTo.metadata.comment).slice(0, 200)}
+				</p>
+			</div>
 		</div>
 	);
 };
