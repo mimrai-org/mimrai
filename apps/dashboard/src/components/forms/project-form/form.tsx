@@ -21,6 +21,18 @@ import { ProjectVisibilitySelect } from "./visibility";
 
 export type PropertiesLayout = "compact" | "expanded";
 
+const colors = [
+	"#d4a373",
+	"#e07a5f",
+	"#4852ad",
+	"#81b29a",
+	"#f2cc8f",
+	"#6a994e",
+	"#f4a261",
+	"#2a9d8f",
+	"#e76f51",
+];
+
 export const ProjectForm = ({
 	defaultValues,
 	propertiesLayout,
@@ -36,7 +48,7 @@ export const ProjectForm = ({
 		defaultValues: {
 			name: "",
 			description: "",
-			color: "#587e42",
+			color: colors[Math.floor(Math.random() * colors.length)],
 			...defaultValues,
 		},
 	});

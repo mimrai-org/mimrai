@@ -1,11 +1,16 @@
 import { buildAppContext } from "@api/ai/agents/config/shared";
 import { createWorkspaceAgent } from "@api/ai/agents/workspace-agent";
-import { getAllToolsForUser } from "@api/ai/tools/tool-registry";
+import {
+	getAllToolsForUser,
+	getIntegrationTools,
+	getIntegrationToolsForUser,
+} from "@api/ai/tools/tool-registry";
 import { formatLLMContextItems } from "@api/ai/utils/format-context-items";
 import { getUserContext } from "@api/ai/utils/get-user-context";
 import type { Context } from "@api/rest/types";
 import { chatRequestSchema } from "@api/schemas/chat";
 import { OpenAPIHono } from "@hono/zod-openapi";
+import { createUIMessageStreamResponse } from "ai";
 import { withPlanFeatures } from "../middleware/plan-feature";
 
 const app = new OpenAPIHono<Context>();
@@ -63,15 +68,19 @@ app.post("/", withPlanFeatures(["ai"]), async (c) => {
 	);
 
 	const agent = createWorkspaceAgent({
-		tools: await getAllToolsForUser({
+		tools: await getIntegrationToolsForUser({
 			userId,
 			teamId,
 		}),
 	});
 
-	return agent.toUIMessageStreamResponse({
+	const stream = await agent.stream({
 		message,
 		context: appContext,
+	});
+
+	return createUIMessageStreamResponse({
+		stream,
 	});
 });
 

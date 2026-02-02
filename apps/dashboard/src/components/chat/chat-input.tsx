@@ -69,8 +69,6 @@ export const ChatInput = () => {
 			setParams({ chatId });
 		}
 
-		console.log("Sending message with context items:", message.files);
-
 		sendMessage({
 			text: message.text || "Sent with attachments",
 			files: message.files,

@@ -481,6 +481,22 @@ export const createTask = async ({
 		teamId: task.teamId,
 	});
 
+	// Trigger agent if task is assigned to system user
+	if (task.assigneeId) {
+		const { triggerAgentTaskExecutionIfNeeded } = await import(
+			"./agent-triggers"
+		);
+		triggerAgentTaskExecutionIfNeeded({
+			taskId: task.id,
+			teamId: task.teamId,
+			assigneeId: task.assigneeId,
+			triggeredBy: "assignment",
+			triggerUserId: userId,
+		}).catch((err) => {
+			console.warn("Failed to trigger agent task execution", err);
+		});
+	}
+
 	return task;
 };
 
@@ -595,6 +611,24 @@ export const updateTask = async ({
 		teamId: task.teamId,
 		userId,
 	});
+
+	// Trigger agent if task is assigned to system user or has relevant updates
+	if (task.assigneeId) {
+		const { triggerAgentTaskExecutionIfNeeded } = await import(
+			"./agent-triggers"
+		);
+		triggerAgentTaskExecutionIfNeeded({
+			taskId: task.id,
+			teamId: task.teamId,
+			assigneeId: task.assigneeId,
+			previousAssigneeId: oldTask.assigneeId,
+			triggeredBy:
+				oldTask.assigneeId !== task.assigneeId ? "assignment" : "update",
+			triggerUserId: userId,
+		}).catch((err) => {
+			console.warn("Failed to trigger agent task execution", err);
+		});
+	}
 
 	return task;
 };
@@ -905,6 +939,30 @@ export const createTaskComment = async ({
 			...metadata,
 		},
 	});
+
+	// Trigger agent if task is assigned to system user and comment is not from the agent
+	if (task.assigneeId && userId) {
+		const { isSystemUser, triggerAgentTaskExecutionIfNeeded } = await import(
+			"./agent-triggers"
+		);
+		// Only trigger if comment is not from the agent and task is assigned to the agent
+		const [isCommentFromAgent, isTaskAssignedToAgent] = await Promise.all([
+			isSystemUser(userId),
+			isSystemUser(task.assigneeId),
+		]);
+
+		if (!isCommentFromAgent && isTaskAssignedToAgent) {
+			triggerAgentTaskExecutionIfNeeded({
+				taskId: task.id,
+				teamId: task.teamId,
+				assigneeId: task.assigneeId,
+				triggeredBy: "comment",
+				triggerUserId: userId,
+			}).catch((err) => {
+				console.warn("Failed to trigger agent on comment", err);
+			});
+		}
+	}
 
 	return activity;
 };

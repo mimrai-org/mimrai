@@ -15,6 +15,8 @@ import {
 } from "../ai-elements/reasoning";
 import { Response } from "../chat/response";
 import { FaviconStack } from "../favicon-stack";
+import { EmailDraftArtifactMessage } from "./artifacts/email-draft-artifact";
+import { TaskArtifactMessage } from "./artifacts/task-artifact";
 import { ChatContextList } from "./chat-context/chat-context";
 import type { ContextItem } from "./chat-context/store";
 import { ChatMessageActions } from "./chat-message-actions";
@@ -216,6 +218,10 @@ export const Messages = ({ isStreaming }: { isStreaming?: boolean }) => {
 										)}
 									</Message>
 								)}
+
+								<TaskArtifactMessage message={message} />
+								<EmailDraftArtifactMessage message={message} />
+
 								{/* Render text parts */}
 								{textParts.length > 0 && (
 									<Message from={message.role}>

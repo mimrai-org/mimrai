@@ -18,10 +18,10 @@ export default async function DashboardLayout({
 			<Suspense>
 				<SidebarProvider defaultOpen={false}>
 					<AppSidebar />
-					<main className="flex-1 px-6">
+					<main className="flex flex-1 flex-col px-6">
 						<BreadcrumbsProvider session={session}>
 							<Header />
-							<div className="flex flex-col rounded-lg bg-background pb-4">
+							<div className="flex flex-1 flex-col rounded-lg bg-background pb-4">
 								{children}
 							</div>
 							{/* <ChatWidget /> */}

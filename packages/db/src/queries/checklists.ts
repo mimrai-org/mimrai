@@ -1,4 +1,4 @@
-import { and, asc, eq, is, or, type SQL, sql } from "drizzle-orm";
+import { and, asc, eq, type SQL, sql } from "drizzle-orm";
 import { db } from "../index";
 import { checklistItems, users } from "../schema";
 import { createChecklistItemActivity } from "./activities";
@@ -151,6 +151,28 @@ export const updateChecklistItem = async ({
 		oldChecklistItem: oldItem,
 		userId,
 	});
+
+	// If checklist item was just completed and belongs to a task,
+	// check if we should trigger agent re-evaluation
+	if (
+		isCompleted === true &&
+		oldItem.isCompleted !== true &&
+		item.taskId &&
+		teamId
+	) {
+		import("./agent-triggers")
+			.then(({ triggerAgentOnChecklistComplete }) =>
+				triggerAgentOnChecklistComplete({
+					taskId: item.taskId as string,
+					teamId,
+					checklistItemId: item.id,
+					completedByUserId: userId,
+				}),
+			)
+			.catch((err) => {
+				console.warn("Failed to trigger agent on checklist complete", err);
+			});
+	}
 
 	return item;
 };

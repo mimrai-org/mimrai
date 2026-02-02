@@ -1,6 +1,6 @@
 import { openai } from "@ai-sdk/openai";
 import { db } from "@mimir/db/client";
-import { chatMessages, chats } from "@mimir/db/schema";
+import { chatMessages } from "@mimir/db/schema";
 import { generateText } from "ai";
 import { and, eq, gt } from "drizzle-orm";
 
@@ -52,15 +52,6 @@ ${fullText}
 	});
 
 	const summaryText = summary.text.trim();
-
-	// Update chat with new summary and timestamp
-	await db
-		.update(chats)
-		.set({
-			summary: summaryText,
-			lastSummaryAt: new Date().toISOString(),
-		})
-		.where(eq(chats.id, chatId));
 
 	return summaryText;
 };

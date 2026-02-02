@@ -1,4 +1,5 @@
 import type { UIChatMessage } from "@api/ai/types";
+import { generateTitle } from "@api/ai/utils/generate-title";
 import { summarizeChat } from "@api/ai/utils/summarize-chat";
 import {
 	getChatById,
@@ -6,11 +7,8 @@ import {
 	saveChatMessage,
 } from "@mimir/db/queries/chats";
 import {
-	type AsyncIterableStream,
-	createAgentUIStream,
-	createAgentUIStreamResponse,
-	type InferUIMessageChunk,
-	type InferUITools,
+	convertToModelMessages,
+	createUIMessageStream,
 	ToolLoopAgent,
 	type ToolLoopAgentSettings,
 	type UIMessage,
@@ -20,6 +18,8 @@ import type { AppContext } from "./shared";
 export interface AgentConfig extends ToolLoopAgentSettings {
 	name: string;
 	description: string;
+	summarizeHistory?: boolean;
+	generateTitle?: boolean;
 	buildInstructions?: (ctx: AppContext) => string;
 }
 
@@ -29,19 +29,7 @@ export interface AgentGenerateParams {
 	onFinish?: (params: { responseMessage: UIMessage }) => void | Promise<void>;
 }
 
-export interface Agent {
-	generate(params: AgentGenerateParams): Promise<UIChatMessage>;
-	toUIMessageStreamResponse(params: AgentGenerateParams): Promise<Response>;
-	toUIMessageStream(
-		params: AgentGenerateParams,
-	): Promise<
-		AsyncIterableStream<
-			InferUIMessageChunk<UIMessage<unknown, never, InferUITools<{}>>>
-		>
-	>;
-}
-
-export const createAgent = (config: AgentConfig): Agent => {
+export const createAgent = (config: AgentConfig) => {
 	const saveConversation = async (
 		message: UIMessage | UIChatMessage,
 		context: AppContext,
@@ -78,36 +66,26 @@ export const createAgent = (config: AgentConfig): Agent => {
 		await Promise.all(savePromises);
 	};
 
-	const loadHistory = async ({
-		message,
-		context,
-	}: AgentGenerateParams): Promise<{
-		messages: UIChatMessage[];
-	}> => {
+	const prepareAgent = async ({ message, context }: AgentGenerateParams) => {
 		const previousMessages: UIChatMessage[] = [];
 		const chatId = context.chatId;
 
-		const chat = await getChatById(chatId);
+		let chat = await getChatById(chatId);
 		if (!chat) {
 			await saveChat({
 				chatId: chatId,
 				teamId: context.teamId,
 				userId: context.userId,
 			});
+			chat = await getChatById(chatId);
 		}
-
-		const summary = await summarizeChat({
-			chatId,
-			lastSummary: chat?.summary,
-			lastSummaryAt: chat?.lastSummaryAt || new Date(0).toISOString(),
-		});
 
 		previousMessages.push(...((chat?.messages || []) as UIChatMessage[]));
 		const slicedMessages = previousMessages.slice(-20);
 
 		const uiMessages = [...slicedMessages, message];
 
-		return { messages: uiMessages as UIChatMessage[] };
+		return { messages: uiMessages as UIChatMessage[], chat };
 	};
 
 	const buildAgent = (params: AgentGenerateParams) => {
@@ -124,56 +102,81 @@ export const createAgent = (config: AgentConfig): Agent => {
 	};
 
 	return {
-		toUIMessageStreamResponse: async (params: AgentGenerateParams) => {
-			const agent = buildAgent(params);
-			const { messages: uiMessages } = await loadHistory(params);
+		async stream(params: AgentGenerateParams) {
+			const { messages, chat } = await prepareAgent(params);
 
-			return createAgentUIStreamResponse({
-				agent,
-				uiMessages,
-				onError: (error) => {
-					console.error("Agent stream error:", error);
-					const message =
-						error instanceof Error ? error.message : String(error);
-					return message;
-				},
+			return createUIMessageStream({
+				originalMessages: messages,
 				onFinish: async ({ responseMessage }) => {
-					params.onFinish?.({ responseMessage });
 					await saveConversation(
 						params.message,
 						params.context,
 						responseMessage,
 					);
 				},
-			});
-		},
-		async toUIMessageStream(params: AgentGenerateParams) {
-			const agent = buildAgent(params);
-			const { messages: uiMessages } = await loadHistory(params);
-
-			return createAgentUIStream({
-				agent,
-				uiMessages,
 				onError: (error) => {
 					console.error("Agent stream error:", error);
-					const message =
+					const errorMessage =
 						error instanceof Error ? error.message : String(error);
-					return message;
+					return errorMessage;
 				},
-				onFinish: async ({ responseMessage }) => {
-					params.onFinish?.({ responseMessage });
-					await saveConversation(
-						params.message,
-						params.context,
-						responseMessage,
-					);
+				execute: async ({ writer }) => {
+					const agent = buildAgent({
+						...params,
+						context: {
+							...params.context,
+							writter: writer,
+						},
+					});
+
+					if (config.summarizeHistory) {
+						const summary = await summarizeChat({
+							chatId: params.context.chatId,
+							lastSummaryAt: chat.lastSummaryAt || new Date(0).toISOString(),
+							lastSummary: chat.summary,
+						});
+						await saveChat({
+							chatId: params.context.chatId,
+							summary: summary,
+							userId: params.context.userId,
+						});
+					}
+
+					if (config.generateTitle) {
+						const title = await generateTitle({
+							messages: messages,
+							currentTitle: chat.title,
+						});
+
+						if (title) {
+							console.log("Generated title:", title);
+							await saveChat({
+								chatId: params.context.chatId,
+								title: title,
+								userId: params.context.userId,
+							});
+							writer.write({
+								type: "data-title",
+								data: {
+									title: title,
+								},
+							});
+						}
+					}
+
+					const modelMessages = await convertToModelMessages(messages);
+
+					const stream = await agent.stream({
+						messages: modelMessages,
+					});
+					writer.merge(stream.toUIMessageStream());
 				},
 			});
 		},
 		async generate(params: AgentGenerateParams) {
 			return new Promise<UIChatMessage>((resolve, reject) => {
 				(async () => {
-					const stream = await this.toUIMessageStream({
+					const stream = await this.stream({
 						...params,
 						onFinish: ({ responseMessage }) => {
 							params.onFinish?.({ responseMessage });
@@ -181,10 +184,8 @@ export const createAgent = (config: AgentConfig): Agent => {
 						},
 					});
 
-					// consume the stream to get the final response
-					for await (const chunk of stream) {
-						// no-op
-					}
+					const reader = stream.getReader();
+					await reader.readMany();
 				})();
 			});
 		},

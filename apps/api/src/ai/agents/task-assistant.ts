@@ -8,7 +8,7 @@ import { getProjectsTool } from "../tools/get-projects";
 import { getStatusesTool } from "../tools/get-statuses";
 import { getTasksTool } from "../tools/get-tasks";
 import { getUsersTool } from "../tools/get-users";
-import { getAllTools, getIntegrationTools } from "../tools/tool-registry";
+import { getIntegrationTools } from "../tools/tool-registry";
 import { updateChecklistItemTool } from "../tools/update-checklist-item";
 import { updateTaskTool } from "../tools/update-task";
 import {
@@ -211,7 +211,7 @@ export const createTaskAssistantAgent = (config: Partial<AgentConfig>) => {
 			...config.tools,
 		},
 		buildInstructions: buildSystemPrompt as (ctx: AppContext) => string,
-		model: openai("gpt-4o-mini"),
+		model: openai("gpt-5-mini"),
 	});
 };
 

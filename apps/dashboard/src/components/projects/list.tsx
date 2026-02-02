@@ -63,7 +63,7 @@ export const ProjectsList = ({
 		<div className="w-full">
 			{showFilters && <ProjectsFilters />}
 
-			<div className="grid grid-cols-3 gap-4">
+			<div className="grid grid-cols-4 gap-4">
 				{listData.map((project) => {
 					const total =
 						project.progress.inProgress + project.progress.completed;

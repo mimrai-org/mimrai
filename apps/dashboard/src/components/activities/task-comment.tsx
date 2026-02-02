@@ -69,6 +69,13 @@ export const TaskCommentActivity = ({
 						groupId: activity.groupId!,
 					}),
 				);
+				queryClient.invalidateQueries(
+					trpc.activities.get.infiniteQueryOptions({
+						groupId: taskId,
+						nStatus: ["archived"],
+						pageSize: 10,
+					}),
+				);
 			},
 			onError: () => {
 				toast.error("Failed to delete comment", { id: "delete-comment" });

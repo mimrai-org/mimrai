@@ -10,7 +10,8 @@
 		"module": "esnext",
 		"moduleResolution": "bundler",
 		"paths": {
-			"@jobs/*": ["src/*"]
+			"@jobs/*": ["src/*"],
+			"@api/ai/*": ["../../apps/api/src/ai/*"]
 		},
 		"jsx": "react-jsx"
 	}

@@ -25,7 +25,7 @@ export const getTasksTool = tool({
 		executionOptions,
 	) {
 		try {
-			const { userId, teamId, teamSlug } =
+			const { userId, teamId, teamSlug, writter } =
 				executionOptions.experimental_context as AppContext;
 
 			const result = await getTasks({
@@ -59,10 +59,16 @@ export const getTasksTool = tool({
 				taskUrl: getTaskPermalink(task.permalinkId),
 			}));
 
-			yield {
-				boardUrl: `${getAppUrl()}/team/${teamSlug}`,
-				data: mappedData,
-			};
+			if (writter) {
+				for (const task of mappedData) {
+					writter.write({
+						type: "data-task",
+						data: task,
+					});
+				}
+			}
+
+			yield mappedData;
 		} catch (error) {
 			console.error("Error in getTasksTool:", error);
 			throw error;

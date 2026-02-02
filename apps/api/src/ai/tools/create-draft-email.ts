@@ -11,7 +11,7 @@ export const createDraftEmailTool = tool({
 		body: z.string().min(1).describe("Body content of the email"),
 	}),
 	execute: async function* (input, executionOptions) {
-		const { teamId, userId } =
+		const { teamId, userId, writter } =
 			executionOptions.experimental_context as AppContext;
 
 		const draft = await createDraftEmail({
@@ -20,6 +20,17 @@ export const createDraftEmailTool = tool({
 			body: input.body,
 			userId: userId,
 		});
+
+		if (writter) {
+			writter.write({
+				type: "data-email-draft",
+				data: {
+					recipient: input.to,
+					subject: input.subject,
+					body: input.body,
+				},
+			});
+		}
 
 		yield {
 			type: "text",

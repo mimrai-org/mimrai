@@ -41,4 +41,22 @@ export type MessageDataParts = {
 	title: {
 		title: string;
 	};
+	task: {
+		id: string;
+		title: string;
+		description?: string;
+		sequence?: number;
+		status: {
+			type: "to_do" | "in_progress" | "done" | "review" | "backlog";
+			name: string;
+			color?: string;
+		};
+		assignee?: string;
+		dueDate?: string;
+	};
+	"email-draft": {
+		subject: string;
+		body: string;
+		recipient: string;
+	};
 };

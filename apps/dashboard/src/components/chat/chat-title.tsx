@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useDataPart } from "@/hooks/use-data-part";
+import { useAIChat } from "./chat-provider";
 
 export interface ChatTitleData {
 	chatId: string;
@@ -7,8 +8,9 @@ export interface ChatTitleData {
 }
 
 export const ChatTitle = () => {
-	const [data] = useDataPart<ChatTitleData>("chat-title");
-	const chatTitle = data as ChatTitleData;
+	const { title } = useAIChat();
+	const [data] = useDataPart<ChatTitleData>("data-title");
+	const dataTitle = data as ChatTitleData;
 
 	return (
 		<AnimatePresence>
@@ -21,7 +23,7 @@ export const ChatTitle = () => {
 			>
 				<div className="flex items-center gap-2 text-foreground text-xs">
 					<div className="whitespace-nowrap">
-						{chatTitle?.title || "New conversation"}
+						{dataTitle?.title || title || "New conversation"}
 					</div>
 				</div>
 			</motion.div>

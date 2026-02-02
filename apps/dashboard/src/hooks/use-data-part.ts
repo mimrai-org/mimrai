@@ -11,6 +11,8 @@ import { useAIChat } from "@/components/chat/chat-provider";
 export function useDataPart<T = unknown>(type: string): [T | undefined] {
 	const { messages } = useAIChat();
 
+	console.log("Messages in useDataPart:", messages);
+
 	const dataPart = useMemo(() => {
 		if (messages.length === 0) return undefined;
 
@@ -19,11 +21,15 @@ export function useDataPart<T = unknown>(type: string): [T | undefined] {
 
 		// Look for data parts in the message
 		const dataParts = lastMessage.parts?.filter(
-			(part) => part.type === "data" && (part as any).data?.type === type,
+			(part) => part.type.startsWith("data") && part.type === type,
 		);
 
+		console.log("Data parts found:", dataParts);
+
 		if (dataParts && dataParts.length > 0) {
-			return (dataParts[0] as any).data?.data as T;
+			console.log("Found data part:", dataParts[0]);
+			// @ts-expect-error -- we trust the data part structure
+			return dataParts[0].data as T;
 		}
 
 		return undefined;

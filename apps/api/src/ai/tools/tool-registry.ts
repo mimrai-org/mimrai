@@ -3,6 +3,7 @@ import {
 	getEnabledIntegrationTypes,
 	getUserAvailableIntegrations,
 } from "../agents/agent-factory";
+// Assistant job tools
 // Checklist/subtask tools
 import { createChecklistItemTool } from "./create-checklist-item";
 // Integration tools
@@ -12,6 +13,7 @@ import { createMilestoneTool } from "./create-milestone";
 import { createProjectTool } from "./create-project";
 // Task management tools
 import { createTaskTool } from "./create-task";
+import { createTaskCommentTool } from "./create-task-comment";
 import { getChecklistItemsTool } from "./get-checklist-item";
 import { getLabelsTool } from "./get-labels";
 // Milestone tools
@@ -40,6 +42,9 @@ export const taskManagementTools = {
 	updateTask: updateTaskTool,
 	getTasks: getTasksTool,
 	getTaskById: getTaskByIdTool,
+
+	// Task comments
+	createTaskComment: createTaskCommentTool,
 
 	// Checklist/subtask management
 	getChecklistItems: getChecklistItemsTool,
@@ -115,6 +120,71 @@ export const getAllTools = (enabledIntegrations?: IntegrationName[]) => {
 	};
 };
 
+export const formatAvaiableTools = (tools: Record<string, unknown>) => {
+	return Object.keys(tools)
+		.map((toolName) => `- ${toolName}`)
+		.join("\n");
+};
+
+/**
+ * Format tools with their descriptions for use in system prompts.
+ * Extracts the description from each tool and formats it as a list.
+ */
+export const formatToolsWithDescriptions = (
+	tools: Record<string, { description?: string }>,
+): string => {
+	return Object.entries(tools)
+		.map(([name, t]) => {
+			const description = t.description || "No description available";
+			return `- ${name}: ${description}`;
+		})
+		.join("\n");
+};
+
+/**
+ * Get a formatted list of all available tools with descriptions
+ * for use in agent system prompts
+ */
+export const getFormattedToolsForPrompt = (
+	enabledIntegrations?: IntegrationName[],
+): string => {
+	const allTools = getAllTools(enabledIntegrations);
+	return formatToolsWithDescriptions(
+		allTools as Record<string, { description?: string }>,
+	);
+};
+
+/**
+ * Get a lightweight list of tool names only (no descriptions)
+ * for use in prompts that need minimal context about capabilities
+ *
+ * This saves significant tokens (~50 tokens vs ~700 tokens with descriptions)
+ * when the AI only needs to know what tools exist, not their full descriptions.
+ */
+export const getToolNamesForPrompt = (
+	enabledIntegrations?: IntegrationName[],
+): string => {
+	const allTools = getAllTools(enabledIntegrations);
+	return Object.keys(allTools)
+		.map((name) => `- ${name}`)
+		.join("\n");
+};
+
+export const getIntegrationToolsForUser = async ({
+	userId,
+	teamId,
+}: {
+	userId: string;
+	teamId: string;
+}) => {
+	const userIntegrations = await getUserAvailableIntegrations({
+		userId,
+		teamId,
+	});
+	const enabledIntegrations = getEnabledIntegrationTypes(userIntegrations);
+	return getIntegrationTools(enabledIntegrations);
+};
+
 export const getAllToolsForUser = async ({
 	userId,
 	teamId,
@@ -167,6 +237,29 @@ export const toolMetadata: Record<
 		name: "webSearch",
 		title: "Web Search",
 		description: "Search the web for current information",
+	},
+	createAssistantJob: {
+		name: "createAssistantJob",
+		title: "Schedule Job",
+		description: "Schedule a job for the assistant to execute later",
+		relatedTools: ["getAssistantJobs"],
+	},
+	getAssistantJobs: {
+		name: "getAssistantJobs",
+		title: "Get Scheduled Jobs",
+		description: "Retrieve all scheduled assistant jobs",
+	},
+	updateAssistantJob: {
+		name: "updateAssistantJob",
+		title: "Update Job",
+		description: "Update an existing scheduled job",
+		relatedTools: ["getAssistantJobs"],
+	},
+	deleteAssistantJob: {
+		name: "deleteAssistantJob",
+		title: "Delete Job",
+		description: "Delete a scheduled job",
+		relatedTools: ["getAssistantJobs"],
 	},
 } as const;
 

@@ -1,9 +1,11 @@
 import type { ChatUserContext } from "@api/ai/chat-cache";
+import type { UIChatMessage } from "@api/ai/types";
 import {
 	type ContextItem,
 	formatLLMContextItems,
 } from "@api/ai/utils/format-context-items";
 import { db } from "@mimir/db/client";
+import type { UIMessageStreamWriter } from "ai";
 
 export function formatContextForLLM(context: AppContext): string {
 	return `<team-info>
@@ -50,6 +52,7 @@ export interface AppContext {
 	additionalContext: string;
 	integrationType: "web" | "slack" | "whatsapp" | "mattermost";
 	contextItems?: Array<ContextItem>;
+	writter?: UIMessageStreamWriter<UIChatMessage>;
 	// Allow additional properties to satisfy Record<string, unknown> constraint
 	[key: string]: unknown;
 }

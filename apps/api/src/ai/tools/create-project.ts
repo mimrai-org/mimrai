@@ -1,4 +1,4 @@
-import { createProject, getProjects } from "@mimir/db/queries/projects";
+import { createProject } from "@mimir/db/queries/projects";
 import { getAppUrl } from "@mimir/utils/envs";
 import { tool } from "ai";
 import z from "zod";
@@ -13,7 +13,6 @@ export const createProjectToolSchema = z.object({
 		.describe("Description of the project, HTML format supported"),
 	color: z
 		.string()
-		.optional()
 		.describe("Color of the project in HEX format without alpha"),
 });
 

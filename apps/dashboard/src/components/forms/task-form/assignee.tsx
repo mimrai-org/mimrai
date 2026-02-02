@@ -18,7 +18,9 @@ export const Assignee = () => {
 				<FormItem>
 					<FormControl>
 						<DataSelectInput
-							queryOptions={trpc.teams.getMembers.queryOptions()}
+							queryOptions={trpc.teams.getMembers.queryOptions({
+								includeSystemUsers: true,
+							})}
 							value={field.value || null}
 							onChange={(value) => field.onChange(value || null)}
 							getValue={(item) => item.id}

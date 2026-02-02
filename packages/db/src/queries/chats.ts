@@ -42,6 +42,7 @@ export const getChatById = async (chatId: string, teamId?: string) => {
 export const saveChat = async (data: {
 	chatId: string;
 	teamId?: string;
+	summary?: string;
 	userId: string;
 	title?: string | null;
 }) => {
@@ -50,6 +51,7 @@ export const saveChat = async (data: {
 		.values({
 			id: data.chatId,
 			teamId: data.teamId,
+			summary: data.summary,
 			userId: data.userId,
 			title: data.title,
 			updatedAt: new Date().toISOString(),
