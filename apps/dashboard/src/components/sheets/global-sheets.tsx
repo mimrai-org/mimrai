@@ -1,4 +1,5 @@
-import { TasksSuggestions } from "../tasks-suggestions/tasks-suggestions";
+import { AgentCreateSheet } from "./agent-create-sheet";
+import { AgentUpdateSheet } from "./agent-update-sheet";
 import { IntegrationInstallSheet } from "./integration-install-sheet";
 import { LabelCreateSheet } from "./label-create-sheet";
 import { LabelUpdateSheet } from "./label-update-sheet";
@@ -26,6 +27,8 @@ export const GlobalSheets = () => {
 			<StatusUpdateSheet />
 			<LabelCreateSheet />
 			<LabelUpdateSheet />
+			<AgentCreateSheet />
+			<AgentUpdateSheet />
 			<TaskUpdateSheet />
 			<TeamCreateSheet />
 			<IntegrationInstallSheet />

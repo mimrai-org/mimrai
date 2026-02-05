@@ -27,4 +27,8 @@ export const generateAuthUrl = () => {
 	return { authorizationUrl, state };
 };
 
+export * from "./create-event";
+export * from "./delete-event";
+export * from "./get-events";
 export * from "./sync-event";
+export * from "./update-event";

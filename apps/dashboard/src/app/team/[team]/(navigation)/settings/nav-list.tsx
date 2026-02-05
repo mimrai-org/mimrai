@@ -2,6 +2,7 @@
 import { t } from "@mimir/locale";
 import {
 	BellIcon,
+	BotIcon,
 	CableIcon,
 	CircleDashedIcon,
 	CloudUploadIcon,
@@ -71,6 +72,12 @@ export const NavList = () => {
 				icon: BellIcon,
 				to: addTeamToUrl("/settings/notifications"),
 				label: t("settings.sidebar.notifications"),
+			},
+			{
+				icon: BotIcon,
+				to: addTeamToUrl("/settings/agents"),
+				label: "Agents",
+				scopes: ["team:write"],
 			},
 			{
 				icon: SparklesIcon,

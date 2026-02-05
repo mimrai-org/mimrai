@@ -21,6 +21,7 @@ export const getUsersTool = tool({
 		const result = await getMembers({
 			teamId: teamId,
 			search,
+			includeSystemUsers: true,
 		});
 
 		if (result.length === 0) {

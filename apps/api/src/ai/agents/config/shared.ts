@@ -36,6 +36,7 @@ export const COMMON_AGENT_RULES = `<behavior-rules>
 
 export interface AppContext {
 	userId: string;
+	behalfUserId: string;
 	fullName: string;
 	teamName: string;
 	teamDescription: string;
@@ -61,12 +62,14 @@ export function buildAppContext(
 	context: ChatUserContext & {
 		artifactSupport?: boolean;
 		contextItems?: Array<ContextItem>;
+		behalfUserId?: string;
 		integrationType: "web" | "slack" | "whatsapp" | "mattermost";
 	},
 	chatId: string,
 ): AppContext {
 	return {
 		userId: context.userId,
+		behalfUserId: context.behalfUserId || context.userId,
 		fullName: context.fullName ?? "",
 		teamName: context.teamName ?? "",
 		teamDescription: context.teamDescription ?? "",

@@ -10,7 +10,7 @@ export const getActivitiesSchema = z.object({
 	nStatus: z.array(z.enum(activityStatusEnum.enumValues).optional()).optional(),
 	type: z.array(z.enum(activityTypeEnum.enumValues)).optional(),
 	search: z.string().optional(),
-
+	ids: z.array(z.string()).optional(),
 	onlyForUser: z.boolean().optional(),
 });
 

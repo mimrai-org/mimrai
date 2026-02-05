@@ -113,6 +113,7 @@ export const createAgent = (config: AgentConfig) => {
 						params.context,
 						responseMessage,
 					);
+					params.onFinish?.({ responseMessage });
 				},
 				onError: (error) => {
 					console.error("Agent stream error:", error);
@@ -180,12 +181,20 @@ export const createAgent = (config: AgentConfig) => {
 						...params,
 						onFinish: ({ responseMessage }) => {
 							params.onFinish?.({ responseMessage });
+							console.log("Agent generate finished:", responseMessage);
 							resolve(responseMessage as UIChatMessage);
 						},
 					});
 
 					const reader = stream.getReader();
-					await reader.readMany();
+					try {
+						while (true) {
+							const { done } = await reader.read();
+							if (done) break;
+						}
+					} finally {
+						reader.releaseLock();
+					}
 				})();
 			});
 		},

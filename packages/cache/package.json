@@ -14,7 +14,8 @@
 		"./users-cache": "./src/users-cache.ts",
 		"./teams-cache": "./src/teams-cache.ts",
 		"./chat-feedback-cache": "./src/chat-feedback-cache.ts",
-		"./shared-redis": "./src/shared-redis.ts"
+		"./shared-redis": "./src/shared-redis.ts",
+		"./system-user-cache": "./src/system-user-cache.ts"
 	},
 	"dependencies": {
 		"@mimir/tsconfig": "workspace:*",

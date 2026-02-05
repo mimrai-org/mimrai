@@ -11,14 +11,14 @@ export const createDraftEmailTool = tool({
 		body: z.string().min(1).describe("Body content of the email"),
 	}),
 	execute: async function* (input, executionOptions) {
-		const { teamId, userId, writter } =
+		const { teamId, behalfUserId, userId, writter } =
 			executionOptions.experimental_context as AppContext;
 
 		const draft = await createDraftEmail({
 			to: input.to,
 			subject: input.subject,
 			body: input.body,
-			userId: userId,
+			userId: behalfUserId,
 		});
 
 		if (writter) {

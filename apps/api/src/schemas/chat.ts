@@ -97,6 +97,10 @@ export const chatRequestSchema = z.object({
 		description: "Agent choice",
 		example: "general",
 	}),
+	agentId: z.string().nullable().optional().openapi({
+		description: "Agent ID to use for the chat",
+		example: "agent_abc123",
+	}),
 	toolChoice: z.string().optional().openapi({
 		description: "Tool choice",
 		example: "getBurnRate",

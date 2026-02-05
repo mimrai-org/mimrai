@@ -65,31 +65,30 @@ export const smartCompleteResponseSchema = z.object({
 	description: z
 		.string()
 		.max(50_000)
-		.optional()
+		.nullable()
 		.describe("Detailed description of the task"),
 	priority: z
 		.enum(priorityEnum.enumValues)
-		.optional()
+		.nullable()
 		.describe("Priority of the task"),
 	dueDate: z
 		.string()
-		.optional()
+		.nullable()
 		.describe("Due date of the task in ISO 8601 format"),
 	labels: z
 		.array(z.string())
-		.optional()
+		.nullable()
 		.describe("Array of IDs (uuid) labels to assign to the task"),
 	assigneeId: z
 		.string()
-		.optional()
+		.nullable()
 		.describe("ID of the user to assign the task to"),
 	recurring: z
 		.object({
 			frequency: z.enum(["daily", "weekly", "monthly", "yearly"]),
 			interval: z.coerce.number().min(1).max(12),
-			startDate: z.string().optional(),
+			startDate: z.string(),
 		})
-		.optional()
 		.nullable()
 		.describe(
 			"Recurrence settings for the task. If provided, the task will be set to recur based on these settings.",

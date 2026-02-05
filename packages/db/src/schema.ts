@@ -245,6 +245,7 @@ export const tasks = pgTable(
 		description: text("description"),
 		priority: priorityEnum("priority").default("medium").notNull(),
 		assigneeId: text("assignee_id"),
+		createdBy: text("created_by"),
 		teamId: text("team_id").notNull(),
 		order: numeric("order", {
 			precision: 100,
@@ -317,12 +318,17 @@ export const tasks = pgTable(
 			columns: [table.completedBy],
 			foreignColumns: [users.id],
 			name: "tasks_completed_by_fkey",
-		}),
+		}).onDelete("set null"),
 		foreignKey({
 			columns: [table.assigneeId],
 			foreignColumns: [users.id],
 			name: "tasks_assignee_id_fkey",
-		}),
+		}).onDelete("set null"),
+		foreignKey({
+			columns: [table.createdBy],
+			foreignColumns: [users.id],
+			name: "tasks_created_by_fkey",
+		}).onDelete("set null"),
 		foreignKey({
 			columns: [table.teamId],
 			foreignColumns: [teams.id],
@@ -976,46 +982,6 @@ export const notificationSettings = pgTable(
 	],
 );
 
-/**
- * Agent execution policy configuration
- * Controls what actions an AI agent can take autonomously when assigned to tasks
- */
-export interface AgentExecutionPolicy {
-	/** Maximum number of plan steps the agent can execute per day */
-	maxStepsPerDay: number;
-	/** Allowed action types the agent can perform autonomously */
-	allowedActions: Array<
-		| "create_task"
-		| "update_task"
-		| "create_checklist"
-		| "update_checklist"
-		| "create_comment"
-		| "send_email"
-		| "web_search"
-	>;
-	/** Whether all task completions require human review before marking done */
-	requireReviewForCompletion: boolean;
-	/** Actions that always require human confirmation regardless of risk level */
-	alwaysConfirmActions: string[];
-	/** Enable autonomous task execution for the agent */
-	enabled: boolean;
-}
-
-export const defaultAgentExecutionPolicy: AgentExecutionPolicy = {
-	maxStepsPerDay: 50,
-	allowedActions: [
-		"create_task",
-		"update_task",
-		"create_checklist",
-		"update_checklist",
-		"create_comment",
-		"web_search",
-	],
-	requireReviewForCompletion: true,
-	alwaysConfirmActions: ["send_email"],
-	enabled: false,
-};
-
 export const autopilotSettings = pgTable(
 	"autopilot_settings",
 	{
@@ -1029,11 +995,6 @@ export const autopilotSettings = pgTable(
 			.array()
 			.default([1, 2, 3, 4, 5]), // 0 = Sunday, 6 = Saturday
 		enableFollowUps: boolean("enable_follow_ups").default(false),
-
-		// Agent autonomous task execution policy
-		agentExecutionPolicy: jsonb("mimir_execution_policy")
-			.$type<AgentExecutionPolicy>()
-			.default(defaultAgentExecutionPolicy),
 
 		createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
 			.defaultNow()
@@ -1053,14 +1014,10 @@ export const autopilotSettings = pgTable(
 );
 
 /**
- * MIMIR Task Execution Status
- * Tracks the lifecycle of autonomous task execution by MIMIR
+ * Tracks the lifecycle of autonomous task execution
  */
 export const taskExecutionStatusEnum = pgEnum("task_execution_status", [
 	"pending", // Task assigned, waiting for analysis
-	"analyzing", // MIMIR is analyzing the task context
-	"planning", // MIMIR is creating an execution plan
-	"awaiting_confirmation", // Plan has high-risk steps requiring confirmation
 	"executing", // MIMIR is executing the plan
 	"blocked", // Execution blocked (waiting for human subtask, info needed)
 	"completed", // Task execution completed successfully
@@ -1068,79 +1025,13 @@ export const taskExecutionStatusEnum = pgEnum("task_execution_status", [
 ]);
 
 /**
- * Risk level for plan steps
- */
-export const planStepRiskEnum = pgEnum("plan_step_risk", [
-	"low", // Safe to execute automatically
-	"medium", // Notify but proceed
-	"high", // Requires explicit confirmation
-]);
-
-/**
- * Plan step structure for MIMIR task execution
- */
-export interface TaskExecutionPlanStep {
-	id: string;
-	order: number;
-	description: string;
-	action: string; // Tool name to execute
-	parameters?: {
-		name: string;
-		value: unknown;
-	}[];
-	riskLevel: "low" | "medium" | "high";
-	riskReason?: string;
-	status:
-		| "pending"
-		| "confirmed"
-		| "rejected"
-		| "executing"
-		| "completed"
-		| "failed"
-		| "skipped";
-	result?: string;
-	error?: string;
-	executedAt?: string;
-}
-
-/**
  * Memory/context storage for task execution
  */
 export interface TaskExecutionMemory {
-	/** Original task analysis summary */
-	taskAnalysis?: string;
 	/** Key information gathered from task context */
-	contextSummary?: string;
-	/** Hash of the task content (title + description) when last analyzed */
-	analyzedContentHash?: string;
-	/** Timestamp of last analysis */
-	analyzedAt?: string;
-	/** Number of comments when last analyzed (to detect new comments) */
-	analyzedCommentCount?: number;
-	/** Questions the agent asked and their answers */
-	qaPairs?: Array<{
-		question: string;
-		answer?: string;
-		askedAt: string;
-		answeredAt?: string;
-	}>;
-	/** Blockers and their resolution status */
-	blockers?: Array<{
-		description: string;
-		resolved: boolean;
-		resolvedAt?: string;
-	}>;
-	/** Human subtasks created and their status */
-	humanSubtasks?: Array<{
-		checklistItemId: string;
-		description: string;
-		assigneeId: string;
-		completed: boolean;
-	}>;
-	/** Additional notes from execution */
+	summary?: string;
+	/** Notes or observations made during execution */
 	notes?: string[];
-	/** Last checkpoint for resuming execution */
-	lastCheckpoint?: string;
 }
 
 /**
@@ -1158,30 +1049,23 @@ export const taskExecutions = pgTable(
 
 		status: taskExecutionStatusEnum("status").default("pending").notNull(),
 
-		// Execution plan
-		plan: jsonb("plan").$type<TaskExecutionPlanStep[]>().default([]),
-		currentStepIndex: integer("current_step_index").default(0),
+		usageMetrics: jsonb("usage_metrics").$type<{
+			inputTokens: number;
+			outputTokens: number;
+			totalTokens: number;
+			costUSD: number;
+		}>(),
 
 		// Memory slot for task context
 		memory: jsonb("memory").$type<TaskExecutionMemory>().default({}),
 
-		// Confirmation tracking
-		confirmationRequestedAt: timestamp("confirmation_requested_at", {
-			withTimezone: true,
-		}),
-		confirmationCommentId: text("confirmation_comment_id"), // Activity ID of the confirmation request comment
+		// Content hash
+		contentHash: text("content_hash"),
 
 		// Trigger.dev job linkage
 		triggerJobId: text("trigger_job_id"),
-		nextCheckAt: timestamp("next_check_at", { withTimezone: true }),
-
-		// Retry and error handling
-		retryCount: integer("retry_count").default(0),
-		lastError: text("last_error"),
 
 		// Timestamps
-		startedAt: timestamp("started_at", { withTimezone: true }),
-		completedAt: timestamp("completed_at", { withTimezone: true }),
 		createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
 			.defaultNow()
 			.notNull(),
@@ -1193,7 +1077,6 @@ export const taskExecutions = pgTable(
 		index("task_executions_task_id_index").on(table.taskId),
 		index("task_executions_team_id_index").on(table.teamId),
 		index("task_executions_status_index").on(table.status),
-		index("task_executions_next_check_at_index").on(table.nextCheckAt),
 		unique("unique_active_task_execution").on(table.taskId), // Only one active execution per task
 		foreignKey({
 			columns: [table.taskId],
@@ -1204,6 +1087,49 @@ export const taskExecutions = pgTable(
 			columns: [table.teamId],
 			foreignColumns: [teams.id],
 			name: "task_executions_team_id_fkey",
+		}).onDelete("cascade"),
+	],
+);
+
+export const agents = pgTable(
+	"agents",
+	{
+		id: text("id")
+			.$defaultFn(() => randomUUID())
+			.primaryKey()
+			.notNull(),
+		teamId: text("team_id").notNull(),
+		name: text("name").notNull(),
+		description: text("description"),
+		avatar: text("avatar"),
+		isActive: boolean("is_active").default(true).notNull(),
+		model: text("model").notNull().default("openai/gpt-5"),
+		soul: text("soul"),
+
+		userId: text("user_id").notNull(),
+		behalfUserId: text("behalf_user_id"),
+		authorizeIntegrations: boolean("authorize_integrations")
+			.default(false)
+			.notNull(),
+
+		createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+			.defaultNow()
+			.notNull(),
+		updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+			.defaultNow()
+			.notNull(),
+	},
+	(table) => [
+		index("agents_team_id_index").on(table.teamId),
+		foreignKey({
+			columns: [table.teamId],
+			foreignColumns: [teams.id],
+			name: "agents_team_id_fkey",
+		}).onDelete("cascade"),
+		foreignKey({
+			columns: [table.userId],
+			foreignColumns: [users.id],
+			name: "agents_user_id_fkey",
 		}).onDelete("cascade"),
 	],
 );

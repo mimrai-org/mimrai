@@ -33,6 +33,11 @@ export const toolMetadata: Record<
 		title: "Get Users",
 		description: "Retrieve users from your team",
 	},
+	getEmails: {
+		name: "getEmails",
+		title: "Get Emails",
+		description: "Retrieve emails from Gmail with filtering",
+	},
 } as const;
 
 export type ToolName = keyof typeof toolMetadata;
@@ -58,5 +63,17 @@ export type MessageDataParts = {
 		subject: string;
 		body: string;
 		recipient: string;
+	};
+	email: {
+		id: string;
+		from: string;
+		to: string;
+		subject: string;
+		date: string;
+		snippet: string;
+		body: string;
+		mimeType: string;
+		labelIds?: string[];
+		threadId: string;
 	};
 };

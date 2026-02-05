@@ -1,12 +1,5 @@
-import { openai } from "@ai-sdk/openai";
 import type { IntegrationName } from "@mimir/integration/registry";
-import { taskManagementTools } from "../tools/tool-registry";
-import { type AgentConfig, createAgent } from "./config/agent";
-import {
-	type AppContext,
-	COMMON_AGENT_RULES,
-	formatContextForLLM,
-} from "./config/shared";
+import { type AppContext, formatContextForLLM } from "./config/shared";
 
 /**
  * Workspace Agent - General purpose assistant for team workspace
@@ -33,7 +26,7 @@ export interface WorkspaceContext extends AppContext {
 	}>;
 }
 
-const buildSystemPrompt = (ctx: WorkspaceContext) => {
+export const buildWorkspaceSystemPrompt = (ctx: WorkspaceContext) => {
 	const availableIntegrationsText =
 		ctx.availableIntegrations && ctx.availableIntegrations.length > 0
 			? ctx.availableIntegrations
@@ -42,11 +35,11 @@ const buildSystemPrompt = (ctx: WorkspaceContext) => {
 			: "No integrations configured.";
 
 	return `
-<identity>
-You are MIMRAI, an assistant inside a productivity workspace for ${ctx.teamName}.
+<porpuse>
+You are working inside a productivity workspace for ${ctx.teamName}.
 You help users plan, understand context, and execute actions on tasks, projects, milestones, and collaboration.
 You are reliable, cautious with high-impact actions, and you prefer real workspace data over guesses.
-</identity>
+</porpuse>
 
 ${formatContextForLLM(ctx)}
 
@@ -113,26 +106,4 @@ The following tools already present data to the user in the chat UI, do NOT repe
 
 </response-specs>
 `;
-};
-
-/**
- * Create a workspace agent with specific integration tools enabled
- */
-export const createWorkspaceAgent = (config: Partial<AgentConfig>) => {
-	return createAgent({
-		name: "Workspace Assistant",
-		description:
-			"General purpose AI assistant for team workspace management, task handling, and collaboration.",
-		buildInstructions: buildSystemPrompt as (ctx: AppContext) => string,
-
-		model: openai("gpt-5-mini"),
-		generateTitle: true,
-		summarizeHistory: true,
-		...config,
-		tools: {
-			// Integration tools would be added here dynamically based on available integrations
-			...config.tools,
-			...taskManagementTools,
-		},
-	});
 };

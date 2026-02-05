@@ -24,6 +24,7 @@ export const createChecklistItemTool = tool({
 			description: input.description,
 			assigneeId: input.assigneeId,
 			teamId: teamId,
+			userId,
 			taskId: input.taskId,
 			attachments: input.attachments,
 		});

@@ -3,10 +3,12 @@ import {
 	getEnabledIntegrationTypes,
 	getUserAvailableIntegrations,
 } from "../agents/agent-factory";
+import { addTaskAttachmentTool } from "./add-task-attachment";
+// Integration tools
+import { createCalendarEventTool } from "./create-calendar-event";
 // Assistant job tools
 // Checklist/subtask tools
 import { createChecklistItemTool } from "./create-checklist-item";
-// Integration tools
 import { createDraftEmailTool } from "./create-draft-email";
 import { createLabelTool } from "./create-label";
 import { createMilestoneTool } from "./create-milestone";
@@ -14,7 +16,10 @@ import { createProjectTool } from "./create-project";
 // Task management tools
 import { createTaskTool } from "./create-task";
 import { createTaskCommentTool } from "./create-task-comment";
+import { deleteCalendarEventTool } from "./delete-calendar-event";
+import { getCalendarEventsTool } from "./get-calendar-events";
 import { getChecklistItemsTool } from "./get-checklist-item";
+import { getEmailsTool } from "./get-emails";
 import { getLabelsTool } from "./get-labels";
 // Milestone tools
 import { getMilestonesTool } from "./get-milestones";
@@ -26,11 +31,11 @@ import { getTaskByIdTool } from "./get-task-by-id";
 import { getTasksTool } from "./get-tasks";
 import { getUsersTool } from "./get-users";
 import { sendDraftEmailTool } from "./send-draft-email";
+import { updateCalendarEventTool } from "./update-calendar-event";
 import { updateChecklistItemTool } from "./update-checklist-item";
 import { updateMilestoneTool } from "./update-milestone";
 import { updateProjectTool } from "./update-project";
 import { updateTaskTool } from "./update-task";
-// Web search
 import { webSearchTool } from "./web-search";
 
 /**
@@ -42,6 +47,7 @@ export const taskManagementTools = {
 	updateTask: updateTaskTool,
 	getTasks: getTasksTool,
 	getTaskById: getTaskByIdTool,
+	addTaskAttachment: addTaskAttachmentTool,
 
 	// Task comments
 	createTaskComment: createTaskCommentTool,
@@ -75,6 +81,8 @@ export const researchTools = {
 	webSearch: webSearchTool,
 } as const;
 
+export const memoryTools = {} as const;
+
 /**
  * Integration tool registry - tools are added here when integrations are available
  * This allows agents to dynamically gain capabilities based on team configuration
@@ -85,6 +93,13 @@ export const integrationToolRegistry: Partial<
 	gmail: {
 		createDraftEmail: createDraftEmailTool,
 		sendDraftEmail: sendDraftEmailTool,
+		getEmails: getEmailsTool,
+	},
+	"google-calendar": {
+		createCalendarEvent: createCalendarEventTool,
+		updateCalendarEvent: updateCalendarEventTool,
+		deleteCalendarEvent: deleteCalendarEventTool,
+		getCalendarEvents: getCalendarEventsTool,
 	},
 	// Future integrations can be added here:
 	// slack: { ... },

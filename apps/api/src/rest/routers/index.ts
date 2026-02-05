@@ -8,6 +8,7 @@ import { gmail } from "./gmail";
 import { googleCalendar } from "./google-calendar";
 import { importsRouter } from "./imports";
 import { integrationsRouter } from "./integrations";
+import { realtimeRouter } from "./realtime";
 import { slackRouter } from "./slack";
 import { transcriptionRouter } from "./transcription";
 import { usersRouter } from "./users";
@@ -27,5 +28,6 @@ routers.route("/transcription", transcriptionRouter);
 routers.route("/google-calendar", googleCalendar);
 routers.route("/gmail", gmail);
 routers.route("/users", usersRouter);
+routers.route("/realtime", realtimeRouter);
 
 export { routers };

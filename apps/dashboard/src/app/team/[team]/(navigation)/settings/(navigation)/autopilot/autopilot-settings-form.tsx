@@ -7,7 +7,6 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@mimir/ui/card";
-import { Checkbox } from "@mimir/ui/checkbox";
 import {
 	Form,
 	FormControl,
@@ -17,21 +16,16 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@mimir/ui/form";
-import { Input } from "@mimir/ui/input";
-import { Label } from "@mimir/ui/label";
-import { Separator } from "@mimir/ui/separator";
 import { Switch } from "@mimir/ui/switch";
 import { useMutation } from "@tanstack/react-query";
 import { cn } from "@ui/lib/utils";
 import {
-	Bot,
 	CheckSquare,
 	Globe,
 	ListTodo,
 	Mail,
 	MessageSquare,
 	PenLine,
-	ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import z from "zod";
@@ -264,223 +258,6 @@ export const AutopilotSettingsForm = ({
 								</FormItem>
 							)}
 						/>
-					</CardContent>
-				</Card>
-
-				{/* Agent Execution Policy Section */}
-				<Card>
-					<CardHeader className="pb-4">
-						<div className="flex items-center gap-2">
-							<Bot className="h-5 w-5 text-muted-foreground" />
-							<CardTitle className="text-base">AI Agent Settings</CardTitle>
-						</div>
-						<CardDescription>
-							Configure how the AI agent can autonomously work on tasks assigned
-							to it
-						</CardDescription>
-					</CardHeader>
-					<CardContent className="space-y-6">
-						<FormField
-							control={form.control}
-							name="agentExecutionPolicy.enabled"
-							render={({ field }) => (
-								<FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-									<div className="space-y-0.5">
-										<FormLabel className="font-medium text-sm">
-											Enable Autonomous Execution
-										</FormLabel>
-										<FormDescription>
-											Allow the AI agent to automatically execute tasks assigned
-											to it
-										</FormDescription>
-									</div>
-									<FormControl>
-										<Switch
-											checked={field.value}
-											onCheckedChange={field.onChange}
-											disabled={field.disabled}
-										/>
-									</FormControl>
-								</FormItem>
-							)}
-						/>
-
-						<div
-							className={cn("space-y-6 transition-opacity", {
-								"pointer-events-none opacity-50": !agentEnabled,
-							})}
-						>
-							<Separator />
-
-							<FormField
-								control={form.control}
-								name="agentExecutionPolicy.maxStepsPerDay"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Maximum Steps Per Day</FormLabel>
-										<FormDescription>
-											Limit the number of actions the agent can perform daily
-											(1-500)
-										</FormDescription>
-										<FormControl>
-											<Input
-												type="number"
-												min={1}
-												max={500}
-												className="w-32"
-												{...field}
-												disabled={field.disabled || !agentEnabled}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-
-							<Separator />
-
-							<FormField
-								control={form.control}
-								name="agentExecutionPolicy.allowedActions"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Allowed Actions</FormLabel>
-										<FormDescription>
-											Select which actions the agent can perform autonomously
-										</FormDescription>
-										<div className="mt-3 grid gap-3 sm:grid-cols-2">
-											{AVAILABLE_ACTIONS.map((action) => {
-												const isChecked = field.value?.includes(action.value);
-												const Icon = action.icon;
-												return (
-													<div
-														key={action.value}
-														className={cn(
-															"flex items-start gap-3 rounded-lg border p-3 transition-colors",
-															isChecked
-																? "border-primary/50 bg-primary/5"
-																: "border-input",
-															(field.disabled || !agentEnabled) &&
-																"cursor-not-allowed opacity-50",
-														)}
-													>
-														<Checkbox
-															id={action.value}
-															checked={isChecked}
-															disabled={field.disabled || !agentEnabled}
-															onCheckedChange={(checked) => {
-																const newValues = checked
-																	? [...(field.value ?? []), action.value]
-																	: field.value?.filter(
-																			(v) => v !== action.value,
-																		);
-																field.onChange(newValues);
-															}}
-														/>
-														<div className="flex-1 space-y-1">
-															<Label
-																htmlFor={action.value}
-																className="flex cursor-pointer items-center gap-2 font-medium text-sm"
-															>
-																<Icon className="h-4 w-4 text-muted-foreground" />
-																{action.label}
-															</Label>
-															<p className="text-muted-foreground text-xs">
-																{action.description}
-															</p>
-														</div>
-													</div>
-												);
-											})}
-										</div>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-
-							<Separator />
-
-							<div className="space-y-4">
-								<div className="flex items-center gap-2">
-									<ShieldCheck className="h-4 w-4 text-muted-foreground" />
-									<h4 className="font-medium text-sm">Safety Controls</h4>
-								</div>
-
-								<FormField
-									control={form.control}
-									name="agentExecutionPolicy.requireReviewForCompletion"
-									render={({ field }) => (
-										<FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-											<div className="space-y-0.5">
-												<FormLabel className="font-medium text-sm">
-													Require Review for Completion
-												</FormLabel>
-												<FormDescription>
-													Require human review before the agent can mark tasks
-													as done
-												</FormDescription>
-											</div>
-											<FormControl>
-												<Switch
-													checked={field.value}
-													onCheckedChange={field.onChange}
-													disabled={field.disabled || !agentEnabled}
-												/>
-											</FormControl>
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name="agentExecutionPolicy.alwaysConfirmActions"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Always Confirm Actions</FormLabel>
-											<FormDescription>
-												Select actions that always require human confirmation,
-												regardless of risk level
-											</FormDescription>
-											<div className="mt-3 flex flex-wrap gap-2">
-												{AVAILABLE_ACTIONS.filter((action) =>
-													allowedActions?.includes(action.value),
-												).map((action) => {
-													const isChecked = field.value?.includes(action.value);
-													const Icon = action.icon;
-													return (
-														<Button
-															key={action.value}
-															type="button"
-															variant={isChecked ? "default" : "outline"}
-															size="sm"
-															className="gap-2"
-															disabled={field.disabled || !agentEnabled}
-															onClick={() => {
-																const newValues = isChecked
-																	? field.value?.filter(
-																			(v) => v !== action.value,
-																		)
-																	: [...(field.value ?? []), action.value];
-																field.onChange(newValues);
-															}}
-														>
-															<Icon className="h-3.5 w-3.5" />
-															{action.label}
-														</Button>
-													);
-												})}
-											</div>
-											{allowedActions?.length === 0 && (
-												<p className="text-muted-foreground text-sm">
-													Enable some actions above to configure confirmations
-												</p>
-											)}
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
-						</div>
 					</CardContent>
 				</Card>
 

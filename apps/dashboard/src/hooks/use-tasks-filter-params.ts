@@ -10,11 +10,6 @@ import { useMemo } from "react";
 import type { TasksGroupBy } from "@/components/tasks-view/tasks-group";
 import type { TasksViewType } from "@/components/tasks-view/tasks-view";
 
-// async import properties list to avoid circular dependency
-const { propertiesList } = await import(
-	"../components/tasks-view/properties/task-properties"
-);
-
 export const tasksFilterParams = {
 	assigneeId: parseAsArrayOf(parseAsString),
 	columnId: parseAsArrayOf(parseAsString),
@@ -30,7 +25,7 @@ export const tasksFilterParams = {
 		"project",
 	]),
 	viewType: parseAsStringLiteral<TasksViewType>(["board", "list", "calendar"]),
-	properties: parseAsArrayOf(parseAsStringLiteral(propertiesList)),
+	properties: parseAsArrayOf(parseAsString),
 	recurring: parseAsBoolean,
 };
 

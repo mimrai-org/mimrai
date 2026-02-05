@@ -10,6 +10,10 @@ interface ChatState {
 	isWebSearch: boolean;
 	setIsWebSearch: (isWebSearch: boolean) => void;
 
+	// Agent selection state
+	selectedAgentId: string | null;
+	setSelectedAgentId: (agentId: string | null) => void;
+
 	// Upload state
 	isUploading: boolean;
 	setIsUploading: (isUploading: boolean) => void;
@@ -42,6 +46,7 @@ export const useChatStore = create<ChatState>()((set, get) => ({
 	// Initial state
 	input: "",
 	isWebSearch: false,
+	selectedAgentId: null,
 	isUploading: false,
 	isRecording: false,
 	isProcessing: false,
@@ -54,6 +59,7 @@ export const useChatStore = create<ChatState>()((set, get) => ({
 	setInput: (input) => set({ input }),
 	clearInput: () => set({ input: "", cursorPosition: 0 }),
 	setIsWebSearch: (isWebSearch) => set({ isWebSearch }),
+	setSelectedAgentId: (selectedAgentId) => set({ selectedAgentId }),
 	setIsUploading: (isUploading) => set({ isUploading }),
 	setIsRecording: (isRecording) => set({ isRecording }),
 	setIsProcessing: (isProcessing) => set({ isProcessing }),

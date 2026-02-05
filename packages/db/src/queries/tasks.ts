@@ -45,6 +45,10 @@ import {
 	getActivityById,
 	updateActivity,
 } from "./activities";
+import {
+	isSystemUser,
+	triggerAgentTaskExecutionIfNeeded,
+} from "./agent-triggers";
 import { getStatuses } from "./statuses";
 import { upsertTaskEmbedding } from "./tasks-embeddings";
 import { getMembers } from "./teams";
@@ -281,6 +285,7 @@ export const getTasks = async ({
 		);
 
 	const dependsOnTask = alias(tasks, "depends_on_task");
+	const creatorUser = alias(users, "creator_user");
 	const dependenciesSubquery = db
 		.select({
 			dependencies: jsonAggBuildObject({
@@ -307,6 +312,7 @@ export const getTasks = async ({
 			title: tasks.title,
 			description: tasks.description,
 			assigneeId: tasks.assigneeId,
+			createdBy: tasks.createdBy,
 			sequence: tasks.sequence,
 			projectId: tasks.projectId,
 			permalinkId: tasks.permalinkId,
@@ -331,6 +337,13 @@ export const getTasks = async ({
 				email: users.email,
 				image: users.image,
 				color: users.color,
+			},
+			creator: {
+				id: creatorUser.id,
+				name: creatorUser.name,
+				email: creatorUser.email,
+				image: creatorUser.image,
+				color: creatorUser.color,
 			},
 			statusId: tasks.statusId,
 			repositoryName: tasks.repositoryName,
@@ -367,6 +380,7 @@ export const getTasks = async ({
 		.innerJoin(statuses, eq(tasks.statusId, statuses.id))
 		.leftJoin(labelsSubquery, eq(labelsSubquery.taskId, tasks.id))
 		.leftJoin(users, eq(tasks.assigneeId, users.id))
+		.leftJoin(creatorUser, eq(tasks.createdBy, creatorUser.id))
 		.leftJoin(checklistSubquery, eq(checklistSubquery.taskId, tasks.id))
 		.leftJoin(projects, eq(tasks.projectId, projects.id))
 		.leftJoin(milestones, eq(tasks.milestoneId, milestones.id))
@@ -441,6 +455,7 @@ export const createTask = async ({
 		.insert(tasks)
 		.values({
 			...input,
+			createdBy: userId,
 			milestoneId: input.projectId === null ? null : input.milestoneId,
 			sequence,
 			permalinkId,
@@ -614,9 +629,6 @@ export const updateTask = async ({
 
 	// Trigger agent if task is assigned to system user or has relevant updates
 	if (task.assigneeId) {
-		const { triggerAgentTaskExecutionIfNeeded } = await import(
-			"./agent-triggers"
-		);
 		triggerAgentTaskExecutionIfNeeded({
 			taskId: task.id,
 			teamId: task.teamId,
@@ -625,8 +637,6 @@ export const updateTask = async ({
 			triggeredBy:
 				oldTask.assigneeId !== task.assigneeId ? "assignment" : "update",
 			triggerUserId: userId,
-		}).catch((err) => {
-			console.warn("Failed to trigger agent task execution", err);
 		});
 	}
 
@@ -729,6 +739,7 @@ export const getTaskByPermalinkId = async (
 };
 
 export const getTaskById = async (id: string, userId?: string) => {
+	const creatorUser = alias(users, "creator_user");
 	const whereClause: SQL[] = [eq(tasks.id, id)];
 
 	if (userId) {
@@ -774,6 +785,7 @@ export const getTaskById = async (id: string, userId?: string) => {
 			title: tasks.title,
 			description: tasks.description,
 			assigneeId: tasks.assigneeId,
+			createdBy: tasks.createdBy,
 			sequence: tasks.sequence,
 			projectId: tasks.projectId,
 			subscribers: tasks.subscribers,
@@ -797,6 +809,13 @@ export const getTaskById = async (id: string, userId?: string) => {
 				email: users.email,
 				image: users.image,
 				color: users.color,
+			},
+			creator: {
+				id: creatorUser.id,
+				name: creatorUser.name,
+				email: creatorUser.email,
+				image: creatorUser.image,
+				color: creatorUser.color,
 			},
 			checklistSummary: {
 				completed: checklistSubquery.completed,
@@ -835,6 +854,7 @@ export const getTaskById = async (id: string, userId?: string) => {
 		.leftJoin(checklistSubquery, eq(checklistSubquery.taskId, tasks.id))
 		.leftJoin(labelsSubquery, eq(labelsSubquery.taskId, tasks.id))
 		.leftJoin(users, eq(tasks.assigneeId, users.id))
+		.leftJoin(creatorUser, eq(tasks.createdBy, creatorUser.id))
 		.leftJoin(projects, eq(tasks.projectId, projects.id))
 		.leftJoin(milestones, eq(tasks.milestoneId, milestones.id))
 		.limit(1);
@@ -942,9 +962,6 @@ export const createTaskComment = async ({
 
 	// Trigger agent if task is assigned to system user and comment is not from the agent
 	if (task.assigneeId && userId) {
-		const { isSystemUser, triggerAgentTaskExecutionIfNeeded } = await import(
-			"./agent-triggers"
-		);
 		// Only trigger if comment is not from the agent and task is assigned to the agent
 		const [isCommentFromAgent, isTaskAssignedToAgent] = await Promise.all([
 			isSystemUser(userId),
@@ -1259,7 +1276,7 @@ export const getSmartCompleteContext = async ({
 		.where(eq(labels.teamId, teamId))
 		.limit(10);
 
-	const membersList = await getMembers({ teamId });
+	const membersList = await getMembers({ teamId, includeSystemUsers: true });
 
 	const projectsList = await db
 		.select()

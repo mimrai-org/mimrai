@@ -13,7 +13,7 @@ import {
 	sql,
 } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
-import { jsonAggBuildObject, jsonBuildObject } from "src/utils/drizzle";
+import { jsonBuildObject } from "src/utils/drizzle";
 import { db } from "..";
 import {
 	activities,
@@ -123,9 +123,10 @@ export const createActivity = async (input: CreateActivityInput) => {
 		}
 
 		await realtime
-			.channel(getChannelName(input.teamId, input.groupId))
+			.channel(getChannelName(input.teamId, input.groupId, result.type))
 			.emit("activities.created", {
 				id: result.id,
+				type: result.type,
 				groupId: result.groupId ?? undefined,
 			});
 	}

@@ -8,6 +8,7 @@ export type UITools = Record<string, any>;
 
 // Define message metadata type
 export type ChatMessageMetadata = {
+	agentId?: string | null;
 	webSearch?: boolean;
 	toolCall?: {
 		toolName: string;

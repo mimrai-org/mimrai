@@ -1,34 +1,37 @@
 {
-	"name": "@mimir/utils",
-	"version": "1.0.0",
-	"main": "src/index.ts",
-	"private": true,
-	"sideEffects": false,
-	"scripts": {
-		"clean": "rm -rf .turbo node_modules",
-		"lint": "biome check .",
-		"format": "biome format --write .",
-		"typecheck": "tsc --noEmit"
-	},
-	"dependencies": {
-		"date-fns": "4.1.0"
-	},
-	"devDependencies": {
-		"@mimir/tsconfig": "workspace:*",
-		"typescript": "^5.9.2"
-	},
-	"exports": {
-		".": "./src/index.ts",
-		"./envs": "./src/envs.ts",
-		"./format": "./src/format.ts",
-		"./random": "./src/random.ts",
-		"./plans": "./src/plans.ts",
-		"./statuses": "./src/statuses.ts",
-		"./tax": "./src/tax.ts",
-		"./tasks": "./src/tasks.ts",
-		"./recurrence": "./src/recurrence.ts",
-		"./shareable": "./src/shareable.ts",
-		"./pr-reviews": "./src/pr-reviews.ts",
-		"./teams": "./src/teams.ts"
-	}
+  "name": "@mimir/utils",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "private": true,
+  "sideEffects": false,
+  "scripts": {
+    "clean": "rm -rf .turbo node_modules",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "date-fns": "4.1.0",
+    "tokenlens": "^1.3.1"
+  },
+  "devDependencies": {
+    "@mimir/tsconfig": "workspace:*",
+    "@types/node": "^20",
+    "typescript": "^5.9.2"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./envs": "./src/envs.ts",
+    "./format": "./src/format.ts",
+    "./random": "./src/random.ts",
+    "./plans": "./src/plans.ts",
+    "./statuses": "./src/statuses.ts",
+    "./tax": "./src/tax.ts",
+    "./tasks": "./src/tasks.ts",
+    "./recurrence": "./src/recurrence.ts",
+    "./shareable": "./src/shareable.ts",
+    "./pr-reviews": "./src/pr-reviews.ts",
+    "./teams": "./src/teams.ts",
+    "./agents": "./src/agents.ts"
+  }
 }

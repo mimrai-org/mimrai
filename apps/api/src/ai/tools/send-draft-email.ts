@@ -9,12 +9,12 @@ export const sendDraftEmailTool = tool({
 		id: z.string().min(1).describe("Draft email ID"),
 	}),
 	execute: async function* (input, executionOptions) {
-		const { teamId, userId } =
+		const { teamId, userId, behalfUserId } =
 			executionOptions.experimental_context as AppContext;
 
 		const draft = await sendDraftEmail({
 			id: input.id,
-			userId: userId,
+			userId: behalfUserId,
 		});
 
 		yield {

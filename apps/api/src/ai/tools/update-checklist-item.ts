@@ -25,6 +25,7 @@ export const updateChecklistItemTool = tool({
 			description: input.description,
 			isCompleted: input.isCompleted,
 			assigneeId: input.assigneeId,
+			userId: userId,
 			teamId: teamId,
 		});
 

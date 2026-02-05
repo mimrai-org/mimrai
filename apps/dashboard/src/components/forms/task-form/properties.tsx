@@ -2,6 +2,7 @@
 import { Assignee } from "./assignee";
 import { TaskFormDependenciesList } from "./dependencies-list";
 import { DueDate } from "./due-date";
+import { TaskExecution } from "./execution";
 import { Labels } from "./labels";
 import { MilestoneSelect } from "./milestone-select";
 import { Priority } from "./priority";
@@ -22,6 +23,10 @@ export const TaskFormProperties = () => {
 				<ProjectSelect />
 				<MilestoneSelect />
 				<Recurring />
+			</div>
+
+			<div className="mt-4">
+				<TaskExecution />
 			</div>
 
 			<div className="mt-4">

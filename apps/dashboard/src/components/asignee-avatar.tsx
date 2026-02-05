@@ -33,7 +33,7 @@ export const AssigneeAvatar = ({
 	image,
 	className,
 }: Props) => {
-	if (!name && !email) {
+	if (!name || !email) {
 		return (
 			<div
 				className={cn(
@@ -59,13 +59,11 @@ export const AssigneeAvatar = ({
 							colorClasses={colorClasses}
 						/>
 					</AvatarFallback>
-					{image && (
-						<AvatarImage
-							src={image}
-							alt={name ?? "Assignee Avatar"}
-							className="size-full object-cover"
-						/>
-					)}
+					<AvatarImage
+						src={image}
+						alt={name ?? "Assignee Avatar"}
+						className="size-full object-cover"
+					/>
 				</Avatar>
 			</TooltipTrigger>
 			<TooltipContent>{name || email}</TooltipContent>
@@ -75,7 +73,7 @@ export const AssigneeAvatar = ({
 
 export const Assignee = (props: Props) => {
 	const { name, email } = props;
-	if (!name && !email) return <div />;
+	if (!name || !email) return <div />;
 
 	return (
 		<div className="flex items-center gap-2">

@@ -6,8 +6,7 @@ import { trpc } from "@/utils/trpc";
 import type { IntegrationConfigFormProps } from "../components";
 
 export const LinkIntegrationMattermostForm = ({
-	id,
-	defaultValues,
+	integration,
 }: IntegrationConfigFormProps) => {
 	const { data } = useQuery(
 		trpc.integrations.getByType.queryOptions({

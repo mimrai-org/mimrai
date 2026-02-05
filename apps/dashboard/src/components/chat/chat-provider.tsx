@@ -58,6 +58,7 @@ export const ChatProvider = ({
 			prepareSendMessagesRequest({ messages, id }) {
 				const lastMessage = messages[messages.length - 1] as ChatInputMessage;
 
+				const agentId = lastMessage.metadata?.agentId;
 				const agentChoice = lastMessage.metadata?.agentChoice;
 				const toolChoice = lastMessage.metadata?.toolChoice;
 				const contextItems = lastMessage.metadata?.contextItems || [];
@@ -67,6 +68,7 @@ export const ChatProvider = ({
 						id,
 						message: lastMessage,
 						contextItems,
+						agentId,
 						agentChoice,
 						toolChoice,
 						timezone: new Intl.DateTimeFormat().resolvedOptions().timeZone,
