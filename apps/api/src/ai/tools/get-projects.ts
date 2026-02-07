@@ -2,7 +2,7 @@ import { getProjects } from "@mimir/db/queries/projects";
 import { getAppUrl } from "@mimir/utils/envs";
 import { tool } from "ai";
 import z from "zod";
-import type { AppContext } from "../agents/config/shared";
+import { getToolContext } from "../agents/config/shared";
 
 export const getProjectsToolSchema = z.object({
 	search: z.string().optional().describe("Search query"),
@@ -15,8 +15,7 @@ export const getProjectsTool = tool({
 	inputSchema: getProjectsToolSchema,
 	execute: async function* ({ search, cursor, pageSize }, executionOptions) {
 		try {
-			const { userId, teamId } =
-				executionOptions.experimental_context as AppContext;
+			const { userId, teamId } = getToolContext(executionOptions);
 
 			const result = await getProjects({
 				teamId: teamId,

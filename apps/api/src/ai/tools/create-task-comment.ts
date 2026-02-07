@@ -1,7 +1,7 @@
 import { createTaskComment } from "@mimir/db/queries/tasks";
 import { tool } from "ai";
 import z from "zod";
-import type { AppContext } from "../agents/config/shared";
+import { getToolContext } from "../agents/config/shared";
 
 export const createTaskCommentToolSchema = z.object({
 	taskId: z.string().describe("The ID (uuid) of the task to comment on"),
@@ -18,8 +18,7 @@ export const createTaskCommentTool = tool({
 	inputSchema: createTaskCommentToolSchema,
 	execute: async function* (input, executionOptions) {
 		try {
-			const { userId, teamId } =
-				executionOptions.experimental_context as AppContext;
+			const { userId, teamId } = getToolContext(executionOptions);
 
 			yield {
 				text: "Adding comment to task...",

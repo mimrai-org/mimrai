@@ -2,7 +2,7 @@ import { updateProject } from "@mimir/db/queries/projects";
 import { getAppUrl } from "@mimir/utils/envs";
 import { tool } from "ai";
 import z from "zod";
-import type { AppContext } from "../agents/config/shared";
+import { getToolContext } from "../agents/config/shared";
 
 export const updateProjectToolSchema = z.object({
 	id: z.string().describe("ID of the project to update (uuid)"),
@@ -22,7 +22,7 @@ export const updateProjectTool = tool({
 	inputSchema: updateProjectToolSchema,
 	execute: async function* ({ ...input }, executionOptions) {
 		try {
-			const { teamId } = executionOptions.experimental_context as AppContext;
+			const { teamId } = getToolContext(executionOptions);
 
 			const result = await updateProject({
 				...input,

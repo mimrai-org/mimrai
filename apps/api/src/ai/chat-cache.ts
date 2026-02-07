@@ -1,4 +1,4 @@
-import { RedisCache } from "./redis-client";
+import { RedisCache } from "@mimir/cache/redis-client";
 
 // Redis-based cache for chat data shared across all server instances
 const userContextCache = new RedisCache("chat:user", 30 * 60); // 30 minutes TTL

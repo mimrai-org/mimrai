@@ -4,8 +4,29 @@ import {
 	type ContextItem,
 	formatLLMContextItems,
 } from "@api/ai/utils/format-context-items";
-import { db } from "@mimir/db/client";
-import type { UIMessageStreamWriter } from "ai";
+import type { ToolExecutionOptions, UIMessageStreamWriter } from "ai";
+
+/**
+ * Extract and validate AppContext from tool execution options.
+ * Replaces unsafe `executionOptions.experimental_context as AppContext` casts
+ * with a runtime check that throws a descriptive error.
+ */
+export function getToolContext(
+	executionOptions: ToolExecutionOptions,
+): AppContext {
+	const ctx = executionOptions.experimental_context;
+	if (
+		!ctx ||
+		typeof ctx !== "object" ||
+		!("userId" in ctx) ||
+		!("teamId" in ctx)
+	) {
+		throw new Error(
+			"Tool executed without a valid AppContext. Ensure the agent was initialized with experimental_context.",
+		);
+	}
+	return ctx as AppContext;
+}
 
 export function formatContextForLLM(context: AppContext): string {
 	return `<team-info>
@@ -53,7 +74,7 @@ export interface AppContext {
 	additionalContext: string;
 	integrationType: "web" | "slack" | "whatsapp" | "mattermost";
 	contextItems?: Array<ContextItem>;
-	writter?: UIMessageStreamWriter<UIChatMessage>;
+	writer?: UIMessageStreamWriter<UIChatMessage>;
 	// Allow additional properties to satisfy Record<string, unknown> constraint
 	[key: string]: unknown;
 }

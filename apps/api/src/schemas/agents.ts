@@ -16,6 +16,7 @@ export const createAgentSchema = z.object({
 	avatar: z.string().optional(),
 	isActive: z.boolean().default(true).optional(),
 	authorizeIntegrations: z.boolean().optional(),
+	activeToolboxes: z.string().array().optional(),
 	model: z.string().optional(),
 	soul: z.string().optional(),
 });
@@ -27,6 +28,7 @@ export const updateAgentSchema = z.object({
 	avatar: z.string().optional(),
 	isActive: z.boolean().optional(),
 	authorizeIntegrations: z.boolean().optional(),
+	activeToolboxes: z.string().array().optional(),
 	model: z.string().optional(),
 	soul: z.string().optional(),
 });

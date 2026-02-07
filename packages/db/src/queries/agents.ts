@@ -91,6 +91,7 @@ export const createAgent = async (input: {
 	description?: string;
 	avatar?: string;
 	behalfUserId?: string;
+	activeToolboxes?: string[];
 	isActive?: boolean;
 	model?: string;
 	soul?: string;
@@ -142,6 +143,7 @@ export const updateAgent = async ({
 	name?: string;
 	description?: string;
 	behalfUserId?: string;
+	activeToolboxes?: string[];
 	avatar?: string;
 	isActive?: boolean;
 	model?: string;

@@ -2,8 +2,10 @@ import { AGENT_DEFAULT_MODEL, getModels } from "@mimir/utils/agents";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Alert, AlertTitle } from "@ui/components/ui/alert";
 import { Button } from "@ui/components/ui/button";
+import { DataSelectInput } from "@ui/components/ui/data-select-input";
 import {
 	DropdownMenu,
+	DropdownMenuCheckboxItem,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
@@ -20,6 +22,9 @@ import {
 import { Input } from "@ui/components/ui/input";
 import { Switch } from "@ui/components/ui/switch";
 import { Textarea } from "@ui/components/ui/textarea";
+import { ToolCaseIcon } from "lucide-react";
+import { useFormContext } from "react-hook-form";
+import { toast } from "sonner";
 import z from "zod";
 import { Editor } from "@/components/editor";
 import { useAgentParams } from "@/hooks/use-agent-params";
@@ -32,6 +37,7 @@ const schema = z.object({
 	name: z.string().min(1, "Name is required"),
 	description: z.string().optional(),
 	authorizeIntegrations: z.boolean(),
+	activeToolboxes: z.string().array().optional(),
 	model: z.string(),
 	soul: z.string().optional(),
 });
@@ -53,6 +59,7 @@ export const AgentForm = ({
 			description: "",
 			model: AGENT_DEFAULT_MODEL,
 			authorizeIntegrations: true,
+			activeToolboxes: [],
 			soul: "",
 			...defaultValues,
 		},
@@ -64,6 +71,7 @@ export const AgentForm = ({
 				queryClient.invalidateQueries(
 					trpc.agents.get.infiniteQueryOptions({ pageSize: 20 }),
 				);
+				toast.success("Agent created");
 				setParams(null);
 			},
 		}),
@@ -75,6 +83,7 @@ export const AgentForm = ({
 				queryClient.invalidateQueries(
 					trpc.agents.get.infiniteQueryOptions({ pageSize: 20 }),
 				);
+				toast.success("Agent updated");
 				setParams(null);
 			},
 		}),
@@ -174,6 +183,8 @@ export const AgentForm = ({
 					)}
 				/>
 
+				<ActiveToolboxesFormField />
+
 				<FormField
 					control={form.control}
 					name="description"
@@ -225,5 +236,58 @@ export const AgentForm = ({
 				</div>
 			</form>
 		</Form>
+	);
+};
+
+const ActiveToolboxesFormField = () => {
+	const form = useFormContext<z.infer<typeof schema>>();
+
+	return (
+		<FormField
+			control={form.control}
+			name="activeToolboxes"
+			render={({ field }) => (
+				<FormItem>
+					<FormLabel>Active Toolboxes</FormLabel>
+					<FormControl>
+						<DataSelectInput
+							queryOptions={trpc.agents.getToolboxes.queryOptions()}
+							value={field.value || null}
+							onChange={(value) => field.onChange(value || null)}
+							getValue={(item) => item}
+							getLabel={(item) => item || "All Toolboxes"}
+							variant={"outline"}
+							placeholder="All Toolboxes"
+							multiple
+							clearable
+							renderClear={() => (
+								<div className="flex items-center gap-2">
+									<ToolCaseIcon className="size-4" />
+									All Toolboxes
+								</div>
+							)}
+							renderItem={(item) => (
+								<div className="flex items-center gap-2">
+									<ToolCaseIcon className="size-4" />
+									{item}
+								</div>
+							)}
+							renderMultiple={(items) => {
+								return items.map((item) => (
+									<div
+										key={item}
+										className="flex items-center gap-2 rounded bg-accent px-2 py-1 text-accent-foreground text-xs"
+									>
+										<ToolCaseIcon className="size-4" />
+										{item}
+									</div>
+								));
+							}}
+						/>
+					</FormControl>
+					<FormMessage />
+				</FormItem>
+			)}
+		/>
 	);
 };

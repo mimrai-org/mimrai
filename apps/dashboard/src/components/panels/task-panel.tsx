@@ -33,7 +33,9 @@ function TaskPanelContent({ panel }: { panel: PanelInstance }) {
 	if (!task) {
 		return (
 			<div className="p-6">
-				<Skeleton className="h-[200px] w-full" />
+				<Skeleton className="h-[16px] w-[50px] rounded-sm" />
+				<Skeleton className="mt-2 h-[32px] w-full" />
+				<Skeleton className="mt-2 h-[100px] w-full" />
 			</div>
 		);
 	}

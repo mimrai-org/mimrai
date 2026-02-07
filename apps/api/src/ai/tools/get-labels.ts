@@ -3,7 +3,7 @@ import { labels } from "@mimir/db/schema";
 import { tool } from "ai";
 import { and, eq } from "drizzle-orm";
 import z from "zod";
-import type { AppContext } from "../agents/config/shared";
+import { getToolContext } from "../agents/config/shared";
 
 export const getLabelsToolSchema = z.object({});
 
@@ -11,8 +11,7 @@ export const getLabelsTool = tool({
 	description: "Get labels for your tasks",
 	inputSchema: getLabelsToolSchema,
 	execute: async function* (input, executionOptions) {
-		const { userId, teamId } =
-			executionOptions.experimental_context as AppContext;
+		const { userId, teamId } = getToolContext(executionOptions);
 
 		yield { text: "Retrieving labels..." };
 

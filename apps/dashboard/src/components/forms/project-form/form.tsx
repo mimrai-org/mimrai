@@ -86,6 +86,7 @@ export const ProjectForm = ({
 			},
 			onSuccess: () => {
 				queryClient.invalidateQueries(trpc.projects.get.infiniteQueryOptions());
+				queryClient.invalidateQueries(trpc.projects.get.queryOptions());
 				toast.success("Project created successfully", { id: "create-project" });
 				setParams(null);
 			},

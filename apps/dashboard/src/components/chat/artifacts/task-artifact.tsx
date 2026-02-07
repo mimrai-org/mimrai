@@ -1,4 +1,4 @@
-import type { MessageDataParts } from "@api/ai/tools/registry";
+import type { MessageDataParts } from "@api/ai/tools/tool-registry";
 import type { UIChatMessage } from "@api/ai/types";
 import { cn } from "@ui/lib/utils";
 import { useTaskPanel } from "@/components/panels/task-panel";

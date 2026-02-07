@@ -458,8 +458,8 @@ function KanbanRoot<T>(props: KanbanRootProps<T>) {
 						}
 					}
 				} else {
-					const activeItems = value[activeColumn];
-					const overItems = value[overColumn];
+					const activeItems = value[activeColumn] as T[];
+					const overItems = value[overColumn] as T[];
 
 					const activeIndex = activeItems?.findIndex(
 						(item) => getItemValue(item) === active.id,

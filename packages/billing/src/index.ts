@@ -266,12 +266,15 @@ export const createTokenMeter = (customerId: string) => {
 			return null;
 		}
 
+		const stripeEventValue = Math.round(totalUSD * 10000) / 10; // in millicents
+
 		await stripeClient.billing.meterEvents.create({
 			event_name: "token_usage_cost",
 			payload: {
 				stripe_customer_id: customerId,
 				model,
-				value: totalUSD.toString(),
+				// amount in millicents to avoid floating point issues
+				value: stripeEventValue.toString(),
 			},
 		});
 

@@ -4,7 +4,7 @@ import { getAppUrl } from "@mimir/utils/envs";
 import { getTaskPermalink } from "@mimir/utils/tasks";
 import { tool } from "ai";
 import z from "zod";
-import type { AppContext } from "../agents/config/shared";
+import { getToolContext } from "../agents/config/shared";
 
 export const getTasksToolSchema = z.object({
 	search: z.string().optional().describe("Search query"),
@@ -51,8 +51,8 @@ export const getTasksTool = tool({
 		executionOptions,
 	) {
 		try {
-			const { userId, teamId, teamSlug, writter } =
-				executionOptions.experimental_context as AppContext;
+			const { userId, teamId, teamSlug, writer } =
+				getToolContext(executionOptions);
 
 			const statusChangedAt =
 				statusChangedAtAfter && statusChangedAtBefore
@@ -99,9 +99,9 @@ export const getTasksTool = tool({
 				taskUrl: getTaskPermalink(task.permalinkId),
 			}));
 
-			if (writter) {
+			if (writer) {
 				for (const task of mappedData.slice(0, 5)) {
-					writter.write({
+					writer.write({
 						type: "data-task",
 						data: task,
 					});

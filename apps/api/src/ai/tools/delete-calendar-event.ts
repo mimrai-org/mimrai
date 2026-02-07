@@ -1,7 +1,7 @@
 import { deleteEvent } from "@mimir/integration/google-calendar";
 import { tool } from "ai";
 import z from "zod";
-import type { AppContext } from "../agents/config/shared";
+import { getToolContext } from "../agents/config/shared";
 
 export const deleteCalendarEventToolSchema = z.object({
 	eventId: z.string().describe("The ID of the event to delete"),
@@ -12,8 +12,7 @@ export const deleteCalendarEventTool = tool({
 	inputSchema: deleteCalendarEventToolSchema,
 	execute: async function* (input, executionOptions) {
 		try {
-			const { userId, teamId, behalfUserId } =
-				executionOptions.experimental_context as AppContext;
+			const { userId, teamId, behalfUserId } = getToolContext(executionOptions);
 			yield {
 				text: `Deleting calendar event: ${input.eventId}`,
 			};

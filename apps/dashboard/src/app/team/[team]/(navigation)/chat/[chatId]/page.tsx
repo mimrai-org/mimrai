@@ -30,7 +30,9 @@ export default async function Page({ params }: Props) {
 				id={chatId}
 				title={chat?.title}
 			>
-				<ChatHistory />
+				<div className="rounded-sm border p-4">
+					<ChatHistory />
+				</div>
 				<div className="mx-auto flex max-h-[calc(100vh-80px)] w-full max-w-4xl flex-1 flex-col">
 					<ChatInterface />
 				</div>

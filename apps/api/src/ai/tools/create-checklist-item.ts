@@ -1,7 +1,7 @@
 import { createChecklistItem } from "@mimir/db/queries/checklists";
 import { tool } from "ai";
 import z from "zod";
-import type { AppContext } from "../agents/config/shared";
+import { getToolContext } from "../agents/config/shared";
 
 export const createChecklistItemToolSchema = z.object({
 	taskId: z.string().describe("Task ID"),
@@ -17,8 +17,7 @@ export const createChecklistItemTool = tool({
 	description: "Create a new checklist item for a specific task.",
 	inputSchema: createChecklistItemToolSchema,
 	execute: async function* (input, executionOptions) {
-		const { userId, teamId } =
-			executionOptions.experimental_context as AppContext;
+		const { userId, teamId } = getToolContext(executionOptions);
 
 		const data = await createChecklistItem({
 			description: input.description,

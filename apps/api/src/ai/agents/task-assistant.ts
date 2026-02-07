@@ -1,5 +1,4 @@
-import { openai } from "@ai-sdk/openai";
-import type { IntegrationName } from "@mimir/integration/registry";
+import { gateway } from "ai";
 import { createChecklistItemTool } from "../tools/create-checklist-item";
 import { getChecklistItemsTool } from "../tools/get-checklist-item";
 import { getLabelsTool } from "../tools/get-labels";
@@ -61,13 +60,6 @@ export interface TaskAssistantContext extends AppContext {
 	}>;
 	/** Available integrations for this team (user has linked their account) */
 	availableIntegrations?: Array<string>;
-}
-
-export interface UserIntegrationInfo {
-	type: IntegrationName;
-	name: string;
-	integrationId: string;
-	userLinkId: string;
 }
 
 const buildSystemPrompt = (ctx: TaskAssistantContext) => {
@@ -211,7 +203,7 @@ export const createTaskAssistantAgent = (config: Partial<AgentConfig>) => {
 			...config.tools,
 		},
 		buildInstructions: buildSystemPrompt as (ctx: AppContext) => string,
-		model: openai("gpt-5-mini"),
+		model: gateway("openai/gpt-5-mini"),
 	});
 };
 
@@ -227,6 +219,8 @@ export const createTaskAssistantAgentForUser = async ({
 		teamId,
 	});
 	const enabledIntegrations = getEnabledIntegrationTypes(userIntegrations);
+	const { tools: integrationTools } =
+		await getIntegrationTools(userIntegrations);
 	const agent = createTaskAssistantAgent({
 		tools: {
 			updateTask: updateTaskTool,
@@ -245,7 +239,7 @@ export const createTaskAssistantAgentForUser = async ({
 
 			// Find related tasks
 			getTasks: getTasksTool,
-			...getIntegrationTools(enabledIntegrations),
+			...integrationTools,
 		},
 	});
 

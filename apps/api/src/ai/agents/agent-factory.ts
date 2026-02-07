@@ -1,26 +1,14 @@
-import { gateway } from "@ai-sdk/gateway";
+import type { UserIntegrationInfo } from "@api/ai/types";
 import { getAgentById } from "@mimir/db/queries/agents";
 import { getLinkedUsers } from "@mimir/db/queries/integrations";
 import type { IntegrationName } from "@mimir/integration/registry";
 import { AGENT_DEFAULT_MODEL } from "@mimir/utils/agents";
 import type { Tool } from "ai";
-import {
-	integrationToolRegistry,
-	researchTools,
-	taskManagementTools,
-} from "../tools/tool-registry";
+import { integrationToolRegistry } from "../tools/tool-registry";
 import { type AgentConfig, createAgent } from "./config/agent";
 import type { AppContext } from "./config/shared";
 
-/**
- * User integration info returned from getUserIntegrations
- */
-export interface UserIntegrationInfo {
-	type: IntegrationName;
-	name: string;
-	integrationId: string;
-	userLinkId: string;
-}
+export type { UserIntegrationInfo };
 
 /**
  * Get all integrations available to a user (where they have linked their account)
@@ -42,6 +30,8 @@ export const getUserAvailableIntegrations = async ({
 		name: link.name,
 		integrationId: link.integrationId,
 		userLinkId: link.id,
+		accessToken: link.accessToken,
+		config: link.config,
 	}));
 };
 
@@ -53,7 +43,12 @@ export const getEnabledIntegrationTypes = (
 ): IntegrationName[] => {
 	return userIntegrations
 		.map((i) => i.type)
-		.filter((type) => integrationToolRegistry[type] !== undefined);
+		.filter(
+			(type) =>
+				integrationToolRegistry[
+					type as keyof typeof integrationToolRegistry
+				] !== undefined,
+		);
 };
 
 export const getCapabilities = ({ tools }: { tools: Record<string, Tool> }) => {
@@ -78,51 +73,178 @@ export const getCapabilitiesPrompt = ({
 		.join("\n");
 };
 
-export const createAgentFromDB = async ({
-	agentId,
-	teamId,
-	config,
-}: {
+interface CreateAgentFromDBParams {
 	agentId?: string;
 	teamId: string;
+	toolboxes?: Record<string, Record<string, unknown>>;
+	defaultActiveToolboxes?: string[];
+	defaultActiveTools?: string[];
 	config: Partial<AgentConfig>;
-}) => {
-	let dbConfig: AgentConfig = {
-		name: "MIMIR",
-		description: "Your AI assistant.",
-		model: gateway(AGENT_DEFAULT_MODEL),
-	};
+}
 
-	// Fetch agent configuration from database
+const DEFAULT_AGENT_CONFIG: AgentConfig = {
+	name: "MIMIR",
+	description: "Your AI assistant.",
+	model: AGENT_DEFAULT_MODEL,
+};
+
+/**
+ * Loads agent config from the database (if an agentId is provided)
+ * and falls back to a sensible default otherwise.
+ */
+async function resolveAgentConfig(agentId: string | undefined, teamId: string) {
 	const agent = await getAgentById({ id: agentId, teamId });
-	if (agent) {
-		if (!agent.isActive) {
-			throw new Error(`Agent ${agent.name} is not active`);
-		}
 
-		dbConfig = {
-			name: agent.name,
-			description: agent.description || "",
-			model: gateway(agent.model || AGENT_DEFAULT_MODEL),
+	if (!agent) {
+		return {
+			dbConfig: DEFAULT_AGENT_CONFIG,
+			agent: null,
+			restrictedToolboxes: [] as string[],
 		};
 	}
 
-	// Create agent configuration from database values
-	const agentConfig = {
+	if (!agent.isActive) {
+		throw new Error(`Agent ${agent.name} is not active`);
+	}
+
+	const dbConfig: AgentConfig = {
+		name: agent.name,
+		description: agent.description || "",
+		model: agent.model || AGENT_DEFAULT_MODEL,
+	};
+
+	return {
+		dbConfig,
+		agent,
+		restrictedToolboxes: agent.activeToolboxes ?? [],
+	};
+}
+
+/**
+ * Resolves which toolboxes are available for the agent to switch into.
+ * Excludes toolboxes that are already active by default, and optionally
+ * restricts the set to only those the agent is explicitly allowed to use.
+ */
+function resolveAvailableToolboxes(
+	allToolboxes: Record<string, Record<string, unknown>> | undefined,
+	defaultActiveToolboxes: string[] | undefined,
+	restrictedToolboxes: string[],
+): string[] {
+	const allNames = Object.keys(allToolboxes ?? {});
+	const defaultSet = new Set(defaultActiveToolboxes ?? []);
+
+	let available = allNames.filter((tb) => !defaultSet.has(tb));
+
+	if (restrictedToolboxes.length > 0) {
+		const allowed = new Set(restrictedToolboxes);
+		available = available.filter((tb) => allowed.has(tb));
+	}
+
+	return available;
+}
+
+/**
+ * Builds the flat list of tool names that are active on every step
+ * (before the agent switches into an optional toolbox).
+ */
+function buildDefaultActiveTools(
+	defaultActiveTools: string[] | undefined,
+	defaultActiveToolboxes: string[] | undefined,
+	toolboxes: Record<string, Record<string, unknown>> | undefined,
+): string[] {
+	const tools = ["switchToolbox", ...(defaultActiveTools ?? [])];
+
+	for (const tb of defaultActiveToolboxes ?? []) {
+		tools.push(...Object.keys(toolboxes?.[tb] ?? {}));
+	}
+
+	return tools;
+}
+
+/**
+ * Finds the last toolbox the agent switched into during the current run
+ * and returns the name, or `undefined` if none was used.
+ */
+function getLastSwitchedToolbox(
+	steps: Array<{ toolCalls: Array<{ toolName: string; input: unknown }> }>,
+): string | undefined {
+	const lastSwitch = steps
+		.flatMap((s) => s.toolCalls)
+		.filter((tc) => tc.toolName === "switchToolbox")
+		.pop();
+
+	return (lastSwitch?.input as { toolbox?: string })?.toolbox;
+}
+
+/**
+ * Create an agent whose config, model, and personality ("soul") are
+ * loaded from the database. Falls back to sensible defaults when no
+ * agentId is provided or the agent record doesn't exist.
+ */
+export const createAgentFromDB = async ({
+	agentId,
+	teamId,
+	toolboxes,
+	defaultActiveToolboxes,
+	defaultActiveTools,
+	config,
+}: CreateAgentFromDBParams) => {
+	const { dbConfig, agent, restrictedToolboxes } = await resolveAgentConfig(
+		agentId,
+		teamId,
+	);
+
+	const availableToolboxes = resolveAvailableToolboxes(
+		toolboxes,
+		defaultActiveToolboxes,
+		restrictedToolboxes,
+	);
+
+	const alwaysActiveTools = buildDefaultActiveTools(
+		defaultActiveTools,
+		defaultActiveToolboxes,
+		toolboxes,
+	);
+
+	const agentConfig: AgentConfig = {
 		...dbConfig,
+
+		prepareStep: async ({ steps }) => {
+			const switchedToolbox = getLastSwitchedToolbox(steps);
+
+			if (switchedToolbox) {
+				const toolboxTools = Object.keys(toolboxes?.[switchedToolbox] ?? {});
+				return {
+					activeTools: [...toolboxTools, ...alwaysActiveTools] as never[],
+				};
+			}
+
+			return { activeTools: alwaysActiveTools as never[] };
+		},
+
+		// Spread caller-provided config (tools, stopWhen, callbacks, etc.)
 		...config,
+
+		// Always wrap buildInstructions so we can inject toolbox & soul context
 		buildInstructions: (ctx: AppContext) => {
-			const soul = agent?.soul || "You are a helpful AI assistant.";
-			const systemPrompt = config.buildInstructions?.(ctx) ?? "";
+			const soul = agent?.soul ?? "You are a helpful AI assistant.";
+			const callerPrompt = config.buildInstructions?.(ctx) ?? "";
 
 			return `
+<toolboxes>
+IMPORTANT: Your capabilities might be limited, but you can gain access to more tools by using the switchToolbox tool. Available toolboxes are:
+${availableToolboxes.map((tb) => `- ${tb}`).join("\n")}
+
+Switching to a toolbox will grant you access to the tools within it, which can help you complete your tasks.
+Example: calling switchToolbox with the {toolbox: "github"} object parameter will give you access to tools that let you interact with GitHub, such as listing pull requests, creating issues, etc.
+</toolboxes>
+
 <soul>
 This is your soul definition, use it to guide your behavior and responses:
 ${soul}
 </soul>
-			
-${systemPrompt}
-			`;
+
+${callerPrompt}`;
 		},
 	};
 

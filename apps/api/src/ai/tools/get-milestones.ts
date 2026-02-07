@@ -2,7 +2,7 @@ import { getMilestones } from "@mimir/db/queries/milestones";
 import { getAppUrl } from "@mimir/utils/envs";
 import { tool } from "ai";
 import z from "zod";
-import type { AppContext } from "../agents/config/shared";
+import { getToolContext } from "../agents/config/shared";
 
 export const getMilestonesToolSchema = z.object({
 	search: z.string().optional().describe("Search query"),
@@ -19,8 +19,7 @@ export const getMilestonesTool = tool({
 	inputSchema: getMilestonesToolSchema,
 	execute: async function* ({ search, ...input }, executionOptions) {
 		try {
-			const { userId, teamId } =
-				executionOptions.experimental_context as AppContext;
+			const { userId, teamId } = getToolContext(executionOptions);
 
 			const result = await getMilestones({
 				...input,

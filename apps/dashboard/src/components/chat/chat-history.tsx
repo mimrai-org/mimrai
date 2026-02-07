@@ -53,12 +53,11 @@ export const ChatHistory = () => {
 	);
 
 	return (
-		<div className="flex flex-col gap-2 px-4">
+		<div className="flex flex-col gap-2">
 			<Link href={`${user.basePath}/chat`}>
 				<Button
 					type="button"
-					variant={"secondary"}
-					size={"sm"}
+					variant={"default"}
 					className="w-full justify-start text-left"
 				>
 					<PlusIcon />
@@ -76,44 +75,43 @@ export const ChatHistory = () => {
 				/>
 				<SearchIcon className="-translate-y-1/2 absolute top-1/2 left-3 size-4 text-muted-foreground" />
 			</div>
-			{chatHistory?.map((chat) => (
-				<ContextMenu key={chat.id}>
-					<ContextMenuTrigger asChild>
-						<Link href={`${user.basePath}/chat/${chat.id}`}>
-							<button
-								type="button"
-								className={cn(
-									"w-full rounded-sm px-2 py-1 text-left text-sm hover:bg-accent/60",
-									{
-										"bg-accent": chat.id === chatId,
-									},
-								)}
+			<div>
+				{chatHistory?.map((chat) => (
+					<ContextMenu key={chat.id}>
+						<ContextMenuTrigger asChild>
+							<Link href={`${user.basePath}/chat/${chat.id}`}>
+								<button
+									type="button"
+									className={cn(
+										"w-full rounded-sm px-2 py-2 text-left text-sm hover:bg-accent/30",
+										{
+											"bg-accent": chat.id === chatId,
+										},
+									)}
+								>
+									<div className="truncate">
+										{chat.title || "Untitled chat"}
+									</div>
+								</button>
+							</Link>
+						</ContextMenuTrigger>
+						<ContextMenuContent>
+							<ContextMenuItem
+								variant="destructive"
+								disabled={isDeleting}
+								onSelect={() => {
+									deleteChat({
+										chatId: chat.id,
+									});
+								}}
 							>
-								<div>{chat.title || "Untitled chat"}</div>
-								<div className="flex justify-start">
-									<span className="text-muted-foreground text-xs">
-										{formatRelative(new Date(chat.updatedAt!), new Date())}
-									</span>
-								</div>
-							</button>
-						</Link>
-					</ContextMenuTrigger>
-					<ContextMenuContent>
-						<ContextMenuItem
-							variant="destructive"
-							disabled={isDeleting}
-							onSelect={() => {
-								deleteChat({
-									chatId: chat.id,
-								});
-							}}
-						>
-							<TrashIcon />
-							Delete
-						</ContextMenuItem>
-					</ContextMenuContent>
-				</ContextMenu>
-			))}
+								<TrashIcon />
+								Delete
+							</ContextMenuItem>
+						</ContextMenuContent>
+					</ContextMenu>
+				))}
+			</div>
 		</div>
 	);
 };

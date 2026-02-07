@@ -1,12 +1,9 @@
-import { openai } from "@ai-sdk/openai";
 import { updateTaskExecution } from "@mimir/db/queries/task-executions";
 import type { TaskExecutionMemory } from "@mimir/db/schema";
 import type { IntegrationName } from "@mimir/integration/registry";
 import { tool } from "ai";
 import z from "zod";
-import { researchTools, taskManagementTools } from "../tools/tool-registry";
-import { type AgentConfig, createAgent } from "./config/agent";
-import type { AppContext } from "./config/shared";
+import { type AppContext, getToolContext } from "./config/shared";
 
 /**
  * Task Executor Agent - Autonomous task execution by AI agent
@@ -28,6 +25,7 @@ export interface TaskExecutorContext extends AppContext {
 		milestone?: string;
 		milestoneId?: string;
 		dueDate?: string;
+		attachments?: string[];
 		labels?: Array<{ id: string; name: string }>;
 		checklistItems?: Array<{
 			id: string;
@@ -103,6 +101,7 @@ You first need to analyze the task to understand its requirements and context.
 	 - Use getUsers to identify potential collaborators.
 	 - Use getChecklistItems to review any existing checklist items.
 	 - Use getStatuses to understand current task status and possible transitions.
+	 - If the task has attachments, use getTaskAttachment to review their content.
 3. Communicate any issues encountered.
 4. Only create checklist items if the task is genuinely complex and requires breaking down into multiple distinct sub-tasks. Avoid creating checklist items for simple tasks or when you can complete the work directly.
    - When creating checklist items, assign them to the most appropriate person, preferring others over yourself unless the sub-task specifically requires your expertise.
@@ -129,6 +128,7 @@ IMPORTANT (status updates):
 	- Do not communicate progress in your response; focus on task delivery.
 	- Do not ask for next steps; if the task is not completed autonomously continue with the next logical action.
 	- Do not update the task description unless explicitly instructed.
+	- When talking about checklist items, tasks, statuses, or projects, always refer to MIMRAI data unless explicitly instructed otherwise.
 </rules>
 
 
@@ -188,6 +188,7 @@ IMPORTANT:
  - Do NOT modify the parent task status.
  - Mark the checklist item as completed using updateChecklistItem when done.
  - If you cannot complete the item, explain why and what is needed.
+ - When talking about checklist items, tasks, statuses, or projects, always refer to MIMRAI data unless explicitly instructed otherwise.
 </workflow>
 
 <rules>
@@ -255,6 +256,8 @@ Project: ${task.project || "No project"} (ID: ${task.projectId || "N/A"})
 Milestone: ${task.milestone || "No milestone"} (ID: ${task.milestoneId || "N/A"})
 Due Date: ${task.dueDate || "Not set"}
 Labels: ${task.labels?.map((l) => l.name).join(", ") || "None"}
+Attachments (to get an attachment plain text, use the getTaskAttachment tool): 
+${task.attachments?.map((a) => a).join("\n") || "None"}
 
 Checklist Items:
 ${checklistText}`;
@@ -293,8 +296,7 @@ export const updateTaskMemoryTool = tool({
 		}),
 	}),
 	execute: async ({ memory }, executionOptions) => {
-		const { task } =
-			executionOptions.experimental_context as TaskExecutorContext;
+		const { task } = getToolContext(executionOptions) as TaskExecutorContext;
 		const updated = await updateTaskExecution({
 			taskId: task.id,
 			memory: memory,

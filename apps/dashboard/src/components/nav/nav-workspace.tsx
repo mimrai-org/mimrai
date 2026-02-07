@@ -71,7 +71,7 @@ export const NavWorkspace = () => {
 				</NavItem>
 			</Link>
 
-			<Link href={`${pathname}/settings`}>
+			<Link href={`${pathname}/settings/general`}>
 				<NavItem>
 					<NavItemIcon>
 						<FolderIcon />

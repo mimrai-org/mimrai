@@ -16,6 +16,7 @@ import { inboxRouter } from "./inbox";
 import { intakesRouter } from "./intakes";
 import { integrationsRouter } from "./integrations";
 import { labelsRouter } from "./labels";
+import { mcpServersRouter } from "./mcp-servers";
 import { milestonesRouter } from "./milestones";
 import { newsletterRouter } from "./newsletter";
 import { notificationSettingsRouter } from "./notification-settings";
@@ -55,6 +56,7 @@ export const appRouter = router({
 	integrations: integrationsRouter,
 	billing: billingRouter,
 	labels: labelsRouter,
+	mcpServers: mcpServersRouter,
 	activities: activitiesRouter,
 	activitiesReactions: activitiesReactionsRouter,
 	agents: agentsRouter,

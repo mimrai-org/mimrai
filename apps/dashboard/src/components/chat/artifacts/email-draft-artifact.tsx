@@ -1,4 +1,4 @@
-import type { MessageDataParts } from "@api/ai/tools/registry";
+import type { MessageDataParts } from "@api/ai/tools/tool-registry";
 import type { UIChatMessage } from "@api/ai/types";
 
 export const EmailDraftArtifactMessage = ({

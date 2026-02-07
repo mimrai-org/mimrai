@@ -1,7 +1,7 @@
 import { createEvent } from "@mimir/integration/google-calendar";
 import { tool } from "ai";
 import z from "zod";
-import type { AppContext } from "../agents/config/shared";
+import { getToolContext } from "../agents/config/shared";
 
 export const createCalendarEventToolSchema = z.object({
 	summary: z.string().min(1).describe("Event title"),
@@ -32,8 +32,7 @@ export const createCalendarEventTool = tool({
 	inputSchema: createCalendarEventToolSchema,
 	execute: async function* (input, executionOptions) {
 		try {
-			const { userId, teamId, behalfUserId } =
-				executionOptions.experimental_context as AppContext;
+			const { userId, teamId, behalfUserId } = getToolContext(executionOptions);
 			yield {
 				text: `Creating calendar event: ${input.summary}`,
 			};

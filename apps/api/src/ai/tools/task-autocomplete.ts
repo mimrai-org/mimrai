@@ -4,7 +4,7 @@ import { getStatuses } from "@mimir/db/queries/statuses";
 import { getMembers } from "@mimir/db/queries/teams";
 import { generateObject, tool } from "ai";
 import z from "zod";
-import type { AppContext } from "../agents/config/shared";
+import { getToolContext } from "../agents/config/shared";
 
 export const taskAutocompleteTool = tool({
 	description:
@@ -37,7 +37,7 @@ export const taskAutocompleteTool = tool({
 			.describe("Array of label IDs (uuid) to be assigned to the task"),
 	}),
 	execute: async function* (input, executionOptions) {
-		const { teamId } = executionOptions.experimental_context as AppContext;
+		const { teamId } = getToolContext(executionOptions);
 		const statuses = await getStatuses({
 			pageSize: 10,
 			teamId: teamId,

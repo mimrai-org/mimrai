@@ -1,7 +1,7 @@
 import { getMembers } from "@mimir/db/queries/teams";
 import { tool } from "ai";
 import z from "zod";
-import type { AppContext } from "../agents/config/shared";
+import { getToolContext } from "../agents/config/shared";
 
 export const getTasksToolSchema = z.object({
 	search: z
@@ -14,7 +14,7 @@ export const getUsersTool = tool({
 	description: "Get members/users of your team",
 	inputSchema: getTasksToolSchema,
 	execute: async function* ({ search }, executionOptions) {
-		const { teamId } = executionOptions.experimental_context as AppContext;
+		const { teamId } = getToolContext(executionOptions);
 
 		yield { text: "Retrieving users..." };
 

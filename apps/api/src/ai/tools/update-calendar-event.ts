@@ -1,7 +1,7 @@
 import { updateEvent } from "@mimir/integration/google-calendar";
 import { tool } from "ai";
 import z from "zod";
-import type { AppContext } from "../agents/config/shared";
+import { getToolContext } from "../agents/config/shared";
 
 export const updateCalendarEventToolSchema = z.object({
 	eventId: z.string().describe("The ID of the event to update"),
@@ -31,8 +31,7 @@ export const updateCalendarEventTool = tool({
 	inputSchema: updateCalendarEventToolSchema,
 	execute: async function* (input, executionOptions) {
 		try {
-			const { userId, teamId, behalfUserId } =
-				executionOptions.experimental_context as AppContext;
+			const { userId, teamId, behalfUserId } = getToolContext(executionOptions);
 			const { eventId, ...updates } = input;
 			yield {
 				text: `Updating calendar event: ${eventId}`,

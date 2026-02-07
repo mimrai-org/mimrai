@@ -1,3 +1,4 @@
+import { getAllToolsForUser } from "@api/ai/tools/tool-registry";
 import {
 	createAgentSchema,
 	deleteAgentSchema,
@@ -65,5 +66,14 @@ export const agentsRouter = router({
 
 	getModels: protectedProcedure.query(async () => {
 		return getModels();
+	}),
+
+	getToolboxes: protectedProcedure.query(async ({ ctx }) => {
+		const { toolboxes } = await getAllToolsForUser({
+			userId: ctx.user.id,
+			teamId: ctx.user.teamId!,
+		});
+
+		return Object.keys(toolboxes);
 	}),
 });

@@ -42,12 +42,7 @@ export const createTaskExecution = async (input: CreateTaskExecutionInput) => {
 	// Check if there's already an active execution for this task
 	const existing = await getActiveTaskExecution(input.taskId);
 	if (existing) {
-		// Return existing if not in a terminal state
-		if (!["completed", "failed"].includes(existing.status)) {
-			return existing;
-		}
-		// Delete the old completed/failed execution to create a new one
-		await deleteTaskExecution(existing.id);
+		return existing;
 	}
 
 	const [execution] = await db

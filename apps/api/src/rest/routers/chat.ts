@@ -2,6 +2,7 @@ import { createAgentFromDB } from "@api/ai/agents/agent-factory";
 import { type AppContext, buildAppContext } from "@api/ai/agents/config/shared";
 import { buildWorkspaceSystemPrompt } from "@api/ai/agents/workspace-agent";
 import {
+	getAllToolsForUser,
 	getIntegrationToolsForUser,
 	researchTools,
 	taskManagementTools,
@@ -36,7 +37,7 @@ app.post("/", withPlanFeatures(["ai"]), async (c) => {
 
 	const userId = session.userId;
 
-	const [userContext, integrationTools, agentConfig, team] = await Promise.all([
+	const [userContext, allTools, agentConfig, team] = await Promise.all([
 		getUserContext({
 			userId,
 			teamId,
@@ -44,7 +45,7 @@ app.post("/", withPlanFeatures(["ai"]), async (c) => {
 			city,
 			timezone,
 		}),
-		getIntegrationToolsForUser({
+		getAllToolsForUser({
 			userId,
 			teamId,
 		}),
@@ -82,11 +83,11 @@ app.post("/", withPlanFeatures(["ai"]), async (c) => {
 	const agent = await createAgentFromDB({
 		agentId,
 		teamId,
+		toolboxes: allTools.toolboxes,
+		defaultActiveToolboxes: ["taskManagement", "research"],
 		config: {
 			tools: {
-				...taskManagementTools,
-				...integrationTools,
-				...researchTools,
+				...allTools.tools,
 			},
 			buildInstructions: buildWorkspaceSystemPrompt as (
 				ctx: AppContext,

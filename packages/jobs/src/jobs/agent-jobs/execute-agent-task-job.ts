@@ -9,11 +9,7 @@ import {
 	type TaskExecutorContext,
 	updateTaskMemoryTool,
 } from "@api/ai/agents/task-executor";
-import {
-	getIntegrationTools,
-	researchTools,
-	taskManagementTools,
-} from "@api/ai/tools/tool-registry";
+import { getAllTools } from "@api/ai/tools/tool-registry";
 import type { UIChatMessage } from "@api/ai/types";
 import { getUserContext } from "@api/ai/utils/get-user-context";
 import { checkPlanFeatures, createTokenMeter } from "@mimir/billing";
@@ -240,7 +236,7 @@ export const executeAgentTaskPlanJob = schemaTask({
 
 		// Get enabled integrations for the system user
 		const userIntegrations = await getUserAvailableIntegrations({
-			userId: agentConfig?.behalfUserId ?? agentConfig.userId,
+			userId: agentConfig?.behalfUserId ?? task.createdBy,
 			teamId,
 		});
 		const enabledIntegrations = getEnabledIntegrationTypes(userIntegrations);
@@ -267,6 +263,7 @@ export const executeAgentTaskPlanJob = schemaTask({
 				projectId: task.projectId ?? undefined,
 				milestone: task.milestone?.name ?? undefined,
 				milestoneId: task.milestoneId ?? undefined,
+				attachments: task.attachments ?? [],
 				dueDate: task.dueDate ?? undefined,
 				labels: task.labels ?? [],
 				checklistItems: task.checklistSummary?.checklist ?? [],
@@ -292,11 +289,14 @@ export const executeAgentTaskPlanJob = schemaTask({
 		});
 
 		try {
+			const { tools: allTools, toolboxes } = await getAllTools(
+				userIntegrations,
+				teamId,
+				agentConfig?.behalfUserId ?? agentConfig?.userId,
+			);
 			const tools = {
-				...taskManagementTools,
 				updateTaskMemory: updateTaskMemoryTool,
-				...researchTools,
-				...getIntegrationTools(enabledIntegrations),
+				...allTools,
 			};
 
 			const meter = createTokenMeter(team.customerId!);
@@ -304,6 +304,9 @@ export const executeAgentTaskPlanJob = schemaTask({
 			const agent = await createAgentFromDB({
 				agentId: agentConfig?.id,
 				teamId,
+				toolboxes,
+				defaultActiveToolboxes: ["taskManagement", "research"],
+				defaultActiveTools: ["updateTaskMemory"],
 				config: {
 					tools,
 					experimental_context: executorContext,
@@ -331,7 +334,7 @@ export const executeAgentTaskPlanJob = schemaTask({
 							totalTokens: meterResults?.totalTokens || 0,
 							costUSD: meterResults?.costUSD || 0,
 						});
-						logger.info("Agent finished execution", { usage, finishReason });
+						logger.info("Agent OnFinish", { usage, finishReason });
 					},
 				},
 			});
@@ -341,17 +344,21 @@ export const executeAgentTaskPlanJob = schemaTask({
 				context: executorContext,
 				message: message,
 			});
+			logger.info("Agent execution completed", { taskId });
 
 			const textResponse = response.parts
 				.filter((p) => p.type === "text")
 				.map((p) => p.text)
 				.join("\n");
 
+			// Remove xmltags from the response if any
+			const cleanedResponse = textResponse.replace(/<[^>]*>/g, "");
+
 			await createTaskComment({
 				taskId: taskId,
-				userId,
+				userId: userId,
 				teamId,
-				comment: textResponse,
+				comment: cleanedResponse,
 			});
 
 			await updateTaskExecution({

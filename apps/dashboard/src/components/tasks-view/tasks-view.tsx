@@ -117,6 +117,10 @@ export const TasksView = ({
 		...DEFAULT_FILTERS,
 		...defaultFilters,
 		...params,
+		properties:
+			(params.properties as Array<keyof typeof PropertiesComponents>) ||
+			defaultFilters?.properties ||
+			DEFAULT_FILTERS.properties,
 		assigneeId: assigneeIdWithMe,
 		projectId: projectId ? [projectId] : undefined,
 	});

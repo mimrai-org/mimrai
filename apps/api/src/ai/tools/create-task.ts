@@ -3,7 +3,7 @@ import { trackTaskCreated } from "@mimir/events/server";
 import { getTaskPermalink } from "@mimir/utils/tasks";
 import { tool } from "ai";
 import z from "zod";
-import type { AppContext } from "../agents/config/shared";
+import { getToolContext } from "../agents/config/shared";
 
 export const createTaskToolSchema = z.object({
 	title: z.string().min(1).describe("Title"),
@@ -41,8 +41,7 @@ export const createTaskTool = tool({
 	inputSchema: createTaskToolSchema,
 	execute: async function* (input, executionOptions) {
 		try {
-			const { userId, teamId, teamName } =
-				executionOptions.experimental_context as AppContext;
+			const { userId, teamId, teamName } = getToolContext(executionOptions);
 			yield {
 				text: `Creating task: ${input.title}`,
 			};

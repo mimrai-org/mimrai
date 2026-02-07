@@ -37,6 +37,7 @@ export const AgentUpdateSheet = () => {
 							name: agent.name,
 							description: agent.description || "",
 							authorizeIntegrations: agent.authorizeIntegrations,
+							activeToolboxes: agent.activeToolboxes || [],
 							model: agent.model,
 							soul: agent.soul || "",
 						}}

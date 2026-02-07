@@ -630,6 +630,7 @@ export const integrationUserLink = pgTable(
 		externalUserId: text("external_user_id").notNull(),
 		externalUserName: text("external_user_name"),
 		integrationId: text("integration_id"),
+		mcpServerId: text("mcp_server_id"),
 		integrationType: text("integration_type").$type<IntegrationName>(),
 		accessToken: text("access_token"),
 		refreshToken: text("refresh_token"),
@@ -645,11 +646,26 @@ export const integrationUserLink = pgTable(
 			table.userId,
 			table.externalUserId,
 		),
+		unique("unique_mcp_server_user").on(
+			table.mcpServerId,
+			table.userId,
+			table.externalUserId,
+		),
 		foreignKey({
 			columns: [table.userId],
 			foreignColumns: [users.id],
 			name: "integration_user_link_user_id_fkey",
 		}),
+		foreignKey({
+			columns: [table.integrationId],
+			foreignColumns: [integrations.id],
+			name: "integration_user_link_integration_id_fkey",
+		}).onDelete("cascade"),
+		foreignKey({
+			columns: [table.mcpServerId],
+			foreignColumns: [mcpServers.id],
+			name: "integration_user_link_mcp_server_id_fkey",
+		}).onDelete("cascade"),
 	],
 );
 
@@ -1111,6 +1127,7 @@ export const agents = pgTable(
 		authorizeIntegrations: boolean("authorize_integrations")
 			.default(false)
 			.notNull(),
+		activeToolboxes: text("active_toolboxes").array().default([]).notNull(),
 
 		createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
 			.defaultNow()
@@ -1802,6 +1819,56 @@ export const taskViews = pgTable(
 			columns: [table.projectId],
 			foreignColumns: [projects.id],
 			name: "task_views_project_id_fkey",
+		}).onDelete("cascade"),
+	],
+);
+
+export const mcpTransportTypeEnum = pgEnum("mcp_transport_type", [
+	"http",
+	"sse",
+]);
+
+export interface McpServerConfig {
+	url: string;
+	headers?: Record<string, string>;
+	scopes?: string[];
+}
+
+export const mcpServers = pgTable(
+	"mcp_servers",
+	{
+		id: text("id")
+			.$defaultFn(() => randomUUID())
+			.primaryKey()
+			.notNull(),
+		teamId: text("team_id").notNull(),
+		name: text("name").notNull(),
+		description: text("description"),
+		transport: mcpTransportTypeEnum("transport").default("http").notNull(),
+		config: jsonb("config").$type<McpServerConfig>().notNull(),
+		isActive: boolean("is_active").default(true).notNull(),
+		createdBy: text("created_by").notNull(),
+		createdAt: timestamp("created_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
+		updatedAt: timestamp("updated_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
+	},
+	(table) => [
+		index("mcp_servers_team_id_index").using("btree", table.teamId),
+		unique("unique_mcp_server_name_per_team").on(table.name, table.teamId),
+		foreignKey({
+			columns: [table.teamId],
+			foreignColumns: [teams.id],
+			name: "mcp_servers_team_id_fkey",
+		}).onDelete("cascade"),
+		foreignKey({
+			columns: [table.createdBy],
+			foreignColumns: [users.id],
+			name: "mcp_servers_created_by_fkey",
 		}).onDelete("cascade"),
 	],
 );

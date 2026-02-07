@@ -9,6 +9,9 @@ import {
 import {
 	convertToModelMessages,
 	createUIMessageStream,
+	type GatewayModelId,
+	gateway,
+	smoothStream,
 	ToolLoopAgent,
 	type ToolLoopAgentSettings,
 	type UIMessage,
@@ -112,7 +115,9 @@ export const createAgent = (config: AgentConfig) => {
 						params.message,
 						params.context,
 						responseMessage,
-					);
+					).catch((err) => {
+						console.error("Error saving conversation:", err);
+					});
 					params.onFinish?.({ responseMessage });
 				},
 				onError: (error) => {
@@ -126,7 +131,7 @@ export const createAgent = (config: AgentConfig) => {
 						...params,
 						context: {
 							...params.context,
-							writter: writer,
+							writer: writer,
 						},
 					});
 
@@ -169,19 +174,29 @@ export const createAgent = (config: AgentConfig) => {
 
 					const stream = await agent.stream({
 						messages: modelMessages,
+						experimental_transform: smoothStream({ chunking: "word" }),
 					});
 					writer.merge(stream.toUIMessageStream());
 				},
 			});
 		},
-		async generate(params: AgentGenerateParams) {
+		async generate(params: AgentGenerateParams & { timeoutMs?: number }) {
+			const timeout = params.timeoutMs ?? 10 * 60 * 1000; // 10 minutes default
+
 			return new Promise<UIChatMessage>((resolve, reject) => {
+				const timer = setTimeout(() => {
+					reject(new Error(`Agent generate timed out after ${timeout}ms`));
+				}, timeout);
+
 				(async () => {
+					let resolved = false;
+
 					const stream = await this.stream({
 						...params,
 						onFinish: ({ responseMessage }) => {
+							resolved = true;
+							clearTimeout(timer);
 							params.onFinish?.({ responseMessage });
-							console.log("Agent generate finished:", responseMessage);
 							resolve(responseMessage as UIChatMessage);
 						},
 					});
@@ -189,13 +204,27 @@ export const createAgent = (config: AgentConfig) => {
 					const reader = stream.getReader();
 					try {
 						while (true) {
+							if (resolved) break;
 							const { done } = await reader.read();
 							if (done) break;
 						}
 					} finally {
 						reader.releaseLock();
 					}
-				})();
+
+					// Stream ended without onFinish firing
+					if (!resolved) {
+						clearTimeout(timer);
+						reject(
+							new Error(
+								"Agent stream ended without producing a response message.",
+							),
+						);
+					}
+				})().catch((err) => {
+					clearTimeout(timer);
+					reject(err);
+				});
 			});
 		},
 	};

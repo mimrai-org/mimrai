@@ -1,5 +1,6 @@
+import type { IntegrationName } from "@mimir/integration/registry";
 import type { UIMessage } from "ai";
-import type { MessageDataParts } from "./tools/registry";
+import type { MessageDataParts } from "./tools/tool-registry";
 import type { ContextItem } from "./utils/format-context-items";
 
 // Define UITools as a generic type to avoid circular dependencies
@@ -23,3 +24,16 @@ export type UIChatMessage = UIMessage<
 	MessageDataParts,
 	UITools
 >;
+
+/**
+ * Information about a user's linked integration.
+ * Used when resolving which integration tools an agent can access.
+ */
+export interface UserIntegrationInfo {
+	type: IntegrationName;
+	name: string;
+	integrationId: string;
+	userLinkId: string;
+	accessToken?: string;
+	config?: Record<string, unknown>;
+}

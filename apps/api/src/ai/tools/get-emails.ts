@@ -1,7 +1,7 @@
 import { getEmails } from "@mimir/integration/gmail";
 import { tool } from "ai";
 import z from "zod";
-import type { AppContext } from "../agents/config/shared";
+import { getToolContext } from "../agents/config/shared";
 
 export const getEmailsToolSchema = z.object({
 	q: z
@@ -24,8 +24,7 @@ export const getEmailsTool = tool({
 	inputSchema: getEmailsToolSchema,
 	execute: async function* ({ q, maxResults, pageToken }, executionOptions) {
 		try {
-			const { userId, writter, behalfUserId } =
-				executionOptions.experimental_context as AppContext;
+			const { userId, writer, behalfUserId } = getToolContext(executionOptions);
 
 			const result = await getEmails({
 				userId: behalfUserId,
@@ -55,9 +54,9 @@ export const getEmailsTool = tool({
 				threadId: email.threadId,
 			}));
 
-			if (writter) {
+			if (writer) {
 				for (const email of mappedEmails) {
-					writter.write({
+					writer.write({
 						type: "data-email",
 						data: email,
 					});
