@@ -1,7 +1,7 @@
 import { fetchModels } from "tokenlens";
 
 export const AGENT_DEFAULT_NAME = "Mimir";
-export const AGENT_DEFAULT_MODEL = "xai/grok-4.1-fast-reasoning";
+export const AGENT_DEFAULT_MODEL = "openai/gpt-5";
 
 export interface Model {
 	name: string;
