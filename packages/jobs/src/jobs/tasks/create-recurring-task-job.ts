@@ -65,6 +65,7 @@ export const createRecurringTaskJob = schemaTask({
 				labels: originalLabels.map((l) => l.labels.id),
 				attachments: originalTask.attachments,
 				teamId: originalTask.teamId,
+				projectId: originalTask.projectId,
 				mentions: originalTask.mentions,
 			});
 
