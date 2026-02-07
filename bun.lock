@@ -492,11 +492,13 @@
       "devDependencies": {
         "@ai-sdk/openai": "3.0.23",
         "@mimir/db": "workspace:*",
+        "@mimir/integration": "workspace:*",
         "@mimir/realtime": "workspace:*",
         "@mimir/tsconfig": "workspace:*",
         "@trpc/server": "^11.6.0",
         "ai": "6.0.64",
         "drizzle-orm": "catalog:",
+        "googleapis": "^169.0.0",
         "typescript": "^5.9.2",
         "zod": "catalog:",
       },

@@ -1,6 +1,7 @@
 import { getLinkedUserByUserId } from "@mimir/db/queries/integrations";
 import { calendar } from "googleapis/build/src/apis/calendar";
 import { oauth2Client } from ".";
+import type { GoogleCalendarEvent } from "./types";
 
 export const getEvents = async ({
 	userId,
@@ -17,7 +18,7 @@ export const getEvents = async ({
 		orderBy?: "startTime" | "updated"; // Order by start time or last updated
 		singleEvents?: boolean; // Whether to expand recurring events
 	};
-}) => {
+}): Promise<GoogleCalendarEvent[]> => {
 	const link = await getLinkedUserByUserId({
 		userId,
 		integrationType: "google-calendar",
@@ -45,5 +46,5 @@ export const getEvents = async ({
 		singleEvents: filters?.singleEvents ?? true,
 	});
 
-	return response.data.items || [];
+	return (response.data.items || []) as GoogleCalendarEvent[];
 };

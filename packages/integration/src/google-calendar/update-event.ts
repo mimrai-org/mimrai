@@ -1,6 +1,7 @@
 import { getLinkedUserByUserId } from "@mimir/db/queries/integrations";
 import { calendar } from "googleapis/build/src/apis/calendar";
 import { oauth2Client } from ".";
+import type { GoogleCalendarEvent } from "./types";
 
 export const updateEvent = async ({
 	userId,
@@ -18,7 +19,7 @@ export const updateEvent = async ({
 		description: string;
 		location: string;
 	}>;
-}) => {
+}): Promise<GoogleCalendarEvent> => {
 	const link = await getLinkedUserByUserId({
 		userId,
 		integrationType: "google-calendar",
@@ -42,5 +43,5 @@ export const updateEvent = async ({
 		requestBody: event,
 	});
 
-	return response.data;
+	return response.data as GoogleCalendarEvent;
 };

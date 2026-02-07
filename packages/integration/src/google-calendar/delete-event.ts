@@ -10,7 +10,7 @@ export const deleteEvent = async ({
 	userId: string;
 	teamId: string;
 	eventId: string;
-}) => {
+}): Promise<{ success: boolean }> => {
 	const link = await getLinkedUserByUserId({
 		userId,
 		integrationType: "google-calendar",

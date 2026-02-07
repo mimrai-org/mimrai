@@ -3,7 +3,7 @@ import { getToolContext } from "@api/ai/agents/config/shared";
 import { generateText, stepCountIs, tool } from "ai";
 import { z } from "zod";
 
-interface SourceItem {
+export interface SourceItem {
 	url: string;
 	title: string;
 	publishedDate?: string;
