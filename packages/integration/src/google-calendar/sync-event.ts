@@ -2,7 +2,7 @@ import { db } from "@mimir/db/client";
 import { getLinkedUserByUserId } from "@mimir/db/queries/integrations";
 import { tasks, teams, users } from "@mimir/db/schema";
 import { getAppUrl } from "@mimir/utils/envs";
-import { eq, inArray } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { calendar } from "googleapis/build/src/apis/calendar";
 import { oauth2Client } from ".";
 

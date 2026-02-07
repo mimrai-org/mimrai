@@ -1,7 +1,7 @@
 import { createDraftEmail } from "@mimir/integration/gmail";
 import { tool } from "ai";
 import z from "zod";
-import type { AppContext } from "../agents/config/shared";
+import { getToolContext } from "../agents/config/shared";
 
 export const createDraftEmailTool = tool({
 	description: "Create a draft email in Gmail",
@@ -11,15 +11,26 @@ export const createDraftEmailTool = tool({
 		body: z.string().min(1).describe("Body content of the email"),
 	}),
 	execute: async function* (input, executionOptions) {
-		const { teamId, userId } =
-			executionOptions.experimental_context as AppContext;
+		const { teamId, behalfUserId, userId, writer } =
+			getToolContext(executionOptions);
 
 		const draft = await createDraftEmail({
 			to: input.to,
 			subject: input.subject,
 			body: input.body,
-			userId: userId,
+			userId: behalfUserId,
 		});
+
+		if (writer) {
+			writer.write({
+				type: "data-email-draft",
+				data: {
+					recipient: input.to,
+					subject: input.subject,
+					body: input.body,
+				},
+			});
+		}
 
 		yield {
 			type: "text",

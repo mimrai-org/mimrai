@@ -1,9 +1,9 @@
 import { openai } from "@ai-sdk/openai";
-import type { AppContext } from "@api/ai/agents/config/shared";
+import { getToolContext } from "@api/ai/agents/config/shared";
 import { generateText, stepCountIs, tool } from "ai";
 import { z } from "zod";
 
-interface SourceItem {
+export interface SourceItem {
 	url: string;
 	title: string;
 	publishedDate?: string;
@@ -16,7 +16,7 @@ export const webSearchTool = tool({
 		query: z.string().describe("Search query"),
 	}),
 	execute: async ({ query }, executionOptions) => {
-		const appContext = executionOptions.experimental_context as AppContext;
+		const appContext = getToolContext(executionOptions);
 
 		try {
 			const result = await generateText({

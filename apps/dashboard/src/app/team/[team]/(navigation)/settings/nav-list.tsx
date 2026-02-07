@@ -2,6 +2,7 @@
 import { t } from "@mimir/locale";
 import {
 	BellIcon,
+	BotIcon,
 	CableIcon,
 	CircleDashedIcon,
 	CloudUploadIcon,
@@ -9,6 +10,7 @@ import {
 	FolderIcon,
 	KeyRoundIcon,
 	MaximizeIcon,
+	ServerIcon,
 	SettingsIcon,
 	SparklesIcon,
 	TagsIcon,
@@ -26,80 +28,83 @@ import {
 } from "@/components/nav/nav-item";
 import { useUser } from "@/components/user-provider";
 
+export const getSettingsLinks = (basePath: string) => [
+	{
+		icon: SettingsIcon,
+		to: `${basePath}/settings/general`,
+		label: t("settings.sidebar.general"),
+	},
+	{
+		icon: UserIcon,
+		to: `${basePath}/settings/profile`,
+		label: t("settings.sidebar.profile"),
+	},
+	{
+		icon: CreditCardIcon,
+		to: `${basePath}/settings/billing`,
+		label: t("settings.sidebar.billing"),
+		scopes: ["team:write"],
+	},
+	{
+		icon: UsersIcon,
+		to: `${basePath}/settings/members`,
+		label: t("settings.sidebar.members"),
+	},
+	{
+		icon: TagsIcon,
+		to: `${basePath}/settings/labels`,
+		label: t("settings.sidebar.labels"),
+	},
+	{
+		icon: CircleDashedIcon,
+		to: `${basePath}/settings/statuses`,
+		label: t("settings.sidebar.statuses"),
+	},
+	{
+		icon: BellIcon,
+		to: `${basePath}/settings/notifications`,
+		label: t("settings.sidebar.notifications"),
+	},
+	{
+		icon: BotIcon,
+		to: `${basePath}/settings/agents`,
+		label: "Agents",
+		scopes: ["team:write"],
+	},
+	{
+		icon: SparklesIcon,
+		to: `${basePath}/settings/autopilot`,
+		label: "Autopilot",
+		scopes: ["team:write"],
+	},
+	{
+		icon: CableIcon,
+		to: `${basePath}/settings/integrations`,
+		label: t("settings.sidebar.integrations"),
+	},
+	{
+		icon: KeyRoundIcon,
+		to: `${basePath}/settings/api-keys`,
+		label: "API Keys",
+	},
+	{
+		icon: ServerIcon,
+		to: `${basePath}/settings/mcp-servers`,
+		label: "MCP Servers",
+	},
+	{
+		icon: CloudUploadIcon,
+		to: `${basePath}/settings/import`,
+		label: t("settings.sidebar.import"),
+	},
+];
+
 export const NavList = () => {
 	const user = useUser();
 
-	const addTeamToUrl = (url: string) => {
-		if (!user?.team) return url;
-		return `${user?.basePath}${url}`;
-	};
-
 	const settingsLinks = useMemo(() => {
-		return [
-			{
-				icon: SettingsIcon,
-				to: addTeamToUrl("/settings/general"),
-				label: t("settings.sidebar.general"),
-			},
-			{
-				icon: UserIcon,
-				to: addTeamToUrl("/settings/profile"),
-				label: t("settings.sidebar.profile"),
-			},
-			{
-				icon: CreditCardIcon,
-				to: addTeamToUrl("/settings/billing"),
-				label: t("settings.sidebar.billing"),
-				scopes: ["team:write"],
-			},
-			{
-				icon: UsersIcon,
-				to: addTeamToUrl("/settings/members"),
-				label: t("settings.sidebar.members"),
-			},
-			{
-				icon: TagsIcon,
-				to: addTeamToUrl("/settings/labels"),
-				label: t("settings.sidebar.labels"),
-			},
-			{
-				icon: CircleDashedIcon,
-				to: addTeamToUrl("/settings/statuses"),
-				label: t("settings.sidebar.statuses"),
-			},
-			{
-				icon: BellIcon,
-				to: addTeamToUrl("/settings/notifications"),
-				label: t("settings.sidebar.notifications"),
-			},
-			{
-				icon: SparklesIcon,
-				to: addTeamToUrl("/settings/autopilot"),
-				label: "Autopilot",
-				scopes: ["team:write"],
-			},
-			{
-				icon: MaximizeIcon,
-				to: addTeamToUrl("/settings/zen"),
-				label: "Zen Mode",
-			},
-			{
-				icon: CableIcon,
-				to: addTeamToUrl("/settings/integrations"),
-				label: t("settings.sidebar.integrations"),
-			},
-			{
-				icon: KeyRoundIcon,
-				to: addTeamToUrl("/settings/api-keys"),
-				label: "API Keys",
-			},
-			{
-				icon: CloudUploadIcon,
-				to: addTeamToUrl("/settings/import"),
-				label: t("settings.sidebar.import"),
-			},
-		];
-	}, [user]);
+		return getSettingsLinks(user.basePath);
+	}, [user.basePath]);
 
 	if (!user) return null;
 

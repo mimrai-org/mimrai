@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { useUser } from "@/components/user-provider";
 import { trpc } from "@/utils/trpc";
+import { StatusIcon } from "../status-icon";
 import {
 	PropertyDueDate,
 	PropertyPriority,
@@ -35,7 +36,7 @@ export const NavTopTasks = () => {
 							href={`${user?.basePath}/projects/${task.projectId}/${task.id}`}
 						>
 							<div className="flex items-center gap-2 rounded-md px-2 py-2 text-sm hover:bg-accent dark:hover:bg-accent/30">
-								<LayersIcon className="size-4 text-muted-foreground" />
+								<StatusIcon type={task.status.type} className="size-4" />
 								<span className="text-muted-foreground">
 									{user?.team?.prefix}-{task.sequence}
 								</span>
@@ -52,6 +53,7 @@ export const NavTopTasks = () => {
 						<Button
 							variant="ghost"
 							className="p-2 font-normal text-muted-foreground"
+							size="sm"
 						>
 							View my tasks
 							<ArrowRight />

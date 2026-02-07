@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-	devIndicators: false,
 	poweredByHeader: false,
 	reactStrictMode: true,
 	typescript: {
@@ -9,9 +8,6 @@ const nextConfig: NextConfig = {
 	},
 	experimental: {
 		optimizePackageImports: [
-			"@mimir/ui",
-			"@mimir/integration",
-			"@mimir/trpc",
 			"lucide-react",
 			"react-icons",
 			"date-fns",
@@ -22,7 +18,7 @@ const nextConfig: NextConfig = {
 			"usehooks-ts",
 		],
 	},
-	transpilePackages: ["@mimir/integration", "@mimir/trpc", "@mimir/ui"],
+	transpilePackages: ["@mimir/ui"],
 	images: {
 		dangerouslyAllowLocalIP: process.env.NODE_ENV !== "production",
 		remotePatterns: [

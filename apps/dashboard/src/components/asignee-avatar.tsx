@@ -59,13 +59,11 @@ export const AssigneeAvatar = ({
 							colorClasses={colorClasses}
 						/>
 					</AvatarFallback>
-					{image && (
-						<AvatarImage
-							src={image}
-							alt={name ?? "Assignee Avatar"}
-							className="size-full object-cover"
-						/>
-					)}
+					<AvatarImage
+						src={image}
+						alt={name ?? "Assignee Avatar"}
+						className="size-full object-cover"
+					/>
 				</Avatar>
 			</TooltipTrigger>
 			<TooltipContent>{name || email}</TooltipContent>

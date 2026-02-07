@@ -1,7 +1,11 @@
-import { and, asc, eq, is, or, type SQL, sql } from "drizzle-orm";
+import { and, asc, eq, type SQL, sql } from "drizzle-orm";
 import { db } from "../index";
-import { checklistItems, users } from "../schema";
+import { checklistItems, tasks, users } from "../schema";
 import { createChecklistItemActivity } from "./activities";
+import {
+	triggerAgentOnChecklistComplete,
+	triggerAgentOnChecklistItemAssignment,
+} from "./agent-triggers";
 
 export const createChecklistItem = async ({
 	taskId,
@@ -46,6 +50,25 @@ export const createChecklistItem = async ({
 		checklistItem: item,
 		userId,
 	});
+
+	// If checklist item is assigned to an agent, trigger agent execution
+	if (assigneeId && taskId) {
+		// Get the task's assignee to compare
+		const [task] = await db
+			.select({ assigneeId: tasks.assigneeId })
+			.from(tasks)
+			.where(eq(tasks.id, taskId))
+			.limit(1);
+
+		triggerAgentOnChecklistItemAssignment({
+			taskId,
+			teamId,
+			checklistItemId: item.id,
+			assigneeId,
+			taskAssigneeId: task?.assigneeId,
+			assignedByUserId: userId,
+		});
+	}
 
 	return item;
 };
@@ -151,6 +174,46 @@ export const updateChecklistItem = async ({
 		oldChecklistItem: oldItem,
 		userId,
 	});
+
+	// If checklist item was just completed and belongs to a task,
+	// check if we should trigger agent re-evaluation
+	if (
+		isCompleted === true &&
+		oldItem.isCompleted !== true &&
+		item.taskId &&
+		teamId
+	) {
+		triggerAgentOnChecklistComplete({
+			taskId: item.taskId as string,
+			teamId,
+			checklistItemId: item.id,
+			completedByUserId: userId,
+		});
+	}
+
+	// If assignee changed and the new assignee is an agent, trigger agent execution
+	if (
+		assigneeId &&
+		assigneeId !== oldItem.assigneeId &&
+		item.taskId &&
+		teamId
+	) {
+		// Get the task's assignee to compare
+		const [task] = await db
+			.select({ assigneeId: tasks.assigneeId })
+			.from(tasks)
+			.where(eq(tasks.id, item.taskId))
+			.limit(1);
+
+		triggerAgentOnChecklistItemAssignment({
+			taskId: item.taskId,
+			teamId,
+			checklistItemId: item.id,
+			assigneeId,
+			taskAssigneeId: task?.assigneeId,
+			assignedByUserId: userId,
+		});
+	}
 
 	return item;
 };

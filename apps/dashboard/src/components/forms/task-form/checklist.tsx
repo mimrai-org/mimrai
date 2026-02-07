@@ -418,7 +418,9 @@ export const TaskChecklistItemForm = ({
 									<FormControl>
 										<DataSelectInput
 											placeholder="Assignee"
-											queryOptions={trpc.teams.getMembers.queryOptions()}
+											queryOptions={trpc.teams.getMembers.queryOptions({
+												includeSystemUsers: true,
+											})}
 											value={field.value || null}
 											onChange={(value) => field.onChange(value || undefined)}
 											getValue={(item) => item.id}

@@ -87,9 +87,29 @@ export const billingRouter = router({
 				teamId: team!.id,
 				recurringInterval: input.recurringInterval,
 			});
+			const paymentMethodsResponse = await stripeClient.paymentMethods.list({
+				customer: team.customerId,
+			});
+			const hasPaymentMethod = paymentMethodsResponse.data.length > 0;
 
 			// If subscription exists, we are upgrading/downgrading
 			if (subscription) {
+				if (!hasPaymentMethod) {
+					// create a checkout session to collect payment method first and set as default
+					const session = await stripeClient.checkout.sessions.create({
+						payment_method_types: ["card"],
+						mode: "setup",
+						customer: team!.customerId!,
+						success_url: `${getAppUrl()}/team/${team.slug}/settings/billing?checkout=success`,
+						cancel_url: `${getAppUrl()}/team/${team.slug}/settings/billing?checkout=cancel`,
+					});
+
+					return {
+						isUpgradeDowngrade: false,
+						url: session.url!,
+					};
+				}
+
 				const itemsToDelete = subscription.items.data;
 
 				// Update the existing subscription
@@ -142,6 +162,7 @@ export const billingRouter = router({
 					},
 				},
 				success_url: `${getAppUrl()}/team/${team.slug}/settings/billing?checkout=success`,
+				cancel_url: `${getAppUrl()}/team/${team.slug}/settings/billing?checkout=cancel`,
 			});
 
 			return {
@@ -159,7 +180,7 @@ export const billingRouter = router({
 
 			const result = await stripeClient.billingPortal.sessions.create({
 				customer: team!.customerId!,
-				return_url: `${getAppUrl()}/dashboard/settings/billing`,
+				return_url: `${getAppUrl()}/team/${team.slug}/settings/billing`,
 			});
 
 			return result;

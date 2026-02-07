@@ -158,6 +158,7 @@ export const getAvailableTeams = async (userId: string) => {
 			name: teams.name,
 			slug: teams.slug,
 			plan: teams.plan,
+			customerId: teams.customerId,
 			role: usersOnTeams.role,
 		})
 		.from(usersOnTeams)
@@ -172,7 +173,9 @@ export const getSystemUser = async () => {
 	const [systemUser] = await db
 		.select()
 		.from(users)
-		.where(eq(users.isSystemUser, true))
+		.where(
+			and(eq(users.isSystemUser, true), eq(users.email, "system@mimrai.com")),
+		)
 		.limit(1);
 
 	if (!systemUser) {

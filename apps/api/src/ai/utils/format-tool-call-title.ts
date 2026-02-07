@@ -1,4 +1,4 @@
-import { type ToolName, toolMetadata } from "../tools/registry";
+import { type ToolName, toolMetadata } from "../tools/tool-registry";
 
 /**
  * Formats a tool call into a descriptive title for chat sessions

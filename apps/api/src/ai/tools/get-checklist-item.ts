@@ -4,7 +4,7 @@ import { getTaskPermalink } from "@mimir/utils/tasks";
 import { tool } from "ai";
 import { and, eq } from "drizzle-orm";
 import z from "zod";
-import type { AppContext } from "../agents/config/shared";
+import { getToolContext } from "../agents/config/shared";
 
 export const getChecklistItemsSchema = z.object({
 	taskId: z.string().describe("Tasks ID"),
@@ -14,8 +14,7 @@ export const getChecklistItemsTool = tool({
 	description: "Retrieve checklist items for a specific task.",
 	inputSchema: getChecklistItemsSchema,
 	execute: async function* (input, executionOptions) {
-		const { userId, teamId } =
-			executionOptions.experimental_context as AppContext;
+		const { userId, teamId } = getToolContext(executionOptions);
 
 		const [task] = await db
 			.select()

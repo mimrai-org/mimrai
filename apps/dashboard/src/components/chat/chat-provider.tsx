@@ -5,9 +5,11 @@ import { DefaultChatTransport } from "ai";
 import { createContext, useContext, useMemo } from "react";
 import type { ChatInputMessage } from "./chat-input";
 
-type ChatContextType = ReturnType<typeof useChat<UIChatMessage>>;
+interface ChatContextValue extends ReturnType<typeof useChat<UIChatMessage>> {
+	title?: string;
+}
 
-const ChatContext = createContext<ChatContextType | null>(null);
+const ChatContext = createContext<ChatContextValue | null>(null);
 
 export const useAIChat = () => {
 	const context = useContext(ChatContext);
@@ -20,12 +22,14 @@ export const useAIChat = () => {
 interface ChatProviderProps {
 	children: React.ReactNode;
 	initialMessages?: UIChatMessage[];
+	title?: string;
 	id: string;
 }
 
 export const ChatProvider = ({
 	children,
 	initialMessages = [],
+	title,
 	id,
 }: ChatProviderProps) => {
 	const authenticatedFetch = useMemo(
@@ -54,6 +58,7 @@ export const ChatProvider = ({
 			prepareSendMessagesRequest({ messages, id }) {
 				const lastMessage = messages[messages.length - 1] as ChatInputMessage;
 
+				const agentId = lastMessage.metadata?.agentId;
 				const agentChoice = lastMessage.metadata?.agentChoice;
 				const toolChoice = lastMessage.metadata?.toolChoice;
 				const contextItems = lastMessage.metadata?.contextItems || [];
@@ -63,6 +68,7 @@ export const ChatProvider = ({
 						id,
 						message: lastMessage,
 						contextItems,
+						agentId,
 						agentChoice,
 						toolChoice,
 						timezone: new Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -72,5 +78,12 @@ export const ChatProvider = ({
 		}),
 	});
 
-	return <ChatContext.Provider value={chat}>{children}</ChatContext.Provider>;
+	const merge = useMemo(() => {
+		return {
+			...chat,
+			title,
+		};
+	}, [chat, title]);
+
+	return <ChatContext.Provider value={merge}>{children}</ChatContext.Provider>;
 };

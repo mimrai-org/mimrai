@@ -15,7 +15,9 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@ui/components/ui/tooltip";
+import { PlusIcon } from "lucide-react";
 import Link from "next/link";
+import { useProjectParams } from "@/hooks/use-project-params";
 import { trpc } from "@/utils/trpc";
 import { ProjectIcon } from "../project-icon";
 import { useUser } from "../user-provider";
@@ -23,9 +25,10 @@ import { useUser } from "../user-provider";
 export function SidebarProjects() {
 	const user = useUser();
 	const { open } = useSidebar();
+	const { setParams: setProjectParams } = useProjectParams();
 	const { data: projects } = useQuery(
 		trpc.projects.get.queryOptions({
-			pageSize: 5,
+			pageSize: 10,
 		}),
 	);
 
@@ -51,6 +54,24 @@ export function SidebarProjects() {
 							</Tooltip>
 						</SidebarMenuItem>
 					))}
+
+					<SidebarMenuItem>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<SidebarMenuButton
+									onClick={() => {
+										setProjectParams({
+											createProject: true,
+										});
+									}}
+								>
+									<PlusIcon />
+									<span>New Project</span>
+								</SidebarMenuButton>
+							</TooltipTrigger>
+							<TooltipContent side="right">Create New Project</TooltipContent>
+						</Tooltip>
+					</SidebarMenuItem>
 				</SidebarMenu>
 			</SidebarGroupContent>
 		</SidebarGroup>

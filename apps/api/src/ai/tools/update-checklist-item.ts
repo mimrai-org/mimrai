@@ -1,7 +1,7 @@
 import { updateChecklistItem } from "@mimir/db/queries/checklists";
 import { tool } from "ai";
 import z from "zod";
-import type { AppContext } from "../agents/config/shared";
+import { getToolContext } from "../agents/config/shared";
 
 export const updateChecklistItemToolSchema = z.object({
 	id: z.string().describe("Checklist Item ID"),
@@ -17,14 +17,14 @@ export const updateChecklistItemTool = tool({
 	description: "Update a specific checklist item",
 	inputSchema: updateChecklistItemToolSchema,
 	execute: async function* (input, executionOptions) {
-		const { userId, teamId } =
-			executionOptions.experimental_context as AppContext;
+		const { userId, teamId } = getToolContext(executionOptions);
 
 		const data = await updateChecklistItem({
 			id: input.id,
 			description: input.description,
 			isCompleted: input.isCompleted,
 			assigneeId: input.assigneeId,
+			userId: userId,
 			teamId: teamId,
 		});
 

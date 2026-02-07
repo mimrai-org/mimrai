@@ -121,9 +121,14 @@ export const TaskContextMenu = ({
 	);
 
 	const { data: members } = useQuery(
-		trpc.teams.getMembers.queryOptions(undefined, {
-			staleTime: ms("5 minutes"),
-		}),
+		trpc.teams.getMembers.queryOptions(
+			{
+				includeSystemUsers: true,
+			},
+			{
+				staleTime: ms("5 minutes"),
+			},
+		),
 	);
 	const { data: statuses } = useQuery(
 		trpc.statuses.get.queryOptions(

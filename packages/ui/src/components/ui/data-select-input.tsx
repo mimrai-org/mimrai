@@ -54,7 +54,7 @@ export const DataSelectInput = <
 	clearable?: boolean;
 	renderItem?: (item: T[number]) => React.ReactNode;
 	renderValue?: (item: T[number]) => React.ReactNode;
-	renderMultiple?: (items: D[]) => React.ReactNode;
+	renderMultiple?: (items: T[number][]) => React.ReactNode;
 	showChevron?: boolean;
 	multiple?: boolean;
 } & Omit<ComponentProps<typeof Button>, "value" | "onChange">) => {

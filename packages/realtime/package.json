@@ -1,24 +1,24 @@
 {
-  "name": "@mimir/realtime",
-  "version": "0.0.1",
-  "private": true,
-  "scripts": {
-    "clean": "rm -rf .turbo node_modules",
-    "lint": "biome check .",
-    "format": "biome format --write .",
-    "typecheck": "tsc --noEmit"
-  },
-  "exports": {
-    ".": "./src/index.ts"
-  },
-  "dependencies": {
-    "@upstash/realtime": "^1.0.2",
-    "@upstash/redis": "^1.36.1",
-    "zod": "catalog:"
-  },
-  "devDependencies": {
-    "@mattermost/types": "^10.12.0",
-    "@mimir/tsconfig": "workspace:*",
-    "@types/bun": "latest"
-  }
+	"name": "@mimir/realtime",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"clean": "rm -rf .turbo node_modules",
+		"lint": "biome check .",
+		"format": "biome format --write .",
+		"typecheck": "tsc --noEmit"
+	},
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"dependencies": {
+		"@upstash/realtime": "^1.0.2",
+		"@upstash/redis": "^1.36.1",
+		"zod": "catalog:"
+	},
+	"devDependencies": {
+		"@mattermost/types": "^10.12.0",
+		"@mimir/tsconfig": "workspace:*",
+		"@types/bun": "latest"
+	}
 }

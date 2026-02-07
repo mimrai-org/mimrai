@@ -1,38 +1,39 @@
 {
-  "name": "@mimir/db",
-  "private": true,
-  "scripts": {
-    "clean": "rm -rf .turbo node_modules",
-    "lint": "biome check .",
-    "format": "biome format --write .",
-    "typecheck": "tsc --noEmit",
-    "db:push": "drizzle-kit push"
-  },
-  "exports": {
-    "./client": "./src/index.ts",
-    "./queries/*": "./src/queries/*.ts",
-    "./schema": "./src/schema.ts",
-    "./job-client": "./src/job-client.ts"
-  },
-  "dependencies": {
-    "@date-fns/utc": "^2.1.1",
-    "@mimir/cache": "workspace:*",
-    "@mimir/embedding": "workspace:*",
-    "@mimir/events": "workspace:*",
-    "@mimir/logger": "workspace:*",
-    "@mimir/utils": "workspace:*",
-    "@mimir/realtime": "workspace:*",
-    "@types/pg": "^8.15.5",
-    "camelcase-keys": "^10.0.0",
-    "date-fns": "4.1.0",
-    "drizzle-orm": "catalog:",
-    "nanoid": "^5.1.6",
-    "pg": "^8.16.3",
-    "snakecase-keys": "^9.0.2"
-  },
-  "devDependencies": {
-    "@mimir/tsconfig": "workspace:*",
-    "drizzle-kit": "^0.31.4",
-    "@types/bun": "latest"
-  }
+	"name": "@mimir/db",
+	"private": true,
+	"scripts": {
+		"clean": "rm -rf .turbo node_modules",
+		"lint": "biome check .",
+		"format": "biome format --write .",
+		"typecheck": "tsc --noEmit",
+		"db:push": "drizzle-kit push"
+	},
+	"exports": {
+		"./client": "./src/index.ts",
+		"./queries/*": "./src/queries/*.ts",
+		"./schema": "./src/schema.ts",
+		"./job-client": "./src/job-client.ts"
+	},
+	"dependencies": {
+		"@date-fns/utc": "^2.1.1",
+		"@mimir/cache": "workspace:*",
+		"@mimir/embedding": "workspace:*",
+		"@mimir/events": "workspace:*",
+		"@mimir/logger": "workspace:*",
+		"@mimir/utils": "workspace:*",
+		"@mimir/realtime": "workspace:*",
+		"@trigger.dev/sdk": "catalog:",
+		"@types/pg": "^8.15.5",
+		"camelcase-keys": "^10.0.0",
+		"date-fns": "4.1.0",
+		"drizzle-orm": "catalog:",
+		"nanoid": "^5.1.6",
+		"pg": "^8.16.3",
+		"snakecase-keys": "^9.0.2"
+	},
+	"devDependencies": {
+		"@mimir/tsconfig": "workspace:*",
+		"drizzle-kit": "^0.31.4",
+		"@types/bun": "latest"
+	}
 }

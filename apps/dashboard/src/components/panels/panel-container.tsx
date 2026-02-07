@@ -96,7 +96,7 @@ export function PanelContainer({
 			}}
 			exit={{ opacity: 0, y: 50 }}
 			whileHover={{
-				y: isTopPanel ? 0 : -5,
+				y: isTopPanel ? 0 : -10,
 			}}
 			transition={{ duration: 0.15, ease: "easeInOut" }}
 			style={{
@@ -114,60 +114,62 @@ export function PanelContainer({
 				}
 			}}
 		>
-			{showCloseButton && (
-				<div className="absolute top-4 right-4 z-10 flex items-center gap-4">
-					{minimized ? (
-						<button
-							type="button"
-							className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-							onClick={() => setMinimized(false)}
-						>
-							<ArrowUpIcon className="size-3.5" />
-							<span className="sr-only">Maximize</span>
-						</button>
-					) : (
-						<button
-							type="button"
-							className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-							onClick={(e) => {
-								e.stopPropagation();
-								setMinimized(true);
-							}}
-						>
-							<ArrowDownIcon className="size-3.5" />
-							<span className="sr-only">Minimize</span>
-						</button>
-					)}
-					{maximizeLink && (
-						<Link
-							href={maximizeLink}
-							onClick={() => {
-								handleClose();
-							}}
-						>
+			<div className="relative">
+				{showCloseButton && (
+					<div className="absolute top-4 right-4 z-10 flex items-center gap-4">
+						{minimized ? (
 							<button
 								type="button"
 								className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+								onClick={() => setMinimized(false)}
 							>
-								<Maximize2Icon className="size-3.5" />
-								<span className="sr-only">Open</span>
+								<ArrowUpIcon className="size-3.5" />
+								<span className="sr-only">Maximize</span>
 							</button>
-						</Link>
-					)}
-					<button
-						type="button"
-						onClick={(e) => {
-							e.stopPropagation();
-							handleClose();
-						}}
-						className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-					>
-						<XIcon className="size-4" />
-						<span className="sr-only">Close</span>
-					</button>
-				</div>
-			)}
-			{isTopPanel ? children : null}
+						) : (
+							<button
+								type="button"
+								className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+								onClick={(e) => {
+									e.stopPropagation();
+									setMinimized(true);
+								}}
+							>
+								<ArrowDownIcon className="size-3.5" />
+								<span className="sr-only">Minimize</span>
+							</button>
+						)}
+						{maximizeLink && (
+							<Link
+								href={maximizeLink}
+								onClick={() => {
+									handleClose();
+								}}
+							>
+								<button
+									type="button"
+									className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+								>
+									<Maximize2Icon className="size-3.5" />
+									<span className="sr-only">Open</span>
+								</button>
+							</Link>
+						)}
+						<button
+							type="button"
+							onClick={(e) => {
+								e.stopPropagation();
+								handleClose();
+							}}
+							className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+						>
+							<XIcon className="size-4" />
+							<span className="sr-only">Close</span>
+						</button>
+					</div>
+				)}
+				{isTopPanel ? children : null}
+			</div>
 		</motion.div>
 	);
 

@@ -1,7 +1,8 @@
 import { generateTeamPrefix, generateTeamSlug } from "@mimir/utils/teams";
 import { and, eq, ilike, isNull, ne, not, or, type SQL } from "drizzle-orm";
+import { union } from "drizzle-orm/pg-core";
 import { db } from "..";
-import { type plansEnum, teams, users, usersOnTeams } from "../schema";
+import { agents, type plansEnum, teams, users, usersOnTeams } from "../schema";
 
 export const checkSlugExists = async (slug: string) => {
 	const [team] = await db
@@ -180,7 +181,10 @@ export const getMembers = async ({
 		eq(usersOnTeams.teamId, teamId),
 		not(isNull(usersOnTeams.userId)),
 	];
-	const systemUsersWhereClause: SQL[] = [eq(users.isSystemUser, true)];
+	const systemUsersWhereClause: SQL[] = [
+		eq(users.isSystemUser, true),
+		or(eq(users.teamId, teamId), isNull(users.teamId))!,
+	];
 
 	search && whereClause.push(ilike(users.name, `%${search}%`));
 	role && whereClause.push(eq(usersOnTeams.role, role));
@@ -195,17 +199,26 @@ export const getMembers = async ({
 			image: users.image,
 			color: users.color,
 			description: usersOnTeams.description,
+			agentDescription: agents.description,
+			agentImage: agents.avatar,
 			role: usersOnTeams.role,
 		})
 		.from(users)
 		.leftJoin(usersOnTeams, eq(users.id, usersOnTeams.userId))
+		.leftJoin(agents, eq(agents.userId, users.id))
 		.where(
 			includeSystemUsers
 				? or(and(...whereClause), and(...systemUsersWhereClause))
 				: and(...whereClause),
 		)
 		.limit(20);
-	return members;
+
+	return members.map((member) => ({
+		...member,
+		role: member.role || "agent",
+		description: member.description || member.agentDescription,
+		image: member.image || member.agentImage,
+	}));
 };
 
 export const leaveTeam = async (userId: string, teamId: string) => {

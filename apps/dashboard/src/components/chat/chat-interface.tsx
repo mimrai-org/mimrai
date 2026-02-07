@@ -13,7 +13,9 @@ export const ChatInterface = ({
 }) => {
 	return (
 		<div className={cn("flex h-full w-full flex-col")}>
-			<div className="h-full flex-1">{showMessages && <Messages />}</div>
+			<div className="flex-1 overflow-y-auto">
+				{showMessages && <Messages />}
+			</div>
 			<div className="space-y-1">
 				{showTitle && <ChatTitle />}
 				<ChatInput />

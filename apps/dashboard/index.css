@@ -1,5 +1,5 @@
 @import "@mimir/ui/index.css";
-@source "../../packages/ui";
+@source "../../packages/ui/src";
 
 @theme {
 	--animate-slide-in-top: slide-in-top 0.3s ease-in-out both;

@@ -33,7 +33,9 @@ export const tasksFilterOptions = {
 		icon: <UserIcon className="size-4!" />,
 		filterKey: "assigneeId",
 		queryOptions: trpc.teams.getMembers.queryOptions(
-			{},
+			{
+				includeSystemUsers: true,
+			},
 			{
 				select: (members) =>
 					members.map((member) => ({

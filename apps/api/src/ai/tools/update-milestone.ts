@@ -2,7 +2,7 @@ import { updateMilestone } from "@mimir/db/queries/milestones";
 import { getAppUrl } from "@mimir/utils/envs";
 import { tool } from "ai";
 import z from "zod";
-import type { AppContext } from "../agents/config/shared";
+import { getToolContext } from "../agents/config/shared";
 
 export const updateMilestoneToolSchema = z.object({
 	id: z.string().min(1).describe("ID of the milestone (uuid)"),
@@ -26,8 +26,7 @@ export const updateMilestoneTool = tool({
 	inputSchema: updateMilestoneToolSchema,
 	execute: async function* ({ ...input }, executionOptions) {
 		try {
-			const { userId, teamId } =
-				executionOptions.experimental_context as AppContext;
+			const { userId, teamId } = getToolContext(executionOptions);
 
 			const result = await updateMilestone({
 				...input,

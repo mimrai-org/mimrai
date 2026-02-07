@@ -19,7 +19,7 @@ export const Name = () => {
 					<FormControl>
 						<Input
 							variant={"ghost"}
-							className="h-10 w-full px-0 font-medium hover:bg-transparent focus:border-0 md:text-2xl dark:hover:bg-transparent"
+							className="h-10 w-full px-0 font-normal hover:bg-transparent focus:border-0 md:text-2xl dark:hover:bg-transparent"
 							placeholder="Project name"
 							autoFocus={false}
 							{...field}

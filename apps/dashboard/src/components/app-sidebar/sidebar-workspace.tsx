@@ -40,7 +40,7 @@ export function SidebarWorkspace() {
 					</SidebarMenuItem>
 					<SidebarMenuItem>
 						<SidebarMenuButton asChild>
-							<Link href={`${user.basePath}/settings`}>
+							<Link href={`${user.basePath}/settings/general`}>
 								<SettingsIcon />
 								<span>Settings</span>
 							</Link>

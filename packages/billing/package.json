@@ -11,14 +11,17 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
-		"date-fns": "^4.1.0",
+		"@mimir/cache": "workspace:*",
 		"@mimir/db": "workspace:*",
 		"@mimir/utils": "workspace:*",
-		"@mimir/cache": "workspace:*",
-		"stripe": "^19.1.0"
+		"@stripe/token-meter": "^0.1.0",
+		"date-fns": "^4.1.0",
+		"stripe": "^19.1.0",
+		"tokenlens": "^1.3.1"
 	},
 	"devDependencies": {
 		"@mimir/tsconfig": "workspace:*",
+		"ai": "6.0.64",
 		"typescript": "^5.9.2"
 	},
 	"exports": {

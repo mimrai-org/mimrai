@@ -33,6 +33,7 @@ export const generateAuthUrl = () => {
 
 export * from "./create-draft-email";
 export * from "./decode";
+export * from "./get-emails";
 export * from "./handle";
 export * from "./process";
 export * from "./send-draft-email";

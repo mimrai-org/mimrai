@@ -20,6 +20,7 @@ import {
 	buildSmartCompletePrompt,
 	smartCompleteResponseSchema,
 } from "@api/utils/smart-complete";
+import { createTokenMeter } from "@mimir/billing";
 import {
 	bulkUpdateTask,
 	cloneTask,
@@ -210,13 +211,13 @@ export const tasksRouter = router({
 			});
 
 			// Try to handle the comment with AI integration
-			handleTaskComment({
-				taskId: input.id,
-				teamId: ctx.user.teamId!,
-				userId: ctx.user.id,
-				commentId: comment.id,
-				comment: input.comment,
-			});
+			// handleTaskComment({
+			// 	taskId: input.id,
+			// 	teamId: ctx.user.teamId!,
+			// 	userId: ctx.user.id,
+			// 	commentId: comment.id,
+			// 	comment: input.comment,
+			// });
 
 			return comment;
 		}),
@@ -263,6 +264,12 @@ export const tasksRouter = router({
 				model: openai("gpt-4o-mini"),
 				output: Output.object({ schema: smartCompleteResponseSchema }),
 				prompt: `Create a task based on the user's prompt: "${input.prompt}"`,
+			});
+
+			const meter = createTokenMeter(ctx.team.customerId!);
+			meter({
+				model: "openai/gpt-4o-mini",
+				usage: response.usage,
 			});
 
 			trackMessage({

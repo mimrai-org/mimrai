@@ -245,6 +245,7 @@ export const tasks = pgTable(
 		description: text("description"),
 		priority: priorityEnum("priority").default("medium").notNull(),
 		assigneeId: text("assignee_id"),
+		createdBy: text("created_by"),
 		teamId: text("team_id").notNull(),
 		order: numeric("order", {
 			precision: 100,
@@ -317,12 +318,17 @@ export const tasks = pgTable(
 			columns: [table.completedBy],
 			foreignColumns: [users.id],
 			name: "tasks_completed_by_fkey",
-		}),
+		}).onDelete("set null"),
 		foreignKey({
 			columns: [table.assigneeId],
 			foreignColumns: [users.id],
 			name: "tasks_assignee_id_fkey",
-		}),
+		}).onDelete("set null"),
+		foreignKey({
+			columns: [table.createdBy],
+			foreignColumns: [users.id],
+			name: "tasks_created_by_fkey",
+		}).onDelete("set null"),
 		foreignKey({
 			columns: [table.teamId],
 			foreignColumns: [teams.id],
@@ -624,6 +630,7 @@ export const integrationUserLink = pgTable(
 		externalUserId: text("external_user_id").notNull(),
 		externalUserName: text("external_user_name"),
 		integrationId: text("integration_id"),
+		mcpServerId: text("mcp_server_id"),
 		integrationType: text("integration_type").$type<IntegrationName>(),
 		accessToken: text("access_token"),
 		refreshToken: text("refresh_token"),
@@ -639,11 +646,26 @@ export const integrationUserLink = pgTable(
 			table.userId,
 			table.externalUserId,
 		),
+		unique("unique_mcp_server_user").on(
+			table.mcpServerId,
+			table.userId,
+			table.externalUserId,
+		),
 		foreignKey({
 			columns: [table.userId],
 			foreignColumns: [users.id],
 			name: "integration_user_link_user_id_fkey",
 		}),
+		foreignKey({
+			columns: [table.integrationId],
+			foreignColumns: [integrations.id],
+			name: "integration_user_link_integration_id_fkey",
+		}).onDelete("cascade"),
+		foreignKey({
+			columns: [table.mcpServerId],
+			foreignColumns: [mcpServers.id],
+			name: "integration_user_link_mcp_server_id_fkey",
+		}).onDelete("cascade"),
 	],
 );
 
@@ -989,6 +1011,7 @@ export const autopilotSettings = pgTable(
 			.array()
 			.default([1, 2, 3, 4, 5]), // 0 = Sunday, 6 = Saturday
 		enableFollowUps: boolean("enable_follow_ups").default(false),
+
 		createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
 			.defaultNow()
 			.notNull(),
@@ -1002,6 +1025,128 @@ export const autopilotSettings = pgTable(
 			columns: [table.teamId],
 			foreignColumns: [teams.id],
 			name: "autopilot_settings_team_id_fkey",
+		}).onDelete("cascade"),
+	],
+);
+
+/**
+ * Tracks the lifecycle of autonomous task execution
+ */
+export const taskExecutionStatusEnum = pgEnum("task_execution_status", [
+	"pending", // Task assigned, waiting for analysis
+	"executing", // MIMIR is executing the plan
+	"blocked", // Execution blocked (waiting for human subtask, info needed)
+	"completed", // Task execution completed successfully
+	"failed", // Execution failed
+]);
+
+/**
+ * Memory/context storage for task execution
+ */
+export interface TaskExecutionMemory {
+	/** Key information gathered from task context */
+	summary?: string;
+	/** Notes or observations made during execution */
+	notes?: string[];
+}
+
+/**
+ * Tracks autonomous task execution by the agent
+ */
+export const taskExecutions = pgTable(
+	"task_executions",
+	{
+		id: text("id")
+			.$defaultFn(() => randomUUID())
+			.primaryKey()
+			.notNull(),
+		taskId: text("task_id").notNull(),
+		teamId: text("team_id").notNull(),
+
+		status: taskExecutionStatusEnum("status").default("pending").notNull(),
+
+		usageMetrics: jsonb("usage_metrics").$type<{
+			inputTokens: number;
+			outputTokens: number;
+			totalTokens: number;
+			costUSD: number;
+		}>(),
+
+		// Memory slot for task context
+		memory: jsonb("memory").$type<TaskExecutionMemory>().default({}),
+
+		// Content hash
+		contentHash: text("content_hash"),
+
+		// Trigger.dev job linkage
+		triggerJobId: text("trigger_job_id"),
+
+		// Timestamps
+		createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+			.defaultNow()
+			.notNull(),
+		updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+			.defaultNow()
+			.notNull(),
+	},
+	(table) => [
+		index("task_executions_task_id_index").on(table.taskId),
+		index("task_executions_team_id_index").on(table.teamId),
+		index("task_executions_status_index").on(table.status),
+		unique("unique_active_task_execution").on(table.taskId), // Only one active execution per task
+		foreignKey({
+			columns: [table.taskId],
+			foreignColumns: [tasks.id],
+			name: "task_executions_task_id_fkey",
+		}).onDelete("cascade"),
+		foreignKey({
+			columns: [table.teamId],
+			foreignColumns: [teams.id],
+			name: "task_executions_team_id_fkey",
+		}).onDelete("cascade"),
+	],
+);
+
+export const agents = pgTable(
+	"agents",
+	{
+		id: text("id")
+			.$defaultFn(() => randomUUID())
+			.primaryKey()
+			.notNull(),
+		teamId: text("team_id").notNull(),
+		name: text("name").notNull(),
+		description: text("description"),
+		avatar: text("avatar"),
+		isActive: boolean("is_active").default(true).notNull(),
+		model: text("model").notNull().default("openai/gpt-5"),
+		soul: text("soul"),
+
+		userId: text("user_id").notNull(),
+		behalfUserId: text("behalf_user_id"),
+		authorizeIntegrations: boolean("authorize_integrations")
+			.default(false)
+			.notNull(),
+		activeToolboxes: text("active_toolboxes").array().default([]).notNull(),
+
+		createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+			.defaultNow()
+			.notNull(),
+		updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+			.defaultNow()
+			.notNull(),
+	},
+	(table) => [
+		index("agents_team_id_index").on(table.teamId),
+		foreignKey({
+			columns: [table.teamId],
+			foreignColumns: [teams.id],
+			name: "agents_team_id_fkey",
+		}).onDelete("cascade"),
+		foreignKey({
+			columns: [table.userId],
+			foreignColumns: [users.id],
+			name: "agents_user_id_fkey",
 		}).onDelete("cascade"),
 	],
 );
@@ -1674,6 +1819,56 @@ export const taskViews = pgTable(
 			columns: [table.projectId],
 			foreignColumns: [projects.id],
 			name: "task_views_project_id_fkey",
+		}).onDelete("cascade"),
+	],
+);
+
+export const mcpTransportTypeEnum = pgEnum("mcp_transport_type", [
+	"http",
+	"sse",
+]);
+
+export interface McpServerConfig {
+	url: string;
+	headers?: Record<string, string>;
+	scopes?: string[];
+}
+
+export const mcpServers = pgTable(
+	"mcp_servers",
+	{
+		id: text("id")
+			.$defaultFn(() => randomUUID())
+			.primaryKey()
+			.notNull(),
+		teamId: text("team_id").notNull(),
+		name: text("name").notNull(),
+		description: text("description"),
+		transport: mcpTransportTypeEnum("transport").default("http").notNull(),
+		config: jsonb("config").$type<McpServerConfig>().notNull(),
+		isActive: boolean("is_active").default(true).notNull(),
+		createdBy: text("created_by").notNull(),
+		createdAt: timestamp("created_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
+		updatedAt: timestamp("updated_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
+	},
+	(table) => [
+		index("mcp_servers_team_id_index").using("btree", table.teamId),
+		unique("unique_mcp_server_name_per_team").on(table.name, table.teamId),
+		foreignKey({
+			columns: [table.teamId],
+			foreignColumns: [teams.id],
+			name: "mcp_servers_team_id_fkey",
+		}).onDelete("cascade"),
+		foreignKey({
+			columns: [table.createdBy],
+			foreignColumns: [users.id],
+			name: "mcp_servers_created_by_fkey",
 		}).onDelete("cascade"),
 	],
 );

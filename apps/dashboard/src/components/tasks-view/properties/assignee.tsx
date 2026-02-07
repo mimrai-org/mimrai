@@ -18,7 +18,11 @@ import { Assignee, AssigneeAvatar } from "../../asignee-avatar";
 import type { KanbanTask } from "../kanban/kanban-task";
 
 export const TaskPropertyAssignee = ({ task }: { task: KanbanTask }) => {
-	const { data, isLoading } = useQuery(trpc.teams.getMembers.queryOptions());
+	const { data, isLoading } = useQuery(
+		trpc.teams.getMembers.queryOptions({
+			includeSystemUsers: true,
+		}),
+	);
 
 	const coworkers = useMemo(() => {
 		const coworksersIds: string[] = [task.assigneeId].filter(

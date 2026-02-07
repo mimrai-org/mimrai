@@ -34,6 +34,7 @@ export const getToolMessage = (toolName: string | null) => {
 		createTask: "Creating task...",
 		updateTask: "Updating task...",
 		getTasks: "Fetching tasks...",
+		getTaskById: "Fetching task details...",
 		createTaskPullRequest: "Creating task pull request...",
 		createChecklistItem: "Creating checklist item...",
 		updateChecklistItem: "Updating checklist item...",

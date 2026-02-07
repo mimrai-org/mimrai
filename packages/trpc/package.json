@@ -17,8 +17,12 @@
     "@mimir/tsconfig": "workspace:*",
     "@mimir/db": "workspace:*",
     "@mimir/realtime": "workspace:*",
+    "@mimir/integration": "workspace:*",
+    "@ai-sdk/openai": "3.0.23",
+    "ai": "6.0.64",
     "drizzle-orm": "catalog:",
     "@trpc/server": "^11.6.0",
+    "googleapis": "^169.0.0",
     "zod": "catalog:",
     "typescript": "^5.9.2"
   },

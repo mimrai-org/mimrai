@@ -25,7 +25,7 @@ export const IntegrationsList = () => {
 	const canWriteTeam = useScopes(["team:write"]);
 
 	return (
-		<Card>
+		<Card className="border-0">
 			<CardHeader>
 				<CardTitle>{t("settings.integrations.title")}</CardTitle>
 				<CardDescription>

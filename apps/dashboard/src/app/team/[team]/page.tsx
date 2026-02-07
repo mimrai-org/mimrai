@@ -1,5 +1,3 @@
-import { ChatInterface } from "@/components/chat/chat-interface";
-import { ChatProvider } from "@/components/chat/chat-provider";
 import { FeedView } from "@/components/feed/view";
 import { NavTopTasks } from "@/components/nav/nav-top-tasks";
 import { NavWorkspace } from "@/components/nav/nav-workspace";

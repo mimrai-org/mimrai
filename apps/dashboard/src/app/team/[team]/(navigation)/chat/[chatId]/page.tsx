@@ -1,4 +1,5 @@
 import { BreadcrumbSetter } from "@/components/breadcrumbs";
+import { ChatHistory } from "@/components/chat/chat-history";
 import { ChatInterface } from "@/components/chat/chat-interface";
 import { ChatProvider } from "@/components/chat/chat-provider";
 import { trpcClient } from "@/utils/trpc";
@@ -15,7 +16,7 @@ export default async function Page({ params }: Props) {
 	});
 
 	return (
-		<div className="mx-auto h-[calc(100vh-80px)] w-full max-w-3xl">
+		<div className="grid max-h-[calc(100vh-80px)] w-full flex-1 grid-cols-[250px_1fr]">
 			<BreadcrumbSetter
 				crumbs={[
 					{
@@ -24,8 +25,17 @@ export default async function Page({ params }: Props) {
 					},
 				]}
 			/>
-			<ChatProvider initialMessages={chat?.messages || []} id={chatId}>
-				<ChatInterface />
+			<ChatProvider
+				initialMessages={chat?.messages || []}
+				id={chatId}
+				title={chat?.title}
+			>
+				<div className="rounded-sm border p-4">
+					<ChatHistory />
+				</div>
+				<div className="mx-auto flex max-h-[calc(100vh-80px)] w-full max-w-4xl flex-1 flex-col">
+					<ChatInterface />
+				</div>
 			</ChatProvider>
 		</div>
 	);

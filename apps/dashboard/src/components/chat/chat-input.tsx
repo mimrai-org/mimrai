@@ -15,6 +15,7 @@ import { useRef, useState } from "react";
 import { useChatParams } from "@/hooks/use-chat-params";
 import { useDataPart } from "@/hooks/use-data-part";
 import { useChatStore } from "@/store/chat";
+import { AgentSelectorButton } from "./agent-selector-button";
 import { type ContextItem, useChatContext } from "./chat-context/store";
 import { useAIChat } from "./chat-provider";
 import type { ChatTitleData } from "./chat-title";
@@ -23,6 +24,7 @@ import { WebSearchButton } from "./web-search-button";
 
 export interface ChatInputMessage extends PromptInputMessage {
 	metadata?: {
+		agentId?: string | null;
 		agentChoice?: string;
 		toolChoice?: string;
 		contextItems?: ContextItem[];
@@ -41,6 +43,7 @@ export const ChatInput = () => {
 	const {
 		input,
 		isWebSearch,
+		selectedAgentId,
 		isUploading,
 		isRecording,
 		isProcessing,
@@ -69,11 +72,12 @@ export const ChatInput = () => {
 			setParams({ chatId });
 		}
 
-		console.log("Sending message with context items:", message.files);
-
 		sendMessage({
 			text: message.text || "Sent with attachments",
 			files: message.files,
+			metadata: {
+				agentId: selectedAgentId,
+			},
 		});
 
 		setInput("");
@@ -136,6 +140,7 @@ export const ChatInput = () => {
 					<PromptInputTools>
 						<PromptInputActionAddAttachments />
 						<WebSearchButton />
+						<AgentSelectorButton />
 					</PromptInputTools>
 
 					<PromptInputTools>

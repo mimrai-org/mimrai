@@ -1,11 +1,12 @@
 "use client";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useSubscription } from "@trpc/tanstack-react-query";
 import { Button } from "@ui/components/ui/button";
 import { AnimatePresence } from "motion/react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { ActivityItem } from "@/components/activities/activity-item";
-import { queryClient, trpc } from "@/utils/trpc";
+import { useChannelName, useRealtime } from "@/lib/realtime-client";
+import { queryClient, trpc, trpcClient } from "@/utils/trpc";
 
 export const TaskActivitiesList = ({ taskId }: { taskId: string }) => {
 	const { data, fetchNextPage, hasNextPage } = useInfiniteQuery(
@@ -17,35 +18,6 @@ export const TaskActivitiesList = ({ taskId }: { taskId: string }) => {
 			},
 			{
 				getNextPageParam: (lastPage) => lastPage.meta.cursor,
-			},
-		),
-	);
-
-	useSubscription(
-		trpc.activities.onCreated.subscriptionOptions(
-			{
-				groupId: taskId,
-			},
-			{
-				onData: (newActivity) => {
-					queryClient.setQueryData(
-						trpc.activities.get.queryKey({
-							groupId: taskId,
-							nStatus: ["archived"],
-							pageSize: 100,
-						}),
-						(oldData) => {
-							if (!oldData) return oldData;
-							if (oldData.data.find((a) => a.id === newActivity.id)) {
-								return oldData;
-							}
-							return {
-								...oldData,
-								data: [newActivity, ...oldData.data],
-							};
-						},
-					);
-				},
 			},
 		),
 	);
