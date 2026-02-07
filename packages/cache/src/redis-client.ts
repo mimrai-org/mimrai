@@ -22,17 +22,9 @@ export class RedisCache {
 			throw new Error("REDIS_URL environment variable is required");
 		}
 
-		const isProduction =
-			process.env.NODE_ENV === "production" || process.env.FLY_APP_NAME;
-
 		this.redis = createClient({
 			url: redisUrl,
-
 			pingInterval: 4 * 60 * 1000, // Your proven 4-minute ping interval
-			socket: {
-				family: isProduction ? 6 : 4, // IPv6 for Fly.io production, IPv4 for local
-				connectTimeout: isProduction ? 15000 : 5000,
-			},
 		});
 
 		// Event listeners from your proven solution

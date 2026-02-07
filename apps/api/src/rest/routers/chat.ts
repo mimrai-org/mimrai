@@ -1,12 +1,7 @@
 import { createAgentFromDB } from "@api/ai/agents/agent-factory";
 import { type AppContext, buildAppContext } from "@api/ai/agents/config/shared";
 import { buildWorkspaceSystemPrompt } from "@api/ai/agents/workspace-agent";
-import {
-	getAllToolsForUser,
-	getIntegrationToolsForUser,
-	researchTools,
-	taskManagementTools,
-} from "@api/ai/tools/tool-registry";
+import { getAllToolsForUser } from "@api/ai/tools/tool-registry";
 import { formatLLMContextItems } from "@api/ai/utils/format-context-items";
 import { getUserContext } from "@api/ai/utils/get-user-context";
 import type { Context } from "@api/rest/types";
