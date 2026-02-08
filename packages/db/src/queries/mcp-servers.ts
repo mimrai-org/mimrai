@@ -104,7 +104,7 @@ export const deleteMcpServer = async ({
 
 /**
  * Get user auth tokens for MCP servers.
- * Returns a map of mcpServerId -> accessToken for all authenticated servers.
+ * Returns full token info including refresh token and config for expiration checking.
  */
 export const getMcpServerUserTokens = async ({
 	userId,
@@ -112,13 +112,28 @@ export const getMcpServerUserTokens = async ({
 }: {
 	userId: string;
 	mcpServerIds: string[];
-}): Promise<Record<string, string>> => {
+}): Promise<
+	Record<
+		string,
+		{
+			accessToken: string;
+			refreshToken: string | null;
+			config: {
+				tokenType?: string;
+				expiresIn?: number;
+				authenticatedAt?: string;
+			} | null;
+		}
+	>
+> => {
 	if (mcpServerIds.length === 0) return {};
 
 	const links = await db
 		.select({
 			mcpServerId: integrationUserLink.mcpServerId,
 			accessToken: integrationUserLink.accessToken,
+			refreshToken: integrationUserLink.refreshToken,
+			config: integrationUserLink.config,
 		})
 		.from(integrationUserLink)
 		.where(
@@ -128,12 +143,62 @@ export const getMcpServerUserTokens = async ({
 			),
 		);
 
-	const tokens: Record<string, string> = {};
+	const tokens: Record<
+		string,
+		{
+			accessToken: string;
+			refreshToken: string | null;
+			config: {
+				tokenType?: string;
+				expiresIn?: number;
+				authenticatedAt?: string;
+			} | null;
+		}
+	> = {};
 	for (const link of links) {
 		if (link.mcpServerId && link.accessToken) {
-			tokens[link.mcpServerId] = link.accessToken;
+			tokens[link.mcpServerId] = {
+				accessToken: link.accessToken,
+				refreshToken: link.refreshToken,
+				config: link.config as {
+					tokenType?: string;
+					expiresIn?: number;
+					authenticatedAt?: string;
+				} | null,
+			};
 		}
 	}
 
 	return tokens;
+};
+
+/**
+ * Update the stored tokens for an MCP server user link after a refresh.
+ */
+export const updateMcpServerUserToken = async ({
+	userId,
+	mcpServerId,
+	accessToken,
+	refreshToken,
+	config,
+}: {
+	userId: string;
+	mcpServerId: string;
+	accessToken: string;
+	refreshToken?: string | null;
+	config?: Record<string, unknown>;
+}) => {
+	await db
+		.update(integrationUserLink)
+		.set({
+			accessToken,
+			...(refreshToken !== undefined ? { refreshToken } : {}),
+			...(config ? { config } : {}),
+		})
+		.where(
+			and(
+				eq(integrationUserLink.userId, userId),
+				eq(integrationUserLink.mcpServerId, mcpServerId),
+			),
+		);
 };

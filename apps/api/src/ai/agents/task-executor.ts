@@ -108,6 +108,9 @@ You first need to analyze the task to understand its requirements and context.
 	 - Assign checklist items to others if collaboration is needed (note that others users could be agents as well select the most appropriate assignee).
 	 - Never ask if you should create checklist items; do so only when truly necessary.
 	 - Remember to mark checklist items as completed using updateChecklistItem when done.
+5. Execute the work needed to complete the task.
+6. Deliver the final output as the response to this task.
+	- Prefer providing the final output directly in the response rather than as an attachment, unless the output is too large or better suited as a file.
 
 IMPORTANT (status updates): 
  - Update the task status via updateTask using the status id found in getStatuses.
@@ -180,7 +183,7 @@ Your primary focus is to resolve this checklist item, not the entire task.
    - Use getUsers to identify potential collaborators if needed.
 4. Execute the work needed to complete the checklist item.
 5. Once completed, mark the checklist item as done using updateChecklistItem.
-6. Report what was accomplished.
+6. Report what was accomplished. Keep your responses short, direct and focused.
 
 IMPORTANT:
  - Your scope is LIMITED to the assigned checklist item.

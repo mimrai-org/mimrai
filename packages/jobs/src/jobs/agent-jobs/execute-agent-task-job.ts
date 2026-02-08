@@ -346,14 +346,12 @@ export const executeAgentTaskPlanJob = schemaTask({
 			});
 			logger.info("Agent execution completed", { taskId });
 
-			const textResponse = response.parts
-				.filter((p) => p.type === "text")
-				.map((p) => p.text)
-				.join("\n");
+			// Find last text part in the response
+			const textParts = response.parts.filter((p) => p.type === "text");
+			const lastTextPart = textParts[textParts.length - 1]?.text || "";
 
 			// Remove xmltags from the response if any
-			const cleanedResponse = textResponse.replace(/<[^>]*>/g, "");
-
+			const cleanedResponse = lastTextPart.replace(/<[^>]*>/g, "");
 			await createTaskComment({
 				taskId: taskId,
 				userId: userId,

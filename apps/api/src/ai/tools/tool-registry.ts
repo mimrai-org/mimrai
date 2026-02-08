@@ -8,6 +8,7 @@ import type { McpServerConfig } from "@mimir/db/schema";
 import type { IntegrationName } from "@mimir/integration/registry";
 import type { Tool } from "ai";
 import { getUserAvailableIntegrations } from "../agents/agent-factory";
+import { resolveValidMcpToken } from "../utils/mcp-token-refresh";
 import { addTaskAttachmentTool } from "./add-task-attachment";
 // Integration tools
 import { createAgentTool } from "./create-agent";
@@ -180,6 +181,7 @@ export const getIntegrationTools = async (
 /**
  * Get tools from team-configured MCP servers.
  * If userId is provided, per-user OAuth tokens are injected into MCP client headers.
+ * Expired tokens are automatically refreshed when a refresh token is available.
  */
 export const getTeamMcpTools = async (
 	teamId: string,
@@ -206,12 +208,23 @@ export const getTeamMcpTools = async (
 	for (const server of mcpServerConfigs) {
 		try {
 			const config = server.config as McpServerConfig;
-			const userToken = userTokens[server.id];
+			const tokenInfo = userTokens[server.id];
+
+			// Resolve a valid access token, refreshing if expired
+			let accessToken: string | null = null;
+			if (tokenInfo && userId) {
+				accessToken = await resolveValidMcpToken({
+					userId,
+					mcpServerId: server.id,
+					serverConfig: config,
+					tokenInfo,
+				});
+			}
 
 			// Merge static headers with per-user auth token if available
 			const headers: Record<string, string> = {
 				...config.headers,
-				...(userToken ? { Authorization: `Bearer ${userToken}` } : {}),
+				...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
 			};
 
 			const mcpClient = await createMCPClient({
