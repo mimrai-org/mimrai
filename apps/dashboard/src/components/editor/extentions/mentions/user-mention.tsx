@@ -63,28 +63,6 @@ function UserMentionNodeComponent({ node }: NodeViewProps) {
 }
 
 /**
- * User mention node renderer for external use
- */
-export function UserMentionNode({ id, label, attrs }: MentionNodeProps) {
-	return (
-		<span
-			className="inline-flex items-center gap-1 rounded-sm border bg-accent/50 px-1 py-0.5 font-medium text-sm"
-			data-mention-type="user"
-			data-mention-id={id}
-		>
-			<AssigneeAvatar
-				name={(attrs.name as string) || label}
-				email={attrs.email as string}
-				image={attrs.image as string}
-				color={attrs.color as string}
-				className="size-4"
-			/>
-			<span>@{label}</span>
-		</span>
-	);
-}
-
-/**
  * TipTap extension for user mentions
  * Creates an inline node that renders the user mention with avatar
  */

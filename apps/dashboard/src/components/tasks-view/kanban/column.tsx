@@ -130,7 +130,7 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 
 					<div>
 						<Button
-							className="w-full justify-start border border-transparent border-dashed text-start text-xs hover:border-input hover:bg-background/20!"
+							className="w-full justify-start border border-transparent border-dashed text-start text-xs hover:border-input hover:bg-accent/30!"
 							variant={"ghost"}
 							onClick={() => {
 								setTaskParams({

@@ -10,6 +10,8 @@ import { type AppContext, getToolContext } from "./config/shared";
  */
 
 export interface TaskExecutorContext extends AppContext {
+	/** The agent's database ID (used for long-term memory) */
+	agentId?: string;
 	/** The task assigned to the agent for execution */
 	task: {
 		id: string;
@@ -51,6 +53,16 @@ export interface TaskExecutorContext extends AppContext {
 	alwaysConfirmActions?: string[];
 	/** Enabled integrations for dynamic tool availability */
 	enabledIntegrations?: IntegrationName[];
+
+	/** Long-term memories retrieved for this agent, injected at execution start */
+	agentMemories?: Array<{
+		id: string;
+		category: string;
+		title: string;
+		content: string;
+		tags: string[];
+		relevanceScore: number;
+	}>;
 
 	/**
 	 * Focus mode: determines what the agent should focus on
@@ -113,11 +125,10 @@ You first need to analyze the task to understand its requirements and context.
 	- Prefer providing the final output directly in the response rather than as an attachment, unless the output is too large or better suited as a file.
 
 IMPORTANT (status updates): 
- - Update the task status via updateTask using the status id found in getStatuses.
+ - Update the task status via updateTask using the status id found using getStatuses tool.
  - Status updates must reflect actual progress on the task.
  - Consider the task completed without needed confirmation
- - If the current task status is not appropriate, update it accordingly.
- - VERY IMPORTANT: Before sending the response, ensure the task status is set to "Done" if all work is done.
+ - VERY IMPORTANT: Before sending the response, ensure the task status is set to a status that accurately reflects the current state of the task.
 </workflow>
 
 <rules>
@@ -131,6 +142,7 @@ IMPORTANT (status updates):
 	- Do not ask for next steps; if the task is not completed autonomously continue with the next logical action.
 	- Do not update the task description unless explicitly instructed.
 	- When talking about checklist items, tasks, statuses, or projects, always refer to MIMRAI data unless explicitly instructed otherwise.
+	- User may explcitly mention tools you must use, if so follow the instructions and use the tool as directed.
 </rules>
 
 
@@ -150,6 +162,15 @@ ${memoryContext}
 - Update this memory as needed using the updateTaskExecution tool during execution.
 - This memory helps maintain context across multiple execution steps.
 </execution-memory>
+
+<long-term-memory>
+${formatAgentMemories(ctx)}
+
+- You have long-term memory that persists across tasks. Use recallAgentMemories to search for relevant past lessons.
+- When you learn something new (mistakes, patterns, preferences), save it with saveAgentMemory so future tasks benefit.
+- When a recalled memory helps you, use bumpAgentMemoryRelevance to mark it as useful.
+- Categories: lesson (mistake/success), preference (user/team), fact (domain knowledge), procedure (workflow).
+</long-term-memory>
 
 <policy>
 Allowed actions: ${allowedActionsText}
@@ -227,6 +248,13 @@ ${memoryContext}
 - This memory helps maintain context across multiple execution steps.
 </execution-memory>
 
+<long-term-memory>
+${formatAgentMemories(ctx)}
+
+- Use saveAgentMemory to record lessons learned during this checklist item.
+- Use recallAgentMemories to search for relevant past knowledge.
+</long-term-memory>
+
 <policy>
 Allowed actions: ${allowedActionsText}
 Actions always requiring confirmation: ${confirmActionsText}
@@ -287,6 +315,25 @@ function formatMemory(ctx: TaskExecutorContext): string {
 	return parts.length > 0
 		? parts.join("\n\n")
 		: "No previous execution context.";
+}
+
+/**
+ * Format long-term agent memories for injection into the system prompt
+ */
+function formatAgentMemories(ctx: TaskExecutorContext): string {
+	const memories = ctx.agentMemories;
+	if (!memories || memories.length === 0) {
+		return "No long-term memories yet. Save lessons as you learn them.";
+	}
+
+	return memories
+		.map(
+			(m) =>
+				`[${m.category}] ${m.title} (score: ${m.relevanceScore}, id: ${m.id})\n  ${m.content}${
+					m.tags.length > 0 ? `\n  Tags: ${m.tags.join(", ")}` : ""
+				}`,
+		)
+		.join("\n\n");
 }
 
 export const updateTaskMemoryTool = tool({

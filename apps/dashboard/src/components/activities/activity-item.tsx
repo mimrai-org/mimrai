@@ -9,6 +9,8 @@ import { TaskColumnChangedActivity } from "./task-column-changed";
 import { TaskCommentActivity } from "./task-comment";
 import { TaskCompletedActivity } from "./task-completed";
 import { TaskCreatedActivity } from "./task-created";
+import { TaskExecutionCompletedActivity } from "./task-execution-completed";
+import { TaskExecutionStartedActivity } from "./task-execution-started";
 import { TaskUpdatedActivity } from "./task-updated";
 import type { Activity } from "./types";
 import { UnknownActivity } from "./unknown-activity";
@@ -47,6 +49,10 @@ export const ActivityItemContainer = ({
 			return <DailyTeamSummaryActivity activity={activity} />;
 		case "task_completed":
 			return <TaskCompletedActivity activity={activity} />;
+		case "task_execution_started":
+			return <TaskExecutionStartedActivity activity={activity} />;
+		case "task_execution_completed":
+			return <TaskExecutionCompletedActivity activity={activity} />;
 		default:
 			return <UnknownActivity activity={activity} />;
 	}

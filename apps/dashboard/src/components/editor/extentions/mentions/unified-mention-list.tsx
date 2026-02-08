@@ -1,12 +1,31 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import type { SuggestionProps } from "@tiptap/suggestion";
-import { LayersIcon, UserIcon } from "lucide-react";
-import { useEffect, useImperativeHandle, useMemo, useState } from "react";
+import { LayersIcon, Loader2Icon, ToolCaseIcon, UserIcon } from "lucide-react";
+import {
+	useEffect,
+	useImperativeHandle,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
+import { useDebounceValue } from "usehooks-ts";
 import { cn } from "@/lib/utils";
+import {
+	selectTasks,
+	selectTools,
+	selectUsers,
+	tasksQueryOptions,
+	toolsQueryOptions,
+	usersQueryOptions,
+} from "./mention-configs";
 import { TaskMentionListItem } from "./task-mention";
+import { ToolMentionListItem } from "./tool-mention";
 import type { AnyMentionEntity, MentionEntityType } from "./types";
 import { UserMentionListItem } from "./user-mention";
+
+const DEBOUNCE_MS = 300;
 
 /**
  * Group configuration for the unified mention dropdown
@@ -20,6 +39,7 @@ interface MentionGroup {
 const mentionGroups: MentionGroup[] = [
 	{ type: "user", label: "Members", icon: UserIcon },
 	{ type: "task", label: "Tasks", icon: LayersIcon },
+	{ type: "tool", label: "Tools", icon: ToolCaseIcon },
 ];
 
 /**
@@ -37,6 +57,8 @@ function MentionItemRenderer({
 			return <UserMentionListItem entity={entity} isSelected={isSelected} />;
 		case "task":
 			return <TaskMentionListItem entity={entity} isSelected={isSelected} />;
+		case "tool":
+			return <ToolMentionListItem entity={entity} isSelected={isSelected} />;
 		default:
 			return <span>{entity.label}</span>;
 	}
@@ -46,24 +68,46 @@ interface UnifiedMentionListProps extends SuggestionProps<AnyMentionEntity> {}
 
 export function UnifiedMentionList(props: UnifiedMentionListProps) {
 	const [selectedIndex, setSelectedIndex] = useState(0);
+	const containerRef = useRef<HTMLDivElement>(null);
 
-	const items = useMemo(() => props.items, [props.items]);
+	const query = props.query;
+	const [debouncedQuery] = useDebounceValue(query, DEBOUNCE_MS);
+
+	// Fetch users — the member list rarely changes, so we fetch once
+	// and filter client-side by the debounced query.
+	const { data: users = [] } = useQuery({
+		...usersQueryOptions(),
+		select: (members) => selectUsers(members, debouncedQuery),
+		staleTime: 60_000,
+	});
+
+	// Fetch tasks — the search is server-side, keyed by debounced query.
+	const { data: tasks = [] } = useQuery({
+		...tasksQueryOptions(debouncedQuery),
+		select: selectTasks,
+	});
+
+	// Fetch tools — tool list is static per session, filter client-side.
+	const { data: tools = [] } = useQuery({
+		...toolsQueryOptions(),
+		select: (data) => selectTools(data, debouncedQuery),
+		staleTime: 60_000,
+	});
+
+	console.log("Tools after selection:", tools);
 
 	// Group items by type
 	const groupedItems = useMemo(() => {
 		const groups: Record<MentionEntityType, AnyMentionEntity[]> = {
-			user: [],
-			task: [],
+			user: users,
+			task: tasks,
 			project: [],
 			milestone: [],
+			tool: tools,
 		};
 
-		for (const item of items) {
-			groups[item.type].push(item);
-		}
-
 		return groups;
-	}, [items]);
+	}, [users, tasks, tools]);
 
 	// Flatten items for index-based navigation
 	const flatItems = useMemo(() => {
@@ -73,6 +117,22 @@ export function UnifiedMentionList(props: UnifiedMentionListProps) {
 		}
 		return result;
 	}, [groupedItems]);
+
+	useEffect(() => {
+		if (containerRef.current) {
+			const container = containerRef.current;
+			const itemElement = container?.querySelector(
+				`[data-item-id="${flatItems[selectedIndex]?.id}"]`,
+			) as HTMLElement | undefined;
+
+			container?.scrollTo({
+				top: itemElement
+					? itemElement.offsetTop - container.offsetTop - 100
+					: 0,
+				behavior: "instant",
+			});
+		}
+	}, [selectedIndex, flatItems]);
 
 	const handleSelect = (index: number) => {
 		const item = flatItems[index];
@@ -98,7 +158,8 @@ export function UnifiedMentionList(props: UnifiedMentionListProps) {
 		handleSelect(selectedIndex);
 	};
 
-	useEffect(() => setSelectedIndex(0), [items]);
+	// // Reset selection when results change
+	// useEffect(() => setSelectedIndex(0), [flatItems]);
 
 	// @ts-expect-error - TipTap's ref handling
 	useImperativeHandle(props.ref, () => ({
@@ -143,12 +204,24 @@ export function UnifiedMentionList(props: UnifiedMentionListProps) {
 	};
 
 	const hasAnyItems = flatItems.length > 0;
+	const isInitialLoad =
+		users.length === 0 && tasks.length === 0 && tools.length === 0;
 
 	return (
-		<div className="relative max-h-[300px] min-w-[250px] overflow-auto rounded-md border bg-popover py-2 shadow-md">
+		<div
+			ref={containerRef}
+			className="relative max-h-[300px] min-w-[250px] max-w-[500px] overflow-auto rounded-md border bg-popover py-2 shadow-md"
+		>
 			{!hasAnyItems ? (
-				<div className="px-4 py-2 text-muted-foreground text-sm">
-					No results found
+				<div className="flex items-center gap-2 px-4 py-2 text-muted-foreground text-sm">
+					{isInitialLoad ? (
+						<>
+							<Loader2Icon className="size-3.5 animate-spin" />
+							Searching…
+						</>
+					) : (
+						"No results found"
+					)}
 				</div>
 			) : (
 				<div className="w-full space-y-2">
@@ -169,6 +242,7 @@ export function UnifiedMentionList(props: UnifiedMentionListProps) {
 									return (
 										<button
 											key={item.id}
+											data-item-id={item.id}
 											type="button"
 											className={cn(
 												"flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm transition-colors",

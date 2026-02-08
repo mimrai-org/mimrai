@@ -740,6 +740,8 @@ export const activityTypeEnum = pgEnum("activity_type", [
 	"task_comment",
 	"task_comment_reply",
 	"task_assigned",
+	"task_execution_started",
+	"task_execution_completed",
 	"checklist_item_completed",
 	"checklist_item_created",
 	"checklist_item_updated",
@@ -1870,6 +1872,95 @@ export const mcpServers = pgTable(
 			foreignColumns: [users.id],
 			name: "mcp_servers_created_by_fkey",
 		}).onDelete("cascade"),
+	],
+);
+
+/**
+ * Persistent agent memory — long-term knowledge entries that agents
+ * accumulate across task executions so they can specialise over time.
+ *
+ * Each row is a single "lesson learned" or annotation.  Entries are
+ * scoped to a specific agent (via `agentId`) and team.
+ */
+export const agentMemories = pgTable(
+	"agent_memories",
+	{
+		id: text("id")
+			.$defaultFn(() => randomUUID())
+			.primaryKey()
+			.notNull(),
+
+		/** The agent that owns this memory */
+		agentId: text("agent_id").notNull(),
+		teamId: text("team_id").notNull(),
+
+		/**
+		 * Category of the memory entry.
+		 *
+		 * - lesson: something the agent learned from a mistake or success
+		 * - preference: a user / team preference the agent inferred
+		 * - fact: a factual piece of knowledge relevant to the team's domain
+		 * - procedure: a step-by-step procedure the agent discovered
+		 */
+		category: text("category", {
+			enum: ["lesson", "preference", "fact", "procedure"],
+		})
+			.default("lesson")
+			.notNull(),
+
+		/** Short human-readable title / summary */
+		title: text("title").notNull(),
+
+		/** Detailed content / annotation */
+		content: text("content").notNull(),
+
+		/**
+		 * Free-form tags that help the agent decide when a memory is relevant.
+		 * E.g. ["email-drafting", "formatting", "project-alpha"]
+		 */
+		tags: text("tags").array().default([]).notNull(),
+
+		/** Optional back-link to the task that originated this memory */
+		sourceTaskId: text("source_task_id"),
+
+		/**
+		 * Relevance score — the agent can bump this when a memory proves useful
+		 * or decay it over time.  Higher = more relevant.
+		 */
+		relevanceScore: integer("relevance_score").default(1).notNull(),
+
+		createdAt: timestamp("created_at", {
+			withTimezone: true,
+			mode: "string",
+		})
+			.defaultNow()
+			.notNull(),
+		updatedAt: timestamp("updated_at", {
+			withTimezone: true,
+			mode: "string",
+		})
+			.defaultNow()
+			.notNull(),
+	},
+	(table) => [
+		index("agent_memories_agent_id_index").on(table.agentId),
+		index("agent_memories_team_id_index").on(table.teamId),
+		index("agent_memories_category_index").on(table.category),
+		foreignKey({
+			columns: [table.agentId],
+			foreignColumns: [agents.id],
+			name: "agent_memories_agent_id_fkey",
+		}).onDelete("cascade"),
+		foreignKey({
+			columns: [table.teamId],
+			foreignColumns: [teams.id],
+			name: "agent_memories_team_id_fkey",
+		}).onDelete("cascade"),
+		foreignKey({
+			columns: [table.sourceTaskId],
+			foreignColumns: [tasks.id],
+			name: "agent_memories_source_task_id_fkey",
+		}).onDelete("set null"),
 	],
 );
 

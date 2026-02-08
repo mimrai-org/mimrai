@@ -10,9 +10,24 @@ export interface Model {
 }
 
 export const promotedModels = [
-	"xai/grok-4.1-fast-reasoning",
 	"openai/gpt-5",
+	"openai/gpt-5.2-chat",
+	"openai/gpt-5.2",
+	"openai/gpt-5.1-instant",
+	"openai/gpt-5.1-thinking",
+	"openai/gpt-5.2-codex",
+	"openai/gpt-5.1-codex",
+	"openai/gpt-5-mini",
+	"openai/gpt-4o",
+	"openai/gpt-4o-mini",
 	"anthropic/claude-haiku-4.5",
+	"anthropic/claude-sonnet-4.5",
+	"anthropic/claude-opus-4.6",
+	"anthropic/claude-opus-4.5",
+	"google/gemini-3-flash",
+	"google/gemini-3-pro-preview",
+	"google/gemini-2.5-pro",
+	"google/gemini-2.5-flash",
 ];
 
 export const getModels = async (): Promise<Model[]> => {
@@ -30,13 +45,5 @@ export const getModels = async (): Promise<Model[]> => {
 				outputCostUSD: model.cost?.output ?? 0,
 			};
 		})
-		.sort((a, b) =>
-			promotedModels.includes(a.name) && promotedModels.includes(b.name)
-				? 0
-				: promotedModels.includes(a.name)
-					? -1
-					: promotedModels.includes(b.name)
-						? 1
-						: a.name.localeCompare(b.name),
-		);
+		.filter((model) => promotedModels.includes(model.name));
 };

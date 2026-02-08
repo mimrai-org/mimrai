@@ -2,7 +2,6 @@ import { computePosition, flip, shift } from "@floating-ui/dom";
 import type { Editor } from "@tiptap/react";
 import { posToDOMRect, ReactRenderer } from "@tiptap/react";
 import type { SuggestionOptions } from "@tiptap/suggestion";
-import { fetchAllMentions } from "./mention-configs";
 import type { AnyMentionEntity, MentionEntityType } from "./types";
 import { UnifiedMentionList } from "./unified-mention-list";
 
@@ -37,6 +36,8 @@ function getNodeTypeForEntity(type: MentionEntityType): string {
 			return "userMention";
 		case "task":
 			return "taskMention";
+		case "tool":
+			return "toolMention";
 		default:
 			return "mention";
 	}
@@ -52,8 +53,11 @@ export function buildUnifiedSuggestionOptions(
 	return {
 		char: "@",
 		allowSpaces: true,
-		items: async ({ query }) => {
-			return fetchAllMentions(query);
+		items: ({ query: _query }) => {
+			// Data fetching is handled inside UnifiedMentionList via useQuery
+			// with debounce and caching. We return an empty array here because
+			// TipTap requires this callback, but the component manages its own data.
+			return [];
 		},
 		command: ({ props, editor, range }) => {
 			const entityType = props.type as MentionEntityType;

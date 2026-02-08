@@ -16,7 +16,7 @@ import {
 	type ToolLoopAgentSettings,
 	type UIMessage,
 } from "ai";
-import type { AppContext } from "./shared";
+import { type AppContext, repairToolCall } from "./shared";
 
 export interface AgentConfig extends ToolLoopAgentSettings {
 	name: string;
@@ -98,6 +98,7 @@ export const createAgent = (config: AgentConfig) => {
 		const agent = new ToolLoopAgent({
 			...config,
 			experimental_context: params.context,
+			experimental_repairToolCall: repairToolCall,
 			instructions: instructions,
 		});
 

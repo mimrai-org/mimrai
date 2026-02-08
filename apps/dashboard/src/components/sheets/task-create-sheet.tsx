@@ -38,8 +38,9 @@ export const TaskCreateSheet = () => {
 				<DialogTitle />
 			</DialogHeader>
 			<DialogContent
+				onPointerDownOutside={(e) => e.preventDefault()}
+				onInteractOutside={(e) => e.preventDefault()}
 				className="max-h-[85vh] overflow-y-auto pt-0 sm:min-w-[1000px]"
-				showCloseButton={false}
 			>
 				<TaskForm
 					defaultValues={{

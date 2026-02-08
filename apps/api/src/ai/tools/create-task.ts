@@ -77,7 +77,10 @@ export const createTaskTool = tool({
 			};
 		} catch (error) {
 			console.error("Error creating task:", error);
-			yield { type: "text", text: "Error creating task" };
+			yield {
+				type: "text",
+				text: "Error creating task, ensure you are providing valid IDs from others tools (e.g. getStatuses, getUsers, getMilestones, getProjects)",
+			};
 		}
 	},
 });

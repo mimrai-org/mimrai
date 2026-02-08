@@ -62,11 +62,6 @@ export const smartCompleteResponseSchema = z.object({
 		.min(1)
 		.max(255)
 		.describe("Title of the task, must be self explanatory"),
-	description: z
-		.string()
-		.max(50_000)
-		.nullable()
-		.describe("Detailed description of the task"),
 	priority: z
 		.enum(priorityEnum.enumValues)
 		.nullable()

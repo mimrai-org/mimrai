@@ -29,7 +29,6 @@ export const updateTaskTool = tool({
 		try {
 			const { userId, teamId } = getToolContext(executionOptions);
 
-			yield { type: "text", text: `Updating task: ${input.title}` };
 			const updatedTask = await updateTask({
 				...input,
 				id: input.id,
@@ -39,6 +38,10 @@ export const updateTaskTool = tool({
 
 			yield { type: "text", text: `Task updated: ${updatedTask.title}` };
 		} catch (error) {
+			yield {
+				type: "text",
+				text: "Error updating task, ensure you are providing valid IDs from others tools (e.g. getStatuses, getUsers, getMilestones, getProjects)",
+			};
 			console.error("Error updating task:", error);
 		}
 	},

@@ -1,13 +1,10 @@
 import type { RouterOutputs } from "@mimir/trpc";
-import { queryClient, trpc } from "@/utils/trpc";
-import { TaskMentionListItem } from "./task-mention";
+import { trpc } from "@/utils/trpc";
 import type {
-	AnyMentionEntity,
-	MentionEntityConfig,
 	TaskMentionEntity,
+	ToolMentionEntity,
 	UserMentionEntity,
 } from "./types";
-import { UserMentionListItem } from "./user-mention";
 
 // Type aliases for API responses
 type Member = RouterOutputs["teams"]["getMembers"][0];
@@ -53,23 +50,47 @@ function taskToTaskEntity(task: Task): TaskMentionEntity {
 		completed: isCompleted,
 		metadata: {
 			sequence: task.sequence,
-			// status and completed are not persisted in the node
-			// they're only used for dropdown display
 		},
 	};
 }
 
 /**
- * Fetch users matching the query
+ * Query options for fetching users.
+ * Members are fetched once and filtered client-side by query.
  */
-async function fetchUsers(query: string): Promise<UserMentionEntity[]> {
-	const members = await queryClient.fetchQuery(
-		trpc.teams.getMembers.queryOptions({
-			includeSystemUsers: true,
-			isMentionable: true,
-		}),
-	);
+export function usersQueryOptions() {
+	return trpc.teams.getMembers.queryOptions({
+		includeSystemUsers: true,
+		isMentionable: true,
+	});
+}
 
+/**
+ * Query options for fetching tasks matching a search query.
+ */
+export function tasksQueryOptions(query: string) {
+	return trpc.tasks.get.queryOptions({
+		search: query,
+		pageSize: 5,
+	});
+}
+
+/**
+ * Query options for fetching available tools.
+ * Tools are fetched once and filtered client-side by query.
+ */
+export function toolsQueryOptions() {
+	return trpc.agents.getTools.queryOptions();
+}
+
+/**
+ * Select and transform raw members into UserMentionEntity[],
+ * filtered by query.
+ */
+export function selectUsers(
+	members: Member[],
+	query: string,
+): UserMentionEntity[] {
 	return members
 		.filter((member) => member.name.toLowerCase().includes(query.toLowerCase()))
 		.slice(0, 5)
@@ -77,75 +98,38 @@ async function fetchUsers(query: string): Promise<UserMentionEntity[]> {
 }
 
 /**
- * Fetch tasks matching the query
+ * Select and transform raw task response into TaskMentionEntity[].
  */
-async function fetchTasks(query: string): Promise<TaskMentionEntity[]> {
-	const tasks = await queryClient.fetchQuery(
-		trpc.tasks.get.queryOptions({
-			search: query,
-			pageSize: 5,
-		}),
-	);
-
-	return tasks.data.map(taskToTaskEntity);
+export function selectTasks(
+	data: RouterOutputs["tasks"]["get"],
+): TaskMentionEntity[] {
+	return data.data.map(taskToTaskEntity);
 }
 
 /**
- * Unified fetcher that returns all entity types
- * Fetches users and tasks in parallel
+ * Select and transform raw tools response into ToolMentionEntity[],
+ * filtered by query.
  */
-export async function fetchAllMentions(
+export function selectTools(
+	tools: RouterOutputs["agents"]["getTools"],
 	query: string,
-): Promise<AnyMentionEntity[]> {
-	const [users, tasks] = await Promise.all([
-		fetchUsers(query),
-		fetchTasks(query),
-	]);
-
-	// Return combined results - users first, then tasks
-	return [...users, ...tasks];
-}
-
-/**
- * User mention configuration
- * Used for type-specific operations
- */
-export const userMentionConfig: MentionEntityConfig<UserMentionEntity> = {
-	char: "@",
-	type: "user",
-	fetcher: fetchUsers,
-	listItemRenderer: UserMentionListItem,
-	nodeRenderer: () => null,
-	emptyPlaceholder: "No members found",
-};
-
-/**
- * Task mention configuration
- * Used for type-specific operations
- */
-export const taskMentionConfig: MentionEntityConfig<TaskMentionEntity> = {
-	char: "@",
-	type: "task",
-	fetcher: fetchTasks,
-	listItemRenderer: TaskMentionListItem,
-	nodeRenderer: () => null,
-	emptyPlaceholder: "No tasks found",
-};
-
-/**
- * Registry of all mention configurations
- * Add new entity configs here to extend the mention system
- */
-export const mentionConfigs: MentionEntityConfig[] = [
-	userMentionConfig as MentionEntityConfig,
-	taskMentionConfig as MentionEntityConfig,
-];
-
-/**
- * Get mention configuration by type
- */
-export function getMentionConfigByType(
-	type: string,
-): MentionEntityConfig | undefined {
-	return mentionConfigs.find((config) => config.type === type);
+): ToolMentionEntity[] {
+	return tools
+		.filter((tool) =>
+			tool.name
+				.replace(/(:|<|>|_)*/, "")
+				.toLowerCase()
+				.match(new RegExp(query.replace(/(:|<|>|_)*/, ""), "i")),
+		)
+		.slice(0, 10)
+		.map((tool) => ({
+			id: tool.name,
+			type: "tool" as const,
+			label: tool.name,
+			name: tool.name,
+			description: tool.description,
+			metadata: {
+				description: tool.description,
+			},
+		}));
 }

@@ -4,7 +4,15 @@ import {
 	type ContextItem,
 	formatLLMContextItems,
 } from "@api/ai/utils/format-context-items";
-import type { ToolExecutionOptions, UIMessageStreamWriter } from "ai";
+import {
+	generateText,
+	InvalidToolInputError,
+	NoSuchToolError,
+	Output,
+	type ToolCallRepairFunction,
+	type ToolExecutionOptions,
+	type UIMessageStreamWriter,
+} from "ai";
 
 /**
  * Extract and validate AppContext from tool execution options.
@@ -110,3 +118,45 @@ export function buildAppContext(
 		contextItems: context.contextItems ?? [],
 	};
 }
+
+// biome-ignore lint/suspicious/noExplicitAny: Tool types no needed here
+export const repairToolCall: ToolCallRepairFunction<any> = async ({
+	inputSchema,
+	error,
+	toolCall,
+	tools,
+}) => {
+	if (NoSuchToolError.isInstance(error)) {
+		return null; // No such tool - cannot repair
+	}
+
+	const tool = tools[toolCall.toolName];
+
+	if (!tool) {
+		return null; // Tool not found - cannot repair
+	}
+
+	if (!InvalidToolInputError.isInstance(error)) {
+		return null; // Not an input error - cannot repair
+	}
+
+	const output = await generateText({
+		model: "openai/gpt-4o-mini",
+		output: Output.object({
+			schema: tool.inputSchema,
+		}),
+		prompt: [
+			`The model tried to call the tool "${toolCall.toolName}"` +
+				" with the following inputs:",
+			JSON.stringify(toolCall.input),
+			"The tool accepts the following schema:",
+			JSON.stringify(inputSchema(toolCall)),
+			"Please fix the inputs.",
+		].join("\n"),
+	});
+
+	return {
+		...toolCall,
+		input: JSON.stringify(output.output),
+	};
+};

@@ -14,6 +14,7 @@ import { Markdown } from "tiptap-markdown";
 import { CommentMark } from "./comment-mark";
 import { buildUnifiedSuggestionOptions } from "./mentions/mention-suggestions";
 import { TaskMentionExtension } from "./mentions/task-mention";
+import { ToolMentionExtension } from "./mentions/tool-mention";
 import { UserMentionExtension } from "./mentions/user-mention";
 
 // Add your extensions here
@@ -41,6 +42,7 @@ const extensions = ({
 	// Custom mention node extensions for rendering mentions as React components
 	UserMentionExtension,
 	TaskMentionExtension,
+	ToolMentionExtension,
 	// Unified mention extension with single @ trigger for all entity types
 	Mention.configure({
 		renderHTML: ({ options, node }) => {
@@ -48,7 +50,7 @@ const extensions = ({
 				"span",
 				mergeAttributes(
 					{
-						class: "border py-0.5 px-1 font-medium",
+						class: "border rounded-sm py-0.5 px-1 font-medium",
 						"data-mention-type": node.attrs.type,
 					},
 					options.HTMLAttributes,

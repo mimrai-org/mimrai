@@ -15,6 +15,7 @@ import {
 	updateAgent,
 } from "@mimir/db/queries/agents";
 import { getModels } from "@mimir/utils/agents";
+import type { Tool } from "ai";
 
 export const agentsRouter = router({
 	get: protectedProcedure
@@ -75,5 +76,28 @@ export const agentsRouter = router({
 		});
 
 		return Object.keys(toolboxes);
+	}),
+
+	getTools: protectedProcedure.query(async ({ ctx }) => {
+		const { toolboxes } = await getAllToolsForUser({
+			userId: ctx.user.id,
+			teamId: ctx.user.teamId!,
+		});
+
+		const result: { name: string; description: string }[] = [];
+		for (const toolboxKey of Object.keys(toolboxes)) {
+			const toolbox = toolboxes[toolboxKey as keyof typeof toolboxes];
+			for (const toolKey of Object.keys(toolbox)) {
+				const tool = toolbox[toolKey as keyof typeof toolbox] as Tool;
+				result.push({
+					name: `${toolboxKey}:${toolKey}`,
+					description: tool.description,
+				});
+			}
+		}
+
+		console.log("Fetched tools for user:", ctx.user.id, result);
+
+		return result;
 	}),
 });

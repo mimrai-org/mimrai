@@ -10,6 +10,12 @@ import type { Tool } from "ai";
 import { getUserAvailableIntegrations } from "../agents/agent-factory";
 import { resolveValidMcpToken } from "../utils/mcp-token-refresh";
 import { addTaskAttachmentTool } from "./add-task-attachment";
+import {
+	bumpAgentMemoryRelevanceTool,
+	recallAgentMemoriesTool,
+	saveAgentMemoryTool,
+	updateAgentMemoryTool,
+} from "./agent-memory";
 // Integration tools
 import { createAgentTool } from "./create-agent";
 import { createCalendarEventTool } from "./create-calendar-event";
@@ -99,7 +105,12 @@ export const researchTools = {
 	webSearch: webSearchTool,
 } as const;
 
-export const memoryTools = {} as const;
+export const memoryTools = {
+	saveAgentMemory: saveAgentMemoryTool,
+	recallAgentMemories: recallAgentMemoriesTool,
+	updateAgentMemory: updateAgentMemoryTool,
+	bumpAgentMemoryRelevance: bumpAgentMemoryRelevanceTool,
+} as const;
 
 /**
  * Integration tool registry - tools are added here when integrations are available
@@ -269,6 +280,7 @@ export const getAllTools = async (
 		tools: {
 			...taskManagementTools,
 			...researchTools,
+			...memoryTools,
 			...integrationTools,
 			...mcpTools,
 		},
@@ -277,6 +289,7 @@ export const getAllTools = async (
 			...mcpToolboxes,
 			taskManagement: taskManagementTools,
 			research: researchTools,
+			memory: memoryTools,
 		},
 	};
 };

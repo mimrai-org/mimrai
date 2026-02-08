@@ -2,7 +2,12 @@
  * Supported entity types for mentions
  * Add new entity types here to extend the mention system
  */
-export type MentionEntityType = "user" | "task" | "project" | "milestone";
+export type MentionEntityType =
+	| "user"
+	| "task"
+	| "project"
+	| "milestone"
+	| "tool";
 
 /**
  * Base interface for all mentionable entities
@@ -37,6 +42,12 @@ export interface TaskMentionEntity extends MentionableEntity {
 	completed?: boolean;
 }
 
+export interface ToolMentionEntity extends MentionableEntity {
+	type: "tool";
+	name: string;
+	description?: string | null;
+}
+
 /**
  * Project entity for mentions
  */
@@ -61,7 +72,8 @@ export type AnyMentionEntity =
 	| UserMentionEntity
 	| TaskMentionEntity
 	| ProjectMentionEntity
-	| MilestoneMentionEntity;
+	| MilestoneMentionEntity
+	| ToolMentionEntity;
 
 /**
  * Props for rendering a mention item in the suggestion list

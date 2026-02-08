@@ -21,6 +21,7 @@ type EditorProps = {
 	onBlur?: () => void;
 	onFocus?: () => void;
 	onUpload?: (fileUrl: string) => Promise<void>;
+	onKeyDown?: (event: React.KeyboardEvent<HTMLDivElement>) => void;
 
 	ref?: React.Ref<EditorInstance>;
 	className?: string;
@@ -41,6 +42,7 @@ export function Editor({
 	onBlur,
 	onFocus,
 	onUpload,
+	onKeyDown,
 	autoFocus,
 	className,
 	tabIndex,
@@ -79,6 +81,7 @@ export function Editor({
 				editor={editor}
 				className={className}
 				tabIndex={tabIndex}
+				onKeyDown={onKeyDown}
 				autoFocus={autoFocus}
 			/>
 			<BubbleMenu editor={editor} taskId={taskId} />

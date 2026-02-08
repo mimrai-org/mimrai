@@ -36,8 +36,14 @@ export function PanelContainer({
 	onClose,
 }: PanelContainerProps) {
 	const panelRef = useRef<HTMLDivElement>(null);
-	const { closePanel, bringToFront, panels, setMinimized, minimized } =
-		usePanels();
+	const {
+		closePanel,
+		bringToFront,
+		panels,
+		setMinimized,
+		minimized,
+		closeAllPanels,
+	} = usePanels();
 
 	// Calculate offset based on index
 	const offset = index * PANEL_OFFSET;
@@ -57,25 +63,30 @@ export function PanelContainer({
 		bringToFront(panel.type, panel.id);
 	}, [bringToFront, panel.type, panel.id, isTopPanel, minimized, setMinimized]);
 
-	// Handle escape key to close the topmost panel (last in array)
+	// Handle escape key to minimize or close panels
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if (e.key === "Escape") {
 				if (panels.length === 0) return;
 
-				// The last panel in the array is the topmost
+				// Only handle escape for the top panel to avoid multiple handlers
 				const topPanel = panels[panels.length - 1];
-
-				// Only close if this is the top panel
 				if (topPanel.type === panel.type && topPanel.id === panel.id) {
-					handleClose();
+					if (minimized) {
+						// If already minimized, close all panels
+						closeAllPanels();
+						setMinimized(false);
+					} else {
+						// If not minimized, minimize all panels
+						setMinimized(true);
+					}
 				}
 			}
 		};
 
 		document.addEventListener("keydown", handleKeyDown);
 		return () => document.removeEventListener("keydown", handleKeyDown);
-	}, [panels, panel.type, panel.id, handleClose]);
+	}, [panels, panel.type, panel.id, minimized, setMinimized, closeAllPanels]);
 
 	const portalContent = (
 		<motion.div
@@ -86,18 +97,22 @@ export function PanelContainer({
 			data-panel-id={panel.id}
 			initial={{
 				opacity: 0,
-				y: 50,
-				height: minimized ? "100px" : `calc(80vh - ${offset}px)`,
+				y: 0,
+				height: `calc(80vh - ${offset}px)`,
 			}}
 			animate={{
 				opacity: 1,
-				y: 0,
-				height: minimized ? "100px" : `calc(80vh - ${offset}px)`,
+				y: minimized ? "90%" : 0,
+				height: `calc(80vh - ${offset}px)`,
 			}}
-			exit={{ opacity: 0, y: 50 }}
-			whileHover={{
-				y: isTopPanel ? 0 : -10,
-			}}
+			exit={{ opacity: 0, y: "100%" }}
+			whileHover={
+				!minimized
+					? {
+							y: isTopPanel ? 0 : -10,
+						}
+					: undefined
+			}
 			transition={{ duration: 0.15, ease: "easeInOut" }}
 			style={{
 				right: `calc(2rem + ${offset}px)`,

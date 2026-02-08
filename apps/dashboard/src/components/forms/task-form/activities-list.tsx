@@ -1,12 +1,10 @@
 "use client";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useSubscription } from "@trpc/tanstack-react-query";
 import { Button } from "@ui/components/ui/button";
 import { AnimatePresence } from "motion/react";
 import { useMemo } from "react";
 import { ActivityItem } from "@/components/activities/activity-item";
-import { useChannelName, useRealtime } from "@/lib/realtime-client";
-import { queryClient, trpc, trpcClient } from "@/utils/trpc";
+import { trpc } from "@/utils/trpc";
 
 export const TaskActivitiesList = ({ taskId }: { taskId: string }) => {
 	const { data, fetchNextPage, hasNextPage } = useInfiniteQuery(

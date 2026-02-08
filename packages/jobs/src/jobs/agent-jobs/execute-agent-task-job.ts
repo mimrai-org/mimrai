@@ -13,7 +13,8 @@ import { getAllTools } from "@api/ai/tools/tool-registry";
 import type { UIChatMessage } from "@api/ai/types";
 import { getUserContext } from "@api/ai/utils/get-user-context";
 import { checkPlanFeatures, createTokenMeter } from "@mimir/billing";
-import { getActivities } from "@mimir/db/queries/activities";
+import { createActivity, getActivities } from "@mimir/db/queries/activities";
+import { getAgentMemories } from "@mimir/db/queries/agent-memories";
 import { getAgentByUserId } from "@mimir/db/queries/agents";
 import {
 	getChatById,
@@ -213,6 +214,7 @@ export const executeAgentTaskPlanJob = schemaTask({
 			await saveChat({
 				chatId: taskId,
 				teamId,
+				title: `${task.title} - Execution Chat`,
 				userId,
 			});
 		}
@@ -280,13 +282,46 @@ export const executeAgentTaskPlanJob = schemaTask({
 			// Focus mode: determines whether we're working on the whole task or a specific checklist item
 			focusMode: focusedChecklistItem ? "checklist-item" : "task",
 			focusedChecklistItem,
+			// Agent identity for long-term memory
+			agentId: agentConfig?.id,
+			agentMemories: [], // populated below
 		};
 
+		// Load long-term agent memories when we have an agent identity
+		if (agentConfig?.id) {
+			const memories = await getAgentMemories({
+				agentId: agentConfig.id,
+				teamId,
+				limit: 30,
+			});
+			executorContext.agentMemories = memories.map((m) => ({
+				id: m.id,
+				category: m.category,
+				title: m.title,
+				content: m.content,
+				tags: m.tags,
+				relevanceScore: m.relevanceScore,
+			}));
+			logger.info("Loaded agent long-term memories", {
+				count: memories.length,
+				agentId: agentConfig.id,
+			});
+		}
+
 		// 6. Update status to executing
-		await updateTaskExecution({
-			taskId: taskId,
-			status: "executing",
-		});
+		await Promise.all([
+			updateTaskExecution({
+				taskId: taskId,
+				status: "executing",
+			}),
+			createActivity({
+				teamId,
+				type: "task_execution_started",
+				groupId: taskId,
+				userId,
+				source: "task",
+			}),
+		]);
 
 		try {
 			const { tools: allTools, toolboxes } = await getAllTools(
@@ -305,7 +340,7 @@ export const executeAgentTaskPlanJob = schemaTask({
 				agentId: agentConfig?.id,
 				teamId,
 				toolboxes,
-				defaultActiveToolboxes: ["taskManagement", "research"],
+				defaultActiveToolboxes: ["taskManagement", "research", "memory"],
 				defaultActiveTools: ["updateTaskMemory"],
 				config: {
 					tools,
@@ -359,11 +394,20 @@ export const executeAgentTaskPlanJob = schemaTask({
 				comment: cleanedResponse,
 			});
 
-			await updateTaskExecution({
-				taskId: taskId,
-				status: "completed",
-				completedAt: new Date(),
-			});
+			await Promise.all([
+				updateTaskExecution({
+					taskId: taskId,
+					status: "completed",
+					completedAt: new Date(),
+				}),
+				createActivity({
+					teamId,
+					type: "task_execution_completed",
+					groupId: taskId,
+					userId,
+					source: "task",
+				}),
+			]);
 		} catch (error) {
 			logger.error("Unexpected error during plan execution", { error });
 			const errorMessage =

@@ -11,6 +11,7 @@ import { CheckIcon, SparklesIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useDebounceCallback } from "usehooks-ts";
+import { Editor } from "@/components/editor";
 import Loader from "@/components/loader";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/utils/trpc";
@@ -47,6 +48,7 @@ export const SmartInput = () => {
 				form.reset(
 					{
 						showSmartInput: true,
+						description: value,
 						...data,
 					},
 					{
@@ -58,14 +60,9 @@ export const SmartInput = () => {
 		}),
 	);
 
-	const debouncedMutate = useDebounceCallback(mutate, 1400);
+	const debouncedMutate = useDebounceCallback(mutate, 10_000);
 
 	useEffect(() => {
-		// check if the length of the value is not too long to used it as title
-		if (value.length <= 20) {
-			form.setValue("title", value);
-		}
-
 		// compare last completed value to debounced value to determine if there is sufficient new context to trigger a new completion
 		const nonWhitespaceCharacters = value.replace(/\s/g, "");
 		const lastCharactersDifference = Math.abs(
@@ -84,52 +81,20 @@ export const SmartInput = () => {
 	};
 
 	return (
-		<div>
-			<Textarea
-				ref={inputRef}
+		<div className="mt-4">
+			<Editor
 				className={cn(
 					"border-0 bg-transparent focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent",
-					"px-0 pt-8 text-base placeholder:text-base md:text-lg",
+					"px-0 pt-2 [&_.tiptap]:min-h-18 [&_.tiptap]:text-base!",
 				)}
 				placeholder="Describe what you want to do..."
 				value={value}
-				onChange={(e) => setValue(e.target.value)}
-				onKeyDown={(e) => {
-					if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
-						e.preventDefault();
-						// look for the submit button and click it
-						const formElement = e.currentTarget.form;
-						if (!formElement) return;
-						const submitButton = formElement.querySelector(
-							'button[type="submit"]',
-						) as HTMLButtonElement;
-						if (submitButton) {
-							submitButton.click();
-						}
-					}
-				}}
+				onChange={(value) => setValue(value)}
 			/>
-			<div className="flex justify-between">
+			<div className="mt-4 flex justify-between">
 				<div>
 					<TaskDuplicated title={value} />
 					<div className={cn("opacity-50")}>
-						{(title || value) && (
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<div className="flex w-fit items-center gap-2 text-sm">
-										{isPending ? (
-											<Loader className="size-4" />
-										) : (
-											<SparklesIcon className="size-4" />
-										)}
-										{isPending ? <Skeleton className="h-4 w-20" /> : title}
-									</div>
-								</TooltipTrigger>
-								<TooltipContent className="max-w-lg">
-									<span>{explanation}</span>
-								</TooltipContent>
-							</Tooltip>
-						)}
 						<TaskFormProperties />
 					</div>
 				</div>

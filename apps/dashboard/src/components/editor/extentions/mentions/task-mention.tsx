@@ -113,54 +113,6 @@ function TaskMentionNodeComponent({ node }: NodeViewProps) {
 }
 
 /**
- * Task mention node renderer for external use (read-only views)
- * Fetches current task status dynamically
- */
-export function TaskMentionNode({ id, label, attrs }: MentionNodeProps) {
-	const sequence = attrs.sequence as number | undefined;
-
-	// Fetch current task status
-	const { data: task, isLoading } = useQuery(
-		trpc.tasks.getById.queryOptions({ id }),
-	);
-
-	const isCompleted = task?.status?.type === "done";
-	const currentSequence = task?.sequence ?? sequence;
-
-	return (
-		<span
-			className={cn(
-				"inline-flex items-center gap-1.5 rounded-md border bg-muted/50 px-2 py-0.5 font-medium text-sm",
-				isCompleted && "opacity-70",
-			)}
-			data-mention-type="task"
-			data-mention-id={id}
-		>
-			{isLoading ? (
-				<Loader2Icon className="size-3.5 shrink-0 animate-spin text-muted-foreground" />
-			) : isCompleted ? (
-				<CheckCircle2Icon className="size-3.5 shrink-0 text-green-500" />
-			) : (
-				<CircleIcon className="size-3.5 shrink-0 text-muted-foreground" />
-			)}
-			{currentSequence && (
-				<span className="text-muted-foreground text-xs">
-					#{currentSequence}
-				</span>
-			)}
-			<span
-				className={cn(
-					"max-w-[350px] truncate",
-					isCompleted && "text-muted-foreground line-through",
-				)}
-			>
-				{task?.title ?? label}
-			</span>
-		</span>
-	);
-}
-
-/**
  * TipTap extension for task mentions
  * Creates an inline node that renders the task mention with checkbox and title
  * Note: Only id, label, and sequence are stored - status is fetched dynamically
