@@ -17,7 +17,7 @@ type Task = RouterOutputs["tasks"]["get"]["data"][number];
 interface TaskItemProps {
 	task: Task;
 	className?: string;
-	onOpenTask: (taskId: string) => void;
+	onOpenTask: (taskId: string, taskTitle: string) => void;
 	visibleProperties: PropertyKey[];
 }
 

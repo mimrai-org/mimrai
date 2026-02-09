@@ -1,12 +1,18 @@
 import { getAllToolsForUser } from "@api/ai/tools/tool-registry";
 import {
 	createAgentSchema,
+	deleteAgentMemorySchema,
 	deleteAgentSchema,
 	getAgentByIdSchema,
+	getAgentMemoriesSchema,
 	getAgentsSchema,
 	updateAgentSchema,
 } from "@api/schemas/agents";
 import { protectedProcedure, router } from "@api/trpc/init";
+import {
+	deleteAgentMemory,
+	getAgentMemories,
+} from "@mimir/db/queries/agent-memories";
 import {
 	createAgent,
 	deleteAgent,
@@ -87,6 +93,11 @@ export const agentsRouter = router({
 		const result: { name: string; description: string }[] = [];
 		for (const toolboxKey of Object.keys(toolboxes)) {
 			const toolbox = toolboxes[toolboxKey as keyof typeof toolboxes];
+			result.push({
+				name: toolboxKey,
+				description: "",
+			});
+
 			for (const toolKey of Object.keys(toolbox)) {
 				const tool = toolbox[toolKey as keyof typeof toolbox] as Tool;
 				result.push({
@@ -100,4 +111,21 @@ export const agentsRouter = router({
 
 		return result;
 	}),
+
+	getMemories: protectedProcedure
+		.input(getAgentMemoriesSchema)
+		.query(async ({ ctx, input }) => {
+			return getAgentMemories({
+				agentId: input.agentId,
+				teamId: ctx.user.teamId!,
+				category: input.category,
+				limit: input.limit,
+			});
+		}),
+
+	deleteMemory: protectedProcedure
+		.input(deleteAgentMemorySchema)
+		.mutation(async ({ input }) => {
+			return deleteAgentMemory(input.id);
+		}),
 });

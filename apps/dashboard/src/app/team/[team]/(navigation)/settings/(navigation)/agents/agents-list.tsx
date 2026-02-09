@@ -2,7 +2,6 @@
 
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@ui/components/ui/button";
-import { Card, CardContent } from "@ui/components/ui/card";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -12,6 +11,7 @@ import {
 import { Skeleton } from "@ui/components/ui/skeleton";
 import {
 	BotIcon,
+	BrainIcon,
 	EditIcon,
 	EllipsisVerticalIcon,
 	TrashIcon,
@@ -114,6 +114,18 @@ export const AgentsList = () => {
 									>
 										<EditIcon />
 										Edit
+									</DropdownMenuItem>
+									<DropdownMenuItem
+										onClick={() => {
+											queryClient.setQueryData(
+												trpc.agents.getById.queryKey({ id: agent.id }),
+												agent,
+											);
+											setParams({ agentMemoryId: agent.id });
+										}}
+									>
+										<BrainIcon />
+										Memory
 									</DropdownMenuItem>
 									<DropdownMenuItem
 										variant="destructive"

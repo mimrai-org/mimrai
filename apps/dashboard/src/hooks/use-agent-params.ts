@@ -4,6 +4,7 @@ export function useAgentParams() {
 	const [params, setParams] = useQueryStates({
 		agentId: parseAsString,
 		createAgent: parseAsBoolean,
+		agentMemoryId: parseAsString,
 	});
 
 	return {

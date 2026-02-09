@@ -107,11 +107,8 @@ export const ProjectsList = ({
 											<div className="flex items-center gap-1 text-xs">
 												<AssigneeAvatar {...project.lead} className="size-4" />
 												<div className="flex items-center gap-1 rounded-sm px-1">
-													<span>
-														{Number(project.progress.completed) +
-															Number(project.progress.inProgress)}
-													</span>
-													Tasks
+													<span>{Number(project.progress.inProgress)}</span>
+													Pending
 												</div>
 											</div>
 										</NavItemSubtitle>

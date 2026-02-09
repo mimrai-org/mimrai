@@ -134,6 +134,8 @@ export const TaskForm = ({
 		ignoreFields: ["showSmartInput"],
 	});
 
+	console.log(form.formState.errors);
+
 	const createMode = !id;
 	const formShowSmartInput = form.watch("showSmartInput");
 	const showSmartInput = createMode && formShowSmartInput;
@@ -146,7 +148,7 @@ export const TaskForm = ({
 						<SmartInput />
 					) : (
 						<>
-							<div className="pt-4">
+							<div className="pt-0">
 								<div className="space-y-1 py-2">
 									<input className="hidden size-0 opacity-0" />
 									{defaultValues?.sequence >= 0 && (

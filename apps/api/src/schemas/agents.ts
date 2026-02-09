@@ -36,3 +36,13 @@ export const updateAgentSchema = z.object({
 export const deleteAgentSchema = z.object({
 	id: z.string(),
 });
+
+export const getAgentMemoriesSchema = z.object({
+	agentId: z.string(),
+	category: z.enum(["lesson", "preference", "fact", "procedure"]).optional(),
+	limit: z.number().min(1).max(100).default(50).optional(),
+});
+
+export const deleteAgentMemorySchema = z.object({
+	id: z.string(),
+});

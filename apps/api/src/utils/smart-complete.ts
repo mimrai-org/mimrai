@@ -32,6 +32,10 @@ ${userPrompt}
 - Keep the title concise and self-explanatory.
 - The description should provide enough detail for someone to understand the task without further clarification.
 - return dates in UTC ISO 8601 format.
+- If the task is recurring, provide the frequency, interval, and start date. Otherswise, set recurring to null.
+- Use provided ID for labels and assignees, do not invent new ones.
+- If you don't have enough information to fill a field, set it to null.
+- Do not include any information that is not relevant to the task details.
 </rules>
 
 <user-context>

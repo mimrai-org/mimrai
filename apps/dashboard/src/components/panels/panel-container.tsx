@@ -90,7 +90,7 @@ export function PanelContainer({
 			data-panel-id={panel.id}
 			initial={{
 				opacity: 0,
-				y: minimized ? "88%" : 0,
+				y: "88%",
 				height: `calc(80vh - ${offset}px)`,
 			}}
 			animate={{
@@ -176,7 +176,7 @@ export function PanelContainer({
 						</button>
 					</div>
 				)}
-				{isTopPanel ? children : null}
+				<div className="py-4">{isTopPanel ? children : null}</div>
 			</div>
 		</motion.div>
 	);

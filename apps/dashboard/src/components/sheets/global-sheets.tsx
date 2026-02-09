@@ -1,4 +1,5 @@
 import { AgentCreateSheet } from "./agent-create-sheet";
+import { AgentMemoryDialog } from "./agent-memory-dialog";
 import { AgentUpdateSheet } from "./agent-update-sheet";
 import { IntegrationInstallSheet } from "./integration-install-sheet";
 import { LabelCreateSheet } from "./label-create-sheet";
@@ -32,6 +33,7 @@ export const GlobalSheets = () => {
 			<McpServerCreateSheet />
 			<McpServerUpdateSheet />
 			<AgentCreateSheet />
+			<AgentMemoryDialog />
 			<AgentUpdateSheet />
 			<TaskUpdateSheet />
 			<TeamCreateSheet />
