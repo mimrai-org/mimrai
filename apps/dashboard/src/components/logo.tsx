@@ -9,7 +9,7 @@ export const Logo = ({ className }: { className?: string }) => {
 			width={32}
 			height={32}
 			loading="lazy"
-			className={cn(className, "rounded-sm object-contain")}
+			className={cn(className, "rounded-sm object-contain dark:invert")}
 		/>
 	);
 };

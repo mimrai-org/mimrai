@@ -49,7 +49,7 @@ import {
 	isSystemUser,
 	triggerAgentTaskExecutionIfNeeded,
 } from "./agent-triggers";
-import { getStatuses } from "./statuses";
+import { getStatusById, getStatuses } from "./statuses";
 import { upsertTaskEmbedding } from "./tasks-embeddings";
 import { getMembers } from "./teams";
 
@@ -227,11 +227,10 @@ export const getTasks = async ({
 		}
 	}
 
-	// exclude done tasks with more than 3 days
+	// exclude done tasks with more than 1 day
 	if (
-		(!input.statusType ||
-			!input.statusType?.includes("done") ||
-			!input.statusId) &&
+		(!input.statusType || !input.statusType?.includes("done")) &&
+		!input.statusId &&
 		!input.statusChangedAt &&
 		!input.completedBy
 	) {
@@ -628,16 +627,22 @@ export const updateTask = async ({
 	});
 
 	// Trigger agent if task is assigned to system user or has relevant updates
-	if (task.assigneeId) {
-		triggerAgentTaskExecutionIfNeeded({
-			taskId: task.id,
+	if (input.assigneeId) {
+		const status = await getStatusById({
+			id: task.statusId,
 			teamId: task.teamId,
-			assigneeId: task.assigneeId,
-			previousAssigneeId: oldTask.assigneeId,
-			triggeredBy:
-				oldTask.assigneeId !== task.assigneeId ? "assignment" : "update",
-			triggerUserId: userId,
 		});
+		if (status?.type !== "done") {
+			triggerAgentTaskExecutionIfNeeded({
+				taskId: task.id,
+				teamId: task.teamId,
+				assigneeId: task.assigneeId,
+				previousAssigneeId: oldTask.assigneeId,
+				triggeredBy:
+					oldTask.assigneeId !== task.assigneeId ? "assignment" : "update",
+				triggerUserId: userId,
+			});
+		}
 	}
 
 	return task;
@@ -710,6 +715,27 @@ export const bulkUpdateTask = async ({
 	}
 
 	return updatedTasks;
+};
+
+export const bulkDeleteTask = async ({
+	ids,
+	teamId,
+}: {
+	ids: string[];
+	teamId: string;
+}) => {
+	const whereClause: SQL[] = [inArray(tasks.id, ids), eq(tasks.teamId, teamId)];
+
+	const deletedTasks = await db
+		.delete(tasks)
+		.where(and(...whereClause))
+		.returning();
+
+	if (deletedTasks.length === 0) {
+		throw new Error("No tasks found to delete");
+	}
+
+	return deletedTasks;
 };
 
 export const getTaskByPermalinkId = async (

@@ -107,6 +107,11 @@ export const bulkUpdateTaskSchema = z.object({
 });
 export type BulkUpdateTaskInput = z.infer<typeof bulkUpdateTaskSchema>;
 
+export const bulkDeleteTaskSchema = z.object({
+	ids: z.array(z.string()).min(1),
+});
+export type BulkDeleteTaskInput = z.infer<typeof bulkDeleteTaskSchema>;
+
 export const deleteTaskSchema = z.object({
 	id: z.string(),
 	teamId: z.string().optional(),

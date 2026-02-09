@@ -32,7 +32,7 @@ export const IntegrationsList = () => {
 					Install and manage integrations to enhance your team's workflow.
 				</CardDescription>
 			</CardHeader>
-			<CardContent>
+			<CardContent className="border-0 p-0">
 				<ul className="grid grid-cols-3 gap-4">
 					{data?.map((integration) => (
 						<li

@@ -143,6 +143,11 @@ export const executeAgentTaskPlanJob = schemaTask({
 
 		const execution = await createTaskExecution({ taskId, teamId });
 
+		if (execution.status === "executing") {
+			logger.warn("Task execution already in progress", { taskId });
+			return { status: "failed", reason: "execution_already_in_progress" };
+		}
+
 		// Build appropriate message based on focus mode
 		const messageText = focusedChecklistItem
 			? execution.status === "pending"

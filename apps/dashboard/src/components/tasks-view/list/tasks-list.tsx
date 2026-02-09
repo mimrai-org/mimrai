@@ -249,7 +249,7 @@ const GroupHeader = memo(function GroupHeader({
 						type="button"
 						data-state={isCollapsed ? "closed" : "open"}
 						onClick={onToggle}
-						className="group mb-2 flex w-full cursor-pointer items-center gap-2 rounded-sm bg-accent px-4 py-2 text-muted-foreground text-sm transition-colors hover:text-foreground dark:bg-card"
+						className="group mb-2 flex w-full cursor-pointer items-center gap-2 rounded-sm border bg-card px-4 py-2 text-muted-foreground text-sm transition-colors hover:text-foreground dark:border-0 dark:bg-card"
 					>
 						<div className="text-muted-foreground group-hover:text-foreground">
 							<ChevronRightIcon className="size-4 group-data-[state=open]:hidden" />

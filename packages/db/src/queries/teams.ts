@@ -215,6 +215,7 @@ export const getMembers = async ({
 
 	return members.map((member) => ({
 		...member,
+		isAgent: !member.role,
 		role: member.role || "agent",
 		description: member.description || member.agentDescription,
 		image: member.image || member.agentImage,

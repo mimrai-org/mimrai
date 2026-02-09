@@ -54,7 +54,7 @@
 	}
 
 	pre {
-		@apply border p-2 my-2;
+		@apply border rounded-sm break-words max-w-xl p-2 my-2;
 
 		code {
 			background: none;

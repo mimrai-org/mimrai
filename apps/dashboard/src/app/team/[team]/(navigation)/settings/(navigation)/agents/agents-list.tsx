@@ -50,86 +50,84 @@ export const AgentsList = () => {
 	}, [data]);
 
 	return (
-		<Card>
-			<CardContent className="text-sm">
-				{isFetching ? (
-					Array.from({ length: 3 }).map((_, index) => (
-						<Skeleton key={index} className="my-2 h-14 rounded-sm" />
-					))
-				) : flatData.length === 0 ? (
-					<div className="flex flex-col items-center justify-center py-12 text-center">
-						<BotIcon className="mb-4 size-12 text-muted-foreground" />
-						<h3 className="mb-2 font-medium text-lg">No agents yet</h3>
-						<p className="mb-4 max-w-sm text-muted-foreground">
-							Create your first AI agent to help automate tasks and enhance your
-							team's productivity.
-						</p>
-						<Button
-							onClick={() => setParams({ createAgent: true })}
-							className="w-fit"
-						>
-							Create Agent
-						</Button>
-					</div>
-				) : (
-					flatData.map((agent) => (
-						<div
-							key={agent.id}
-							className="flex items-center gap-4 rounded-sm px-4 py-2 hover:bg-accent dark:hover:bg-accent/30"
-						>
-							<div>
-								<AssigneeAvatar
-									name={agent.name}
-									email={agent.name}
-									image={agent.avatar}
-								/>
-							</div>
-							<div>
-								<h3 className="font-medium">{agent.name}</h3>
-								<p className="text-muted-foreground">
-									{agent.description || "No description provided."}
-								</p>
-							</div>
-							<div className="ml-auto flex items-center gap-2">
-								<div className="text-muted-foreground">{agent.model}</div>
-								<DropdownMenu>
-									<DropdownMenuTrigger asChild>
-										<Button
-											type="button"
-											size="sm"
-											className="size-5"
-											variant="ghost"
-										>
-											<EllipsisVerticalIcon />
-										</Button>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent>
-										<DropdownMenuItem
-											onClick={() => {
-												queryClient.setQueryData(
-													trpc.agents.getById.queryKey({ id: agent.id }),
-													agent,
-												);
-												setParams({ agentId: agent.id });
-											}}
-										>
-											<EditIcon />
-											Edit
-										</DropdownMenuItem>
-										<DropdownMenuItem
-											variant="destructive"
-											onClick={() => deleteAgent({ id: agent.id })}
-										>
-											<TrashIcon />
-											Delete
-										</DropdownMenuItem>
-									</DropdownMenuContent>
-								</DropdownMenu>
-							</div>
+		<div className="text-sm">
+			{isFetching ? (
+				Array.from({ length: 3 }).map((_, index) => (
+					<Skeleton key={index} className="my-2 h-14 rounded-sm" />
+				))
+			) : flatData.length === 0 ? (
+				<div className="flex flex-col items-center justify-center py-12 text-center">
+					<BotIcon className="mb-4 size-12 text-muted-foreground" />
+					<h3 className="mb-2 font-medium text-lg">No agents yet</h3>
+					<p className="mb-4 max-w-sm text-muted-foreground">
+						Create your first AI agent to help automate tasks and enhance your
+						team's productivity.
+					</p>
+					<Button
+						onClick={() => setParams({ createAgent: true })}
+						className="w-fit"
+					>
+						Create Agent
+					</Button>
+				</div>
+			) : (
+				flatData.map((agent) => (
+					<div
+						key={agent.id}
+						className="flex items-center gap-4 rounded-sm px-4 py-2 hover:bg-accent dark:hover:bg-accent/30"
+					>
+						<div>
+							<AssigneeAvatar
+								name={agent.name}
+								email={agent.name}
+								image={agent.avatar}
+							/>
 						</div>
-					))
-				)}
-			</CardContent>
-		</Card>
+						<div>
+							<h3 className="font-medium">{agent.name}</h3>
+							<p className="text-muted-foreground">
+								{agent.description || "No description provided."}
+							</p>
+						</div>
+						<div className="ml-auto flex items-center gap-2">
+							<div className="text-muted-foreground">{agent.model}</div>
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<Button
+										type="button"
+										size="sm"
+										className="size-5"
+										variant="ghost"
+									>
+										<EllipsisVerticalIcon />
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent>
+									<DropdownMenuItem
+										onClick={() => {
+											queryClient.setQueryData(
+												trpc.agents.getById.queryKey({ id: agent.id }),
+												agent,
+											);
+											setParams({ agentId: agent.id });
+										}}
+									>
+										<EditIcon />
+										Edit
+									</DropdownMenuItem>
+									<DropdownMenuItem
+										variant="destructive"
+										onClick={() => deleteAgent({ id: agent.id })}
+									>
+										<TrashIcon />
+										Delete
+									</DropdownMenuItem>
+								</DropdownMenuContent>
+							</DropdownMenu>
+						</div>
+					</div>
+				))
+			)}
+		</div>
 	);
 };

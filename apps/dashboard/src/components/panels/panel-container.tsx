@@ -72,21 +72,14 @@ export function PanelContainer({
 				// Only handle escape for the top panel to avoid multiple handlers
 				const topPanel = panels[panels.length - 1];
 				if (topPanel.type === panel.type && topPanel.id === panel.id) {
-					if (minimized) {
-						// If already minimized, close all panels
-						closeAllPanels();
-						setMinimized(false);
-					} else {
-						// If not minimized, minimize all panels
-						setMinimized(true);
-					}
+					closePanel(panel.type, panel.id);
 				}
 			}
 		};
 
 		document.addEventListener("keydown", handleKeyDown);
 		return () => document.removeEventListener("keydown", handleKeyDown);
-	}, [panels, panel.type, panel.id, minimized, setMinimized, closeAllPanels]);
+	}, [panels, panel.type, panel.id, closePanel]);
 
 	const portalContent = (
 		<motion.div
@@ -97,7 +90,7 @@ export function PanelContainer({
 			data-panel-id={panel.id}
 			initial={{
 				opacity: 0,
-				y: 0,
+				y: minimized ? "88%" : 0,
 				height: `calc(80vh - ${offset}px)`,
 			}}
 			animate={{

@@ -1,5 +1,6 @@
 import { openai } from "@ai-sdk/openai";
 import {
+	bulkDeleteTaskSchema,
 	bulkUpdateTaskSchema,
 	cloneTaskSchema,
 	commentTaskSchema,
@@ -22,6 +23,7 @@ import {
 } from "@api/utils/smart-complete";
 import { createTokenMeter } from "@mimir/billing";
 import {
+	bulkDeleteTask,
 	bulkUpdateTask,
 	cloneTask,
 	createTask,
@@ -175,6 +177,14 @@ export const tasksRouter = router({
 			return bulkUpdateTask({
 				...input,
 				userId: ctx.user.id,
+				teamId: ctx.user.teamId!,
+			});
+		}),
+	bulkDelete: protectedProcedure
+		.input(bulkDeleteTaskSchema)
+		.mutation(async ({ ctx, input }) => {
+			return bulkDeleteTask({
+				...input,
 				teamId: ctx.user.teamId!,
 			});
 		}),

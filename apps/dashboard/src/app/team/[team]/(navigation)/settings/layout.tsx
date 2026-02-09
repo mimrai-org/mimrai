@@ -6,7 +6,7 @@ export default async function Layout({
 	children: React.ReactNode;
 }) {
 	return (
-		<div className="grid grid-cols-[250px_1fr]">
+		<div className="mx-auto grid grid-cols-[250px_1fr] gap-8 pt-4 lg:w-7xl">
 			<SettingsSidebar />
 			<div>{children}</div>
 		</div>

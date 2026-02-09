@@ -1,8 +1,11 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Button } from "@ui/components/ui/button";
+import { Button, buttonVariants } from "@ui/components/ui/button";
 import { Separator } from "@ui/components/ui/separator";
-import { CheckIcon, XIcon } from "lucide-react";
+import { cn } from "@ui/lib/utils";
+import { he, vi } from "date-fns/locale";
+import { CheckIcon, Trash2Icon, XIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
+import { useState } from "react";
 import Loader from "@/components/loader";
 import { useTaskSelectionStore } from "@/store/task-selection";
 import { queryClient, trpc } from "@/utils/trpc";
@@ -31,6 +34,27 @@ export const TaskListBulkActions = () => {
 		}),
 	);
 
+	const { mutate: bulkDelete, isPending: isDeleting } = useMutation(
+		trpc.tasks.bulkDelete.mutationOptions({
+			onSuccess: () => {
+				clearTaskSelection();
+				setConfirmDelete(false);
+				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
+				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
+			},
+		}),
+	);
+
+	const [confirmDelete, setConfirmDelete] = useState(false);
+
+	const handleBulkDelete = () => {
+		if (!confirmDelete) {
+			setConfirmDelete(true);
+			return;
+		}
+		bulkDelete({ ids: selectedTaskIds });
+	};
+
 	const handleMarkAsDone = () => {
 		if (!statuses?.data || statuses?.data.length === 0) return;
 		const statusId = statuses.data[0].id;
@@ -56,12 +80,32 @@ export const TaskListBulkActions = () => {
 					</div>
 					<Separator orientation="vertical" className="min-h-6" />
 
-					<BulkActionItem onClick={handleMarkAsDone} disabled={isPending}>
+					<BulkActionItem
+						onClick={handleMarkAsDone}
+						disabled={isPending || isDeleting}
+					>
 						{isPending ? <Loader /> : <CheckIcon />}
 						<BulkActionItemLabel>Mark as Done</BulkActionItemLabel>
 					</BulkActionItem>
 
-					<BulkActionItem onClick={clearTaskSelection} disabled={isPending}>
+					<BulkActionItem
+						onClick={handleBulkDelete}
+						disabled={isPending || isDeleting}
+						variant={confirmDelete ? "destructive" : "ghost"}
+					>
+						{isDeleting ? <Loader /> : <Trash2Icon />}
+						<BulkActionItemLabel>
+							{confirmDelete ? "Confirm?" : "Delete"}
+						</BulkActionItemLabel>
+					</BulkActionItem>
+
+					<BulkActionItem
+						onClick={() => {
+							clearTaskSelection();
+							setConfirmDelete(false);
+						}}
+						disabled={isPending || isDeleting}
+					>
 						<XIcon />
 						<BulkActionItemLabel>Clear</BulkActionItemLabel>
 					</BulkActionItem>
@@ -73,15 +117,18 @@ export const TaskListBulkActions = () => {
 
 const bulkActionItemVariants = {
 	hover: {},
+	initial: {},
 };
 
 const bulkActionItemLabelVariants = {
 	hover: {
 		opacity: 1,
+		marginLeft: 4,
 		width: "auto",
 	},
 	initial: {
 		opacity: 0,
+		marginLeft: 0,
 		width: 0,
 	},
 };
@@ -90,27 +137,28 @@ const BulkActionItem = ({
 	children,
 	onClick,
 	disabled,
+	variant = "ghost",
 }: {
 	children: React.ReactNode;
 	onClick: () => void;
 	disabled?: boolean;
+	variant?: "ghost" | "destructive";
 }) => {
 	return (
-		<motion.div
+		<motion.button
 			initial="initial"
 			whileHover="hover"
 			variants={bulkActionItemVariants}
+			className={cn(
+				buttonVariants({ variant, size: "sm" }),
+				"flex items-center gap-0!",
+			)}
+			onClick={onClick}
+			title="Clear selection"
+			disabled={disabled}
 		>
-			<Button
-				onClick={onClick}
-				variant="ghost"
-				title="Clear selection"
-				size="sm"
-				disabled={disabled}
-			>
-				{children}
-			</Button>
-		</motion.div>
+			{children}
+		</motion.button>
 	);
 };
 
@@ -118,7 +166,7 @@ const BulkActionItemLabel = ({ children }: { children: React.ReactNode }) => {
 	return (
 		<motion.span
 			variants={bulkActionItemLabelVariants}
-			className="overflow-hidden whitespace-nowrap font-normal text-muted-foreground text-xs"
+			className="overflow-hidden whitespace-nowrap font-normal text-current text-xs"
 		>
 			{children}
 		</motion.span>

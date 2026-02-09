@@ -210,6 +210,7 @@
         "cmdk": "^1.1.1",
         "date-fns": "^4.1.0",
         "embla-carousel-react": "^8.6.0",
+        "facehash": "^0.0.5",
         "lucide-react": "^0.546.0",
         "motion": "^12.23.22",
         "next": "16.1.6",
