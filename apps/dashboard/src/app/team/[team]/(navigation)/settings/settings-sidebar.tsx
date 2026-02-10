@@ -15,7 +15,7 @@ export const SettingsSidebar = () => {
 	}, [user.basePath]);
 
 	return (
-		<div className="sticky top-4 flex flex-col gap-1 self-start rounded-sm border p-2 text-sm">
+		<div className="sticky top-[68px] flex flex-col gap-1 self-start rounded-sm border p-2 text-sm">
 			{settingsLinks.map((link) => {
 				const isActive = pathname === link.to;
 				const Icon = link.icon;

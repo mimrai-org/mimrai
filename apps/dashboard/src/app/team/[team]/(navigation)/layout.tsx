@@ -16,17 +16,17 @@ export default async function DashboardLayout({
 		<>
 			{/*<Header />*/}
 			<Suspense>
-				<SidebarProvider defaultOpen={false}>
+				<SidebarProvider defaultOpen={true}>
 					<AppSidebar />
-					<main className="flex flex-1 flex-col px-6">
-						<BreadcrumbsProvider session={session}>
+					<BreadcrumbsProvider session={session}>
+						<main className="flex flex-1 flex-col">
 							<Header />
-							<div className="flex flex-1 flex-col rounded-lg bg-background pb-4">
+							<div className="flex flex-1 flex-col rounded-lg bg-background p-6 pb-4">
 								{children}
 							</div>
 							{/* <ChatWidget /> */}
-						</BreadcrumbsProvider>
-					</main>
+						</main>
+					</BreadcrumbsProvider>
 				</SidebarProvider>
 			</Suspense>
 		</>

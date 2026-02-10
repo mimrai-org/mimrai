@@ -34,43 +34,34 @@ export function SidebarProjects() {
 
 	return (
 		<SidebarGroup>
-			<SidebarGroupLabel>Projects</SidebarGroupLabel>
+			<Link href={`${user.basePath}/projects`}>
+				<SidebarGroupLabel>Projects</SidebarGroupLabel>
+			</Link>
 			<SidebarGroupContent>
 				<SidebarMenu>
 					{projects?.data.map((project) => (
 						<SidebarMenuItem key={project.id}>
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<SidebarMenuButton asChild>
-										<Link href={`${user.basePath}/projects/${project.id}`}>
-											<ProjectIcon {...project} />
-											<span>{project.name}</span>
-										</Link>
-									</SidebarMenuButton>
-								</TooltipTrigger>
-								{!open && (
-									<TooltipContent side="right">{project.name}</TooltipContent>
-								)}
-							</Tooltip>
+							<SidebarMenuButton asChild tooltip={project.name}>
+								<Link href={`${user.basePath}/projects/${project.id}`}>
+									<ProjectIcon {...project} />
+									<span>{project.name}</span>
+								</Link>
+							</SidebarMenuButton>
 						</SidebarMenuItem>
 					))}
 
 					<SidebarMenuItem>
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<SidebarMenuButton
-									onClick={() => {
-										setProjectParams({
-											createProject: true,
-										});
-									}}
-								>
-									<PlusIcon />
-									<span>New Project</span>
-								</SidebarMenuButton>
-							</TooltipTrigger>
-							<TooltipContent side="right">Create New Project</TooltipContent>
-						</Tooltip>
+						<SidebarMenuButton
+							onClick={() => {
+								setProjectParams({
+									createProject: true,
+								});
+							}}
+							tooltip={"Create New Project"}
+						>
+							<PlusIcon />
+							<span>New Project</span>
+						</SidebarMenuButton>
 					</SidebarMenuItem>
 				</SidebarMenu>
 			</SidebarGroupContent>

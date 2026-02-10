@@ -29,6 +29,7 @@ export function NavUser() {
 					name={user.name}
 					email={user.email}
 					image={user.image}
+					className="size-7"
 				/>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent
@@ -43,6 +44,7 @@ export function NavUser() {
 							name={user.name}
 							email={user.email}
 							image={user.image}
+							className="size-7"
 						/>
 						<div className="grid flex-1 text-left text-sm leading-tight">
 							<span className="truncate font-medium">{user.name}</span>

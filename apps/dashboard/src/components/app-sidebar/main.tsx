@@ -17,8 +17,8 @@ export function AppSidebar() {
 	const { open } = useSidebar();
 
 	return (
-		<Sidebar collapsible="icon" className="border-none">
-			<SidebarHeader className="h-[48px]">
+		<Sidebar collapsible="icon" className="">
+			<SidebarHeader className="h-[48px] border-b">
 				<div
 					className={cn(
 						"group/header relative flex h-full items-center justify-between",
@@ -27,12 +27,21 @@ export function AppSidebar() {
 						},
 					)}
 				>
-					<Logo
-						className={cn("size-5", {
-							"opacity-100 transition-opacity group-hover/header:opacity-0":
-								!open,
-						})}
-					/>
+					<div className="flex items-center gap-2">
+						<Logo
+							className={cn("size-8", {
+								"opacity-100 transition-opacity group-hover/header:opacity-0":
+									!open,
+							})}
+						/>
+						<span
+							className={cn("font-header font-medium text-foreground", {
+								hidden: !open,
+							})}
+						>
+							MIMRAI
+						</span>
+					</div>
 					<SidebarTrigger
 						className={cn({
 							"absolute inset-0 opacity-0 transition-opacity group-hover/header:opacity-100":

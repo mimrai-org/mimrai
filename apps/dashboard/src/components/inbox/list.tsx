@@ -19,7 +19,7 @@ export const InboxList = ({ className }: { className?: string }) => {
 		<div
 			className={cn(
 				"flex flex-col gap-2",
-				"h-[calc(100vh-90px)] overflow-y-auto p-2",
+				"h-[calc(100vh-90px)] overflow-y-auto",
 				{
 					"min-w-1/3 max-w-1/3": selectedInbox,
 					"w-full": !selectedInbox,

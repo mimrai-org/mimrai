@@ -22,7 +22,7 @@ export const FeedView = () => {
 						"mention",
 						"daily_team_summary",
 					],
-					pageSize: 10,
+					pageSize: 5,
 				},
 				{
 					getNextPageParam: (lastPage) => lastPage.meta.cursor,

@@ -311,8 +311,6 @@ export const McpServerForm = ({
 					)}
 				/>
 
-				{error && <div className="text-red-500 text-sm">{error}</div>}
-
 				<div className="flex justify-end gap-2 pt-2">
 					{defaultValues?.id && (
 						<Button
