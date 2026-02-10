@@ -9,8 +9,7 @@ import {
 } from "@ui/components/ui/context-menu";
 import { Input } from "@ui/components/ui/input";
 import { cn } from "@ui/lib/utils";
-import { formatRelative } from "date-fns";
-import { Edit, PlusIcon, SearchIcon, TrashIcon } from "lucide-react";
+import { PlusIcon, SearchIcon, TrashIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -75,7 +74,7 @@ export const ChatHistory = () => {
 				/>
 				<SearchIcon className="-translate-y-1/2 absolute top-1/2 left-3 size-4 text-muted-foreground" />
 			</div>
-			<div>
+			<div className="flex flex-col gap-1">
 				{chatHistory?.map((chat) => (
 					<ContextMenu key={chat.id}>
 						<ContextMenuTrigger asChild>
@@ -83,9 +82,9 @@ export const ChatHistory = () => {
 								<button
 									type="button"
 									className={cn(
-										"w-full rounded-sm px-2 py-2 text-left text-sm hover:bg-accent/30",
+										"w-full rounded-sm px-2 py-2 text-left text-muted-foreground text-sm transition-colors hover:bg-accent/30 hover:text-foreground",
 										{
-											"bg-accent": chat.id === chatId,
+											"bg-accent text-foreground": chat.id === chatId,
 										},
 									)}
 								>

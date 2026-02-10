@@ -1252,7 +1252,7 @@ export const cloneTask = async ({
 	if (!task) throw new Error("Task not found");
 
 	const newTask = await createTask({
-		title: task.title,
+		title: `${task.title} (Clone)`,
 		description: task.description!,
 		assigneeId: task.assigneeId!,
 		statusId: task.statusId,

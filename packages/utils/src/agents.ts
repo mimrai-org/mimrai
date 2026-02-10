@@ -1,7 +1,7 @@
 import { fetchModels } from "tokenlens";
 
 export const AGENT_DEFAULT_NAME = "Mimir";
-export const AGENT_DEFAULT_MODEL = "openai/gpt-5";
+export const AGENT_DEFAULT_MODEL = "openai/gpt-5.2-chat";
 
 export interface Model {
 	name: string;

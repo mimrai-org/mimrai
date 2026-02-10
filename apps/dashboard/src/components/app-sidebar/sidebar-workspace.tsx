@@ -11,11 +11,16 @@ import {
 } from "@ui/components/ui/sidebar";
 import { HomeIcon, InboxIcon, SettingsIcon } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { trpc } from "@/utils/trpc";
 import { useUser } from "../user-provider";
 
 export function SidebarWorkspace() {
 	const user = useUser();
+	const pathname = usePathname();
+
+	const isInboxActive = pathname === `${user.basePath}/inbox`;
+	const isSettingsActive = pathname.startsWith(`${user.basePath}/settings`);
 
 	return (
 		<SidebarGroup>
@@ -31,7 +36,7 @@ export function SidebarWorkspace() {
 						</SidebarMenuButton>
 					</SidebarMenuItem>
 					<SidebarMenuItem>
-						<SidebarMenuButton asChild>
+						<SidebarMenuButton asChild isActive={isInboxActive}>
 							<Link href={`${user.basePath}/inbox`}>
 								<InboxIcon />
 								<span>Inbox</span>
@@ -39,7 +44,7 @@ export function SidebarWorkspace() {
 						</SidebarMenuButton>
 					</SidebarMenuItem>
 					<SidebarMenuItem>
-						<SidebarMenuButton asChild>
+						<SidebarMenuButton asChild isActive={isSettingsActive}>
 							<Link href={`${user.basePath}/settings/general`}>
 								<SettingsIcon />
 								<span>Settings</span>

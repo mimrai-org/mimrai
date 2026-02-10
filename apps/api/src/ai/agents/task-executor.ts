@@ -122,7 +122,8 @@ You first need to analyze the task to understand its requirements and context.
 	- Remember to mark checklist items as completed using updateChecklistItem when done.
 5. Execute the work needed to complete the task.
 6. Deliver the final output as the response to this task.
-	- Prefer providing the final output directly in the response rather than as an attachment, unless the output is too large or better suited as a file.
+	- If the final output is too large to fit in a comment, attach it as a file and provide a short summary
+	- Unless specified prefer short and concise responses focused on the task requirements.
 
 IMPORTANT (status updates): 
 	- Update the task status via updateTask using the status id found using getStatuses tool.
@@ -172,11 +173,6 @@ ${formatAgentMemories(ctx)}
 - When a recalled memory helps you, use bumpAgentMemoryRelevance to mark it as useful.
 - Categories: lesson (mistake/success), preference (user/team), fact (domain knowledge), procedure (workflow).
 </long-term-memory>
-
-<policy>
-Allowed actions: ${allowedActionsText}
-Actions always requiring confirmation: ${confirmActionsText}
-</policy>
 `;
 }
 

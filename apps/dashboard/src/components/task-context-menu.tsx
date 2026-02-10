@@ -18,7 +18,6 @@ import {
 	CopyPlusIcon,
 	Maximize2Icon,
 	SignalHighIcon,
-	SparklesIcon,
 	TagsIcon,
 	TargetIcon,
 	TrashIcon,
@@ -34,6 +33,7 @@ import { Assignee, AssigneeAvatar } from "./asignee-avatar";
 import { useChatContext } from "./chat/chat-context/store";
 import Loader from "./loader";
 import { MilestoneIcon } from "./milestone-icon";
+import { useTaskPanel } from "./panels/task-panel";
 import { ProjectIcon } from "./project-icon";
 import { StatusIcon } from "./status-icon";
 import { PriorityItem } from "./tasks-view/properties/priority";
@@ -50,6 +50,7 @@ export const TaskContextMenu = ({
 	additionalItems?: React.ReactNode;
 }) => {
 	const { setParams } = useTaskParams();
+	const taskPanel = useTaskPanel();
 	const { setItems } = useChatContext();
 
 	const user = useUser();
@@ -110,7 +111,7 @@ export const TaskContextMenu = ({
 				});
 				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
 				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
-				setParams({ taskId: task.id });
+				taskPanel.open(task.id);
 			},
 			onError: () => {
 				toast.error("Failed to clone task", {
