@@ -15,6 +15,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/components/user-provider";
 import { authClient } from "@/lib/auth-client";
+import { AssigneeAvatar } from "./asignee-avatar";
 
 export function NavUser() {
 	const user = useUser();
@@ -24,25 +25,11 @@ export function NavUser() {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger>
-				<Avatar className="size-6 rounded-full ring-4 ring-secondary/50">
-					<AvatarImage src={user.image!} alt={user.name} />
-					<AvatarFallback
-						className="rounded-none"
-						style={{
-							backgroundColor: user.color ?? "var(--primary)",
-							color: user.color
-								? getContrast(user.color)
-								: "var(--primary-foreground)",
-						}}
-					>
-						{user.name
-							?.split(" ")
-							.slice(0, 2)
-							.map((n) => n[0])
-							.join("")
-							.toUpperCase()}
-					</AvatarFallback>
-				</Avatar>
+				<AssigneeAvatar
+					name={user.name}
+					email={user.email}
+					image={user.image}
+				/>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent
 				className="w-(--radix-dropdown-menu-trigger-width) min-w-56"
@@ -52,25 +39,11 @@ export function NavUser() {
 			>
 				<DropdownMenuLabel className="p-0 font-normal">
 					<div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-						<Avatar className="h-8 w-8 rounded-lg">
-							<AvatarImage src={user.image!} alt={user.name} />
-							<AvatarFallback
-								className="rounded-none"
-								style={{
-									backgroundColor: user.color ?? "var(--primary)",
-									color: user.color
-										? getContrast(user.color)
-										: "var(--primary-foreground)",
-								}}
-							>
-								{user.name
-									?.split(" ")
-									.slice(0, 2)
-									.map((n) => n[0])
-									.join("")
-									.toUpperCase()}
-							</AvatarFallback>
-						</Avatar>
+						<AssigneeAvatar
+							name={user.name}
+							email={user.email}
+							image={user.image}
+						/>
 						<div className="grid flex-1 text-left text-sm leading-tight">
 							<span className="truncate font-medium">{user.name}</span>
 							<span className="truncate text-xs">{user.email}</span>
