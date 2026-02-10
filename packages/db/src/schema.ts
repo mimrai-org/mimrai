@@ -343,12 +343,12 @@ export const tasks = pgTable(
 			columns: [table.projectId],
 			foreignColumns: [projects.id],
 			name: "tasks_project_id_fkey",
-		}),
+		}).onDelete("cascade"),
 		foreignKey({
 			columns: [table.milestoneId],
 			foreignColumns: [milestones.id],
 			name: "tasks_milestone_id_fkey",
-		}),
+		}).onDelete("cascade"),
 		foreignKey({
 			columns: [table.prReviewId],
 			foreignColumns: [prReviews.id],

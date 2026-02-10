@@ -1,18 +1,13 @@
 "use client";
-import { motion } from "framer-motion";
 import {
-	Activity,
-	Bell,
 	BrainCircuit,
 	CalendarClock,
-	GitMerge,
 	ListTodo,
-	Maximize2,
 	Moon,
 	Sun,
-	Users,
 	Wind,
 } from "lucide-react";
+import { motion } from "motion/react";
 import type React from "react";
 
 interface FeatureCardProps {

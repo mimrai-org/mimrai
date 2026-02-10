@@ -1,3 +1,4 @@
+import { cn } from "@ui/lib/utils";
 import Image from "next/image";
 
 export const Logo = ({
@@ -15,7 +16,7 @@ export const Logo = ({
 			alt="Mimir Logo"
 			width={width || 32}
 			height={height || 32}
-			className={className}
+			className={cn(className, "invert dark:invert-0")}
 		/>
 	);
 };

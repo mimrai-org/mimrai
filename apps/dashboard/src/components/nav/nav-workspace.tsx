@@ -1,5 +1,6 @@
 "use client";
 import {
+	BotIcon,
 	ChartPieIcon,
 	FolderIcon,
 	FoldersIcon,
@@ -39,7 +40,21 @@ export const NavWorkspace = () => {
 			</Link>
 
 			<NavInboxItem />
-			<NavPrReviewsItem />
+
+			<Link href={`${pathname}/settings/agents`}>
+				<NavItem>
+					<NavItemIcon>
+						<FolderIcon />
+						<NavItemIconSecondary>
+							<BotIcon />
+						</NavItemIconSecondary>
+					</NavItemIcon>
+					<NavItemContent>
+						<NavItemTitle>Agents</NavItemTitle>
+						<NavItemSubtitle>View all agents</NavItemSubtitle>
+					</NavItemContent>
+				</NavItem>
+			</Link>
 
 			<Link href={`${pathname}/projects`}>
 				<NavItem>

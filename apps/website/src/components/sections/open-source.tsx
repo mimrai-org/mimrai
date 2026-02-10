@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@ui/components/ui/button";
-import { motion } from "framer-motion";
 import { GithubIcon } from "lucide-react";
+import { motion } from "motion/react";
 import type React from "react";
 
 export const OpenSource: React.FC = () => {

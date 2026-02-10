@@ -2,7 +2,6 @@
 import { getAppUrl } from "@mimir/utils/envs";
 import { Badge } from "@ui/components/ui/badge";
 import { Button } from "@ui/components/ui/button";
-import { motion } from "framer-motion";
 import {
 	Bot,
 	Layers,
@@ -11,6 +10,7 @@ import {
 	WindIcon,
 	Zap,
 } from "lucide-react";
+import { motion } from "motion/react";
 import Link from "next/link";
 import type React from "react";
 import { Waveform } from "../visuals/background-effects";

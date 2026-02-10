@@ -24,7 +24,7 @@ export const Navbar: React.FC = () => {
 			<div className="mx-auto flex max-w-7xl items-center justify-between px-6">
 				<Link href="/">
 					<div className="flex items-center gap-2">
-						<Logo className="rounded-sm bg-white" />
+						<Logo className="rounded-sm" />
 						{/* <div className="h-5 w-5 rotate-45 bg-white" /> */}
 						<span className="font-medium text-lg text-white tracking-wide">
 							MIMRAI

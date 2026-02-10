@@ -36,7 +36,9 @@ export type Project = RouterOutputs["projects"]["get"]["data"][number];
 
 export const ProjectsList = ({
 	showFilters = true,
+	pageSize = 8,
 }: {
+	pageSize?: number;
 	showFilters?: boolean;
 }) => {
 	const user = useUser();
@@ -46,7 +48,7 @@ export const ProjectsList = ({
 	const { data } = useInfiniteQuery(
 		trpc.projects.get.infiniteQueryOptions(
 			{
-				pageSize: 5,
+				pageSize,
 				search: params.search ?? "",
 			},
 			{
