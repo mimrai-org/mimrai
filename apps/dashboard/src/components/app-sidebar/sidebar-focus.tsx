@@ -3,7 +3,6 @@
 import {
 	SidebarGroup,
 	SidebarGroupContent,
-	SidebarGroupLabel,
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
@@ -22,7 +21,6 @@ export function SidebarFocus() {
 
 	return (
 		<SidebarGroup>
-			<SidebarGroupLabel>Focus</SidebarGroupLabel>
 			<SidebarGroupContent>
 				<SidebarMenu>
 					<SidebarMenuItem>

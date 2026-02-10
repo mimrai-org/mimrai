@@ -4,6 +4,7 @@ import {
 	Sidebar,
 	SidebarContent,
 	SidebarHeader,
+	SidebarSeparator,
 	SidebarTrigger,
 	useSidebar,
 } from "@ui/components/ui/sidebar";

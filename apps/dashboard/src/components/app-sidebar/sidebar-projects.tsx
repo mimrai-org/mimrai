@@ -10,11 +10,6 @@ import {
 	SidebarMenuItem,
 	useSidebar,
 } from "@ui/components/ui/sidebar";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@ui/components/ui/tooltip";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";

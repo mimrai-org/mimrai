@@ -1,10 +1,8 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import {
 	SidebarGroup,
 	SidebarGroupContent,
-	SidebarGroupLabel,
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
@@ -12,7 +10,6 @@ import {
 import { HomeIcon, InboxIcon, SettingsIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { trpc } from "@/utils/trpc";
 import { useUser } from "../user-provider";
 
 export function SidebarWorkspace() {
@@ -24,7 +21,6 @@ export function SidebarWorkspace() {
 
 	return (
 		<SidebarGroup>
-			<SidebarGroupLabel>Workspace</SidebarGroupLabel>
 			<SidebarGroupContent>
 				<SidebarMenu>
 					<SidebarMenuItem>
