@@ -1,4 +1,5 @@
 import { openai } from "@ai-sdk/openai";
+import { gateway } from "ai";
 import { createTaskTool } from "../tools/create-task";
 import { getProjectsTool } from "../tools/get-projects";
 import { getStatusesTool } from "../tools/get-statuses";
@@ -53,6 +54,7 @@ Current time: ${ctx.currentDateTime}
 - Use bullet points for lists, max 5 items
 - Include task URLs when relevant
 - Never expose raw UUIDs to the user
+- Do not assign tasks to agents unless explicitly requested by the user
 - Write in the user's language (locale: ${ctx.locale})
 </critical-rules>
 
@@ -106,5 +108,5 @@ export const messagingAgent = createAgent({
 		"Agent optimized for chat applications to assist with task management.",
 	tools: messagingTools,
 	buildInstructions: buildSystemPrompt,
-	model: openai("gpt-4o-mini"),
+	model: gateway("anthropic/claude-haiku-4.5"),
 });

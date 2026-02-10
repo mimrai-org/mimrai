@@ -10,6 +10,11 @@ import {
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Badge } from "@ui/components/ui/badge";
 import { Button } from "@ui/components/ui/button";
+import {
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
+} from "@ui/components/ui/collapsible";
 import { Skeleton } from "@ui/components/ui/skeleton";
 import { BrainIcon, TrashIcon } from "lucide-react";
 import { useAgentParams } from "@/hooks/use-agent-params";
@@ -70,7 +75,7 @@ export const AgentMemoryDialog = () => {
 					</DialogDescription>
 				</DialogHeader>
 
-				<div className="max-h-[60vh] space-y-3 overflow-y-auto pr-1">
+				<div className="max-h-[60vh] space-y-1 overflow-y-auto pr-1">
 					{isFetching ? (
 						Array.from({ length: 3 }).map((_, i) => (
 							<Skeleton key={i} className="h-20 rounded-md" />
@@ -91,7 +96,10 @@ export const AgentMemoryDialog = () => {
 							};
 
 							return (
-								<div key={memory.id} className="group relative space-y-2 py-3">
+								<div
+									key={memory.id}
+									className="group relative space-y-2 rounded-sm p-4 hover:bg-accent dark:hover:bg-accent/30"
+								>
 									<div className="flex flex-wrap items-center gap-2">
 										<Badge variant="secondary" className={cat.color}>
 											{cat.label}
@@ -105,10 +113,18 @@ export const AgentMemoryDialog = () => {
 											Score: {memory.relevanceScore}
 										</span>
 									</div>
-									<h4 className="font-medium text-sm">{memory.title}</h4>
-									<p className="whitespace-pre-wrap text-muted-foreground text-sm">
-										{memory.content}
-									</p>
+									<Collapsible>
+										<CollapsibleTrigger className="collapsible-chevron inline items-center text-left">
+											<span className="font-medium text-sm">
+												{memory.title}
+											</span>
+										</CollapsibleTrigger>
+										<CollapsibleContent>
+											<p className="mt-2 whitespace-pre-wrap text-muted-foreground text-sm">
+												{memory.content}
+											</p>
+										</CollapsibleContent>
+									</Collapsible>
 									<Button
 										type="button"
 										size="icon"
