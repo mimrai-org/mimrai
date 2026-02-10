@@ -30,182 +30,192 @@ export const TasksFilters = ({
 	const { setFilters, filters } = useTasksViewContext();
 
 	return (
-		<FiltersProvider
-			filters={filters}
-			setFilters={setFilters}
-			options={tasksFilterOptions}
-		>
-			<TasksViewsList projectId={projectId} />
-			<Filters>
-				<FiltersSearchInput placeholder="Search tasks..." />
-				<div className="ml-auto flex gap-4">
-					<TasksViewCreate />
-					<Popover>
-						<PopoverTrigger asChild>
-							<Button variant={"ghost"} size="sm">
-								<EyeIcon />
-								Display
-							</Button>
-						</PopoverTrigger>
-						<PopoverContent>
-							<div className="space-y-4">
-								<div className="space-y-2">
-									<div className="text-muted-foreground text-xs">
-										Show Properties
+		<div>
+			<FiltersProvider
+				filters={filters}
+				setFilters={setFilters}
+				options={tasksFilterOptions}
+			>
+				<TasksViewsList projectId={projectId} />
+				<Filters>
+					<FiltersSearchInput placeholder="Search tasks..." />
+					<div className="ml-auto flex gap-4">
+						<TasksViewCreate />
+						<Popover>
+							<PopoverTrigger asChild>
+								<Button variant={"ghost"} size="sm">
+									<EyeIcon />
+									Display
+								</Button>
+							</PopoverTrigger>
+							<PopoverContent>
+								<div className="space-y-4">
+									<div className="space-y-2">
+										<div className="text-muted-foreground text-xs">
+											Show Properties
+										</div>
+										<div className="flex flex-wrap gap-1 text-xs">
+											{Object.entries(PropertiesComponents).map(([key, _]) => (
+												<button
+													key={key}
+													type="button"
+													className={cn(
+														"rounded-sm border px-2 py-1 capitalize hover:bg-accent/10",
+														{
+															"bg-accent hover:bg-accent/80":
+																filters.properties?.includes(
+																	key as keyof typeof PropertiesComponents,
+																),
+														},
+													)}
+													onClick={() => {
+														const currentProperties = filters.properties || [];
+														if (
+															currentProperties.includes(
+																key as keyof typeof PropertiesComponents,
+															)
+														) {
+															// Remove property
+															const newProperties = currentProperties.filter(
+																(prop) =>
+																	prop !==
+																	(key as keyof typeof PropertiesComponents),
+															);
+															setFilters({
+																...filters,
+																properties: newProperties,
+															});
+														} else {
+															// Add property
+															setFilters({
+																...filters,
+																properties: [
+																	...currentProperties,
+																	key as keyof typeof PropertiesComponents,
+																],
+															});
+														}
+													}}
+												>
+													{key}
+												</button>
+											))}
+										</div>
 									</div>
-									<div className="flex flex-wrap gap-1 text-xs">
-										{Object.entries(PropertiesComponents).map(([key, _]) => (
+									<hr />
+									<div className="space-y-2">
+										<div className="text-muted-foreground text-xs">View As</div>
+										<div className="grid h-16 grid-cols-3 gap-2">
 											<button
-												key={key}
 												type="button"
 												className={cn(
-													"rounded-sm border px-2 py-1 capitalize hover:bg-accent/10",
+													"flex h-full items-center justify-center rounded-md border p-2 hover:bg-accent/80",
 													{
-														"bg-accent hover:bg-accent/80":
-															filters.properties?.includes(
-																key as keyof typeof PropertiesComponents,
-															),
+														"bg-accent": filters.viewType === "list",
 													},
 												)}
 												onClick={() => {
-													const currentProperties = filters.properties || [];
-													if (
-														currentProperties.includes(
-															key as keyof typeof PropertiesComponents,
-														)
-													) {
-														// Remove property
-														const newProperties = currentProperties.filter(
-															(prop) =>
-																prop !==
-																(key as keyof typeof PropertiesComponents),
-														);
-														setFilters({
-															...filters,
-															properties: newProperties,
-														});
-													} else {
-														// Add property
-														setFilters({
-															...filters,
-															properties: [
-																...currentProperties,
-																key as keyof typeof PropertiesComponents,
-															],
-														});
-													}
+													setFilters({
+														...filters,
+														viewType: "list",
+													});
 												}}
 											>
-												{key}
+												<ListIcon className="size-4" />
 											</button>
-										))}
+											<button
+												type="button"
+												className={cn(
+													"flex h-full items-center justify-center rounded-md border p-2 hover:bg-accent/80",
+													{
+														"bg-accent": filters.viewType === "board",
+													},
+												)}
+												onClick={() => {
+													setFilters({
+														...filters,
+														viewType: "board",
+													});
+												}}
+											>
+												<KanbanIcon className="size-4" />
+											</button>
+											<button
+												type="button"
+												className={cn(
+													"flex h-full items-center justify-center rounded-md border p-2 hover:bg-accent/80",
+													{
+														"bg-accent": filters.viewType === "calendar",
+													},
+												)}
+												onClick={() => {
+													setFilters({
+														...filters,
+														viewType: "calendar",
+													});
+												}}
+											>
+												<CalendarIcon className="size-4" />
+											</button>
+										</div>
 									</div>
-								</div>
-								<hr />
-								<div className="space-y-2">
-									<div className="text-muted-foreground text-xs">View As</div>
-									<div className="grid h-16 grid-cols-3 gap-2">
-										<button
-											type="button"
-											className={cn(
-												"flex h-full items-center justify-center rounded-md border p-2 hover:bg-accent/80",
-												{
-													"bg-accent": filters.viewType === "list",
-												},
-											)}
-											onClick={() => {
+									<hr />
+									<div className="space-y-4">
+										<div className="text-muted-foreground text-xs">
+											Group By
+										</div>
+										<RadioGroup
+											value={filters.groupBy || "status"}
+											onValueChange={(value) =>
 												setFilters({
 													...filters,
-													viewType: "list",
-												});
-											}}
+													groupBy: value as TasksGroupBy,
+												})
+											}
 										>
-											<ListIcon className="size-4" />
-										</button>
-										<button
-											type="button"
-											className={cn(
-												"flex h-full items-center justify-center rounded-md border p-2 hover:bg-accent/80",
-												{
-													"bg-accent": filters.viewType === "board",
-												},
-											)}
-											onClick={() => {
-												setFilters({
-													...filters,
-													viewType: "board",
-												});
-											}}
-										>
-											<KanbanIcon className="size-4" />
-										</button>
-										<button
-											type="button"
-											className={cn(
-												"flex h-full items-center justify-center rounded-md border p-2 hover:bg-accent/80",
-												{
-													"bg-accent": filters.viewType === "calendar",
-												},
-											)}
-											onClick={() => {
-												setFilters({
-													...filters,
-													viewType: "calendar",
-												});
-											}}
-										>
-											<CalendarIcon className="size-4" />
-										</button>
-									</div>
-								</div>
-								<hr />
-								<div className="space-y-4">
-									<div className="text-muted-foreground text-xs">Group By</div>
-									<RadioGroup
-										value={filters.groupBy || "status"}
-										onValueChange={(value) =>
-											setFilters({ ...filters, groupBy: value as TasksGroupBy })
-										}
-									>
-										{tasksGroupByItems.map((item) => (
-											<div key={item.value} className="flex items-center gap-2">
-												<RadioGroupItem
-													id={`group-by-${item.value}`}
-													value={item.value}
-												/>
-												<Label
-													htmlFor={`group-by-${item.value}`}
-													className="text-xs"
+											{tasksGroupByItems.map((item) => (
+												<div
+													key={item.value}
+													className="flex items-center gap-2"
 												>
-													{item.label}
-												</Label>
-											</div>
-										))}
-									</RadioGroup>
+													<RadioGroupItem
+														id={`group-by-${item.value}`}
+														value={item.value}
+													/>
+													<Label
+														htmlFor={`group-by-${item.value}`}
+														className="text-xs"
+													>
+														{item.label}
+													</Label>
+												</div>
+											))}
+										</RadioGroup>
+									</div>
+									<hr />
+									<div className="flex items-center gap-2">
+										<Checkbox
+											id="show-empty-columns"
+											checked={filters?.showEmptyColumns}
+											onCheckedChange={(checked) =>
+												setFilters({
+													showEmptyColumns: !!checked,
+												})
+											}
+										/>
+										<Label
+											htmlFor="show-empty-columns"
+											className="text-muted-foreground text-xs"
+										>
+											Show Empty Columns
+										</Label>
+									</div>
 								</div>
-								<hr />
-								<div className="flex items-center gap-2">
-									<Checkbox
-										id="show-empty-columns"
-										checked={filters?.showEmptyColumns}
-										onCheckedChange={(checked) =>
-											setFilters({
-												showEmptyColumns: !!checked,
-											})
-										}
-									/>
-									<Label
-										htmlFor="show-empty-columns"
-										className="text-muted-foreground text-xs"
-									>
-										Show Empty Columns
-									</Label>
-								</div>
-							</div>
-						</PopoverContent>
-					</Popover>
-				</div>
-			</Filters>
-		</FiltersProvider>
+							</PopoverContent>
+						</Popover>
+					</div>
+				</Filters>
+			</FiltersProvider>
+		</div>
 	);
 };

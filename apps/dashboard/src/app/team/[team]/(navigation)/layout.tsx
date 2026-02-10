@@ -1,6 +1,6 @@
-import { SidebarProvider } from "@ui/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@ui/components/ui/sidebar";
 import { Suspense } from "react";
-import { AppSidebar } from "@/components/app-sidebar/main";
+import { AppSidebar, AppSidebarWrapper } from "@/components/app-sidebar/main";
 import { BreadcrumbsProvider } from "@/components/breadcrumbs";
 import Header from "@/components/header";
 import { getSession } from "@/lib/get-session";
@@ -21,9 +21,7 @@ export default async function DashboardLayout({
 					<BreadcrumbsProvider session={session}>
 						<main className="flex flex-1 flex-col">
 							<Header />
-							<div className="flex flex-1 flex-col rounded-lg bg-background p-6 pb-4">
-								{children}
-							</div>
+							<AppSidebarWrapper>{children}</AppSidebarWrapper>
 							{/* <ChatWidget /> */}
 						</main>
 					</BreadcrumbsProvider>

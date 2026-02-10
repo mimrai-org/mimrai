@@ -58,3 +58,21 @@ export function AppSidebar() {
 		</Sidebar>
 	);
 }
+
+export const AppSidebarWrapper = ({
+	children,
+}: {
+	children: React.ReactNode;
+}) => {
+	const { open } = useSidebar();
+
+	return (
+		<div
+			className={cn("flex flex-1 flex-col rounded-lg bg-background p-6", {
+				"max-w-[calc(100vw-256px)]": open,
+			})}
+		>
+			{children}
+		</div>
+	);
+};

@@ -88,7 +88,7 @@ export function TasksBoard() {
 					<Kanban.Board asChild>
 						<div
 							ref={scrollContainerRef}
-							className="scrollbar-hide flex items-stretch gap-4 overflow-x-auto py-2"
+							className="scrollbar-hide flex w-full items-stretch gap-4 overflow-x-auto py-2"
 						>
 							{columnsArray.map(({ name: columnName, column, tasks }) => {
 								return (

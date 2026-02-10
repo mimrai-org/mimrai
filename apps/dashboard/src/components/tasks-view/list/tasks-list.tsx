@@ -146,7 +146,7 @@ export const TasksList = () => {
 			>
 				<div
 					ref={scrollContainerRef}
-					className="h-[calc(100vh-140px)] overflow-y-auto overflow-x-hidden py-4"
+					className="h-full overflow-y-auto overflow-x-hidden py-4"
 				>
 					<div
 						style={{

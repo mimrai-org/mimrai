@@ -6,7 +6,7 @@ import { NavUser } from "./nav-user";
 
 export default function Header() {
 	return (
-		<header className="sticky top-0 z-10 h-[48px] border-b bg-background px-4">
+		<header className="sticky top-0 z-5 h-[48px] border-b bg-background px-4">
 			<div className="h-full px-4 sm:px-0">
 				<div className="flex h-full flex-col items-start justify-center">
 					<div className="flex w-full items-center justify-between">
