@@ -24,7 +24,7 @@ export const NavItem = ({
 };
 
 export const NavItemContent = ({ children }: { children: React.ReactNode }) => {
-	return <div className="flex w-full flex-col overflow-hidden">{children}</div>;
+	return <div className="w-full truncate">{children}</div>;
 };
 
 export const NavItemTitle = ({
@@ -35,7 +35,7 @@ export const NavItemTitle = ({
 	className?: string;
 }) => {
 	return (
-		<span className={cn("truncate font-medium", className)}>{children}</span>
+		<div className={cn("truncate font-medium", className)}>{children}</div>
 	);
 };
 
@@ -45,7 +45,7 @@ export const NavItemSubtitle = ({
 	children: React.ReactNode;
 }) => {
 	return (
-		<span className="flex items-center gap-2 truncate text-muted-foreground text-xs">
+		<span className="inline items-center gap-2 truncate text-muted-foreground text-xs">
 			{children}
 		</span>
 	);

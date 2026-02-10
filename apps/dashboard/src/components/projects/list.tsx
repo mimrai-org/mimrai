@@ -102,9 +102,7 @@ export const ProjectsList = ({
 										</NavItemIconSecondary>
 									</NavItemIcon>
 									<NavItemContent>
-										<NavItemTitle className="flex items-center gap-1">
-											{project.name}
-										</NavItemTitle>
+										<NavItemTitle>{project.name}</NavItemTitle>
 										<NavItemSubtitle>
 											<div className="flex items-center gap-1 text-xs">
 												<AssigneeAvatar {...project.lead} className="size-4" />

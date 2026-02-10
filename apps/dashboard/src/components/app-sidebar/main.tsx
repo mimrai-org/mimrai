@@ -68,9 +68,12 @@ export const AppSidebarWrapper = ({
 
 	return (
 		<div
-			className={cn("flex flex-1 flex-col rounded-lg bg-background p-6", {
-				"max-w-[calc(100vw-256px)]": open,
-			})}
+			className={cn(
+				"relative flex flex-1 flex-col rounded-lg bg-background p-6",
+				{
+					"max-w-[calc(100vw-256px)]": open,
+				},
+			)}
 		>
 			{children}
 		</div>
