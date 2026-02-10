@@ -1,3 +1,4 @@
+import { teamCache } from "@mimir/cache/teams-cache";
 import { generateTeamPrefix, generateTeamSlug } from "@mimir/utils/teams";
 import { and, eq, ilike, isNull, ne, not, or, type SQL } from "drizzle-orm";
 import { union } from "drizzle-orm/pg-core";
@@ -90,6 +91,8 @@ export const createTeam = async ({
 			.set({ teamId: team.id, teamSlug: team.slug })
 			.where(eq(users.id, userId));
 	}
+
+	await teamCache.delete(`${userId}:${team.id}`);
 
 	// Create default labels
 	// const defaultLabels = await createDefaultLabels(team.id);

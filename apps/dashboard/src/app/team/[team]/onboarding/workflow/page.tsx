@@ -23,8 +23,7 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@ui/components/ui/tooltip";
-import { ChevronRight, InfoIcon, PencilIcon, SkipForward } from "lucide-react";
-import Link from "next/link";
+import { ChevronRight, PencilIcon, SkipForward } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";

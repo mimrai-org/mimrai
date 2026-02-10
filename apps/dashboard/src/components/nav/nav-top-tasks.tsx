@@ -26,7 +26,7 @@ export const NavTopTasks = () => {
 	}
 
 	return (
-		<div className="space-y-2 rounded-md border p-4">
+		<div className="space-y-2 rounded-md border border-dashed p-4">
 			{top3 && top3.length > 0 ? (
 				<>
 					<h2 className="font-header">Continue where you left off</h2>
@@ -62,9 +62,7 @@ export const NavTopTasks = () => {
 				</>
 			) : (
 				<p className="text-muted-foreground text-sm">
-					No tasks in your queue.
-					<br />
-					Take a break or create a new task.
+					No recent tasks. Start working on a project to see your tasks here.
 				</p>
 			)}
 		</div>

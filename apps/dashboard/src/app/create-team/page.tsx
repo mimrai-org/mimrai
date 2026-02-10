@@ -3,6 +3,7 @@ import { Button } from "@mimir/ui/button";
 import {
 	Form,
 	FormControl,
+	FormDescription,
 	FormField,
 	FormItem,
 	FormLabel,
@@ -10,10 +11,11 @@ import {
 } from "@mimir/ui/form";
 import { Input } from "@mimir/ui/input";
 import { useMutation } from "@tanstack/react-query";
-import { ArrowRightIcon, RocketIcon } from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import z from "zod";
+import { Logo } from "@/components/logo";
 import { useUser } from "@/components/user-provider";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { trpc } from "@/utils/trpc";
@@ -41,14 +43,42 @@ export default function Page() {
 		}
 	}, [user?.email]);
 
-	const { mutateAsync: createTeam } = useMutation(
-		trpc.teams.create.mutationOptions(),
-	);
+	const {
+		mutateAsync: createTeam,
+		isPending: isCreating,
+		error: createTeamError,
+		isSuccess: isTeamCreated,
+	} = useMutation(trpc.teams.create.mutationOptions());
+
+	const {
+		mutateAsync: setupWorkflow,
+		isPending: isSettingUpWorkflow,
+		error: setupWorkflowError,
+		isSuccess: isWorkflowSetupSuccess,
+	} = useMutation(trpc.onboarding.defaultWorkflow.mutationOptions());
 
 	const handleSubmit = async (data: z.infer<typeof schema>) => {
 		const team = await createTeam(data);
+		await setupWorkflow({
+			teamId: team.id,
+		});
 		router.push(`/team/${team.slug}/onboarding`);
 	};
+
+	const isLoading =
+		isCreating ||
+		isSettingUpWorkflow ||
+		isTeamCreated ||
+		isWorkflowSetupSuccess;
+
+	if (isLoading) {
+		return (
+			<div className="flex h-screen w-full animate-blur-in flex-col items-center justify-center gap-4">
+				<Logo className="size-[40px]" />
+				<h2 className="font-header text-4xl">Setting up your workspace...</h2>
+			</div>
+		);
+	}
 
 	return (
 		<div className="mx-auto my-auto">
@@ -90,6 +120,9 @@ export default function Page() {
 									<Input placeholder="acme@example.com" {...field} />
 								</FormControl>
 								<FormMessage />
+								<FormDescription>
+									This email will be used for billing and notifications.
+								</FormDescription>
 							</FormItem>
 						)}
 					/>

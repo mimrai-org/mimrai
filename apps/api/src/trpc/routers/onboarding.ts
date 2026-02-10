@@ -10,6 +10,7 @@ import {
 	createStatus,
 } from "@mimir/db/queries/statuses";
 import { updateTeam } from "@mimir/db/queries/teams";
+import { getAvailableTeams } from "@mimir/db/queries/users";
 import z from "zod";
 
 export const onboardingRouter = router({
@@ -64,12 +65,24 @@ export const onboardingRouter = router({
 
 			return { success: true };
 		}),
-	defaultWorkflow: protectedProcedure.mutation(async ({ ctx }) => {
-		// create statuses
-		await createDefaultStatuses(ctx.user.teamId);
-		// create labels
-		await createDefaultLabels(ctx.user.teamId);
+	defaultWorkflow: protectedProcedure
+		.input(
+			z.object({
+				teamId: z.string(),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			// check the user is part of the team
+			const availableTeams = await getAvailableTeams(ctx.user.id);
+			if (!availableTeams.find((team) => team.id === input.teamId)) {
+				throw new Error("User is not part of the team");
+			}
 
-		return { success: true };
-	}),
+			// create statuses
+			await createDefaultStatuses(input.teamId);
+			// create labels
+			await createDefaultLabels(input.teamId);
+
+			return { success: true };
+		}),
 });
