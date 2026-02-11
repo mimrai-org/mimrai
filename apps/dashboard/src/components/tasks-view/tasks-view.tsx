@@ -1,17 +1,14 @@
 "use client";
 import type { RouterInputs, RouterOutputs } from "@mimir/trpc";
-import { useInfiniteQuery } from "@tanstack/react-query";
 import {
 	createContext,
 	useCallback,
 	useContext,
-	useEffect,
 	useMemo,
-	useRef,
 	useState,
 } from "react";
 import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";
-import { queryClient, trpc } from "@/utils/trpc";
+import { useTasksWithData } from "@/hooks/use-tasks-with-data";
 import { useUser } from "../user-provider";
 import { TasksCalendar } from "./calendar/calendar";
 import { TasksFilters, type TasksFiltersProps } from "./filters/tasks-filters";
@@ -125,20 +122,6 @@ export const TasksView = ({
 		projectId: projectId ? [projectId] : undefined,
 	});
 
-	const { data, fetchNextPage, hasNextPage, isLoading } = useInfiniteQuery(
-		trpc.tasks.get.infiniteQueryOptions(
-			{
-				...filters,
-				// Calendar view uses the same data as list view
-				view: filters.viewType === "calendar" ? "list" : filters.viewType,
-			},
-			{
-				getNextPageParam: (lastPage) => lastPage.meta.cursor,
-				placeholderData: (oldData) => oldData,
-			},
-		),
-	);
-
 	const handleSetFilters = useCallback(
 		(newFilters: Partial<TasksViewContextFilters>) => {
 			setFilters((prev) => ({ ...prev, ...newFilters }));
@@ -146,26 +129,17 @@ export const TasksView = ({
 		[],
 	);
 
-	const tasks = useMemo(
-		() => data?.pages.flatMap((page) => page.data) || [],
-		[data],
+	// Use the unified hook for fetching tasks with client-side joins
+	const { tasks, isLoading, fetchNextPage, hasNextPage } = useTasksWithData(
+		{
+			...filters,
+			// Calendar view uses the same data as list view
+			view: filters.viewType === "calendar" ? "list" : filters.viewType,
+		},
+		{
+			refetchOnWindowFocus: false,
+		},
 	);
-
-	// Track previously cached task IDs to avoid redundant setQueryData calls
-	const cachedTaskIds = useRef<Set<string>>(new Set());
-
-	useEffect(() => {
-		// Only cache new tasks that haven't been cached yet
-		for (const task of tasks) {
-			if (!cachedTaskIds.current.has(task.id)) {
-				queryClient.setQueryData(
-					trpc.tasks.getById.queryKey({ id: task.id }),
-					task,
-				);
-				cachedTaskIds.current.add(task.id);
-			}
-		}
-	}, [tasks]);
 
 	const contextValue = useMemo<TasksViewContextValue>(
 		() => ({
