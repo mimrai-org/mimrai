@@ -15,7 +15,7 @@ export const AgentCreateSheet = () => {
 
 	return (
 		<Dialog open={isOpen} onOpenChange={() => setParams(null)}>
-			<DialogContent>
+			<DialogContent className="max-h-[calc(100vh-60px)] overflow-y-auto">
 				<DialogHeader>
 					<DialogTitle>Create Agent</DialogTitle>
 				</DialogHeader>

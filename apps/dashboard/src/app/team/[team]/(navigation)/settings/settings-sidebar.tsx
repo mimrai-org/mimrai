@@ -23,7 +23,7 @@ export const SettingsSidebar = () => {
 					<Link key={link.to} href={link.to}>
 						<div
 							className={cn(
-								"flex items-center gap-2 rounded-sm px-4 py-2 transition-colors hover:bg-accent dark:hover:bg-accent/30 [&_svg]:opacity-50",
+								"flex h-8 items-center gap-2 rounded-sm px-4 transition-colors hover:bg-accent dark:hover:bg-accent/30 [&_svg]:opacity-50",
 								{
 									"bg-accent [&_svg]:opacity-100": isActive,
 								},
