@@ -11,21 +11,21 @@ export interface NotificationType {
 export const allNotificationTypes: NotificationType[] = [
 	{
 		type: "task_assigned",
-		channels: ["email", "mattermost"],
+		channels: ["mattermost"],
 		showInSettings: true,
 		category: "tasks",
 		order: 2,
 	},
 	{
 		type: "task_column_changed",
-		channels: ["email", "mattermost"],
+		channels: ["mattermost"],
 		showInSettings: true,
 		category: "tasks",
 		order: 3,
 	},
 	{
 		type: "task_comment",
-		channels: ["email", "mattermost"],
+		channels: ["mattermost"],
 		showInSettings: true,
 		category: "tasks",
 		order: 4,

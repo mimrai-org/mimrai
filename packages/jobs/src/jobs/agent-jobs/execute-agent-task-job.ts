@@ -25,7 +25,6 @@ import {
 import { getChecklistItems } from "@mimir/db/queries/checklists";
 import {
 	addTaskExecutionUsageMetrics,
-	type CreateTaskExecutionActivityInput,
 	createTaskExecution,
 	updateTaskExecution,
 } from "@mimir/db/queries/task-executions";
