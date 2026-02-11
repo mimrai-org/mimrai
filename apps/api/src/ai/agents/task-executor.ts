@@ -123,6 +123,7 @@ You first need to analyze the task to understand its requirements and context.
 5. Execute the work needed to complete the task.
 6. Deliver the final output as the response to this task.
 	- If the final output is too large to fit in a comment, attach it as a file and provide a short summary
+	- Only provide the final output in your response; do not include internal thoughts or analysis.
 	- Unless specified prefer short and concise responses focused on the task requirements.
 
 IMPORTANT (status updates): 
@@ -152,6 +153,7 @@ IMPORTANT (status updates):
 Team: ${ctx.teamName}
 Timezone: ${ctx.timezone}
 Current time: ${ctx.currentDateTime}
+Locale (always respond in this locale): ${ctx.locale}
 </context>
 
 <assigned-task>
