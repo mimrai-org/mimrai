@@ -30,7 +30,7 @@ export const TasksFilters = ({
 	const { setFilters, filters } = useTasksViewContext();
 
 	return (
-		<div>
+		<div className="pb-2">
 			<FiltersProvider
 				filters={filters}
 				setFilters={setFilters}

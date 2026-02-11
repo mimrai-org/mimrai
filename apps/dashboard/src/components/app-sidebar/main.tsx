@@ -4,7 +4,6 @@ import {
 	Sidebar,
 	SidebarContent,
 	SidebarHeader,
-	SidebarSeparator,
 	SidebarTrigger,
 	useSidebar,
 } from "@ui/components/ui/sidebar";
@@ -19,7 +18,7 @@ export function AppSidebar() {
 
 	return (
 		<Sidebar collapsible="icon" className="">
-			<SidebarHeader className="h-[48px] border-b">
+			<SidebarHeader className="h-[48px]">
 				<div
 					className={cn(
 						"group/header relative flex h-full items-center justify-between",

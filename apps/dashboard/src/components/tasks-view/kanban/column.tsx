@@ -54,7 +54,7 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 	return (
 		<Kanban.Column
 			className={cn(
-				"flex h-[calc(100vh-170px)] min-h-[200px] min-w-86 max-w-86 flex-1 grow-1 flex-col rounded-sm shadow-none",
+				"flex h-[calc(100vh-188px)] min-h-[200px] min-w-86 max-w-86 flex-1 grow-1 flex-col rounded-sm p-0 shadow-none",
 			)}
 			value={columnName}
 		>

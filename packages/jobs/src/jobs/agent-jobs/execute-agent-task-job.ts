@@ -12,6 +12,7 @@ import {
 import { getAllTools } from "@api/ai/tools/tool-registry";
 import type { UIChatMessage } from "@api/ai/types";
 import { getUserContext } from "@api/ai/utils/get-user-context";
+import { getDb } from "@jobs/init";
 import { checkPlanFeatures, createTokenMeter } from "@mimir/billing";
 import { createActivity, getActivities } from "@mimir/db/queries/activities";
 import { getAgentMemories } from "@mimir/db/queries/agent-memories";
@@ -24,6 +25,7 @@ import {
 import { getChecklistItems } from "@mimir/db/queries/checklists";
 import {
 	addTaskExecutionUsageMetrics,
+	type CreateTaskExecutionActivityInput,
 	createTaskExecution,
 	updateTaskExecution,
 } from "@mimir/db/queries/task-executions";
@@ -60,6 +62,8 @@ export const executeAgentTaskPlanJob = schemaTask({
 	maxDuration: 15 * 60, // 15 minutes
 	run: async (payload) => {
 		const { taskId, teamId, checklistItemId } = payload;
+		const db = getDb();
+
 		logger.info("Starting agent plan execution", {
 			taskId,
 			checklistItemId,

@@ -1,7 +1,12 @@
 import type { UIChatMessage } from "@api/ai/types";
 import { cn } from "@ui/lib/utils";
-import type { UIMessage } from "ai";
-import { PaperclipIcon } from "lucide-react";
+import type { UIMessage, UIMessagePart } from "ai";
+import {
+	CheckIcon,
+	CircleCheck,
+	PaperclipIcon,
+	ToolCaseIcon,
+} from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import { useUser } from "@/components/user-provider";
@@ -15,6 +20,7 @@ import {
 } from "../ai-elements/reasoning";
 import { Response } from "../chat/response";
 import { FaviconStack } from "../favicon-stack";
+import Loader from "../loader";
 import { EmailDraftArtifactMessage } from "./artifacts/email-draft-artifact";
 import { TaskArtifactMessage } from "./artifacts/task-artifact";
 import { ChatContextList } from "./chat-context/chat-context";
@@ -118,6 +124,30 @@ export const Messages = ({ isStreaming }: { isStreaming?: boolean }) => {
 						// Extract sources from webSearch tool results (already deduplicated)
 						const webSearchSources = extractWebSearchSources(message.parts);
 
+						// Extract tool calls for status indicators
+						const toolCallParts = message.parts.filter((part) =>
+							part.type.startsWith("tool-"),
+						);
+
+						console.log("Tool call parts:", toolCallParts);
+
+						const toolCalls = toolCallParts.map((part) => {
+							const toolCallPart = part as {
+								input: Record<string, unknown>;
+								output: Record<string, unknown>;
+								type: string;
+								state: "output-available" | "output-error" | "output-denied";
+							};
+							const toolName = toolCallPart.type.replace("tool-", "");
+
+							return {
+								toolName: toolName,
+								input: toolCallPart.input,
+								output: toolCallPart.output,
+								state: toolCallPart.state,
+							};
+						});
+
 						// Combine sources and deduplicate between AI SDK and webSearch sources
 						const allSources = [...aiSdkSources, ...webSearchSources];
 						const uniqueSources = allSources.filter(
@@ -157,6 +187,29 @@ export const Messages = ({ isStreaming }: { isStreaming?: boolean }) => {
 										<ReasoningTrigger />
 										<ReasoningContent>{reasoningContent}</ReasoningContent>
 									</Reasoning>
+								)}
+
+								{toolCallParts.length > 0 && (
+									<div className="mb-2 flex flex-col gap-1 text-muted-foreground text-xs">
+										{toolCalls.map((toolCall, idx) => (
+											<div key={idx} className="flex items-center gap-2">
+												{![
+													"output-available",
+													"output-error",
+													"output-denied",
+												].includes(toolCall.state) ? (
+													<Loader className="size-3" />
+												) : (
+													<ToolCaseIcon
+														className={cn("size-3", {
+															"text-red-500": toolCall.state === "output-error",
+														})}
+													/>
+												)}
+												{toolCall.toolName}
+											</div>
+										))}
+									</div>
 								)}
 
 								{/* Render file attachments */}

@@ -57,7 +57,7 @@ export const ChatHistory = () => {
 				<Button
 					type="button"
 					variant={"default"}
-					className="w-full justify-start text-left"
+					className="h-8 w-full justify-start text-left"
 				>
 					<PlusIcon />
 					New Chat
@@ -82,7 +82,7 @@ export const ChatHistory = () => {
 								<button
 									type="button"
 									className={cn(
-										"w-full rounded-sm px-2 py-2 text-left text-muted-foreground text-sm transition-colors hover:bg-accent/30 hover:text-foreground",
+										"h-8 w-full rounded-sm px-2 text-left text-muted-foreground text-sm transition-colors hover:bg-accent/30 hover:text-foreground",
 										{
 											"bg-accent text-foreground": chat.id === chatId,
 										},

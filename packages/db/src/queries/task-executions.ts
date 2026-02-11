@@ -5,6 +5,7 @@ import {
 	type taskExecutionStatusEnum,
 	taskExecutions,
 } from "../schema";
+import { getMessages } from "./chats";
 
 export type TaskExecutionStatus =
 	(typeof taskExecutionStatusEnum.enumValues)[number];
@@ -209,4 +210,21 @@ export const hasActiveExecution = async (taskId: string) => {
 	const execution = await getActiveTaskExecution(taskId);
 	if (!execution) return false;
 	return !["completed", "failed"].includes(execution.status);
+};
+
+export const getTaskExecutionLogs = async ({
+	taskId,
+	teamId,
+}: {
+	taskId: string;
+	teamId: string;
+}) => {
+	const messages = await getMessages({
+		chatId: taskId,
+		teamId,
+	});
+
+	return messages.flatMap((msg) => {
+		return msg.parts;
+	});
 };

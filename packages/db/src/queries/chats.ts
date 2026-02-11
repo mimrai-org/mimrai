@@ -119,3 +119,25 @@ export const getChatHistory = async ({
 
 	return chatsList;
 };
+
+export const getMessages = async ({
+	chatId,
+	teamId,
+	pageSize = 20,
+}: {
+	chatId: string;
+	teamId: string;
+	pageSize?: number;
+}) => {
+	const messages = await db
+		.select({
+			content: chatMessages.content,
+		})
+		.from(chatMessages)
+		.innerJoin(chats, eq(chats.id, chatMessages.chatId))
+		.where(and(eq(chatMessages.chatId, chatId), eq(chats.teamId, teamId)))
+		.orderBy(desc(chatMessages.createdAt))
+		.limit(pageSize);
+
+	return messages.map((m) => m.content).reverse();
+};

@@ -1,12 +1,5 @@
 "use client";
-import {
-	ArrowDownIcon,
-	ArrowUpIcon,
-	Maximize2Icon,
-	Minimize2Icon,
-	MinusIcon,
-	XIcon,
-} from "lucide-react";
+import { ArrowDownIcon, ArrowUpIcon, Maximize2Icon, XIcon } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef } from "react";
@@ -90,7 +83,7 @@ export function PanelContainer({
 			data-panel-id={panel.id}
 			initial={{
 				opacity: 0,
-				y: "88%",
+				y: minimized ? "95%" : "5%",
 				height: `calc(80vh - ${offset}px)`,
 			}}
 			animate={{
