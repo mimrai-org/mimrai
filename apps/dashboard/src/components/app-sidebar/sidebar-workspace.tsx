@@ -7,7 +7,12 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from "@ui/components/ui/sidebar";
-import { HomeIcon, InboxIcon, SettingsIcon } from "lucide-react";
+import {
+	ClipboardClockIcon,
+	HomeIcon,
+	InboxIcon,
+	SettingsIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUser } from "../user-provider";
@@ -28,6 +33,14 @@ export function SidebarWorkspace() {
 							<Link href={`${user.basePath}`}>
 								<HomeIcon />
 								<span>Home</span>
+							</Link>
+						</SidebarMenuButton>
+					</SidebarMenuItem>
+					<SidebarMenuItem>
+						<SidebarMenuButton asChild isActive={isInboxActive}>
+							<Link href={`${user.basePath}/recurring`}>
+								<ClipboardClockIcon />
+								<span>Recurring</span>
 							</Link>
 						</SidebarMenuButton>
 					</SidebarMenuItem>

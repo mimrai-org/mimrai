@@ -1,7 +1,14 @@
 "use client";
 import { AnimatePresence } from "motion/react";
 import { usePanels } from "./panel-context";
-import { TASK_PANEL_TYPE, TaskPanel } from "./task-panel";
+import {
+	CLONE_TASK_PANEL_TYPE,
+	CloneTaskPanel,
+	CREATE_TASK_PANEL_TYPE,
+	CreateTaskPanel,
+	TASK_PANEL_TYPE,
+	TaskPanel,
+} from "./task-panel";
 
 /**
  * Renders all open panels.
@@ -17,6 +24,22 @@ export function PanelStack() {
 					case TASK_PANEL_TYPE:
 						return (
 							<TaskPanel
+								key={`${panel.type}-${panel.id}`}
+								panel={panel}
+								index={index}
+							/>
+						);
+					case CREATE_TASK_PANEL_TYPE:
+						return (
+							<CreateTaskPanel
+								key={`${panel.type}-${panel.id}`}
+								panel={panel}
+								index={index}
+							/>
+						);
+					case CLONE_TASK_PANEL_TYPE:
+						return (
+							<CloneTaskPanel
 								key={`${panel.type}-${panel.id}`}
 								panel={panel}
 								index={index}

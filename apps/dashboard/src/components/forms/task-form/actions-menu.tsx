@@ -18,6 +18,7 @@ import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 import { DependencyIcon } from "@/components/dependency-icon";
 import Loader from "@/components/loader";
+import { useCloneTaskPanel } from "@/components/panels/task-panel";
 import { useShareableParams } from "@/hooks/use-shareable-params";
 import { useTaskDependencyParams } from "@/hooks/use-task-dependency-params";
 import { useTaskParams } from "@/hooks/use-task-params";
@@ -29,6 +30,7 @@ export const ActionsMenu = () => {
 	const { setParams: setShareableParams } = useShareableParams();
 	const { setParams: setTaskDependecyParams } = useTaskDependencyParams();
 	const form = useFormContext<TaskFormValues>();
+	const cloneTaskPanel = useCloneTaskPanel();
 	const taskId = form.watch("id");
 
 	const { mutate: deleteTask, isPending: isDeleting } = useMutation(
@@ -54,33 +56,31 @@ export const ActionsMenu = () => {
 		}),
 	);
 
-	const { mutate: cloneTask, isPending: isCloning } = useMutation(
-		trpc.tasks.clone.mutationOptions({
-			onMutate: () => {
-				toast.loading("Cloning task...", {
-					id: "cloning-task",
-				});
-			},
-			onSuccess: (task) => {
-				toast.success("Task cloned", {
-					id: "cloning-task",
-				});
-				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
-				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
-				setParams({ taskId: task.id });
-			},
-			onError: () => {
-				toast.error("Failed to clone task", {
-					id: "cloning-task",
-				});
-			},
-		}),
-	);
+	// const { mutate: cloneTask, isPending: isCloning } = useMutation(
+	// 	trpc.tasks.clone.mutationOptions({
+	// 		onMutate: () => {
+	// 			toast.loading("Cloning task...", {
+	// 				id: "cloning-task",
+	// 			});
+	// 		},
+	// 		onSuccess: (task) => {
+	// 			toast.success("Task cloned", {
+	// 				id: "cloning-task",
+	// 			});
+	// 			queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
+	// 			queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
+	// 			setParams({ taskId: task.id });
+	// 		},
+	// 		onError: () => {
+	// 			toast.error("Failed to clone task", {
+	// 				id: "cloning-task",
+	// 			});
+	// 		},
+	// 	}),
+	// );
 
 	const handleClone = () => {
-		cloneTask({
-			taskId: form.getValues().id!,
-		});
+		cloneTaskPanel.open(form.getValues().id!);
 	};
 
 	return (
@@ -95,9 +95,8 @@ export const ActionsMenu = () => {
 					onClick={() => {
 						handleClone();
 					}}
-					disabled={isCloning}
 				>
-					{isCloning ? <Loader /> : <CopyPlusIcon />}
+					<CopyPlusIcon />
 					Clone
 				</DropdownMenuItem>
 				<DropdownMenuItem

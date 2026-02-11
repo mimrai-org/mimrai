@@ -83,13 +83,13 @@ export function PanelContainer({
 			data-panel-id={panel.id}
 			initial={{
 				opacity: 0,
-				y: minimized ? "95%" : "5%",
+				y: minimized ? "75%" : "5%",
 				height: `calc(80vh - ${offset}px)`,
 			}}
 			animate={{
 				opacity: 1,
-				y: minimized ? "90%" : 0,
-				height: `calc(80vh - ${offset}px)`,
+				y: minimized ? "80%" : 0,
+				height: `calc(800px - ${offset}px)`,
 			}}
 			exit={{ opacity: 0, y: "100%" }}
 			whileHover={

@@ -10,6 +10,10 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useDebounceValue } from "usehooks-ts";
 import type z from "zod";
+import {
+	useCreateTaskPanel,
+	useTaskPanel,
+} from "@/components/panels/task-panel";
 import { useUser } from "@/components/user-provider";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useFormAutoSave, useZodForm } from "@/hooks/use-zod-form";
@@ -43,6 +47,8 @@ export const TaskForm = ({
 	const editorRef = useRef<EditorInstance | null>(null);
 	const [lastSavedDate, setLastSavedDate] = useState<Date>(new Date());
 	const { setParams } = useTaskParams();
+	const taskPanel = useTaskPanel();
+	const createTaskPanel = useCreateTaskPanel();
 	const queryClient = useQueryClient();
 
 	const form = useZodForm(taskFormSchema, {
@@ -69,6 +75,8 @@ export const TaskForm = ({
 				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
 				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
 				setParams(null);
+				taskPanel.open(task.id);
+				createTaskPanel.close("create");
 			},
 			onError: (error) => {
 				toast.error("Failed to create task", { id: "create-task" });
@@ -138,7 +146,8 @@ export const TaskForm = ({
 
 	const createMode = !id;
 	const formShowSmartInput = form.watch("showSmartInput");
-	const showSmartInput = createMode && formShowSmartInput;
+	// const showSmartInput = createMode && formShowSmartInput;
+	const showSmartInput = false;
 
 	return (
 		<div>
@@ -162,7 +171,7 @@ export const TaskForm = ({
 										<Title />
 									</div>
 									{createMode && (
-										<div className="px-8">
+										<div className="px-4">
 											<TaskDuplicated title={debouncedTitle} />
 										</div>
 									)}
@@ -207,9 +216,10 @@ export const TaskForm = ({
 													size={"sm"}
 													className="text-xs"
 													disabled={
-														!form.formState.isDirty ||
-														isPendingCreate ||
-														isPendingUpdate
+														(!form.formState.isDirty ||
+															isPendingCreate ||
+															isPendingUpdate) &&
+														Boolean(id)
 													}
 												>
 													{(isPendingCreate || isPendingUpdate) && (

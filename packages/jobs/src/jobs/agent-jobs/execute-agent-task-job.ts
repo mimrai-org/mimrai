@@ -155,10 +155,10 @@ export const executeAgentTaskPlanJob = schemaTask({
 		const messageText = focusedChecklistItem
 			? execution.status === "pending"
 				? `You have been assigned to complete the following checklist item: "${focusedChecklistItem.description}". Please resolve this item.`
-				: "Check the last user message and evaluate next steps based on the current checklist item state."
+				: "Check the last message and evaluate next steps based on the current checklist item state."
 			: execution.status === "pending"
-				? "Starting task execution."
-				: "Check the last user message and evaluate next steps based on the current task state.";
+				? "Resolve the task."
+				: "Check the last message and evaluate next steps based on the current task state.";
 
 		const message: UIChatMessage = {
 			id: generateId(),

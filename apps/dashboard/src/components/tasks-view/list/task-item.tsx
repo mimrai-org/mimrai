@@ -17,7 +17,7 @@ type Task = RouterOutputs["tasks"]["get"]["data"][number];
 interface TaskItemProps {
 	task: Task;
 	className?: string;
-	onOpenTask: (taskId: string, taskTitle: string) => void;
+	onOpenTask: (task: Task) => void;
 	visibleProperties: PropertyKey[];
 }
 
@@ -49,9 +49,9 @@ export const TaskItem = memo(function TaskItem({
 		(e: React.MouseEvent<HTMLButtonElement>) => {
 			if (isDragging) return;
 			e.preventDefault();
-			onOpenTask(task.id);
+			onOpenTask(task);
 		},
-		[isDragging, onOpenTask, task.id],
+		[isDragging, onOpenTask, task],
 	);
 
 	const handleCheckboxChange = useCallback(() => {

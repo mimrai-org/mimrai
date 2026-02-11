@@ -33,7 +33,7 @@ import { Assignee, AssigneeAvatar } from "./asignee-avatar";
 import { useChatContext } from "./chat/chat-context/store";
 import Loader from "./loader";
 import { MilestoneIcon } from "./milestone-icon";
-import { useTaskPanel } from "./panels/task-panel";
+import { useCloneTaskPanel, useTaskPanel } from "./panels/task-panel";
 import { ProjectIcon } from "./project-icon";
 import { StatusIcon } from "./status-icon";
 import { PriorityItem } from "./tasks-view/properties/priority";
@@ -51,6 +51,7 @@ export const TaskContextMenu = ({
 }) => {
 	const { setParams } = useTaskParams();
 	const taskPanel = useTaskPanel();
+	const cloneTaskPanel = useCloneTaskPanel();
 	const { setItems } = useChatContext();
 
 	const user = useUser();
@@ -98,28 +99,28 @@ export const TaskContextMenu = ({
 		}),
 	);
 
-	const { mutate: cloneTask, isPending: isCloning } = useMutation(
-		trpc.tasks.clone.mutationOptions({
-			onMutate: () => {
-				toast.loading("Cloning task...", {
-					id: "clone-task",
-				});
-			},
-			onSuccess: (task) => {
-				toast.success("Task cloned", {
-					id: "clone-task",
-				});
-				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
-				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
-				taskPanel.open(task.id);
-			},
-			onError: () => {
-				toast.error("Failed to clone task", {
-					id: "clone-task",
-				});
-			},
-		}),
-	);
+	// const { mutate: cloneTask, isPending: isCloning } = useMutation(
+	// 	trpc.tasks.clone.mutationOptions({
+	// 		onMutate: () => {
+	// 			toast.loading("Cloning task...", {
+	// 				id: "clone-task",
+	// 			});
+	// 		},
+	// 		onSuccess: (task) => {
+	// 			toast.success("Task cloned", {
+	// 				id: "clone-task",
+	// 			});
+	// 			queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
+	// 			queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
+	// 			taskPanel.open(task.id);
+	// 		},
+	// 		onError: () => {
+	// 			toast.error("Failed to clone task", {
+	// 				id: "clone-task",
+	// 			});
+	// 		},
+	// 	}),
+	// );
 
 	const { data: members } = useQuery(
 		trpc.teams.getMembers.queryOptions(
@@ -216,15 +217,8 @@ export const TaskContextMenu = ({
 					</ContextMenuSubContent>
 				</ContextMenuSub>
 
-				<ContextMenuItem
-					onClick={() => cloneTask({ taskId: task.id })}
-					disabled={isCloning}
-				>
-					{isCloning ? (
-						<Loader className="text-muted-foreground" />
-					) : (
-						<CopyPlusIcon className="text-muted-foreground" />
-					)}
+				<ContextMenuItem onClick={() => cloneTaskPanel.open(task.id)}>
+					<CopyPlusIcon className="text-muted-foreground" />
 					Clone
 				</ContextMenuItem>
 

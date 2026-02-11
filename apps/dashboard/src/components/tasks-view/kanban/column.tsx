@@ -4,6 +4,7 @@ import { Button } from "@mimir/ui/button";
 import * as Kanban from "@mimir/ui/kanban";
 import { Badge } from "@ui/components/ui/badge";
 import { Minimize2Icon, PlusIcon } from "lucide-react";
+import { useCreateTaskPanel } from "@/components/panels/task-panel";
 import type { GenericGroup } from "@/components/tasks-view/tasks-group";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { cn } from "@/lib/utils";
@@ -23,6 +24,7 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 
 	const { overColumnName, activeTaskId } = useKanbanStore();
 	const { setParams: setTaskParams } = useTaskParams();
+	const createTaskPanel = useCreateTaskPanel();
 	const { filters } = useTasksViewContext();
 
 	const open = !hiddenColumns.includes(columnName);
@@ -133,10 +135,9 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 							className="w-full justify-start border border-transparent border-dashed text-start text-xs hover:border-input hover:bg-accent/30!"
 							variant={"ghost"}
 							onClick={() => {
-								setTaskParams({
-									createTask: true,
-									taskStatusId: column.id,
-									taskProjectId:
+								createTaskPanel.open("create", {
+									statusId: column.id,
+									projectId:
 										filters.projectId?.length > 0
 											? filters.projectId[0]
 											: undefined,

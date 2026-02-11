@@ -22,9 +22,14 @@ import {
 } from "lucide-react";
 import { memo, useCallback, useMemo, useRef, useState } from "react";
 import { usePanel } from "@/components/panels/panel-context";
-import { TASK_PANEL_TYPE } from "@/components/panels/task-panel";
+import {
+	TASK_PANEL_TYPE,
+	useCreateTaskPanel,
+	useTaskPanel,
+} from "@/components/panels/task-panel";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useTaskSelectionStore } from "@/store/task-selection";
+import { queryClient, trpc } from "@/utils/trpc";
 import Loader from "../../loader";
 import { TaskContextMenu } from "../../task-context-menu";
 import type { PropertyKey } from "../properties/task-properties";
@@ -53,10 +58,14 @@ export const TasksList = () => {
 	const { tasks, reorderTask } = useTasksGrouped();
 
 	// Get stable reference to panel opener - only this component subscribes to panel context
-	const taskPanel = usePanel(TASK_PANEL_TYPE);
+	const taskPanel = useTaskPanel();
 	const handleOpenTask = useCallback(
-		(taskId: string) => {
-			taskPanel.open(taskId);
+		(task: Task) => {
+			queryClient.setQueryData(
+				trpc.tasks.getById.queryKey({ id: task.id }),
+				task,
+			);
+			taskPanel.open(task.id);
 		},
 		[taskPanel],
 	);
@@ -279,16 +288,22 @@ const CreateTaskButton = memo(function CreateTaskButton({
 	groupId: string;
 }) {
 	const { filters } = useTasksViewContext();
+	const createTaskPanel = useCreateTaskPanel();
 	const { setParams: setTaskParams } = useTaskParams();
 
 	const handleCreateTask = useCallback(() => {
-		setTaskParams({
-			createTask: true,
-			taskStatusId: groupId,
-			taskProjectId:
+		createTaskPanel.open("create", {
+			statusId: groupId,
+			projectId:
 				filters.projectId?.length > 0 ? filters.projectId[0] : undefined,
 		});
-	}, [setTaskParams, groupId, filters.projectId]);
+		// setTaskParams({
+		// 	createTask: true,
+		// 	taskStatusId: groupId,
+		// 	taskProjectId:
+		// 		filters.projectId?.length > 0 ? filters.projectId[0] : undefined,
+		// });
+	}, [createTaskPanel, groupId, filters.projectId]);
 
 	return (
 		<Button
