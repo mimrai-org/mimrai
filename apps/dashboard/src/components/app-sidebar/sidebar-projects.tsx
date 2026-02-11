@@ -6,6 +6,7 @@ import {
 	SidebarGroupContent,
 	SidebarGroupLabel,
 	SidebarMenu,
+	SidebarMenuAction,
 	SidebarMenuButton,
 	SidebarMenuItem,
 	useSidebar,
@@ -15,7 +16,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useProjectParams } from "@/hooks/use-project-params";
 import { trpc } from "@/utils/trpc";
+import { AssigneeAvatar } from "../asignee-avatar";
 import { ProjectIcon } from "../project-icon";
+import { ProjectContextMenu } from "../projects/context-menu";
 import { useUser } from "../user-provider";
 
 export function SidebarProjects() {
@@ -41,18 +44,23 @@ export function SidebarProjects() {
 							`${user.basePath}/projects/${project.id}`,
 						);
 						return (
-							<SidebarMenuItem key={project.id}>
-								<SidebarMenuButton
-									asChild
-									tooltip={project.name}
-									isActive={isActive}
-								>
-									<Link href={`${user.basePath}/projects/${project.id}`}>
-										<ProjectIcon {...project} />
-										<span>{project.name}</span>
-									</Link>
-								</SidebarMenuButton>
-							</SidebarMenuItem>
+							<ProjectContextMenu key={project.id} project={project}>
+								<SidebarMenuItem>
+									<SidebarMenuButton
+										asChild
+										tooltip={project.name}
+										isActive={isActive}
+									>
+										<Link href={`${user.basePath}/projects/${project.id}`}>
+											<ProjectIcon {...project} />
+											<span>{project.name}</span>
+										</Link>
+									</SidebarMenuButton>
+									<SidebarMenuAction>
+										<AssigneeAvatar {...project.lead} className="size-5" />
+									</SidebarMenuAction>
+								</SidebarMenuItem>
+							</ProjectContextMenu>
 						);
 					})}
 

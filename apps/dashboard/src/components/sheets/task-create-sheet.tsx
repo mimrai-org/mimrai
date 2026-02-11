@@ -34,14 +34,10 @@ export const TaskCreateSheet = () => {
 
 	return (
 		<Dialog open={isOpen} onOpenChange={() => setParams(null)}>
-			<DialogHeader>
-				<DialogTitle />
-			</DialogHeader>
-			<DialogContent
-				onPointerDownOutside={(e) => e.preventDefault()}
-				onInteractOutside={(e) => e.preventDefault()}
-				className="max-h-[85vh] overflow-y-auto pt-0 sm:min-w-[1000px]"
-			>
+			<DialogContent className="max-h-[85vh] overflow-y-auto pt-0 sm:min-w-[1000px]">
+				<DialogHeader>
+					<DialogTitle />
+				</DialogHeader>
 				<TaskForm
 					defaultValues={{
 						statusId: taskStatusId || todoStatus?.id || "backlog",

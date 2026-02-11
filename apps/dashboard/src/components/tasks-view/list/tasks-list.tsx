@@ -292,7 +292,7 @@ const CreateTaskButton = memo(function CreateTaskButton({
 
 	return (
 		<Button
-			className="mb-2 w-full justify-start text-start text-muted-foreground text-xs"
+			className="mb-2 w-full justify-start text-start text-muted-foreground text-xs hover:bg-transparent dark:hover:bg-transparent"
 			variant={"ghost"}
 			onClick={handleCreateTask}
 		>
