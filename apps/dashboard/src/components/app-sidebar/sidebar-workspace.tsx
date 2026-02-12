@@ -22,6 +22,7 @@ export function SidebarWorkspace() {
 	const pathname = usePathname();
 
 	const isInboxActive = pathname === `${user.basePath}/inbox`;
+	const isRecurringActive = pathname === `${user.basePath}/recurring`;
 	const isSettingsActive = pathname.startsWith(`${user.basePath}/settings`);
 
 	return (
@@ -37,7 +38,7 @@ export function SidebarWorkspace() {
 						</SidebarMenuButton>
 					</SidebarMenuItem>
 					<SidebarMenuItem>
-						<SidebarMenuButton asChild isActive={isInboxActive}>
+						<SidebarMenuButton asChild isActive={isRecurringActive}>
 							<Link href={`${user.basePath}/recurring`}>
 								<ClipboardClockIcon />
 								<span>Recurring</span>
