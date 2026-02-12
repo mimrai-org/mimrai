@@ -1,9 +1,9 @@
 import { DataSelectInput } from "@mimir/ui/data-select-input";
 import { FormControl, FormField, FormItem } from "@mimir/ui/form";
-import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { ProjectIcon } from "@/components/project-icon";
+import { useProjects } from "@/hooks/use-data";
 import { trpc } from "@/utils/trpc";
 import type { TaskFormValues } from "./form-type";
 
@@ -11,15 +11,7 @@ export const ProjectSelect = () => {
 	const form = useFormContext<TaskFormValues>();
 	const projectId = form.watch("projectId");
 
-	const { data: projects } = useQuery(
-		trpc.projects.get.queryOptions(
-			{},
-			{
-				refetchOnMount: false,
-				refetchOnWindowFocus: false,
-			},
-		),
-	);
+	const { data: projects } = useProjects();
 
 	useEffect(() => {
 		if (

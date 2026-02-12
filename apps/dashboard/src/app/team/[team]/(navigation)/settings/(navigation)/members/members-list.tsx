@@ -13,6 +13,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { EllipsisIcon } from "lucide-react";
 import { AssigneeAvatar } from "@/components/asignee-avatar";
 import { useUser } from "@/components/user-provider";
+import { useTeamMembers } from "@/hooks/use-data";
 import { useMemberParams } from "@/hooks/use-member-params";
 import { useScopes } from "@/hooks/use-scopes";
 import { queryClient, trpc } from "@/utils/trpc";
@@ -20,7 +21,7 @@ import { queryClient, trpc } from "@/utils/trpc";
 export const MembersList = () => {
 	const user = useUser();
 	const { setParams } = useMemberParams();
-	const { data: members } = useQuery(trpc.teams.getMembers.queryOptions());
+	const { data: members } = useTeamMembers();
 	const { mutateAsync: leaveTeam } = useMutation(
 		trpc.teams.leave.mutationOptions({
 			onSuccess: () => {

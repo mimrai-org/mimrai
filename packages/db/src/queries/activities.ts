@@ -123,10 +123,11 @@ export const createActivity = async (input: CreateActivityInput) => {
 		}
 
 		await realtime
-			.channel(getChannelName(input.teamId, input.groupId, result.type))
+			.channel(getChannelName(input.teamId))
 			.emit("activities.created", {
 				id: result.id,
 				type: result.type,
+				metadata: result.metadata,
 				groupId: result.groupId ?? undefined,
 			});
 	}
@@ -217,6 +218,7 @@ export const createTaskUpdateActivity = async ({
 			type: "task_assigned",
 			metadata: {
 				title: newTask.title,
+				assigneeId: changes.assigneeId.value,
 				assigneeName: changes.assigneeId.display,
 				subscribers: newTask.subscribers,
 			},

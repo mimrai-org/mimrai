@@ -22,12 +22,12 @@ import { useDebounceValue } from "usehooks-ts";
 import Loader from "@/components/loader";
 import { TaskContextMenu } from "@/components/task-context-menu";
 import { TaskItem } from "@/components/tasks-view/task-item";
+import { useTasks } from "@/hooks/use-data";
 import { useTaskParams } from "@/hooks/use-task-params";
-import { useTasksWithData } from "@/hooks/use-tasks-with-data";
 import { queryClient, trpc } from "@/utils/trpc";
 
 export const TasksList = ({ projectId }: { projectId: string }) => {
-	const { tasks, isLoading, hasNextPage, fetchNextPage } = useTasksWithData({
+	const { tasks, isLoading, hasNextPage, fetchNextPage } = useTasks({
 		pageSize: 20,
 		projectId: [projectId],
 	});

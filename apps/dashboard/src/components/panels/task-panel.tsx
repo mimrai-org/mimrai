@@ -2,7 +2,6 @@
 import { Skeleton } from "@mimir/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import { TaskForm } from "@/components/forms/task-form/form";
-import { useTaskRealtime } from "@/hooks/use-task-realtime";
 import { trpc } from "@/utils/trpc";
 import { useUser } from "../user-provider";
 import { PanelContainer } from "./panel-container";
@@ -29,8 +28,6 @@ function TaskPanelContent({ panel }: { panel: PanelInstance }) {
 			},
 		),
 	);
-
-	useTaskRealtime(task?.id);
 
 	if (!task) {
 		return (

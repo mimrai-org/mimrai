@@ -5,5 +5,6 @@ export const activities = {
 		id: z.string(),
 		type: z.string(),
 		groupId: z.string().optional(),
+		metadata: z.record(z.string(), z.unknown()).optional().nullable(),
 	}),
 };

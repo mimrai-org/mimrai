@@ -7,8 +7,9 @@ import {
 	useMemo,
 	useState,
 } from "react";
+import { useActivitiesRealtime } from "@/hooks/use-activities-realtime";
+import { useTasks } from "@/hooks/use-data";
 import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";
-import { useTasksWithData } from "@/hooks/use-tasks-with-data";
 import { useUser } from "../user-provider";
 import { TasksCalendar } from "./calendar/calendar";
 import { TasksFilters, type TasksFiltersProps } from "./filters/tasks-filters";
@@ -130,7 +131,7 @@ export const TasksView = ({
 	);
 
 	// Use the unified hook for fetching tasks with client-side joins
-	const { tasks, isLoading, fetchNextPage, hasNextPage } = useTasksWithData(
+	const { tasks, isLoading, fetchNextPage, hasNextPage } = useTasks(
 		{
 			...filters,
 			// Calendar view uses the same data as list view
@@ -140,6 +141,8 @@ export const TasksView = ({
 			refetchOnWindowFocus: false,
 		},
 	);
+
+	useActivitiesRealtime();
 
 	const contextValue = useMemo<TasksViewContextValue>(
 		() => ({

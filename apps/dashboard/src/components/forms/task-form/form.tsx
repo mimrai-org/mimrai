@@ -15,6 +15,10 @@ import {
 	useTaskPanel,
 } from "@/components/panels/task-panel";
 import { useUser } from "@/components/user-provider";
+import {
+	invalidateTasksCache,
+	updateTaskInCache,
+} from "@/hooks/use-data-cache-helpers";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useFormAutoSave, useZodForm } from "@/hooks/use-zod-form";
 import { trpc } from "@/utils/trpc";
@@ -72,9 +76,7 @@ export const TaskForm = ({
 			},
 			onSuccess: (task) => {
 				toast.success("Task created successfully", { id: "create-task" });
-				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
-				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
-				setParams(null);
+				invalidateTasksCache();
 				taskPanel.open(task.id);
 				createTaskPanel.close("create");
 			},
@@ -90,19 +92,7 @@ export const TaskForm = ({
 				toast.error("Failed to update task", { id: "update-task" });
 			},
 			onSuccess: (task) => {
-				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
-				queryClient.invalidateQueries(
-					trpc.tasks.getById.queryOptions({ id: task.id }),
-				);
-				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
-				queryClient.invalidateQueries(
-					trpc.tasks.getSubscribers.queryOptions({ id: task.id }),
-				);
-				queryClient.invalidateQueries(
-					trpc.activities.get.queryOptions({
-						groupId: task.id,
-					}),
-				);
+				updateTaskInCache(task);
 			},
 		}),
 	);

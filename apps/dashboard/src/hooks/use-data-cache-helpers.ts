@@ -1,4 +1,4 @@
-import type { RouterOutputs } from "@mimir/trpc";
+import type { RouterInputs, RouterOutputs } from "@mimir/trpc";
 import { queryClient, trpc } from "@/utils/trpc";
 
 /**
@@ -42,10 +42,12 @@ export function updateMemberInCache(updatedMember: Member) {
  * Update a single task in all task queries.
  * Use this when you update task-specific properties (not status/assignee).
  */
-export function updateTaskInCache(updatedTask: Task) {
+export function updateTaskInCache(updatedTask: Partial<Task>) {
 	// Update in infinite queries
 	queryClient.setQueriesData(
-		{ queryKey: trpc.tasks.get.queryKey() },
+		{
+			queryKey: trpc.tasks.get.infiniteQueryKey(),
+		},
 		(old: any) => {
 			if (!old?.pages) return old;
 			return {
@@ -53,7 +55,7 @@ export function updateTaskInCache(updatedTask: Task) {
 				pages: old.pages.map((page: any) => ({
 					...page,
 					data: page.data.map((task: any) =>
-						task.id === updatedTask.id ? updatedTask : task,
+						task.id === updatedTask.id ? { ...task, ...updatedTask } : task,
 					),
 				})),
 			};
@@ -73,7 +75,7 @@ export function updateTaskInCache(updatedTask: Task) {
 export function removeTaskFromCache(taskId: string) {
 	// Remove from infinite queries
 	queryClient.setQueriesData(
-		{ queryKey: trpc.tasks.get.queryKey() },
+		{ queryKey: trpc.tasks.get.infiniteQueryKey() },
 		(old: any) => {
 			if (!old?.pages) return old;
 			return {
@@ -87,7 +89,9 @@ export function removeTaskFromCache(taskId: string) {
 	);
 
 	// Invalidate getById query
-	queryClient.invalidateQueries(trpc.tasks.getById.queryKey({ id: taskId }));
+	queryClient.invalidateQueries(
+		trpc.tasks.getById.queryOptions({ id: taskId }),
+	);
 }
 
 /**
