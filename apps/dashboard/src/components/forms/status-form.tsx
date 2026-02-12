@@ -21,6 +21,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import z from "zod";
+import { updateStatusInCache } from "@/hooks/use-data-cache-helpers";
 import { useStatusParams } from "@/hooks/use-status-params";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { trpc } from "@/utils/trpc";
@@ -79,8 +80,9 @@ export const StatusForm = ({
 					trpc.statuses.getById.queryKey({ id: status.id }),
 					status,
 				);
-				queryClient.invalidateQueries(trpc.statuses.get.queryOptions());
-				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
+				// Update status in cache - this will automatically update all tasks with this status
+				updateStatusInCache(status);
+				toast.success("Status updated successfully");
 				setParams(null);
 			},
 		}),

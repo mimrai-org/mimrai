@@ -325,25 +325,6 @@ export const getTasks = async ({
 				name: milestones.name,
 				color: milestones.color,
 			},
-			project: {
-				id: projects.id,
-				name: projects.name,
-				color: projects.color,
-			},
-			assignee: {
-				id: users.id,
-				name: users.name,
-				email: users.email,
-				image: users.image,
-				color: users.color,
-			},
-			creator: {
-				id: creatorUser.id,
-				name: creatorUser.name,
-				email: creatorUser.email,
-				image: creatorUser.image,
-				color: creatorUser.color,
-			},
 			statusId: tasks.statusId,
 			repositoryName: tasks.repositoryName,
 			branchName: tasks.branchName,
@@ -364,13 +345,6 @@ export const getTasks = async ({
 			recurring: tasks.recurring,
 			recurringJobId: tasks.recurringJobId,
 			recurringNextDate: tasks.recurringNextDate,
-			status: {
-				id: statuses.id,
-				name: statuses.name,
-				description: statuses.description,
-				order: statuses.order,
-				type: statuses.type,
-			},
 			labels: labelsSubquery.labels,
 			dependencies: dependenciesSubquery.dependencies,
 		})
@@ -378,10 +352,7 @@ export const getTasks = async ({
 		.where(and(...whereClause))
 		.innerJoin(statuses, eq(tasks.statusId, statuses.id))
 		.leftJoin(labelsSubquery, eq(labelsSubquery.taskId, tasks.id))
-		.leftJoin(users, eq(tasks.assigneeId, users.id))
-		.leftJoin(creatorUser, eq(tasks.createdBy, creatorUser.id))
 		.leftJoin(checklistSubquery, eq(checklistSubquery.taskId, tasks.id))
-		.leftJoin(projects, eq(tasks.projectId, projects.id))
 		.leftJoin(milestones, eq(tasks.milestoneId, milestones.id))
 		.leftJoinLateral(dependenciesSubquery, sql`true`);
 

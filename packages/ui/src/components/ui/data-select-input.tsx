@@ -2,6 +2,7 @@ import { type UseQueryOptions, useQuery } from "@tanstack/react-query";
 import { cn } from "@ui/lib/utils";
 import { ChevronDownIcon } from "lucide-react";
 import { type ComponentProps, useMemo, useState } from "react";
+import { useDebounceValue } from "usehooks-ts";
 import { Button } from "./button";
 import { Checkbox } from "./checkbox";
 import { Command, CommandGroup, CommandInput, CommandItem } from "./command";
@@ -44,7 +45,9 @@ export const DataSelectInput = <
 	...buttonProps
 }: {
 	placeholder?: string;
-	queryOptions: UseQueryOptions<TFn, TError, T, TQueryKey>;
+	queryOptions:
+		| UseQueryOptions<TFn, TError, T, TQueryKey>
+		| ((search: string) => UseQueryOptions<TFn, TError, T, TQueryKey>);
 	value: V;
 	before?: React.ReactNode;
 	onChange: (value: V) => void;
@@ -59,7 +62,14 @@ export const DataSelectInput = <
 	multiple?: boolean;
 } & Omit<ComponentProps<typeof Button>, "value" | "onChange">) => {
 	const [open, setOpen] = useState(false);
-	const { data } = useQuery(queryOptions);
+	const [search, setSearch] = useState("");
+	const [debouncedSearch] = useDebounceValue(search, 300);
+
+	const { data } = useQuery(
+		typeof queryOptions === "function"
+			? queryOptions(debouncedSearch)
+			: queryOptions,
+	);
 
 	const singleValue = useMemo(() => {
 		if (!value) return null;
@@ -111,8 +121,12 @@ export const DataSelectInput = <
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent>
-				<Command>
-					<CommandInput placeholder="Type to filter..." />
+				<Command shouldFilter={false}>
+					<CommandInput
+						placeholder="Type to filter..."
+						value={search}
+						onValueChange={setSearch}
+					/>
 					<CommandGroup>
 						{clearable && (
 							<CommandItem

@@ -89,7 +89,7 @@ export function PanelContainer({
 			animate={{
 				opacity: 1,
 				y: minimized ? "80%" : 0,
-				height: `calc(800px - ${offset}px)`,
+				height: `calc(800px + ${offset}px)`,
 			}}
 			exit={{ opacity: 0, y: "100%" }}
 			whileHover={

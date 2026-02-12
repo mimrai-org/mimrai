@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/ui/button";
 import {
 	Command,
@@ -16,27 +16,21 @@ import {
 } from "@ui/components/ui/popover";
 import { PlusIcon, XIcon } from "lucide-react";
 import { AnimatePresence } from "motion/react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { useDebounceValue } from "usehooks-ts";
 import Loader from "@/components/loader";
 import { TaskContextMenu } from "@/components/task-context-menu";
 import { TaskItem } from "@/components/tasks-view/task-item";
+import { useTasks } from "@/hooks/use-data";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { queryClient, trpc } from "@/utils/trpc";
 
 export const TasksList = ({ projectId }: { projectId: string }) => {
-	const { data, isLoading, hasNextPage, fetchNextPage } = useInfiniteQuery(
-		trpc.tasks.get.infiniteQueryOptions(
-			{
-				pageSize: 20,
-				projectId: [projectId],
-			},
-			{
-				getNextPageParam: (lastPage) => lastPage.meta.cursor,
-			},
-		),
-	);
+	const { tasks, isLoading, hasNextPage, fetchNextPage } = useTasks({
+		pageSize: 20,
+		projectId: [projectId],
+	});
 
 	const { mutate: updateTask, isPending: isUpdating } = useMutation(
 		trpc.tasks.update.mutationOptions({
@@ -55,10 +49,6 @@ export const TasksList = ({ projectId }: { projectId: string }) => {
 		}),
 	);
 
-	const listData = useMemo(() => {
-		return data?.pages.flatMap((page) => page.data) || [];
-	}, [data]);
-
 	return (
 		<div>
 			<div className="flex items-center justify-between">
@@ -67,7 +57,7 @@ export const TasksList = ({ projectId }: { projectId: string }) => {
 			</div>
 			<AnimatePresence>
 				<ul className="flex flex-col gap-2 py-2">
-					{listData.map((task) => (
+					{tasks.map((task) => (
 						<TaskContextMenu
 							key={task.id}
 							task={task}

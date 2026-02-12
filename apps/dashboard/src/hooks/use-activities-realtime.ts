@@ -1,24 +1,45 @@
 import { useChannelName, useRealtime } from "@/lib/realtime-client";
 import { queryClient, trpc } from "@/utils/trpc";
+import type { Task } from "./use-data";
+import { updateTaskInCache } from "./use-data-cache-helpers";
 
-export const useTaskRealtime = (taskId?: string) => {
-	const channels = useChannelName(taskId, [
-		"task_comment",
-		"task_update",
-		"task_comment_reply",
-		"task_assigned",
-		"task_column_changed",
-		"task_completed",
-		"checklist_item_completed",
-		"checklist_item_created",
-		"checklist_item_updated",
-	]);
+export const useActivitiesRealtime = () => {
+	const channels = useChannelName();
 
 	useRealtime({
-		channels,
+		channels: channels,
 		events: ["activities.created"],
-		enabled: Boolean(taskId),
+
 		onData: async (event) => {
+			const payload: Partial<Task> = {
+				id: event.data.groupId,
+			};
+
+			// Update the get task by id query
+			if (event.data.type === "task_column_changed") {
+				payload.statusId = event.data.metadata.toColumnId as string;
+			}
+
+			if (event.data.type === "task_assigned") {
+				payload.assigneeId = event.data.metadata.assigneeId as string;
+			}
+
+			console.log("Received activity event:", event.data, payload);
+
+			updateTaskInCache(payload);
+
+			if (
+				[
+					"checklist_item_completed",
+					"checklist_item_created",
+					"checklist_item_updated",
+				].includes(event.data.type)
+			) {
+				queryClient.invalidateQueries(
+					trpc.checklists.get.queryOptions({ taskId: event.data.groupId }),
+				);
+			}
+
 			// Fetch activity
 			const newActivity = await queryClient.fetchQuery(
 				trpc.activities.get.queryOptions({
@@ -28,29 +49,10 @@ export const useTaskRealtime = (taskId?: string) => {
 			if (!newActivity.data.length) return;
 			const [activity] = newActivity.data;
 
-			// Update the get task by id query
-			if (["task_column_changed", "task_assigned"].includes(activity.type)) {
-				queryClient.invalidateQueries(
-					trpc.tasks.getById.queryOptions({ id: taskId! }),
-				);
-			}
-
-			if (
-				[
-					"checklist_item_completed",
-					"checklist_item_created",
-					"checklist_item_updated",
-				].includes(activity.type)
-			) {
-				queryClient.invalidateQueries(
-					trpc.checklists.get.queryOptions({ taskId: taskId! }),
-				);
-			}
-
 			// Update activities list
 			queryClient.setQueryData(
 				trpc.activities.get.infiniteQueryKey({
-					groupId: taskId,
+					groupId: event.data.groupId,
 					nStatus: ["archived"],
 					pageSize: 10,
 				}),

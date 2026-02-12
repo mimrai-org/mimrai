@@ -27,6 +27,7 @@ import ms from "ms";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useUser } from "@/components/user-provider";
+import { useProjects, useStatuses, useTeamMembers } from "@/hooks/use-data";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { queryClient, trpc } from "@/utils/trpc";
 import { Assignee, AssigneeAvatar } from "./asignee-avatar";
@@ -99,47 +100,10 @@ export const TaskContextMenu = ({
 		}),
 	);
 
-	// const { mutate: cloneTask, isPending: isCloning } = useMutation(
-	// 	trpc.tasks.clone.mutationOptions({
-	// 		onMutate: () => {
-	// 			toast.loading("Cloning task...", {
-	// 				id: "clone-task",
-	// 			});
-	// 		},
-	// 		onSuccess: (task) => {
-	// 			toast.success("Task cloned", {
-	// 				id: "clone-task",
-	// 			});
-	// 			queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
-	// 			queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
-	// 			taskPanel.open(task.id);
-	// 		},
-	// 		onError: () => {
-	// 			toast.error("Failed to clone task", {
-	// 				id: "clone-task",
-	// 			});
-	// 		},
-	// 	}),
-	// );
+	const { data: members } = useTeamMembers();
 
-	const { data: members } = useQuery(
-		trpc.teams.getMembers.queryOptions(
-			{
-				includeSystemUsers: true,
-			},
-			{
-				staleTime: ms("5 minutes"),
-			},
-		),
-	);
-	const { data: statuses } = useQuery(
-		trpc.statuses.get.queryOptions(
-			{},
-			{
-				staleTime: ms("10 minutes"),
-			},
-		),
-	);
+	const { data: statuses } = useStatuses();
+
 	const { data: labels } = useQuery(
 		trpc.labels.get.queryOptions(
 			{},
@@ -149,14 +113,7 @@ export const TaskContextMenu = ({
 		),
 	);
 
-	const { data: projects } = useQuery(
-		trpc.projects.get.queryOptions(
-			{},
-			{
-				staleTime: ms("10 minutes"),
-			},
-		),
-	);
+	const { data: projects } = useProjects();
 
 	const { data: milestones } = useQuery(
 		trpc.milestones.get.queryOptions(

@@ -11,16 +11,20 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@ui/components/ui/popover";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { useDebounceValue } from "usehooks-ts";
 import { cn } from "@/lib/utils";
 import { queryClient, trpc } from "@/utils/trpc";
 import { Assignee, AssigneeAvatar } from "../../asignee-avatar";
 import type { KanbanTask } from "../kanban/kanban-task";
 
 export const TaskPropertyAssignee = ({ task }: { task: KanbanTask }) => {
+	const [search, setSearch] = useState("");
+	const [debouncedSearch] = useDebounceValue(search, 300);
 	const { data, isLoading } = useQuery(
 		trpc.teams.getMembers.queryOptions({
 			includeSystemUsers: true,
+			search: debouncedSearch,
 		}),
 	);
 
@@ -45,7 +49,7 @@ export const TaskPropertyAssignee = ({ task }: { task: KanbanTask }) => {
 
 	const { mutate: updateTask, isPending } = useMutation(
 		trpc.tasks.update.mutationOptions({
-			onSuccess: () => {
+			onSuccess: (task) => {
 				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
 				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
 			},
@@ -81,8 +85,12 @@ export const TaskPropertyAssignee = ({ task }: { task: KanbanTask }) => {
 					</div>
 				</PopoverTrigger>
 				<PopoverContent>
-					<Command>
-						<CommandInput placeholder="Search..." />
+					<Command shouldFilter={false}>
+						<CommandInput
+							placeholder="Search..."
+							value={search}
+							onValueChange={setSearch}
+						/>
 						<CommandGroup>
 							<PopoverClose className="w-full">
 								<CommandItem

@@ -6,6 +6,7 @@ import "../../index.css";
 import { Toaster } from "@ui/components/ui/sonner";
 import Head from "next/head";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { getSession } from "@/lib/get-session";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -33,16 +34,18 @@ export default async function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const session = await getSession();
+
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<Head>
 				<meta name="apple-mobile-web-app-title" content="Mimrai" />
 			</Head>
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} ${fontHeader.variable} flex min-h-screen flex-col antialiased`}
+				className={`${geistSans.variable} ${geistMono.variable} ${fontHeader.variable} flex min-h-screen flex-col bg-background antialiased`}
 			>
 				<NuqsAdapter>
-					<Providers>{children}</Providers>
+					<Providers session={session}>{children}</Providers>
 					<Toaster
 						toastOptions={{
 							classNames: {

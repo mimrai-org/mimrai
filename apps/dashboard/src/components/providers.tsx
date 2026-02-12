@@ -2,12 +2,24 @@
 
 import { getApiUrl } from "@mimir/utils/envs";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { RealtimeProvider } from "@upstash/realtime/client";
 import { useState } from "react";
+import type { getSession } from "@/lib/get-session";
+import {
+	PersisterLoader,
+	PersistQueryClientProviderWithIDB,
+} from "@/utils/persister";
 import { queryClient } from "@/utils/trpc";
 import { ThemeProvider } from "./theme-provider";
 
-export default function Providers({ children }: { children: React.ReactNode }) {
+export default function Providers({
+	children,
+	session,
+}: {
+	children: React.ReactNode;
+	session: Awaited<ReturnType<typeof getSession>>;
+}) {
 	const [localQueryClient] = useState(() => queryClient);
 
 	return (
@@ -17,18 +29,21 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 				withCredentials: true,
 			}}
 		>
-			<QueryClientProvider client={localQueryClient}>
+			<PersistQueryClientProviderWithIDB
+				client={localQueryClient}
+				session={session}
+			>
 				<ThemeProvider
 					attribute="class"
 					defaultTheme="system"
 					enableSystem
 					disableTransitionOnChange
 				>
-					{children}
+					<PersisterLoader>{children}</PersisterLoader>
 				</ThemeProvider>
 				{/* <CleanTasksFilters /> */}
 				{/* <ReactQueryDevtools /> */}
-			</QueryClientProvider>
+			</PersistQueryClientProviderWithIDB>
 		</RealtimeProvider>
 	);
 }

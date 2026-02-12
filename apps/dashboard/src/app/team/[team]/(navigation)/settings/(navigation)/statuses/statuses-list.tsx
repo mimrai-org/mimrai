@@ -36,6 +36,7 @@ import { EllipsisIcon, GripVerticalIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { StatusIcon } from "@/components/status-icon";
+import { useStatuses } from "@/hooks/use-data";
 import { useStatusParams } from "@/hooks/use-status-params";
 import { queryClient, trpc } from "@/utils/trpc";
 
@@ -139,7 +140,7 @@ const SortableStatusItem = ({
 
 export const StatusesList = () => {
 	const { setParams } = useStatusParams();
-	const { data } = useQuery(trpc.statuses.get.queryOptions());
+	const { data } = useStatuses();
 	const [items, setItems] = useState<Status[]>([]);
 
 	// Keep local state in sync with server data

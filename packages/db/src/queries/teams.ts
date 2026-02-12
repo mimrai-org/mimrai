@@ -190,6 +190,7 @@ export const getMembers = async ({
 	];
 
 	search && whereClause.push(ilike(users.name, `%${search}%`));
+	search && systemUsersWhereClause.push(ilike(users.name, `%${search}%`));
 	role && whereClause.push(eq(usersOnTeams.role, role));
 	isMentionable && whereClause.push(eq(users.isMentionable, true));
 	isMentionable && systemUsersWhereClause.push(eq(users.isMentionable, true));

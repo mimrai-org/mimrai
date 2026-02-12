@@ -1,6 +1,6 @@
 "use client";
 import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
-import type { QueryClient } from "@tanstack/react-query";
+import { type QueryClient, useIsRestoring } from "@tanstack/react-query";
 import {
 	type PersistedClient,
 	type Persister,
@@ -8,6 +8,7 @@ import {
 } from "@tanstack/react-query-persist-client";
 import { del, get, set } from "idb-keyval";
 import { useState } from "react";
+import { Logo } from "@/components/logo";
 import type { getSession } from "@/lib/get-session";
 
 /**
@@ -30,11 +31,11 @@ export function createIDBPersister(idbValidKey: IDBValidKey = "reactQuery") {
 
 export const PersistQueryClientProviderWithIDB = ({
 	children,
-	queryClient,
+	client,
 	session,
 }: {
 	children: React.ReactNode;
-	queryClient: QueryClient;
+	client: QueryClient;
 	session: Awaited<ReturnType<typeof getSession>>;
 }) => {
 	const [persister] = useState(
@@ -47,7 +48,7 @@ export const PersistQueryClientProviderWithIDB = ({
 
 	return (
 		<PersistQueryClientProvider
-			client={queryClient}
+			client={client}
 			persistOptions={{
 				persister,
 			}}
@@ -55,4 +56,24 @@ export const PersistQueryClientProviderWithIDB = ({
 			{children}
 		</PersistQueryClientProvider>
 	);
+};
+
+export const PersisterLoader = ({
+	children,
+}: {
+	children: React.ReactNode;
+}) => {
+	const isRestoring = useIsRestoring();
+
+	if (isRestoring) {
+		return (
+			<div className="flex h-screen animate-blur-in flex-col items-center justify-center">
+				<Logo className="size-8" />
+				<span className="text-muted-foreground text-sm">
+					Preparing your data...
+				</span>
+			</div>
+		);
+	}
+	return <>{children}</>;
 };
