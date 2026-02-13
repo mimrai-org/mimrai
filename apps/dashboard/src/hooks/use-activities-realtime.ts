@@ -1,7 +1,7 @@
 import { useChannelName, useRealtime } from "@/lib/realtime-client";
 import { queryClient, trpc } from "@/utils/trpc";
 import type { Task } from "./use-data";
-import { updateTaskInCache } from "./use-data-cache-helpers";
+import { addTaskToCache, updateTaskInCache } from "./use-data-cache-helpers";
 
 export const useActivitiesRealtime = () => {
 	const channels = useChannelName();
@@ -11,20 +11,31 @@ export const useActivitiesRealtime = () => {
 		events: ["activities.created"],
 
 		onData: async (event) => {
+			if (event.data.type === "task_created") {
+				// Fetch the task details and update the cache
+				const task = await queryClient.fetchQuery(
+					trpc.tasks.getById.queryOptions({
+						id: event.data.groupId,
+					}),
+				);
+				if (task) {
+					addTaskToCache(task);
+				}
+				return;
+			}
+
 			const payload: Partial<Task> = {
 				id: event.data.groupId,
 			};
 
-			// Update the get task by id query
 			if (event.data.type === "task_column_changed") {
+				// Update the get task by id query
 				payload.statusId = event.data.metadata.toColumnId as string;
 			}
 
 			if (event.data.type === "task_assigned") {
 				payload.assigneeId = event.data.metadata.assigneeId as string;
 			}
-
-			console.log("Received activity event:", event.data, payload);
 
 			updateTaskInCache(payload);
 

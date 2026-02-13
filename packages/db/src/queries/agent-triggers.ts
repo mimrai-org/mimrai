@@ -2,9 +2,10 @@ import { systemUserCache } from "@mimir/cache/system-user-cache";
 import { tasks as triggerTasks } from "@trigger.dev/sdk";
 import { and, eq } from "drizzle-orm";
 import { db } from "../index";
-import { checklistItems, tasks, users } from "../schema";
+import { checklistItems, projects, statuses, tasks, users } from "../schema";
 
 const AGENT_TASK_JOB_ID = "execute-agent-task-plan";
+const PM_AGENT_JOB_ID = "execute-pm-agent";
 
 /**
  * Check if the given user ID is the system user (agent)
@@ -61,11 +62,20 @@ export const triggerAgentTaskExecutionIfNeeded = async ({
 		return false;
 	}
 
-	// Prevent self-triggering if the trigger was done by the agent itself
+	// Prevent self triggering if the comment by the agent itself commented
 	if (
 		triggerUserId &&
 		triggerUserId === assigneeId &&
-		triggeredBy === "assignment"
+		triggeredBy === "comment"
+	) {
+		return false;
+	}
+
+	// Prevent triggering on updates that are not new assignments (e.g. status change, title change)
+	if (
+		triggerUserId &&
+		triggerUserId === assigneeId &&
+		triggeredBy === "update"
 	) {
 		return false;
 	}
@@ -240,6 +250,301 @@ export const triggerAgentOnChecklistItemAssignment = async ({
 				"trigger:checklist-assignment",
 				`checklistItemId:${checklistItemId}`,
 				`assigneeId:${assigneeId}`,
+			],
+		},
+	);
+
+	return true;
+};
+
+// ─── Project Manager Agent Triggers ─────────────────────────────────────────
+
+/**
+ * Trigger the PM agent when a task's status changes within a project.
+ *
+ * Invokes the PM agent when:
+ * - Task moves to "review" → PM reviews the work
+ * - Task moves to "done" → PM re-scopes and checks milestone progress
+ *
+ * Does NOT trigger for other status transitions (backlog, to_do, in_progress).
+ */
+export const triggerPMAgentOnStatusChange = async ({
+	taskId,
+	teamId,
+	oldStatusId,
+	newStatusId,
+}: {
+	taskId: string;
+	teamId: string;
+	oldStatusId: string;
+	newStatusId: string;
+	changedByUserId?: string;
+}): Promise<boolean> => {
+	// Fetch task with project info
+	const [task] = await db
+		.select({
+			id: tasks.id,
+			title: tasks.title,
+			projectId: tasks.projectId,
+			milestoneId: tasks.milestoneId,
+		})
+		.from(tasks)
+		.where(and(eq(tasks.id, taskId), eq(tasks.teamId, teamId)))
+		.limit(1);
+
+	if (!task?.projectId) {
+		return false; // No project = no PM to notify
+	}
+
+	// Fetch old and new status details
+	const [oldStatus, newStatus] = await Promise.all([
+		db
+			.select({ id: statuses.id, name: statuses.name, type: statuses.type })
+			.from(statuses)
+			.where(eq(statuses.id, oldStatusId))
+			.limit(1)
+			.then((r) => r[0]),
+		db
+			.select({ id: statuses.id, name: statuses.name, type: statuses.type })
+			.from(statuses)
+			.where(eq(statuses.id, newStatusId))
+			.limit(1)
+			.then((r) => r[0]),
+	]);
+
+	if (!oldStatus || !newStatus) {
+		return false;
+	}
+
+	// Only trigger for review or done transitions
+	if (newStatus.type !== "review" && newStatus.type !== "done") {
+		return false;
+	}
+
+	// Build the trigger payload
+	const trigger =
+		newStatus.type === "done"
+			? {
+					type: "task_completed" as const,
+					taskId: task.id,
+					taskTitle: task.title,
+				}
+			: {
+					type: "task_status_changed" as const,
+					taskId: task.id,
+					oldStatus: oldStatus.name,
+					newStatus: newStatus.name,
+					newStatusType: newStatus.type!,
+				};
+
+	await triggerTasks.trigger(
+		PM_AGENT_JOB_ID,
+		{
+			projectId: task.projectId,
+			teamId,
+			trigger,
+		},
+		{
+			idempotencyKey: `pm-status-${taskId}-${newStatusId}-${Date.now()}`,
+			tags: [
+				`projectId:${task.projectId}`,
+				`teamId:${teamId}`,
+				`trigger:${trigger.type}`,
+				`taskId:${taskId}`,
+			],
+		},
+	);
+
+	// If the task completed and has a milestone, check if milestone is fully done
+	if (newStatus.type === "done" && task.milestoneId) {
+		await triggerPMAgentOnMilestoneCompletion({
+			taskId,
+			teamId,
+			projectId: task.projectId,
+			milestoneId: task.milestoneId,
+		});
+	}
+
+	return true;
+};
+
+/**
+ * Check if a milestone is fully completed after a task finishes,
+ * and trigger the PM agent with a milestone_completed event if so.
+ */
+const triggerPMAgentOnMilestoneCompletion = async ({
+	teamId,
+	projectId,
+	milestoneId,
+}: {
+	taskId: string;
+	teamId: string;
+	projectId: string;
+	milestoneId: string;
+}): Promise<boolean> => {
+	// Check if all tasks in this milestone are done
+	const milestoneTasks = await db
+		.select({
+			taskId: tasks.id,
+			statusType: statuses.type,
+		})
+		.from(tasks)
+		.innerJoin(statuses, eq(tasks.statusId, statuses.id))
+		.where(and(eq(tasks.milestoneId, milestoneId), eq(tasks.teamId, teamId)));
+
+	const allDone =
+		milestoneTasks.length > 0 &&
+		milestoneTasks.every((t) => t.statusType === "done");
+
+	if (!allDone) {
+		return false;
+	}
+
+	// Fetch milestone name
+	const { milestones } = await import("../schema");
+	const [milestone] = await db
+		.select({ id: milestones.id, name: milestones.name })
+		.from(milestones)
+		.where(eq(milestones.id, milestoneId))
+		.limit(1);
+
+	if (!milestone) {
+		return false;
+	}
+
+	await triggerTasks.trigger(
+		PM_AGENT_JOB_ID,
+		{
+			projectId,
+			teamId,
+			trigger: {
+				type: "milestone_completed" as const,
+				milestoneId: milestone.id,
+				milestoneName: milestone.name,
+			},
+		},
+		{
+			idempotencyKey: `pm-milestone-${milestoneId}-${Date.now()}`,
+			tags: [
+				`projectId:${projectId}`,
+				`teamId:${teamId}`,
+				"trigger:milestone_completed",
+				`milestoneId:${milestoneId}`,
+			],
+		},
+	);
+
+	return true;
+};
+
+/**
+ * Trigger the PM agent when an agent is mentioned in a task comment.
+ * This allows agents working on tasks to ask the PM agent questions by mentioning it.
+ *
+ * If the mentioned user is a human (not a system user), returns false — the system
+ * should wait for the human to respond naturally.
+ */
+export const triggerPMAgentOnMention = async ({
+	taskId,
+	teamId,
+	mentionedUserId,
+	commentByUserId,
+	commentByUserName,
+	commentText,
+}: {
+	taskId: string;
+	teamId: string;
+	mentionedUserId: string;
+	commentByUserId: string;
+	commentByUserName: string;
+	commentText: string;
+}): Promise<boolean> => {
+	// Only trigger if mention is for an agent (system user)
+	const isMentionedAgent = await isSystemUser(mentionedUserId);
+	if (!isMentionedAgent) {
+		return false; // Mentioned a human — wait for human response
+	}
+
+	// Prevent self-triggering
+	if (mentionedUserId === commentByUserId) {
+		return false;
+	}
+
+	// Fetch task to get project association
+	const [task] = await db
+		.select({
+			id: tasks.id,
+			projectId: tasks.projectId,
+			projectLeadId: projects.leadId,
+		})
+		.from(tasks)
+		.innerJoin(projects, eq(tasks.projectId, projects.id))
+		.where(and(eq(tasks.id, taskId), eq(tasks.teamId, teamId)))
+		.limit(1);
+
+	if (!task?.projectId) {
+		return false; // No project = no PM context
+	}
+
+	// The commenter is yourself, don't trigger. This can happen when the PM agent comments and mentions otherselves for follow-up actions. We want to avoid infinite loops.
+	if (task.projectLeadId === commentByUserId) {
+		return false;
+	}
+
+	await triggerTasks.trigger(
+		PM_AGENT_JOB_ID,
+		{
+			projectId: task.projectId,
+			teamId,
+			trigger: {
+				type: "agent_mention" as const,
+				taskId: task.id,
+				mentionedByUserId: commentByUserId,
+				mentionedByUserName: commentByUserName,
+				message: commentText,
+			},
+		},
+		{
+			idempotencyKey: `pm-mention-${taskId}-${Date.now()}`,
+			tags: [
+				`projectId:${task.projectId}`,
+				`teamId:${teamId}`,
+				"trigger:agent_mention",
+				`taskId:${taskId}`,
+			],
+		},
+	);
+
+	return true;
+};
+
+/**
+ * Trigger the PM agent when a new project is created.
+ * The PM will analyze the project description, create milestones, breakdown tasks,
+ * and kick off the entire planning loop.
+ */
+export const triggerPMAgentOnProjectCreation = async ({
+	projectId,
+	teamId,
+}: {
+	projectId: string;
+	teamId: string;
+}): Promise<boolean> => {
+	await triggerTasks.trigger(
+		PM_AGENT_JOB_ID,
+		{
+			projectId,
+			teamId,
+			trigger: {
+				type: "project_created" as const,
+			},
+		},
+		{
+			idempotencyKey: `pm-project-created-${projectId}`,
+			tags: [
+				`projectId:${projectId}`,
+				`teamId:${teamId}`,
+				"trigger:project_created",
 			],
 		},
 	);

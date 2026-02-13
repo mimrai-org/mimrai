@@ -48,6 +48,8 @@ import {
 import {
 	isSystemUser,
 	triggerAgentTaskExecutionIfNeeded,
+	triggerPMAgentOnMention,
+	triggerPMAgentOnStatusChange,
 } from "./agent-triggers";
 import { getStatusById, getStatuses } from "./statuses";
 import { upsertTaskEmbedding } from "./tasks-embeddings";
@@ -468,9 +470,6 @@ export const createTask = async ({
 
 	// Trigger agent if task is assigned to system user
 	if (task.assigneeId) {
-		const { triggerAgentTaskExecutionIfNeeded } = await import(
-			"./agent-triggers"
-		);
 		triggerAgentTaskExecutionIfNeeded({
 			taskId: task.id,
 			teamId: task.teamId,
@@ -614,6 +613,19 @@ export const updateTask = async ({
 				triggerUserId: userId,
 			});
 		}
+	}
+
+	// Trigger PM agent if task status changed and task belongs to a project
+	if (input.statusId && input.statusId !== oldTask.statusId && task.projectId) {
+		triggerPMAgentOnStatusChange({
+			taskId: task.id,
+			teamId: task.teamId,
+			oldStatusId: oldTask.statusId,
+			newStatusId: input.statusId,
+			changedByUserId: userId,
+		}).catch((err) => {
+			console.warn("Failed to trigger PM agent on status change", err);
+		});
 	}
 
 	return task;
@@ -974,6 +986,22 @@ export const createTaskComment = async ({
 				triggerUserId: userId,
 			}).catch((err) => {
 				console.warn("Failed to trigger agent on comment", err);
+			});
+		}
+	}
+
+	// Trigger PM agent if any mentioned user is an agent (e.g., an executor asking the PM a question)
+	if (mentions.length > 0 && userId && task.projectId) {
+		for (const mentionedId of mentions) {
+			triggerPMAgentOnMention({
+				taskId: task.id,
+				teamId: task.teamId,
+				mentionedUserId: mentionedId,
+				commentByUserId: userId,
+				commentByUserName: "", // Resolved inside the trigger
+				commentText: comment,
+			}).catch((err) => {
+				console.warn("Failed to trigger PM agent on mention", err);
 			});
 		}
 	}

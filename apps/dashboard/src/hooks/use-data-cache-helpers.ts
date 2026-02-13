@@ -38,6 +38,10 @@ export function updateMemberInCache(updatedMember: Member) {
 	});
 }
 
+export function invalidateMembersCache() {
+	queryClient.invalidateQueries(trpc.teams.getMembers.queryOptions());
+}
+
 /**
  * Update a single task in all task queries.
  * Use this when you update task-specific properties (not status/assignee).
@@ -67,6 +71,36 @@ export function updateTaskInCache(updatedTask: Partial<Task>) {
 			trpc.tasks.getById.queryOptions({ id: updatedTask.id }),
 		);
 	}
+}
+
+export function addTaskToCache(newTask: Task) {
+	// Add to infinite queries
+	queryClient.setQueriesData(
+		{
+			queryKey: trpc.tasks.get.infiniteQueryKey(),
+		},
+		(old: any) => {
+			if (!old?.pages) return old;
+			return {
+				...old,
+				pages: old.pages.map((page: any, index: number) => {
+					// Add to the first page only for simplicity
+					if (index === 0) {
+						return {
+							...page,
+							data: [newTask, ...page.data],
+						};
+					}
+					return page;
+				}),
+			};
+		},
+	);
+
+	queryClient.setQueryData(
+		trpc.tasks.getById.queryKey({ id: newTask.id }),
+		newTask,
+	);
 }
 
 /**

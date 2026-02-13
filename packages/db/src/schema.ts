@@ -1184,6 +1184,103 @@ export const taskExecutions = pgTable(
 	],
 );
 
+export const projectExecutionStatusEnum = pgEnum("project_execution_status", [
+	"pending", // Project assigned, waiting for analysis
+	"executing", // PM agent is actively working
+	"idle", // PM is idle, waiting for next trigger
+	"blocked", // Execution blocked (waiting for input)
+	"completed", // Project execution fully completed
+	"failed", // Execution failed
+]);
+
+export interface ProjectExecutionMemory {
+	/** High-level summary of current project state */
+	summary?: string;
+	/** Notes or observations made during execution */
+	notes?: string[];
+	/** High-level project plan / scope summary */
+	projectPlan?: string;
+	/** Decisions made during project management */
+	decisions?: Array<{
+		date: string;
+		decision: string;
+		reason: string;
+	}>;
+	/** Blockers or risks identified */
+	blockers?: Array<{
+		description: string;
+		taskId?: string;
+		status: "open" | "resolved";
+	}>;
+	/** Milestone completion tracking */
+	milestoneProgress?: Record<
+		string,
+		{
+			status: "not_started" | "in_progress" | "completed";
+			notes?: string;
+		}
+	>;
+}
+
+export const projectExecutions = pgTable(
+	"project_executions",
+	{
+		id: text("id")
+			.$defaultFn(() => randomUUID())
+			.primaryKey()
+			.notNull(),
+		projectId: text("project_id").notNull(),
+		teamId: text("team_id").notNull(),
+
+		status: projectExecutionStatusEnum("status").default("pending").notNull(),
+
+		usageMetrics: jsonb("usage_metrics").$type<{
+			inputTokens: number;
+			outputTokens: number;
+			totalTokens: number;
+			costUSD: number;
+		}>(),
+
+		// Memory slot for PM context that persists across invocations
+		memory: jsonb("memory").$type<ProjectExecutionMemory>().default({}),
+
+		contextStale: boolean("context_stale").default(false).notNull(),
+
+		// Trigger.dev job linkage
+		triggerJobId: text("trigger_job_id"),
+
+		lastError: text("last_error"),
+
+		// Timestamps
+		createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+			.defaultNow()
+			.notNull(),
+		updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+			.defaultNow()
+			.notNull(),
+		completedAt: timestamp("completed_at", {
+			withTimezone: true,
+			mode: "string",
+		}),
+	},
+	(table) => [
+		index("project_executions_project_id_index").on(table.projectId),
+		index("project_executions_team_id_index").on(table.teamId),
+		index("project_executions_status_index").on(table.status),
+		unique("unique_active_project_execution").on(table.projectId),
+		foreignKey({
+			columns: [table.projectId],
+			foreignColumns: [projects.id],
+			name: "project_executions_project_id_fkey",
+		}).onDelete("cascade"),
+		foreignKey({
+			columns: [table.teamId],
+			foreignColumns: [teams.id],
+			name: "project_executions_team_id_fkey",
+		}).onDelete("cascade"),
+	],
+);
+
 export const agents = pgTable(
 	"agents",
 	{

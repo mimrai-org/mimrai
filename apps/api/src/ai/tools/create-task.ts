@@ -42,9 +42,6 @@ export const createTaskTool = tool({
 	execute: async function* (input, executionOptions) {
 		try {
 			const { userId, teamId, teamName } = getToolContext(executionOptions);
-			yield {
-				text: `Creating task: ${input.title}`,
-			};
 
 			const newTask = await createTask({
 				title: input.title,

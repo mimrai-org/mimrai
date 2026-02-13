@@ -54,12 +54,15 @@ export const getAgentMemories = async ({
 	teamId,
 	category,
 	tags,
+	query,
 	limit = 50,
 }: {
 	agentId: string;
 	teamId: string;
 	category?: AgentMemoryCategory;
 	tags?: string[];
+	/** Keyword search across title and content (case-insensitive) */
+	query?: string;
 	limit?: number;
 }) => {
 	const conditions: SQL[] = [
@@ -78,6 +81,14 @@ export const getAgentMemories = async ({
 				tags.map((t) => sql`${t}`),
 				sql`, `,
 			)}]::text[]`,
+		);
+	}
+
+	// Keyword search across title and content
+	if (query && query.trim().length > 0) {
+		const pattern = `%${query.trim()}%`;
+		conditions.push(
+			sql`(${agentMemories.title} ILIKE ${pattern} OR ${agentMemories.content} ILIKE ${pattern})`,
 		);
 	}
 

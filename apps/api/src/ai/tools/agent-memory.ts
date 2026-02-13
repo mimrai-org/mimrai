@@ -21,18 +21,19 @@ function resolveAgentId(ctx: TaskExecutorContext): string | undefined {
 
 export const saveAgentMemoryTool = tool({
 	description:
-		"Save a new lesson, preference, fact, or procedure to your long-term memory. " +
-		"Use this whenever you learn something from a mistake, discover a useful pattern, " +
-		"or note a user/team preference. These memories persist across tasks and help you " +
-		"avoid repeating mistakes and improve over time.",
+		"Save a user/team preference or important indication to your long-term memory. " +
+		"Use this ONLY when a user explicitly states a preference, gives a standing instruction, " +
+		"or provides domain knowledge that will be useful across future tasks. " +
+		"Do NOT save generic lessons, task summaries, or things you can infer from context.",
 	inputSchema: z.object({
 		category: z
-			.enum(["lesson", "preference", "fact", "procedure"])
-			.default("lesson")
+			.enum(["preference", "fact", "procedure"])
+			.default("preference")
 			.describe(
-				"The type of memory: lesson (learned from mistake/success), " +
-					"preference (user/team preference), fact (domain knowledge), " +
-					"procedure (step-by-step workflow)",
+				"The type of memory: " +
+					"preference (user/team preference or standing instruction), " +
+					"fact (domain knowledge relevant to the team), " +
+					"procedure (user-defined step-by-step workflow)",
 			),
 		title: z
 			.string()
@@ -83,12 +84,18 @@ export const saveAgentMemoryTool = tool({
 
 export const recallAgentMemoriesTool = tool({
 	description:
-		"Search your long-term memory for past lessons, preferences, facts, or procedures. " +
-		"Use this at the start of a task or when you encounter something familiar to recall " +
-		"what you have learned before. This helps you avoid past mistakes and apply proven patterns.",
+		"Search your long-term memory for user preferences, team indications, or domain knowledge. " +
+		"Use this when you need to check if the user/team has stated preferences relevant to your current task. " +
+		"Always provide a query to search by keywords instead of loading all memories.",
 	inputSchema: z.object({
+		query: z
+			.string()
+			.min(1)
+			.describe(
+				"Keywords to search for in memory titles and content (e.g. 'date format', 'code style', 'deploy')",
+			),
 		category: z
-			.enum(["lesson", "preference", "fact", "procedure"])
+			.enum(["preference", "fact", "procedure"])
 			.optional()
 			.describe("Filter by memory category"),
 		tags: z
@@ -98,9 +105,9 @@ export const recallAgentMemoriesTool = tool({
 		limit: z
 			.number()
 			.min(1)
-			.max(50)
+			.max(20)
 			.optional()
-			.default(20)
+			.default(10)
 			.describe("Maximum number of memories to return"),
 	}),
 	execute: async (input, executionOptions) => {
@@ -118,6 +125,7 @@ export const recallAgentMemoriesTool = tool({
 		const memories = await getAgentMemories({
 			agentId,
 			teamId: ctx.teamId,
+			query: input.query,
 			category: input.category,
 			tags: input.tags,
 			limit: input.limit,
@@ -150,7 +158,7 @@ export const updateAgentMemoryTool = tool({
 		title: z.string().optional().describe("Updated title"),
 		content: z.string().optional().describe("Updated content"),
 		category: z
-			.enum(["lesson", "preference", "fact", "procedure"])
+			.enum(["preference", "fact", "procedure"])
 			.optional()
 			.describe("Updated category"),
 		tags: z

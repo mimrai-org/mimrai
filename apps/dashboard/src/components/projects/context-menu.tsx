@@ -29,6 +29,7 @@ export const ProjectContextMenu = ({
 			},
 			onSuccess: () => {
 				queryClient.invalidateQueries(trpc.projects.get.infiniteQueryOptions());
+				queryClient.invalidateQueries(trpc.projects.get.queryOptions());
 				toast.success("Project deleted successfully", { id: "delete-project" });
 			},
 			onError: (_error) => {
@@ -44,6 +45,7 @@ export const ProjectContextMenu = ({
 			},
 			onSuccess: (project) => {
 				queryClient.invalidateQueries(trpc.projects.get.infiniteQueryOptions());
+				queryClient.invalidateQueries(trpc.projects.get.queryOptions());
 				toast.success("Project cloned successfully", { id: "clone-project" });
 				setParams({ projectId: project.id });
 			},

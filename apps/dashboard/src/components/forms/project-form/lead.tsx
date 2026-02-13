@@ -1,4 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -10,7 +9,7 @@ import { UserStarIcon } from "lucide-react";
 import { useMemo } from "react";
 import { useFormContext } from "react-hook-form";
 import { AssigneeAvatar } from "@/components/asignee-avatar";
-import { trpc } from "@/utils/trpc";
+import { useTeamMembers } from "@/hooks/use-data";
 import type { PropertiesLayout } from "./form";
 import type { ProjectFormValues } from "./form-type";
 
@@ -22,7 +21,9 @@ export const ProjectLeadSelect = ({
 	const form = useFormContext<ProjectFormValues>();
 
 	const leadId = form.watch("leadId");
-	const { data: teamMembers } = useQuery(trpc.teams.getMembers.queryOptions());
+	const { data: teamMembers } = useTeamMembers({
+		includeSystemUsers: false,
+	});
 
 	const lead = useMemo(() => {
 		if (!teamMembers || !leadId) return null;

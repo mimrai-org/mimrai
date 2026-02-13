@@ -14,7 +14,6 @@ import type { UIChatMessage } from "@api/ai/types";
 import { getUserContext } from "@api/ai/utils/get-user-context";
 import { calculateTokenUsageCost, checkPlanFeatures } from "@mimir/billing";
 import { createActivity, getActivities } from "@mimir/db/queries/activities";
-import { getAgentMemories } from "@mimir/db/queries/agent-memories";
 import { getAgentByUserId } from "@mimir/db/queries/agents";
 import {
 	getChatById,
@@ -265,15 +264,15 @@ export const executeAgentTaskPlanJob = schemaTask({
 							});
 						}
 					},
-					onFinish: async ({ usage, finishReason }) => {
+					onFinish: async ({ totalUsage, finishReason }) => {
 						const usageCost = await calculateTokenUsageCost({
 							model: agentConfig?.model || AGENT_DEFAULT_MODEL,
-							usage,
+							usage: totalUsage,
 						});
 						await addTaskExecutionUsageMetrics(task.id, {
-							inputTokens: usage.inputTokens || 0,
-							outputTokens: usage.outputTokens || 0,
-							totalTokens: usage.totalTokens || 0,
+							inputTokens: totalUsage.inputTokens || 0,
+							outputTokens: totalUsage.outputTokens || 0,
+							totalTokens: totalUsage.totalTokens || 0,
 							costUSD: usageCost?.costUSD || 0,
 						});
 
@@ -288,14 +287,14 @@ export const executeAgentTaskPlanJob = schemaTask({
 										usageCost?.model ||
 										agentConfig?.model ||
 										AGENT_DEFAULT_MODEL,
-									inputTokens: usage.inputTokens || 0,
-									outputTokens: usage.outputTokens || 0,
-									totalTokens: usage.totalTokens || 0,
+									inputTokens: totalUsage.inputTokens || 0,
+									outputTokens: totalUsage.outputTokens || 0,
+									totalTokens: totalUsage.totalTokens || 0,
 									costUSD: usageCost?.costUSD || 0,
 								},
 							});
 						}
-						logger.info("Agent OnFinish", { usage, finishReason });
+						logger.info("Agent OnFinish", { totalUsage, finishReason });
 					},
 				},
 			});
@@ -537,29 +536,7 @@ const getTaskExecutorContext = async ({
 		focusedChecklistItem,
 		// Agent identity for long-term memory
 		agentId: agentConfig?.id,
-		agentMemories: [], // populated below
 	};
-
-	if (agentConfig?.id) {
-		// Load long-term agent memories when we have an agent identity
-		const memories = await getAgentMemories({
-			agentId: agentConfig.id,
-			teamId,
-			limit: 30,
-		});
-		executorContext.agentMemories = memories.map((m) => ({
-			id: m.id,
-			category: m.category,
-			title: m.title,
-			content: m.content,
-			tags: m.tags,
-			relevanceScore: m.relevanceScore,
-		}));
-		logger.info("Loaded agent long-term memories", {
-			count: memories.length,
-			agentId: agentConfig.id,
-		});
-	}
 
 	return {
 		executorContext,

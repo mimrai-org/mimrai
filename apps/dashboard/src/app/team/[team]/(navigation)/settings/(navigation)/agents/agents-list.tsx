@@ -19,6 +19,7 @@ import {
 import { useMemo } from "react";
 import { AssigneeAvatar } from "@/components/asignee-avatar";
 import { useAgentParams } from "@/hooks/use-agent-params";
+import { invalidateMembersCache } from "@/hooks/use-data-cache-helpers";
 import { queryClient, trpc } from "@/utils/trpc";
 
 export const AgentsList = () => {
@@ -41,6 +42,7 @@ export const AgentsList = () => {
 				queryClient.invalidateQueries(
 					trpc.agents.get.infiniteQueryOptions({ pageSize: 20 }),
 				);
+				invalidateMembersCache();
 			},
 		}),
 	);

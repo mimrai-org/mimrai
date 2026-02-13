@@ -9,6 +9,7 @@ import {
 	tasks,
 	users,
 } from "../schema";
+import { triggerPMAgentOnProjectCreation } from "./agent-triggers";
 import { createMilestone } from "./milestones";
 import { cloneTask } from "./tasks";
 
@@ -217,6 +218,14 @@ export const createProject = async ({
 			})),
 		);
 	}
+
+	// Trigger PM agent to plan the project (milestones, tasks, assignments)
+	triggerPMAgentOnProjectCreation({
+		projectId: project.id,
+		teamId,
+	}).catch(() => {
+		// Non-blocking — project creation should succeed even if PM trigger fails
+	});
 
 	return project;
 };

@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db } from "../index";
 import {
 	type TaskExecutionMemory,
@@ -134,27 +134,28 @@ export const addTaskExecutionUsageMetrics = async (
 		costUSD: number;
 	},
 ) => {
-	const execution = await getTaskExecutionByTaskId(taskId);
-	if (!execution) return null;
-
-	const existingMetrics = execution.usageMetrics || {
+	const defaultMetrics = {
 		inputTokens: 0,
 		outputTokens: 0,
 		totalTokens: 0,
 		costUSD: 0,
 	};
 
-	const updatedMetrics = {
-		inputTokens: existingMetrics.inputTokens + usageMetrics.inputTokens,
-		outputTokens: existingMetrics.outputTokens + usageMetrics.outputTokens,
-		totalTokens: existingMetrics.totalTokens + usageMetrics.totalTokens,
-		costUSD: existingMetrics.costUSD + usageMetrics.costUSD,
-	};
+	const [execution] = await db
+		.update(taskExecutions)
+		.set({
+			usageMetrics: sql`jsonb_build_object(
+				'inputTokens', COALESCE((COALESCE(${taskExecutions.usageMetrics}, ${JSON.stringify(defaultMetrics)}::jsonb)->>'inputTokens')::numeric, 0) + ${usageMetrics.inputTokens},
+				'outputTokens', COALESCE((COALESCE(${taskExecutions.usageMetrics}, ${JSON.stringify(defaultMetrics)}::jsonb)->>'outputTokens')::numeric, 0) + ${usageMetrics.outputTokens},
+				'totalTokens', COALESCE((COALESCE(${taskExecutions.usageMetrics}, ${JSON.stringify(defaultMetrics)}::jsonb)->>'totalTokens')::numeric, 0) + ${usageMetrics.totalTokens},
+				'costUSD', COALESCE((COALESCE(${taskExecutions.usageMetrics}, ${JSON.stringify(defaultMetrics)}::jsonb)->>'costUSD')::numeric, 0) + ${usageMetrics.costUSD}
+			)`,
+			updatedAt: new Date().toISOString(),
+		})
+		.where(eq(taskExecutions.taskId, taskId))
+		.returning();
 
-	return updateTaskExecution({
-		taskId,
-		usageMetrics: updatedMetrics,
-	});
+	return execution ?? null;
 };
 
 /**
