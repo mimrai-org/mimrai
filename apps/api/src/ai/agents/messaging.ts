@@ -1,4 +1,3 @@
-import { openai } from "@ai-sdk/openai";
 import { gateway } from "ai";
 import { createTaskTool } from "../tools/create-task";
 import { getProjectsTool } from "../tools/get-projects";

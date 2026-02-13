@@ -1,6 +1,7 @@
 "use client";
 
 import { Breadcrumbs } from "./breadcrumbs";
+import { NavCredits } from "./nav-credits";
 import { NavSearch } from "./nav-search";
 import { NavUser } from "./nav-user";
 
@@ -16,6 +17,7 @@ export default function Header() {
 						</div>
 						<div className="flex items-center gap-4">
 							{/* <NavSuggestions /> */}
+							<NavCredits />
 							<NavUser />
 						</div>
 					</div>

@@ -48,7 +48,6 @@ export const PLANS = [
 		default: true,
 		limits: {
 			users: undefined,
-			tokens: undefined,
 		},
 		prices: {
 			monthly: 8,
@@ -58,21 +57,17 @@ export const PLANS = [
 			sandbox: {
 				monthly: {
 					users: "price_1SIoxFDmvrGQzAG862L6sGTj",
-					tokens: "price_1Sx7EiDmvrGQzAG8LTIMNAdS",
 				},
 				yearly: {
 					users: "price_1SIpDVDmvrGQzAG89FaEN18h",
-					tokens: "price_1Sx7EiDmvrGQzAG8LTIMNAdS",
 				},
 			},
 			production: {
 				monthly: {
 					users: "price_1SMH1JDXvZH4KaAprWCb2WGU",
-					tokens: "price_1Sx8QLDXvZH4KaApsVbOj3eV",
 				},
 				yearly: {
 					users: "price_1SMH1KDXvZH4KaApEyRPUMhS",
-					tokens: "price_1Sx8QLDXvZH4KaApsVbOj3eV",
 				},
 			},
 		},
@@ -90,6 +85,9 @@ export const PLANS = [
 		],
 	},
 ];
+
+export const CREDIT_PACKS = [1000, 2000, 5000];
+export const FEE_PERCENTAGE = 0.1;
 
 export type PriceType =
 	keyof (typeof PLANS)[number]["pricesIds"]["sandbox"]["monthly"];

@@ -209,17 +209,25 @@ export const createAgentFromDB = async ({
 	const agentConfig: AgentConfig = {
 		...dbConfig,
 
-		prepareStep: async ({ steps }) => {
+		prepareStep: async ({ steps, ...rest }) => {
+			const parentPrepareStep = config.prepareStep
+				? await config.prepareStep({ steps, ...rest })
+				: {};
+
 			const switchedToolbox = getLastSwitchedToolbox(steps);
 
 			if (switchedToolbox) {
 				const toolboxTools = Object.keys(toolboxes?.[switchedToolbox] ?? {});
 				return {
 					activeTools: [...toolboxTools, ...alwaysActiveTools] as never[],
+					...parentPrepareStep,
 				};
 			}
 
-			return { activeTools: alwaysActiveTools as never[] };
+			return {
+				activeTools: alwaysActiveTools as never[],
+				...parentPrepareStep,
+			};
 		},
 
 		// Spread caller-provided config (tools, stopWhen, callbacks, etc.)

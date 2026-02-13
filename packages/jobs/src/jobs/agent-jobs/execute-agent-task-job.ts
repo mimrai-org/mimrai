@@ -12,8 +12,7 @@ import {
 import { getAllTools } from "@api/ai/tools/tool-registry";
 import type { UIChatMessage } from "@api/ai/types";
 import { getUserContext } from "@api/ai/utils/get-user-context";
-import { getDb } from "@jobs/init";
-import { checkPlanFeatures, createTokenMeter } from "@mimir/billing";
+import { calculateTokenUsageCost, checkPlanFeatures } from "@mimir/billing";
 import { createActivity, getActivities } from "@mimir/db/queries/activities";
 import { getAgentMemories } from "@mimir/db/queries/agent-memories";
 import { getAgentByUserId } from "@mimir/db/queries/agents";
@@ -23,9 +22,11 @@ import {
 	saveChatMessage,
 } from "@mimir/db/queries/chats";
 import { getChecklistItems } from "@mimir/db/queries/checklists";
+import { getCreditBalance, recordCreditUsage } from "@mimir/db/queries/credits";
 import {
 	addTaskExecutionUsageMetrics,
 	createTaskExecution,
+	getTaskExecutionByTaskId,
 	updateTaskExecution,
 } from "@mimir/db/queries/task-executions";
 import { createTaskComment, getTaskById } from "@mimir/db/queries/tasks";
@@ -33,7 +34,7 @@ import { getTeamById } from "@mimir/db/queries/teams";
 import { getSystemUser } from "@mimir/db/queries/users";
 import { AGENT_DEFAULT_MODEL } from "@mimir/utils/agents";
 import { logger, schemaTask } from "@trigger.dev/sdk";
-import { generateId, stepCountIs } from "ai";
+import { convertToModelMessages, generateId, stepCountIs } from "ai";
 import z from "zod";
 
 /**
@@ -61,7 +62,6 @@ export const executeAgentTaskPlanJob = schemaTask({
 	maxDuration: 15 * 60, // 15 minutes
 	run: async (payload) => {
 		const { taskId, teamId, checklistItemId } = payload;
-		const db = getDb();
 
 		logger.info("Starting agent plan execution", {
 			taskId,
@@ -74,7 +74,20 @@ export const executeAgentTaskPlanJob = schemaTask({
 			return { status: "failed", reason: "team_not_found" };
 		}
 
-		const task = await getTaskById(taskId);
+		const {
+			task,
+			executorContext,
+			agentConfig,
+			execution,
+			userIntegrations,
+			userId,
+			focusedChecklistItem,
+		} = await getTaskExecutorContext({
+			taskId,
+			teamId,
+			checklistItemId,
+		});
+
 		if (!task) {
 			await updateTaskExecution({
 				taskId: taskId,
@@ -85,69 +98,15 @@ export const executeAgentTaskPlanJob = schemaTask({
 		}
 
 		// If focusing on a checklist item, find it and determine the agent to use
-		let focusedChecklistItem:
-			| {
-					id: string;
-					description: string;
-					isCompleted: boolean;
-					assigneeId?: string;
-			  }
-			| undefined;
-		let agentUserId: string | null = null;
 
-		if (checklistItemId) {
-			// Get checklist items to find the focused one
-			const checklistItems = await getChecklistItems({
-				taskId,
-				teamId,
-			});
-			const item = checklistItems.find((c) => c.id === checklistItemId);
-
-			if (!item) {
-				logger.error("Checklist item not found", { checklistItemId });
-				return { status: "failed", reason: "checklist_item_not_found" };
-			}
-
-			if (!item.assigneeId) {
-				logger.error("Checklist item has no assignee", { checklistItemId });
-				return { status: "failed", reason: "checklist_item_no_assignee" };
-			}
-
-			focusedChecklistItem = {
-				id: item.id,
-				description: item.description,
-				isCompleted: item.isCompleted,
-				assigneeId: item.assigneeId ?? undefined,
-			};
-			agentUserId = item.assigneeId;
-
-			logger.info("Focusing on checklist item", {
-				checklistItemId,
-				description: item.description,
-				assigneeId: item.assigneeId,
-			});
-		} else {
-			// Regular task execution - use task assignee
-			if (!task.assigneeId) {
-				await updateTaskExecution({
-					taskId: taskId,
-					status: "failed",
-					lastError: "Task has no assignee",
-				});
-				return { status: "failed", reason: "task_no_assignee" };
-			}
-			agentUserId = task.assigneeId;
-		}
-
-		const agentConfig = await getAgentByUserId({
-			userId: agentUserId,
-			teamId,
-		});
-
-		const execution = await createTaskExecution({ taskId, teamId });
+		// const execution = await createTaskExecution({ taskId, teamId });
 
 		if (execution.status === "executing") {
 			logger.warn("Task execution already in progress", { taskId });
+			await updateTaskExecution({
+				taskId,
+				contextStale: true,
+			});
 			return { status: "failed", reason: "execution_already_in_progress" };
 		}
 
@@ -171,15 +130,7 @@ export const executeAgentTaskPlanJob = schemaTask({
 			],
 		};
 
-		const systemUser = await getSystemUser();
-		if (!systemUser) {
-			return { status: "failed", reason: "system_user_not_found" };
-		}
-
 		// Use the agent user ID (from checklist item or task assignee), fallback to system user
-		const userId = agentConfig
-			? agentConfig.userId
-			: (agentUserId ?? systemUser.id);
 
 		const canAccess = await checkPlanFeatures(teamId, ["ai"]);
 		if (!canAccess) {
@@ -194,126 +145,28 @@ export const executeAgentTaskPlanJob = schemaTask({
 			return { status: "failed", reason: "plan_cannot_access_ai_features" };
 		}
 
-		const userContext = await getUserContext({
-			userId,
-			teamId,
-		});
-
-		const activitiesResult = await getActivities({
-			groupId: taskId,
-			teamId,
-			type: ["task_comment", "task_comment_reply"],
-			pageSize: 20,
-		});
-
-		const activitiesAsMessages = activitiesResult.data.map((a) => ({
-			id: a.id,
-			message: {
-				role: a.userId === userId ? "assistant" : "user",
-				id: a.id,
-				parts: [{ type: "text", text: a.metadata?.comment || "" }],
-			} as UIChatMessage,
-			userId: a.userId,
-			createdAt: a.createdAt!,
-		}));
-
-		const chat = await getChatById(taskId, teamId);
-		if (!chat) {
-			await saveChat({
-				chatId: taskId,
-				teamId,
-				title: `${task.title} - Execution Chat`,
-				userId,
-			});
-		}
-
-		const unsavedMessages = activitiesAsMessages.filter(
-			(a) => !chat?.messages.find((m) => m.id === a.id),
-		);
-
-		await Promise.all(
-			unsavedMessages.map((m) =>
-				saveChatMessage({
-					chatId: taskId,
-					teamId,
-					message: m.message,
-					userId: m.userId,
-					role: m.message.role,
-					createdAt: m.createdAt,
-				}),
-			),
-		);
-
-		// Get enabled integrations for the system user
-		const userIntegrations = await getUserAvailableIntegrations({
-			userId: agentConfig?.behalfUserId ?? task.createdBy,
-			teamId,
-		});
-		const enabledIntegrations = getEnabledIntegrationTypes(userIntegrations);
-
-		const executorContext: TaskExecutorContext = {
-			...buildAppContext(
-				{
-					...userContext,
-					integrationType: "web",
-					behalfUserId: agentConfig?.behalfUserId ?? task.createdBy,
-				},
+		const creditBalance = await getCreditBalance({ teamId });
+		if ((creditBalance?.balanceCents ?? 0) <= 0) {
+			logger.warn("Insufficient credits for task execution", {
 				taskId,
-			),
-			task: {
-				id: task.id,
-				title: task.title,
-				description: task.description ?? undefined,
-				status: task.status?.name,
-				statusId: task.statusId,
-				priority: task.priority ?? undefined,
-				assignee: task.assignee?.name ?? undefined,
-				assigneeId: task.assigneeId ?? undefined,
-				project: task.project?.name ?? undefined,
-				projectId: task.projectId ?? undefined,
-				milestone: task.milestone?.name ?? undefined,
-				milestoneId: task.milestoneId ?? undefined,
-				attachments: task.attachments ?? [],
-				dueDate: task.dueDate ?? undefined,
-				labels: task.labels ?? [],
-				checklistItems: task.checklistSummary?.checklist ?? [],
-			},
-			activities: activitiesResult.data.map((a) => ({
-				userId: a.userId ?? "",
-				userName: a.user?.name ?? "Unknown",
-				type: a.type,
-				content: a.metadata?.comment,
-				createdAt: a.createdAt ?? "",
-			})),
-			executionMemory: execution.memory ?? undefined,
-			enabledIntegrations,
-			// Focus mode: determines whether we're working on the whole task or a specific checklist item
-			focusMode: focusedChecklistItem ? "checklist-item" : "task",
-			focusedChecklistItem,
-			// Agent identity for long-term memory
-			agentId: agentConfig?.id,
-			agentMemories: [], // populated below
-		};
-
-		// Load long-term agent memories when we have an agent identity
-		if (agentConfig?.id) {
-			const memories = await getAgentMemories({
-				agentId: agentConfig.id,
 				teamId,
-				limit: 30,
+				balanceCents: creditBalance?.balanceCents ?? 0,
 			});
-			executorContext.agentMemories = memories.map((m) => ({
-				id: m.id,
-				category: m.category,
-				title: m.title,
-				content: m.content,
-				tags: m.tags,
-				relevanceScore: m.relevanceScore,
-			}));
-			logger.info("Loaded agent long-term memories", {
-				count: memories.length,
-				agentId: agentConfig.id,
-			});
+			await Promise.all([
+				updateTaskExecution({
+					taskId,
+					status: "failed",
+					lastError: "Insufficient credits",
+				}),
+				createTaskComment({
+					taskId,
+					teamId,
+					userId,
+					comment:
+						"Execution stopped because your team has no available credits. Please purchase more credits and retry.",
+				}),
+			]);
+			return { status: "failed", reason: "insufficient_credits" };
 		}
 
 		// 6. Update status to executing
@@ -342,7 +195,8 @@ export const executeAgentTaskPlanJob = schemaTask({
 				...allTools,
 			};
 
-			const meter = createTokenMeter(team.customerId!);
+			let latestExecutorContext = executorContext;
+			let latestNewMessages: UIChatMessage[] = [];
 
 			const agent = await createAgentFromDB({
 				agentId: agentConfig?.id,
@@ -352,12 +206,57 @@ export const executeAgentTaskPlanJob = schemaTask({
 				defaultActiveTools: ["updateTaskMemory"],
 				config: {
 					tools,
-					experimental_context: executorContext,
+					experimental_context: latestExecutorContext,
 					stopWhen: stepCountIs(50),
 					buildInstructions: buildExecutorSystemPrompt as (
 						ctx: AppContext,
 					) => string,
-					onStepFinish: async ({ toolCalls, toolResults }) => {
+
+					prepareStep: async ({ steps, ...rest }) => {
+						const taskExecution = await getTaskExecutionByTaskId(taskId);
+						if (!taskExecution) {
+							logger.error("Task execution not found during step preparation", {
+								taskId,
+							});
+							return {};
+						}
+
+						// If context is marked as stale, refresh it from the database to get latest state
+						if (taskExecution.contextStale) {
+							logger.warn("Execution context is stale, marking for refresh", {
+								taskId,
+							});
+							const { executorContext: newExecutorContext, newMessages } =
+								await getTaskExecutorContext({
+									taskId,
+									teamId,
+									checklistItemId,
+								});
+							latestExecutorContext = newExecutorContext;
+							latestNewMessages = [
+								...latestNewMessages,
+								...newMessages.filter(
+									(m) => !latestNewMessages.find((lm) => lm.id === m.id),
+								),
+							];
+
+							await updateTaskExecution({
+								taskId,
+								contextStale: false,
+							});
+						}
+
+						return {
+							experimental_context: latestExecutorContext,
+							messages: [
+								...rest.messages,
+								...(latestNewMessages?.length > 0
+									? await convertToModelMessages(latestNewMessages)
+									: []),
+							],
+						};
+					},
+					onStepFinish: async ({ toolResults }) => {
 						for (const call of toolResults) {
 							logger.info(`Tool: ${call.toolName}`, {
 								toolName: call.toolName,
@@ -366,17 +265,36 @@ export const executeAgentTaskPlanJob = schemaTask({
 							});
 						}
 					},
-					onFinish: async ({ usage, finishReason, response }) => {
-						const meterResults = await meter({
+					onFinish: async ({ usage, finishReason }) => {
+						const usageCost = await calculateTokenUsageCost({
 							model: agentConfig?.model || AGENT_DEFAULT_MODEL,
 							usage,
 						});
 						await addTaskExecutionUsageMetrics(task.id, {
-							inputTokens: meterResults?.inputTokens || 0,
-							outputTokens: meterResults?.outputTokens || 0,
-							totalTokens: meterResults?.totalTokens || 0,
-							costUSD: meterResults?.costUSD || 0,
+							inputTokens: usage.inputTokens || 0,
+							outputTokens: usage.outputTokens || 0,
+							totalTokens: usage.totalTokens || 0,
+							costUSD: usageCost?.costUSD || 0,
 						});
+
+						const usageCostCents = Math.round((usageCost?.costUSD || 0) * 100);
+						if (usageCostCents > 0) {
+							await recordCreditUsage({
+								teamId,
+								amountCents: usageCostCents,
+								metadata: {
+									taskId,
+									model:
+										usageCost?.model ||
+										agentConfig?.model ||
+										AGENT_DEFAULT_MODEL,
+									inputTokens: usage.inputTokens || 0,
+									outputTokens: usage.outputTokens || 0,
+									totalTokens: usage.totalTokens || 0,
+									costUSD: usageCost?.costUSD || 0,
+								},
+							});
+						}
 						logger.info("Agent OnFinish", { usage, finishReason });
 					},
 				},
@@ -406,7 +324,7 @@ export const executeAgentTaskPlanJob = schemaTask({
 				updateTaskExecution({
 					taskId: taskId,
 					status: "completed",
-					completedAt: new Date(),
+					completedAt: new Date().toISOString(),
 				}),
 				createActivity({
 					teamId,
@@ -425,7 +343,7 @@ export const executeAgentTaskPlanJob = schemaTask({
 				taskId: taskId,
 				status: "failed",
 				lastError: errorMessage,
-				completedAt: new Date(),
+				completedAt: new Date().toISOString(),
 			});
 
 			return {
@@ -435,3 +353,224 @@ export const executeAgentTaskPlanJob = schemaTask({
 		}
 	},
 });
+
+const getTaskExecutorContext = async ({
+	taskId,
+	checklistItemId,
+	teamId,
+}: {
+	taskId: string;
+	checklistItemId?: string;
+	teamId: string;
+}) => {
+	const task = await getTaskById(taskId);
+	const execution = await createTaskExecution({ taskId, teamId });
+	const systemUser = await getSystemUser();
+	if (!systemUser) {
+		return { status: "failed", reason: "system_user_not_found" };
+	}
+
+	let agentUserId: string | null = null;
+	let focusedChecklistItem:
+		| {
+				id: string;
+				description: string;
+				isCompleted: boolean;
+				assigneeId?: string;
+		  }
+		| undefined;
+
+	if (checklistItemId) {
+		// Get checklist items to find the focused one
+		const checklistItems = await getChecklistItems({
+			taskId,
+			teamId,
+		});
+		const item = checklistItems.find((c) => c.id === checklistItemId);
+
+		if (!item) {
+			logger.error("Checklist item not found", { checklistItemId });
+			return { status: "failed", reason: "checklist_item_not_found" };
+		}
+
+		if (!item.assigneeId) {
+			logger.error("Checklist item has no assignee", { checklistItemId });
+			return { status: "failed", reason: "checklist_item_no_assignee" };
+		}
+
+		focusedChecklistItem = {
+			id: item.id,
+			description: item.description,
+			isCompleted: item.isCompleted,
+			assigneeId: item.assigneeId ?? undefined,
+		};
+		agentUserId = item.assigneeId;
+
+		logger.info("Focusing on checklist item", {
+			checklistItemId,
+			description: item.description,
+			assigneeId: item.assigneeId,
+		});
+	} else {
+		// Regular task execution - use task assignee
+		if (!task.assigneeId) {
+			await updateTaskExecution({
+				taskId: taskId,
+				status: "failed",
+				lastError: "Task has no assignee",
+			});
+			return { status: "failed", reason: "task_no_assignee" };
+		}
+		agentUserId = task.assigneeId;
+	}
+
+	const agentConfig = await getAgentByUserId({
+		userId: agentUserId,
+		teamId,
+	});
+
+	const userId = agentConfig
+		? agentConfig.userId
+		: (agentUserId ?? systemUser.id);
+
+	const userContext = await getUserContext({
+		userId,
+		teamId,
+	});
+
+	const userIntegrations = await getUserAvailableIntegrations({
+		userId: agentConfig?.behalfUserId ?? task.createdBy,
+		teamId,
+	});
+	const enabledIntegrations = getEnabledIntegrationTypes(userIntegrations);
+
+	const activitiesResult = await getActivities({
+		groupId: taskId,
+		teamId,
+		type: ["task_comment", "task_comment_reply"],
+		pageSize: 20,
+	});
+
+	const activitiesAsMessages = activitiesResult.data.map((a) => ({
+		id: a.id,
+		message: {
+			role: a.userId === userContext.userId ? "assistant" : "user",
+			id: a.id,
+			parts: [{ type: "text", text: a.metadata?.comment || "" }],
+		} as UIChatMessage,
+		userId: a.userId,
+		createdAt: a.createdAt!,
+	}));
+
+	const chat = await getChatById(taskId, teamId);
+	let allMessages: UIChatMessage[] = [...(chat?.messages ?? [])];
+	if (!chat) {
+		await saveChat({
+			chatId: taskId,
+			teamId,
+			title: `${task.title} - Execution Chat`,
+			userId,
+		});
+	}
+
+	const unsavedMessages = activitiesAsMessages
+		.filter((a) => !chat?.messages.find((m) => m.id === a.id))
+		.sort(
+			(a, b) =>
+				new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+		);
+
+	const savedMessages = await Promise.all(
+		unsavedMessages.map((m) =>
+			saveChatMessage({
+				chatId: taskId,
+				teamId,
+				message: m.message,
+				userId: m.userId,
+				role: m.message.role,
+				createdAt: m.createdAt,
+			}),
+		),
+	);
+
+	const savedMessageUI = savedMessages.map((m) => m.content);
+	allMessages = [...allMessages, ...savedMessageUI];
+
+	const executorContext: TaskExecutorContext = {
+		...buildAppContext(
+			{
+				...userContext,
+				integrationType: "web",
+				behalfUserId: agentConfig?.behalfUserId ?? task.createdBy,
+			},
+			taskId,
+		),
+		task: {
+			id: task.id,
+			title: task.title,
+			description: task.description ?? undefined,
+			status: task.status?.name,
+			statusId: task.statusId,
+			priority: task.priority ?? undefined,
+			assignee: task.assignee?.name ?? undefined,
+			assigneeId: task.assigneeId ?? undefined,
+			project: task.project?.name ?? undefined,
+			projectId: task.projectId ?? undefined,
+			milestone: task.milestone?.name ?? undefined,
+			milestoneId: task.milestoneId ?? undefined,
+			attachments: task.attachments ?? [],
+			dueDate: task.dueDate ?? undefined,
+			labels: task.labels ?? [],
+			checklistItems: task.checklistSummary?.checklist ?? [],
+		},
+		activities: activitiesResult.data.map((a) => ({
+			userId: a.userId ?? "",
+			userName: a.user?.name ?? "Unknown",
+			type: a.type,
+			content: a.metadata?.comment,
+			createdAt: a.createdAt ?? "",
+		})),
+		executionMemory: execution.memory ?? undefined,
+		enabledIntegrations,
+		// Focus mode: determines whether we're working on the whole task or a specific checklist item
+		focusMode: focusedChecklistItem ? "checklist-item" : "task",
+		focusedChecklistItem,
+		// Agent identity for long-term memory
+		agentId: agentConfig?.id,
+		agentMemories: [], // populated below
+	};
+
+	if (agentConfig?.id) {
+		// Load long-term agent memories when we have an agent identity
+		const memories = await getAgentMemories({
+			agentId: agentConfig.id,
+			teamId,
+			limit: 30,
+		});
+		executorContext.agentMemories = memories.map((m) => ({
+			id: m.id,
+			category: m.category,
+			title: m.title,
+			content: m.content,
+			tags: m.tags,
+			relevanceScore: m.relevanceScore,
+		}));
+		logger.info("Loaded agent long-term memories", {
+			count: memories.length,
+			agentId: agentConfig.id,
+		});
+	}
+
+	return {
+		executorContext,
+		agentConfig,
+		userIntegrations,
+		userId,
+		execution,
+		focusedChecklistItem,
+		task,
+		messages: allMessages,
+		newMessages: savedMessageUI,
+		agentUserId,
+	};
+};

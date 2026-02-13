@@ -1,7 +1,5 @@
 "use client";
 
-import { getContrast } from "@mimir/utils/random";
-import { Avatar, AvatarFallback, AvatarImage } from "@ui/components/ui/avatar";
 import {
 	DropdownMenu,
 	DropdownMenuContent,

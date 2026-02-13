@@ -1,4 +1,3 @@
-import { openai } from "@ai-sdk/openai";
 import {
 	bulkDeleteTaskSchema,
 	bulkUpdateTaskSchema,
@@ -17,11 +16,7 @@ import {
 	updateTaskSchema,
 } from "@api/schemas/tasks";
 import { protectedProcedure, router } from "@api/trpc/init";
-import {
-	buildSmartCompletePrompt,
-	smartCompleteResponseSchema,
-} from "@api/utils/smart-complete";
-import { createTokenMeter } from "@mimir/billing";
+import { buildSmartCompletePrompt } from "@api/utils/smart-complete";
 import {
 	bulkDeleteTask,
 	bulkUpdateTask,
@@ -42,12 +37,10 @@ import {
 } from "@mimir/db/queries/tasks";
 import { getDuplicateTaskEmbedding } from "@mimir/db/queries/tasks-embeddings";
 import { getMemberById } from "@mimir/db/queries/teams";
-import { trackMessage, trackTaskCreated } from "@mimir/events/server";
+import { trackTaskCreated } from "@mimir/events/server";
 import { syncGoogleCalendarTaskEvent } from "@mimir/integration/google-calendar";
-import { handleTaskComment } from "@mimir/integration/task-comments";
 import { createRecurringTaskJob } from "@mimir/jobs/tasks/create-recurring-task-job";
 import { runs } from "@trigger.dev/sdk";
-import { generateText, Output } from "ai";
 import z from "zod";
 
 export const tasksRouter = router({
@@ -269,26 +262,28 @@ export const tasksRouter = router({
 				teamId: ctx.user.teamId!,
 			});
 
-			const response = await generateText({
-				system: systemPrompt,
-				model: openai("gpt-4o-mini"),
-				output: Output.object({ schema: smartCompleteResponseSchema }),
-				prompt: `Create a task based on the user's prompt: "${input.prompt}"`,
-			});
+			return {};
 
-			const meter = createTokenMeter(ctx.team.customerId!);
-			meter({
-				model: "openai/gpt-4o-mini",
-				usage: response.usage,
-			});
+			// const response = await generateText({
+			// 	system: systemPrompt,
+			// 	model: openai("gpt-4o-mini"),
+			// 	output: Output.object({ schema: smartCompleteResponseSchema }),
+			// 	prompt: `Create a task based on the user's prompt: "${input.prompt}"`,
+			// });
 
-			trackMessage({
-				userId: ctx.user.id,
-				teamId: ctx.user.teamId!,
-				source: "smart-complete",
-			});
+			// const meter = createTokenMeter(ctx.team.customerId!);
+			// meter({
+			// 	model: "openai/gpt-4o-mini",
+			// 	usage: response.usage,
+			// });
 
-			return response.output;
+			// trackMessage({
+			// 	userId: ctx.user.id,
+			// 	teamId: ctx.user.teamId!,
+			// 	source: "smart-complete",
+			// });
+
+			// return response.output;
 		}),
 
 	getSubscribers: protectedProcedure

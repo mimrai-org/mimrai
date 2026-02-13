@@ -102,9 +102,6 @@ export const getPriceQuantity = async ({
 			const members = await getMembers({ teamId });
 			return members.length;
 		}
-		case "tokens":
-			// Tokens price is metered, no quantity needed
-			return undefined as unknown as number;
 		default:
 			return 0;
 	}
@@ -220,70 +217,56 @@ export const checkPlanFeatures = async (
 	);
 };
 
-export const createTokenMeter = (customerId: string) => {
-	return async ({
-		usage,
+export const calculateTokenUsageCost = async ({
+	usage,
+	model,
+}: {
+	usage: LanguageModelUsage;
+	model: string;
+}) => {
+	if (process.env.DISABLE_BILLING === "true") {
+		return null;
+	}
+
+	const modelsCatalog = await fetchModels({
 		model,
-	}: {
-		usage: LanguageModelUsage;
-		model: string;
-	}) => {
-		if (process.env.DISABLE_BILLING === "true") {
-			return null;
-		}
+	});
 
-		const modelsCatalog = await fetchModels({
-			model,
-		});
+	const modelInfo = modelsCatalog.find((m) => m.model.id === model);
 
-		const modelInfo = modelsCatalog.find((m) => m.model.id === model);
+	if (!modelInfo) {
+		console.warn(`Model ${model} not found in catalog`);
+		return null;
+	}
 
-		if (!modelInfo) {
-			console.warn(`Model ${model} not found in catalog`);
-			return null;
-		}
-
-		const tokenCosts = getTokenCosts({
-			modelId: model,
-			providers: {
-				id: modelInfo.provider,
-				models: {
-					[modelInfo.model.id]: modelInfo.model,
-				},
+	const tokenCosts = getTokenCosts({
+		modelId: model,
+		providers: {
+			id: modelInfo.provider,
+			models: {
+				[modelInfo.model.id]: modelInfo.model,
 			},
-			usage: {
-				input_tokens: usage.inputTokens,
-				output_tokens: usage.outputTokens,
-				cacheReads: usage.inputTokenDetails.cacheReadTokens,
-				cacheWrites: usage.inputTokenDetails.cacheWriteTokens,
-				reasoning_tokens: usage.outputTokenDetails.reasoningTokens,
-			},
-		});
+		},
+		usage: {
+			input_tokens: usage.inputTokens,
+			output_tokens: usage.outputTokens,
+			cacheReads: usage.inputTokenDetails.cacheReadTokens,
+			cacheWrites: usage.inputTokenDetails.cacheWriteTokens,
+			reasoning_tokens: usage.outputTokenDetails.reasoningTokens,
+		},
+	});
 
-		const totalUSD = tokenCosts.totalUSD || 0; // Convert to cents
+	const totalUSD = tokenCosts.totalUSD || 0;
 
-		if (totalUSD === 0) {
-			return null;
-		}
+	if (totalUSD === 0) {
+		return null;
+	}
 
-		const stripeEventValue = Math.round(totalUSD * 10000) / 10; // in millicents
-
-		await stripeClient.billing.meterEvents.create({
-			event_name: "token_usage_cost",
-			payload: {
-				stripe_customer_id: customerId,
-				model,
-				// amount in millicents to avoid floating point issues
-				value: stripeEventValue.toString(),
-			},
-		});
-
-		return {
-			model,
-			costUSD: totalUSD,
-			inputTokens: usage.inputTokens,
-			outputTokens: usage.outputTokens,
-			totalTokens: usage.totalTokens,
-		};
+	return {
+		model,
+		costUSD: totalUSD,
+		inputTokens: usage.inputTokens,
+		outputTokens: usage.outputTokens,
+		totalTokens: usage.totalTokens,
 	};
 };

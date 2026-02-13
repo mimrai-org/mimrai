@@ -4,6 +4,7 @@ import { and, eq, ilike, isNull, ne, not, or, type SQL } from "drizzle-orm";
 import { union } from "drizzle-orm/pg-core";
 import { db } from "..";
 import { agents, type plansEnum, teams, users, usersOnTeams } from "../schema";
+import { recordCreditPromo } from "./credits";
 
 export const checkSlugExists = async (slug: string) => {
 	const [team] = await db
@@ -90,6 +91,12 @@ export const createTeam = async ({
 			.update(users)
 			.set({ teamId: team.id, teamSlug: team.slug })
 			.where(eq(users.id, userId));
+
+		await recordCreditPromo({
+			teamId: team.id,
+			amountCents: 500,
+			metadata: { reason: "Welcome bonus for creating first team" },
+		});
 	}
 
 	await teamCache.delete(`${userId}:${team.id}`);

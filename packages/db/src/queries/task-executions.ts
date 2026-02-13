@@ -26,14 +26,10 @@ export interface UpdateTaskExecutionInput {
 		totalTokens: number;
 		costUSD: number;
 	};
-	confirmationRequestedAt?: Date | null;
-	confirmationCommentId?: string | null;
 	triggerJobId?: string | null;
-	nextCheckAt?: Date | null;
-	retryCount?: number;
+	contextStale?: boolean;
 	lastError?: string | null;
-	startedAt?: Date | null;
-	completedAt?: Date | null;
+	completedAt?: string | null;
 }
 
 /**

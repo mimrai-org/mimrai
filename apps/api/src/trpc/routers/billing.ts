@@ -1,10 +1,19 @@
 import { stripeClient } from "@api/lib/payments";
-import { createCheckoutSchema } from "@api/schemas/billing";
+import {
+	createCheckoutSchema,
+	purchaseCreditsSchema,
+} from "@api/schemas/billing";
 import { protectedProcedure, router } from "@api/trpc/init";
 import { buildSubscriptionItems } from "@mimir/billing";
+import { getCreditBalance } from "@mimir/db/queries/credits";
 import { getTeamById, updateTeamPlan } from "@mimir/db/queries/teams";
 import { getAppUrl } from "@mimir/utils/envs";
-import { getPlanBySlug, getPlans, type PlanSlug } from "@mimir/utils/plans";
+import {
+	FEE_PERCENTAGE,
+	getPlanBySlug,
+	getPlans,
+	type PlanSlug,
+} from "@mimir/utils/plans";
 
 export const billingRouter = router({
 	subscription: protectedProcedure.query(async ({ ctx }) => {
@@ -67,6 +76,72 @@ export const billingRouter = router({
 	plans: protectedProcedure.query(async () => {
 		return getPlans();
 	}),
+
+	creditsBalance: protectedProcedure.query(async ({ ctx }) => {
+		const balance = await getCreditBalance({ teamId: ctx.user.teamId! });
+
+		return {
+			balanceCents: balance?.balanceCents ?? 0,
+		};
+	}),
+
+	purchaseCredits: protectedProcedure
+		.meta({
+			scopes: ["team:write"],
+		})
+		.input(purchaseCreditsSchema)
+		.mutation(async ({ ctx, input }) => {
+			const team = await getTeamById(ctx.user.teamId!);
+
+			if (!team?.customerId) {
+				throw new Error("Team customer is not configured for billing");
+			}
+
+			const session = await stripeClient.checkout.sessions.create({
+				mode: "payment",
+				customer: team.customerId,
+				payment_intent_data: {
+					metadata: {
+						billingType: "credits",
+						teamId: team.id,
+						amountCents: input.amountCents.toString(),
+					},
+				},
+				line_items: [
+					{
+						quantity: 1,
+						price_data: {
+							currency: "usd",
+							unit_amount: input.amountCents,
+							product_data: {
+								name: "Mimrai Credits",
+							},
+						},
+					},
+					{
+						quantity: 1,
+						price_data: {
+							currency: "usd",
+							unit_amount: Math.round(input.amountCents * FEE_PERCENTAGE), // 10% fee
+							product_data: {
+								name: "Processing Fee",
+							},
+						},
+					},
+				],
+				metadata: {
+					billingType: "credits",
+					teamId: team.id,
+					amountCents: input.amountCents.toString(),
+				},
+				success_url: `${getAppUrl()}/team/${team.slug}/settings/billing?credits=success`,
+				cancel_url: `${getAppUrl()}/team/${team.slug}/settings/billing?credits=cancel`,
+			});
+
+			return {
+				url: session.url!,
+			};
+		}),
 
 	checkout: protectedProcedure
 		.meta({

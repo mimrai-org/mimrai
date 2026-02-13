@@ -7,8 +7,9 @@ import { getUserContext } from "@api/ai/utils/get-user-context";
 import type { Context } from "@api/rest/types";
 import { chatRequestSchema } from "@api/schemas/chat";
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { createTokenMeter } from "@mimir/billing";
+import { calculateTokenUsageCost } from "@mimir/billing";
 import { getAgentById } from "@mimir/db/queries/agents";
+import { recordCreditUsage } from "@mimir/db/queries/credits";
 import { getTeamById } from "@mimir/db/queries/teams";
 import { AGENT_DEFAULT_MODEL } from "@mimir/utils/agents";
 import { createUIMessageStreamResponse } from "ai";
@@ -72,8 +73,6 @@ app.post("/", withPlanFeatures(["ai"]), async (c) => {
 		id,
 	);
 
-	const meter = createTokenMeter(team.customerId);
-
 	// Use agent from database if agentId is provided, otherwise use default workspace agent
 	const agent = await createAgentFromDB({
 		agentId,
@@ -88,10 +87,26 @@ app.post("/", withPlanFeatures(["ai"]), async (c) => {
 				ctx: AppContext,
 			) => string,
 			onFinish: async ({ response, usage }) => {
-				meter({
+				const usageCost = await calculateTokenUsageCost({
 					model: agentConfig?.model || AGENT_DEFAULT_MODEL,
 					usage,
 				});
+
+				const usageCostCents = Math.round((usageCost?.costUSD || 0) * 100);
+				if (usageCostCents > 0) {
+					await recordCreditUsage({
+						teamId,
+						amountCents: usageCostCents,
+						metadata: {
+							model:
+								usageCost?.model || agentConfig?.model || AGENT_DEFAULT_MODEL,
+							inputTokens: usage.inputTokens || 0,
+							outputTokens: usage.outputTokens || 0,
+							totalTokens: usage.totalTokens || 0,
+							costUSD: usageCost?.costUSD || 0,
+						},
+					});
+				}
 			},
 			generateTitle: true,
 		},
