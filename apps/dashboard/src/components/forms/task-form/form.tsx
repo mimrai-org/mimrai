@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useDebounceValue } from "usehooks-ts";
 import type z from "zod";
 import {
+	useCloneTaskPanel,
 	useCreateTaskPanel,
 	useTaskPanel,
 } from "@/components/panels/task-panel";
@@ -53,6 +54,7 @@ export const TaskForm = ({
 	const { setParams } = useTaskParams();
 	const taskPanel = useTaskPanel();
 	const createTaskPanel = useCreateTaskPanel();
+	const cloneTaskPanel = useCloneTaskPanel();
 	const queryClient = useQueryClient();
 
 	const form = useZodForm(taskFormSchema, {
@@ -78,7 +80,8 @@ export const TaskForm = ({
 				toast.success("Task created successfully", { id: "create-task" });
 				invalidateTasksCache();
 				taskPanel.open(task.id);
-				createTaskPanel.close("create");
+				createTaskPanel.closeAll();
+				cloneTaskPanel.closeAll();
 			},
 			onError: (error) => {
 				toast.error("Failed to create task", { id: "create-task" });
@@ -131,8 +134,6 @@ export const TaskForm = ({
 		enabled: Boolean(id),
 		ignoreFields: ["showSmartInput"],
 	});
-
-	console.log(form.formState.errors);
 
 	const createMode = !id;
 	const formShowSmartInput = form.watch("showSmartInput");

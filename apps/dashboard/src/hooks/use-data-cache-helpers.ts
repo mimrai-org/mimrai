@@ -62,11 +62,11 @@ export function updateTaskInCache(updatedTask: Partial<Task>) {
 		},
 	);
 
-	// Update in getById query
-	queryClient.setQueryData(
-		trpc.tasks.getById.queryKey({ id: updatedTask.id }),
-		updatedTask,
-	);
+	if (updatedTask.id) {
+		queryClient.invalidateQueries(
+			trpc.tasks.getById.queryOptions({ id: updatedTask.id }),
+		);
+	}
 }
 
 /**

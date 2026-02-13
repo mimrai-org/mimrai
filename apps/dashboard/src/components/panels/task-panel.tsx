@@ -18,15 +18,7 @@ interface TaskPanelProps {
 
 function TaskPanelContent({ panel }: { panel: PanelInstance }) {
 	const { data: task } = useQuery(
-		trpc.tasks.getById.queryOptions(
-			{ id: panel.id },
-			{
-				placeholderData: (old) => {
-					if (panel.id === old?.id) return old;
-					return undefined;
-				},
-			},
-		),
+		trpc.tasks.getById.queryOptions({ id: panel.id }),
 	);
 
 	if (!task) {
@@ -38,6 +30,8 @@ function TaskPanelContent({ panel }: { panel: PanelInstance }) {
 			</div>
 		);
 	}
+
+	console.log("Rendering TaskPanelContent for task:", task);
 
 	return (
 		<TaskForm

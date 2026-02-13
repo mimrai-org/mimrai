@@ -106,14 +106,14 @@ export const Messages = ({ isStreaming }: { isStreaming?: boolean }) => {
 						);
 						const textContent = textParts
 							.map((part) => (part.type === "text" ? part.text : ""))
-							.join("");
+							.join("\n\n");
 
 						const reasoningParts = message.parts.filter(
 							(part) => part.type === "reasoning",
 						);
 						const reasoningContent = reasoningParts
 							.map((part) => (part.type === "reasoning" ? part.text : ""))
-							.join("");
+							.join("\n\n");
 
 						// Extract file parts
 						const fileParts = extractFileParts(message.parts);
