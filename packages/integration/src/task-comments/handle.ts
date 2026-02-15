@@ -9,7 +9,7 @@ import { getUserContext } from "@api/ai/utils/get-user-context";
 import { db } from "@mimir/db/client";
 import { getChatById, saveChatMessage } from "@mimir/db/queries/chats";
 import { createTaskComment } from "@mimir/db/queries/tasks";
-import { getSystemUser } from "@mimir/db/queries/users";
+import { getMimirUser } from "@mimir/db/queries/users";
 import {
 	activities,
 	labels,
@@ -36,7 +36,9 @@ export const handleTaskComment = async ({
 	commentId: string;
 	comment: string;
 }) => {
-	const systemUser = await getSystemUser();
+	const systemUser = await getMimirUser({
+		teamId,
+	});
 
 	if (!systemUser) {
 		throw new Error("System user not found");

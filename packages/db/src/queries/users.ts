@@ -1,6 +1,7 @@
 import { and, eq, ilike, type SQL } from "drizzle-orm";
 import { db } from "..";
-import { teams, users, usersOnTeams } from "../schema";
+import { agents, teams, users, usersOnTeams } from "../schema";
+import { createAgent } from "./agents";
 
 export const getUserById = async (userId: string) => {
 	const [user] = await db
@@ -169,33 +170,38 @@ export const getAvailableTeams = async (userId: string) => {
 	return teamsList;
 };
 
-export const getSystemUser = async () => {
+export const getMimirUser = async ({ teamId }: { teamId: string }) => {
+	const email = `${teamId}-main@mimrai.com`;
 	const [systemUser] = await db
 		.select()
-		.from(users)
+		.from(agents)
 		.where(
-			and(eq(users.isSystemUser, true), eq(users.email, "system@mimrai.com")),
+			and(
+				eq(users.isSystemUser, true),
+				eq(users.email, email),
+				eq(agents.teamId, teamId),
+			),
 		)
+		.innerJoin(users, eq(users.id, agents.userId))
 		.limit(1);
 
 	if (!systemUser) {
-		const [newSystemUser] = await db
-			.insert(users)
-			.values({
-				name: "Mimir",
-				email: "system@mimrai.com",
-				isSystemUser: true,
-				createdAt: new Date(),
-				updatedAt: new Date(),
-				emailVerified: true,
-				id: crypto.randomUUID(),
-				color: "hsl(0, 0%, 20%)",
-			})
-			.returning();
-		return newSystemUser;
+		const agent = await createAgent({
+			teamId,
+			name: "Mimir",
+			isActive: true,
+			soul: "You are Mimir, a helpful and concise assistant.",
+		});
+
+		const [user] = await db
+			.select()
+			.from(users)
+			.where(eq(users.id, agent.userId))
+			.limit(1);
+		return user;
 	}
 
-	return systemUser;
+	return systemUser.user;
 };
 
 export const updateUser = async ({

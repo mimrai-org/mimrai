@@ -30,7 +30,7 @@ import {
 } from "./notification-settings";
 import { getStatusById } from "./statuses";
 import { getMemberById } from "./teams";
-import { getSystemUser } from "./users";
+import { getMimirUser } from "./users";
 
 export type CreateActivityInput = {
 	userId?: string | null;
@@ -47,7 +47,9 @@ export const createActivity = async (input: CreateActivityInput) => {
 
 	// If userId is not set, get system user id
 	if (!userId) {
-		userId = (await getSystemUser())!.id;
+		userId = (await getMimirUser({
+			teamId: input.teamId,
+		}))!.id;
 	}
 
 	let metadataChanges = input.metadata?.changes;
@@ -149,7 +151,7 @@ export const createTaskUpdateActivity = async ({
 	let definedUserId = userId;
 
 	// If userId is not set, get system user id
-	if (!definedUserId) definedUserId = (await getSystemUser())!.id;
+	if (!definedUserId) definedUserId = (await getMimirUser({ teamId }))!.id;
 
 	const changeKeys = [
 		"title",
@@ -494,7 +496,8 @@ export const createChecklistItemActivity = async ({
 	let definedUserId = userId;
 
 	// If userId is not set, get system user id
-	if (!definedUserId) definedUserId = (await getSystemUser())!.id;
+	if (!definedUserId)
+		definedUserId = (await getMimirUser({ teamId: checklistItem.teamId }))!.id;
 
 	if (checklistItem.taskId) {
 		const [task] = await db
