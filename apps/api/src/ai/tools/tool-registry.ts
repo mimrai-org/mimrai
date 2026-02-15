@@ -354,11 +354,7 @@ export type MessageDataParts = {
 		title: string;
 		description?: string;
 		sequence?: number;
-		status: {
-			type: "to_do" | "in_progress" | "done" | "review" | "backlog";
-			name: string;
-			color?: string;
-		};
+		statusId: string;
 		assignee?: string;
 		dueDate?: string;
 	};

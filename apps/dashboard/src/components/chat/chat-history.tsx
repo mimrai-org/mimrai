@@ -8,13 +8,25 @@ import {
 	ContextMenuTrigger,
 } from "@ui/components/ui/context-menu";
 import { Input } from "@ui/components/ui/input";
+import { Separator } from "@ui/components/ui/separator";
 import { cn } from "@ui/lib/utils";
-import { PlusIcon, SearchIcon, TrashIcon } from "lucide-react";
+import {
+	ArrowRight,
+	ChevronRight,
+	MessageCircleHeartIcon,
+	MessageCircleIcon,
+	PlusIcon,
+	SearchIcon,
+	TrashIcon,
+} from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useDebounceValue } from "usehooks-ts";
+import { type Agent, useAgents } from "@/hooks/use-data";
+import { useChatStore } from "@/store/chat";
 import { queryClient, trpc } from "@/utils/trpc";
+import { AssigneeAvatar } from "../asignee-avatar";
 import { useUser } from "../user-provider";
 import { useAIChat } from "./chat-provider";
 
@@ -23,6 +35,10 @@ export const ChatHistory = () => {
 	const { id: chatId } = useAIChat();
 	const [search, setSearch] = useState("");
 	const [debouncedSearch] = useDebounceValue(search, 300);
+	const { selectedAgentId, setSelectedAgentId } = useChatStore();
+
+	const { data: agents } = useAgents();
+
 	const { data: chatHistory } = useQuery(
 		trpc.chats.history.queryOptions({
 			search: debouncedSearch,
@@ -51,8 +67,40 @@ export const ChatHistory = () => {
 		}),
 	);
 
+	const selectedAgent = useMemo(() => {
+		if (!selectedAgentId || !agents?.data) {
+			return null;
+		}
+		return agents.data.find((agent) => agent.id === selectedAgentId) || null;
+	}, [selectedAgentId, agents]);
+
+	if (!selectedAgent) {
+		return (
+			<div className="flex flex-col gap-2">
+				{agents?.data.map((agent) => (
+					<AgentButton
+						key={agent.id}
+						agent={agent}
+						onClick={() => {
+							setSelectedAgentId(agent.id);
+						}}
+					/>
+				))}
+			</div>
+		);
+	}
+
 	return (
 		<div className="flex flex-col gap-2">
+			{selectedAgent && (
+				<AgentButton
+					agent={selectedAgent}
+					onClick={() => {
+						setSelectedAgentId(null);
+					}}
+				/>
+			)}
+			<Separator />
 			<Link href={`${user.basePath}/chat`}>
 				<Button
 					type="button"
@@ -74,6 +122,7 @@ export const ChatHistory = () => {
 				/>
 				<SearchIcon className="-translate-y-1/2 absolute top-1/2 left-3 size-4 text-muted-foreground" />
 			</div>
+			<Separator />
 			<div className="flex flex-col gap-1">
 				{chatHistory?.map((chat) => (
 					<ContextMenu key={chat.id}>
@@ -112,5 +161,34 @@ export const ChatHistory = () => {
 				))}
 			</div>
 		</div>
+	);
+};
+
+const AgentButton = ({
+	agent,
+	onClick,
+	className,
+}: {
+	agent: Agent;
+	className?: string;
+	onClick: () => void;
+}) => {
+	return (
+		<button
+			type="button"
+			onClick={onClick}
+			className={cn(
+				"flex flex-col gap-2 rounded-sm px-2 py-1 text-sm hover:bg-accent dark:hover:bg-accent/30",
+				className,
+			)}
+		>
+			<div className="flex items-center gap-2 text-start">
+				<AssigneeAvatar {...agent} className="size-5" />
+				<div className="flex-1">
+					<div className="font-medium">{agent.name}</div>
+					<div className="text-muted-foreground">{agent.description}</div>
+				</div>
+			</div>
+		</button>
 	);
 };

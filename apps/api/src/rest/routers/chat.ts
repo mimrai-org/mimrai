@@ -33,7 +33,7 @@ app.post("/", withPlanFeatures(["ai"]), async (c) => {
 
 	const userId = session.userId;
 
-	const [userContext, allTools, agentConfig, team] = await Promise.all([
+	const [userContext, allTools, agentConfig] = await Promise.all([
 		getUserContext({
 			userId,
 			teamId,
@@ -49,7 +49,6 @@ app.post("/", withPlanFeatures(["ai"]), async (c) => {
 			id: agentId!,
 			teamId,
 		}),
-		getTeamById(teamId),
 	]);
 
 	// If there are context items, add them to the message parts

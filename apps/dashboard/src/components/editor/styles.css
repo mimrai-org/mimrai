@@ -5,21 +5,21 @@
 }
 
 .tiptap {
-	@apply text-sm leading-relaxed;
+	@apply text-base leading-relaxed;
 	@apply font-sans;
 
 	h1 {
-		@apply text-lg;
-		margin-bottom: 0.5rem;
+		@apply text-2xl font-medium;
+		margin-bottom: 1rem;
 	}
 
 	h2 {
-		@apply text-base;
+		@apply text-xl font-medium;
 		margin-bottom: 0.5rem;
 	}
 
 	h3 {
-		@apply text-base;
+		@apply text-lg font-medium;
 		margin-bottom: 0.5rem;
 	}
 
@@ -46,6 +46,28 @@
 	ul {
 		list-style: disc;
 		margin-left: 1rem;
+
+		&[data-type="taskList"] {
+			list-style: none;
+
+			li {
+				@apply flex items-center gap-2 mb-1;
+				/* label {
+					@apply flex items-center gap-1 cursor-pointer;
+					input[type="checkbox"] {
+						@apply size-0 absolute opacity-0;
+					}
+					& > span {
+						@apply block size-4 border rounded bg-input;
+
+						::before {
+							@apply block size-2 bg-primary rounded absolute left-1 top-1 opacity-0 transition-opacity;
+							content: "";
+						}
+					}
+				} */
+			}
+		}
 	}
 
 	ol {
@@ -54,7 +76,7 @@
 	}
 
 	pre {
-		@apply border rounded-sm break-words max-w-xl p-2 my-2;
+		@apply border rounded-sm break-words max-w-xl p-2 my-8;
 
 		code {
 			background: none;
@@ -65,7 +87,7 @@
 	}
 
 	blockquote {
-		@apply border-l-2 border-primary pl-4 italic ml-2;
+		@apply border-l-2 border-primary pl-4 ml-2 my-8;
 	}
 
 	img {
@@ -76,6 +98,15 @@
 
 		&.ProseMirror-selectednode {
 			outline: 3px solid var(--purple);
+		}
+	}
+
+	table {
+		@apply w-full border-collapse my-8;
+
+		th,
+		td {
+			@apply border p-2 text-left;
 		}
 	}
 }

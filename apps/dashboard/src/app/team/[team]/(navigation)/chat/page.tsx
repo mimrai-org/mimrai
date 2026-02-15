@@ -7,6 +7,7 @@ interface Props {
 
 export default async function Page({ params }: Props) {
 	const { team } = await params;
+
 	const newChatId = generateId();
 
 	return redirect(`/team/${team}/chat/${newChatId}`);

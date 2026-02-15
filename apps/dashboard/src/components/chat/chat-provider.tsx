@@ -2,7 +2,9 @@
 import { useChat } from "@ai-sdk/react";
 import type { UIChatMessage } from "@api/ai/types";
 import { DefaultChatTransport } from "ai";
-import { createContext, useContext, useMemo } from "react";
+import { createContext, useContext, useEffect, useMemo } from "react";
+import { getSelectedAgentCookieKeyClient, useChatStore } from "@/store/chat";
+import { useUser } from "../user-provider";
 import type { ChatInputMessage } from "./chat-input";
 
 interface ChatContextValue extends ReturnType<typeof useChat<UIChatMessage>> {
@@ -22,6 +24,7 @@ export const useAIChat = () => {
 interface ChatProviderProps {
 	children: React.ReactNode;
 	initialMessages?: UIChatMessage[];
+	initialSelectedAgentId?: string;
 	title?: string;
 	id: string;
 }
@@ -29,9 +32,14 @@ interface ChatProviderProps {
 export const ChatProvider = ({
 	children,
 	initialMessages = [],
+	initialSelectedAgentId,
 	title,
 	id,
 }: ChatProviderProps) => {
+	const user = useUser();
+	const setSelectedAgentId = useChatStore((state) => state.setSelectedAgentId);
+	const selectedAgentId = useChatStore((state) => state.selectedAgentId);
+
 	const authenticatedFetch = useMemo(
 		() =>
 			Object.assign(
@@ -48,6 +56,17 @@ export const ChatProvider = ({
 			),
 		[],
 	);
+
+	useEffect(() => {
+		if (initialSelectedAgentId) {
+			setSelectedAgentId(initialSelectedAgentId);
+		}
+	}, [initialSelectedAgentId, setSelectedAgentId]);
+
+	useEffect(() => {
+		// biome-ignore lint/suspicious/noDocumentCookie: not suspicious in this case
+		document.cookie = `${getSelectedAgentCookieKeyClient(user.team.id)}=${selectedAgentId || ""}; path=/; max-age=31536000`;
+	}, [selectedAgentId, user.team.id]);
 
 	const chat = useChat({
 		id,

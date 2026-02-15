@@ -5,8 +5,10 @@ import CodeBlock from "@tiptap/extension-code-block";
 import FileHandler from "@tiptap/extension-file-handler";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
+import { ListKit } from "@tiptap/extension-list";
 import Mention from "@tiptap/extension-mention";
 import Placeholder from "@tiptap/extension-placeholder";
+import { TableKit } from "@tiptap/extension-table";
 import Underline from "@tiptap/extension-underline";
 import { mergeAttributes } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -39,6 +41,8 @@ const extensions = ({
 		},
 	}),
 	Markdown,
+	TableKit,
+	ListKit,
 	// Custom mention node extensions for rendering mentions as React components
 	UserMentionExtension,
 	TaskMentionExtension,

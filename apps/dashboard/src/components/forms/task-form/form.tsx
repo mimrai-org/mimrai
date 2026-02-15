@@ -158,7 +158,7 @@ export const TaskForm = ({
 											</span>
 										</div>
 									)}
-									<div className="flex items-center justify-between gap-4 px-4">
+									<div className="flex items-center justify-between gap-4 px-4 py-2">
 										<Title />
 									</div>
 									{createMode && (

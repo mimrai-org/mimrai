@@ -9,6 +9,7 @@ export type Task = RouterOutputs["tasks"]["get"]["data"][number];
 type Status = RouterOutputs["statuses"]["get"]["data"][number];
 type Member = RouterOutputs["teams"]["getMembers"][number];
 type Project = RouterOutputs["projects"]["get"]["data"][number];
+export type Agent = RouterOutputs["agents"]["get"]["data"][number];
 
 type EnrichedTask = Task & {
 	status: Status;
@@ -215,6 +216,27 @@ export function useProjects(
 ) {
 	return useQuery(
 		trpc.projects.get.queryOptions(
+			{
+				...filters,
+			},
+			{
+				...options,
+				staleTime: 5 * 60 * 1000, // 5 minutes
+			},
+		),
+	);
+}
+
+export function useAgents(
+	filters: RouterInputs["agents"]["get"] = {},
+	options?: {
+		enabled?: boolean;
+		refetchOnWindowFocus?: boolean;
+		refetchOnMount?: boolean;
+	},
+) {
+	return useQuery(
+		trpc.agents.get.queryOptions(
 			{
 				...filters,
 			},

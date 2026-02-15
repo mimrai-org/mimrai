@@ -37,18 +37,16 @@ export function getToolContext(
 }
 
 export function formatContextForLLM(context: AppContext): string {
-	return `<team-info>
-<user-name>${context.fullName}</user-name>
-<user-id>${context.userId}</user-id>
-<current-date>${context.currentDateTime}</current-date>
-<timezone>${context.timezone}</timezone>
-<team-name>${context.teamName}</team-name>
-<team-description>${context.teamDescription}</team-description>
-<base-currency>${context.baseCurrency}</base-currency>
-<locale>${context.locale}</locale>
-</team-info>
-
-${formatLLMContextItems(context.contextItems ?? [])}
+	return `
+## Team & User Information
+User: ${context.fullName}
+User ID: ${context.userId}
+Current Date: ${context.currentDateTime}
+Timezone: ${context.timezone}
+Team Name: ${context.teamName}
+Team Description: ${context.teamDescription}
+Base Currency: ${context.baseCurrency}
+Locale: ${context.locale}
 
 Important: Use the current date/time above for time-sensitive operations.`;
 }

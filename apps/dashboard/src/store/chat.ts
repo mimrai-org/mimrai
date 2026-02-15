@@ -1,5 +1,8 @@
 import { create } from "zustand";
 
+export const getSelectedAgentCookieKeyClient = (teamId: string) =>
+	`chat_selected_agent_${teamId}`;
+
 interface ChatState {
 	// Input state
 	input: string;

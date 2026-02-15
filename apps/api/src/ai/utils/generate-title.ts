@@ -37,7 +37,7 @@ export const generateTitle = async ({
 		model: openai("gpt-4o-mini"),
 		prompt: `Generate a concise and descriptive title for the following conversation between a user and an AI assistant. 
 The title should capture the main topic or purpose of the conversation in 3 to 5 words. 
-Return only the title without any additional text.
+Return only the title without any additional text or formatting.
 
 Conversation:
 ${fullText}`,

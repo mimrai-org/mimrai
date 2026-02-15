@@ -6,6 +6,7 @@ import {
 	CircleCheck,
 	PaperclipIcon,
 	ToolCaseIcon,
+	WrenchIcon,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
@@ -129,8 +130,6 @@ export const Messages = ({ isStreaming }: { isStreaming?: boolean }) => {
 							part.type.startsWith("tool-"),
 						);
 
-						console.log("Tool call parts:", toolCallParts);
-
 						const toolCalls = toolCallParts.map((part) => {
 							const toolCallPart = part as {
 								input: Record<string, unknown>;
@@ -190,9 +189,12 @@ export const Messages = ({ isStreaming }: { isStreaming?: boolean }) => {
 								)}
 
 								{toolCallParts.length > 0 && (
-									<div className="mb-2 flex flex-col gap-1 text-muted-foreground text-xs">
+									<div className="mb-2 flex flex-col gap-1 text-xs">
 										{toolCalls.map((toolCall, idx) => (
-											<div key={idx} className="flex items-center gap-2">
+											<div
+												key={idx}
+												className="flex w-fit items-center gap-2 rounded-md bg-transparent px-2 py-1 text-muted-foreground dark:bg-transparent/30"
+											>
 												{![
 													"output-available",
 													"output-error",
@@ -200,7 +202,7 @@ export const Messages = ({ isStreaming }: { isStreaming?: boolean }) => {
 												].includes(toolCall.state) ? (
 													<Loader className="size-3" />
 												) : (
-													<ToolCaseIcon
+													<WrenchIcon
 														className={cn("size-3", {
 															"text-red-500": toolCall.state === "output-error",
 														})}
@@ -285,7 +287,7 @@ export const Messages = ({ isStreaming }: { isStreaming?: boolean }) => {
 											})}
 										>
 											<MessageContextItems message={message} />
-											<MessageContent>
+											<MessageContent variant="contained">
 												<Response>{textContent}</Response>
 											</MessageContent>
 										</div>

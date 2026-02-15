@@ -11,10 +11,12 @@ import {
 	PromptInputToolbar,
 	PromptInputTools,
 } from "@mimir/ui/prompt-input-new";
+import type { Editor as EditorInstance } from "@tiptap/react";
 import { useRef, useState } from "react";
 import { useChatParams } from "@/hooks/use-chat-params";
 import { useDataPart } from "@/hooks/use-data-part";
 import { useChatStore } from "@/store/chat";
+import { Editor } from "../editor";
 import { AgentSelectorButton } from "./agent-selector-button";
 import { type ContextItem, useChatContext } from "./chat-context/store";
 import { useAIChat } from "./chat-provider";
@@ -33,6 +35,7 @@ export interface ChatInputMessage extends PromptInputMessage {
 
 export const ChatInput = () => {
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
+	const editorRef = useRef<EditorInstance>(null);
 	const { setParams, chatId: chatIdParam } = useChatParams();
 	const { setItems } = useChatContext();
 	const [value, setValue] = useState("");
@@ -81,6 +84,7 @@ export const ChatInput = () => {
 		});
 
 		setInput("");
+		editorRef.current?.commands.clearContent();
 
 		// Clear context items after sending
 		setItems([]);
@@ -98,9 +102,12 @@ export const ChatInput = () => {
 					<PromptInputAttachments>
 						{(attachment) => <PromptInputAttachment data={attachment} />}
 					</PromptInputAttachments>
-					<PromptInputTextarea
-						ref={textareaRef}
-						onChange={handleInputChange}
+					<Editor
+						ref={editorRef}
+						value={input}
+						onChange={(value) => {
+							setInput(value);
+						}}
 						onKeyDown={(e) => {
 							// Handle Enter key for commands
 							if (e.key === "Enter" && showCommands) {
@@ -116,7 +123,7 @@ export const ChatInput = () => {
 								}
 
 								e.preventDefault();
-								const form = e.currentTarget.form;
+								const form = e.currentTarget.closest("form");
 								if (form) {
 									form.requestSubmit();
 								}
@@ -124,9 +131,8 @@ export const ChatInput = () => {
 							}
 
 							// Handle other keys normally
-							handleKeyDown(e);
+							// handleKeyDown(e);
 						}}
-						value={input}
 						placeholder={
 							isWebSearch
 								? "Search the web"
@@ -134,6 +140,12 @@ export const ChatInput = () => {
 									? `Continue "${chatTitle?.title}" conversation`
 									: "Type your message here..."
 						}
+						className="p-4 [&_.tiptap]:min-h-[40px] [&_.tiptap]:text-sm!"
+					/>
+					<PromptInputTextarea
+						ref={textareaRef}
+						value={input}
+						className="invisible size-0! min-h-0 min-w-0 p-0 opacity-0"
 					/>
 				</PromptInputBody>
 				<PromptInputToolbar>
