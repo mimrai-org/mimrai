@@ -154,6 +154,14 @@ export function invalidateDocumentsCache() {
 	queryClient.invalidateQueries({
 		queryKey: trpc.documents.get.queryKey(),
 	});
+
+	queryClient.invalidateQueries({
+		queryKey: trpc.documents.get.infiniteQueryKey(),
+	});
+
+	queryClient.invalidateQueries({
+		queryKey: trpc.documents.getById.queryKey(),
+	});
 }
 
 /**
