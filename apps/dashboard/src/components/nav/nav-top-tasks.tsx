@@ -33,7 +33,7 @@ export const NavTopTasks = () => {
 							href={`${user?.basePath}/projects/${task.projectId}/${task.id}`}
 						>
 							<div className="flex items-center gap-2 rounded-md px-2 py-2 text-sm hover:bg-accent dark:hover:bg-accent/30">
-								<StatusIcon type={task.status.type} className="size-4" />
+								<StatusIcon type={task.status?.type} className="size-4" />
 								<span className="text-muted-foreground">
 									{user?.team?.prefix}-{task.sequence}
 								</span>
