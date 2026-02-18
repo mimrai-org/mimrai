@@ -21,7 +21,7 @@ export const Title = () => {
 					<FormControl>
 						<div className="relative">
 							<div
-								className="font-medium focus-visible:outline-none focus-visible:ring-0 md:text-3xl"
+								className="font-medium focus-visible:outline-none focus-visible:ring-0 md:text-2xl"
 								onBlur={(e) => {
 									field.onBlur();
 									// field.onChange(e.target.textContent || "");
