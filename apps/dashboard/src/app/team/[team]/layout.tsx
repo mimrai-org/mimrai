@@ -8,6 +8,7 @@ import { PanelStack } from "@/components/panels/panel-stack";
 import { GlobalSheets } from "@/components/sheets/global-sheets";
 import { StickySidebarProvider } from "@/components/sticky-sidebar";
 import { UserProvider } from "@/components/user-provider";
+import { getSession } from "@/lib/get-session";
 import { trpcClient } from "@/utils/trpc";
 
 type Props = {
@@ -19,26 +20,27 @@ type Props = {
 
 export default async function Layout({ children, params }: Props) {
 	const { team } = await params;
-	const cookieStore = await cookies();
-	const user = await trpcClient.users.getCurrent.query();
+	const session = await getSession();
 
-	if (!user?.id) {
+	if (!session?.user?.teamSlug) {
 		return redirect("/sign-in");
 	}
 
 	// switch to the team in the URL
 	try {
-		if (user.team?.slug !== team) {
+		if (session.user?.teamSlug !== team) {
 			await trpcClient.users.switchTeam.mutate({
 				slug: team,
 			});
 		}
 	} catch (error) {
-		if (!user.team?.slug) {
+		if (!session.user.teamSlug) {
 			return redirect("/team");
 		}
-		return redirect(`/team/${user.team.slug}/onboarding`);
+		return redirect(`/team/${session.user.teamSlug}/onboarding`);
 	}
+
+	const user = await trpcClient.users.getCurrent.query();
 
 	return (
 		<Suspense>

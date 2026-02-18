@@ -8,8 +8,10 @@ import { ActivityItem } from "@/components/activities/activity-item";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { trpc } from "@/utils/trpc";
 import Loader from "../loader";
+import { useUser } from "../user-provider";
 
 export const FeedView = () => {
+	const user = useUser();
 	const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
 		useInfiniteQuery(
 			trpc.activities.get.infiniteQueryOptions(
@@ -79,10 +81,15 @@ export const FeedView = () => {
 		<div className="space-y-6 py-4">
 			{Object.entries(groupedActivities).map(([date, acts]) => (
 				<div key={date}>
-					<h2 className="mb-4 font-header">{date}</h2>
+					<h2 className="mb-8 font-header text-xl">{date}</h2>
 					<div className="space-y-4">
 						{acts.map((activity) => (
-							<div key={activity.id} className={cn("rounded-sm")}>
+							<div
+								key={activity.id}
+								className={cn("rounded-sm", {
+									// "ml-auto": activity.userId === user?.id,
+								})}
+							>
 								<ActivityItem
 									key={activity.id}
 									activity={activity}
@@ -95,7 +102,7 @@ export const FeedView = () => {
 			))}
 			{hasNextPage && (
 				<div ref={ref} className="flex justify-center py-4">
-					{isFetchingNextPage ? <Loader /> : <div className="w- h-6" />}
+					{isFetchingNextPage ? <Loader /> : <div className="size-6" />}
 				</div>
 			)}
 		</div>
