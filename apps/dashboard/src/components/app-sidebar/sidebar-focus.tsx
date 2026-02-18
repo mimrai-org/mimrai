@@ -39,7 +39,7 @@ export function SidebarFocus() {
 						<SidebarMenuButton asChild isActive={isChatActive}>
 							<Link href={`${user.basePath}/chat`}>
 								<MessagesSquareIcon />
-								<span>Agents Chat</span>
+								<span>Chat</span>
 							</Link>
 						</SidebarMenuButton>
 					</SidebarMenuItem>

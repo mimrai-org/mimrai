@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import {
 	SidebarGroup,
+	SidebarGroupAction,
 	SidebarGroupContent,
 	SidebarGroupLabel,
 	SidebarMenu,
@@ -37,6 +38,15 @@ export function SidebarProjects() {
 			<Link href={`${user.basePath}/projects`}>
 				<SidebarGroupLabel>Projects</SidebarGroupLabel>
 			</Link>
+			<SidebarGroupAction
+				onClick={() => {
+					setProjectParams({
+						createProject: true,
+					});
+				}}
+			>
+				<PlusIcon />
+			</SidebarGroupAction>
 			<SidebarGroupContent>
 				<SidebarMenu>
 					{projects?.data.map((project) => {
@@ -63,20 +73,6 @@ export function SidebarProjects() {
 							</ProjectContextMenu>
 						);
 					})}
-
-					<SidebarMenuItem>
-						<SidebarMenuButton
-							onClick={() => {
-								setProjectParams({
-									createProject: true,
-								});
-							}}
-							tooltip={"Create New Project"}
-						>
-							<PlusIcon />
-							<span>New Project</span>
-						</SidebarMenuButton>
-					</SidebarMenuItem>
 				</SidebarMenu>
 			</SidebarGroupContent>
 		</SidebarGroup>

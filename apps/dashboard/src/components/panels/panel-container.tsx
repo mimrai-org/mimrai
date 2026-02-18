@@ -169,7 +169,13 @@ export function PanelContainer({
 						</button>
 					</div>
 				)}
-				<div className="py-4">{isTopPanel ? children : null}</div>
+				<div
+					className={cn("py-4", {
+						hidden: !isTopPanel,
+					})}
+				>
+					{children}
+				</div>
 			</div>
 		</motion.div>
 	);

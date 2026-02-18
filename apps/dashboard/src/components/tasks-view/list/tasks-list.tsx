@@ -13,6 +13,7 @@ import {
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "@ui/components/ui/context-menu";
+import { cn } from "@ui/lib/utils";
 import {
 	CheckSquareIcon,
 	ChevronDownIcon,
@@ -37,8 +38,7 @@ import { TaskListBulkActions } from "./bulk-actions";
 import { TaskItem } from "./task-item";
 
 const ESTIMATED_TASK_HEIGHT = 44;
-const ESTIMATED_GROUP_HEADER_HEIGHT = 48;
-const ESTIMATED_CREATE_BUTTON_HEIGHT = 44;
+const ESTIMATED_GROUP_HEADER_HEIGHT = 44;
 
 type VirtualItem =
 	| { type: "group-header"; group: GenericGroup; taskCount: number }
@@ -104,11 +104,6 @@ export const TasksList = () => {
 						groupId: taskGroup.column.id,
 					});
 				}
-				// Add create button at end of group
-				items.push({
-					type: "create-button",
-					groupId: taskGroup.column.id,
-				});
 			}
 		}
 		return items;
@@ -120,7 +115,6 @@ export const TasksList = () => {
 		estimateSize: (index) => {
 			const item = flattenedItems[index];
 			if (item.type === "group-header") return ESTIMATED_GROUP_HEADER_HEIGHT;
-			if (item.type === "create-button") return ESTIMATED_CREATE_BUTTON_HEIGHT;
 			return ESTIMATED_TASK_HEIGHT;
 		},
 		overscan: 10,
@@ -194,9 +188,6 @@ export const TasksList = () => {
 											</div>
 										</TaskContextMenu>
 									)}
-									{item.type === "create-button" && (
-										<CreateTaskButton groupId={item.groupId} />
-									)}
 								</div>
 							);
 						})}
@@ -238,6 +229,17 @@ const GroupHeader = memo(function GroupHeader({
 	);
 	const { tasks } = useTasksGrouped();
 
+	const { filters } = useTasksViewContext();
+	const createTaskPanel = useCreateTaskPanel();
+
+	const handleCreateTask = useCallback(() => {
+		createTaskPanel.open("create", {
+			statusId: group.id,
+			projectId:
+				filters.projectId?.length > 0 ? filters.projectId[0] : undefined,
+		});
+	}, [createTaskPanel, group.id, filters.projectId]);
+
 	const handleSelectAll = useCallback(() => {
 		const groupTasks = tasks[group.name]?.tasks || [];
 		const allTaskIds = groupTasks.map((task) => task.id);
@@ -256,17 +258,40 @@ const GroupHeader = memo(function GroupHeader({
 						type="button"
 						data-state={isCollapsed ? "closed" : "open"}
 						onClick={onToggle}
-						className="group mb-2 flex w-full cursor-pointer items-center gap-2 rounded-sm bg-card px-4 py-2 text-muted-foreground text-sm transition-colors hover:text-foreground dark:border-0 dark:bg-card"
+						className={cn(
+							"group mb-2 flex w-full cursor-pointer items-center gap-2 rounded-sm px-4 py-2 text-muted-foreground text-sm transition-colors hover:text-foreground dark:border-0",
+							"bg-card dark:bg-card",
+							{
+								"opacity-50 hover:bg-card hover:opacity-100": taskCount === 0,
+							},
+						)}
 					>
-						<div className="text-muted-foreground group-hover:text-foreground">
-							<ChevronRightIcon className="size-4 group-data-[state=open]:hidden" />
-							<ChevronDownIcon className="hidden size-4 group-data-[state=open]:block" />
-						</div>
+						{taskCount > 0 ? (
+							<div className="text-muted-foreground group-hover:text-foreground">
+								<ChevronRightIcon className="size-4 group-data-[state=open]:hidden" />
+								<ChevronDownIcon className="hidden size-4 group-data-[state=open]:block" />
+							</div>
+						) : null}
 						{group.icon}
 						{group.name}
 						<span className="rounded-sm border px-1 text-muted-foreground text-xs">
 							{taskCount}
 						</span>
+
+						<div className="ml-auto">
+							<div
+								aria-label="create task"
+								role="button"
+								tabIndex={0}
+								className="text-muted-foreground hover:text-foreground"
+								onClick={(e) => {
+									e.stopPropagation();
+									handleCreateTask();
+								}}
+							>
+								<PlusIcon className="size-3.5" />
+							</div>
+						</div>
 					</button>
 				</ContextMenuTrigger>
 				<ContextMenuContent>
@@ -277,33 +302,5 @@ const GroupHeader = memo(function GroupHeader({
 				</ContextMenuContent>
 			</ContextMenu>
 		</div>
-	);
-});
-
-const CreateTaskButton = memo(function CreateTaskButton({
-	groupId,
-}: {
-	groupId: string;
-}) {
-	const { filters } = useTasksViewContext();
-	const createTaskPanel = useCreateTaskPanel();
-
-	const handleCreateTask = useCallback(() => {
-		createTaskPanel.open("create", {
-			statusId: groupId,
-			projectId:
-				filters.projectId?.length > 0 ? filters.projectId[0] : undefined,
-		});
-	}, [createTaskPanel, groupId, filters.projectId]);
-
-	return (
-		<Button
-			className="mb-2 w-full justify-start text-start text-muted-foreground text-xs hover:bg-transparent dark:hover:bg-transparent"
-			variant={"ghost"}
-			onClick={handleCreateTask}
-		>
-			<PlusIcon className="size-3.5" />
-			Create Task
-		</Button>
 	);
 });

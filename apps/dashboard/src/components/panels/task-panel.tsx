@@ -31,8 +31,6 @@ function TaskPanelContent({ panel }: { panel: PanelInstance }) {
 		);
 	}
 
-	console.log("Rendering TaskPanelContent for task:", task);
-
 	return (
 		<TaskForm
 			defaultValues={{

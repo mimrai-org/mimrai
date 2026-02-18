@@ -24,6 +24,7 @@ export const Description = ({
 							onChange={(value) => {
 								field.onChange(value);
 							}}
+							autoFocus
 							shouldInsertImage={true}
 							onUpload={async (url) => {
 								const currentValue = form.getValues("attachments") ?? [];
