@@ -10,11 +10,11 @@ export const ProjectBoardShareable = ({
 }) => {
 	const groupedTasks = tasks.data.reduce(
 		(groups, task) => {
-			const column = task.status.name || "Uncategorized";
+			const column = task.status?.name || "Uncategorized";
 			if (!groups[column]) {
 				groups[column] = {
 					tasks: [],
-					order: task.status.order || 0,
+					order: task.status?.order ?? Number.MAX_SAFE_INTEGER,
 				};
 			}
 			groups[column].tasks.push(task);
@@ -34,7 +34,7 @@ export const ProjectBoardShareable = ({
 	);
 
 	const findColumnByName = (name: string) => {
-		return tasks.data.find((task) => task.status.name === name)?.status;
+		return tasks.data.find((task) => task.status?.name === name)?.status;
 	};
 
 	const renderColumnIcon = (name: string) => {
@@ -60,7 +60,7 @@ export const ProjectBoardShareable = ({
 								<h4
 									className={cn("font-medium", {
 										"text-muted-foreground line-through":
-											task.status.type === "done",
+											task.status?.type === "done",
 									})}
 								>
 									{task.title}

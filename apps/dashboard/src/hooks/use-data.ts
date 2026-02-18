@@ -13,7 +13,7 @@ export type Agent = RouterOutputs["agents"]["get"]["data"][number];
 export type Document = RouterOutputs["documents"]["get"]["data"][number];
 export type DocumentDetail = RouterOutputs["documents"]["getById"];
 
-type EnrichedTask = Task & {
+export type EnrichedTask = Task & {
 	status: Status;
 	assignee?: Member;
 	creator: Member;

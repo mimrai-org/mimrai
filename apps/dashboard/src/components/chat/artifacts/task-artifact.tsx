@@ -30,7 +30,7 @@ export const TaskArtifact = ({ task }: { task: MessageDataParts["task"] }) => {
 	const taskWithStatus = useMemo(() => {
 		return {
 			...task,
-			status: statuses.data.find((s) => s.id === task.statusId),
+			status: statuses?.data.find((s) => s.id === task.statusId),
 		};
 	}, [task, statuses]);
 
@@ -47,7 +47,12 @@ export const TaskArtifact = ({ task }: { task: MessageDataParts["task"] }) => {
 					"inline-flex items-center gap-1.5 rounded-md border bg-muted/50 px-2 py-0.5 align-middle font-medium text-sm transition-colors hover:bg-muted",
 				)}
 			>
-				<StatusIcon {...taskWithStatus.status} className="size-3.5 shrink-0" />
+				{taskWithStatus.status && (
+					<StatusIcon
+						{...taskWithStatus.status}
+						className="size-3.5 shrink-0"
+					/>
+				)}
 				{taskWithStatus.sequence >= 0 && (
 					<span className="text-muted-foreground text-xs">
 						#{taskWithStatus.sequence}
@@ -56,7 +61,7 @@ export const TaskArtifact = ({ task }: { task: MessageDataParts["task"] }) => {
 				<span
 					className={cn(
 						"max-w-[350px] truncate",
-						taskWithStatus.status.type === "done" &&
+						taskWithStatus.status?.type === "done" &&
 							"text-muted-foreground line-through",
 					)}
 				>

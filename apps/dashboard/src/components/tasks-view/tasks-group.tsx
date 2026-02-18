@@ -6,6 +6,7 @@ import {
 	useQueryClient,
 } from "@tanstack/react-query";
 import { useMemo } from "react";
+import type { EnrichedTask, Task } from "@/hooks/use-data";
 import { trpc } from "@/utils/trpc";
 import { AssigneeAvatar } from "../asignee-avatar";
 import { MilestoneIcon } from "../milestone-icon";
@@ -14,7 +15,6 @@ import { StatusIcon } from "../status-icon";
 import { Priority } from "./properties/priority";
 import { useTasksViewContext } from "./tasks-view";
 
-export type Task = RouterOutputs["tasks"]["get"]["data"][number];
 export type Status = RouterOutputs["statuses"]["get"]["data"][number];
 export type TeamMember = RouterOutputs["teams"]["getMembers"][number];
 export type Project = RouterOutputs["projects"]["get"]["data"][number];
@@ -37,11 +37,11 @@ export type GenericGroup<O = any> = {
 };
 export type GroupByOption<O = any, D = GenericGroup<O>, DD = Array<D>> = {
 	label: string;
-	updateKey: keyof Task;
-	getGroupName: (item: Task) => string;
-	getData: (item: Task) => any;
-	updateData: (item: Partial<Task>, data: any) => void;
-	select: (tasks: Task[], group: O) => Task[];
+	updateKey: keyof EnrichedTask;
+	getGroupName: (item: EnrichedTask) => string;
+	getData: (item: EnrichedTask) => any;
+	updateData: (item: Partial<EnrichedTask>, data: any) => void;
+	select: (tasks: EnrichedTask[], group: O) => EnrichedTask[];
 
 	queryOptions: UseQueryOptions<any, any, DD, any>;
 };
@@ -65,7 +65,7 @@ export const tasksGroupByOptions: Record<TasksGroupBy, GroupByOption> = {
 	status: {
 		label: "Status",
 		updateKey: "statusId",
-		getGroupName: (item) => item.status.name || "No Status",
+		getGroupName: (item) => item.status?.name || "No Status",
 		getData: (item) => item.status,
 		updateData: (item, data) => {
 			item.status = data;
@@ -230,7 +230,10 @@ export const useTasksSorted = () => {
 			// Weight-based sorting: each criterion only breaks ties from the previous one
 			const comparisons = [
 				// Sort by status order (only when grouping by status)
-				filters.groupBy === "status" ? a.status.order - b.status.order : 0,
+				filters.groupBy === "status"
+					? (a.status?.order ?? Number.MAX_SAFE_INTEGER) -
+						(b.status?.order ?? Number.MAX_SAFE_INTEGER)
+					: 0,
 				// Sort by priority (urgent > high > medium > low)
 				(priorityOrder[a.priority ?? ""] ?? 5) -
 					(priorityOrder[b.priority ?? ""] ?? 5),

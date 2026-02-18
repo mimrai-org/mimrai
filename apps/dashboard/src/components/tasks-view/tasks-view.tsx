@@ -8,7 +8,7 @@ import {
 	useState,
 } from "react";
 import { useActivitiesRealtime } from "@/hooks/use-activities-realtime";
-import { useTasks } from "@/hooks/use-data";
+import { type EnrichedTask, useTasks } from "@/hooks/use-data";
 import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";
 import { useUser } from "../user-provider";
 import { TasksCalendar } from "./calendar/calendar";
@@ -32,7 +32,7 @@ export type TasksViewContextValue = {
 	filters: TasksViewContextFilters;
 	setFilters: (filters: Partial<TasksViewContextFilters>) => void;
 
-	tasks: RouterOutputs["tasks"]["get"]["data"];
+	tasks: EnrichedTask[];
 
 	fetchNextPage: () => void;
 	hasNextPage?: boolean;
