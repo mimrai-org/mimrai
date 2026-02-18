@@ -1,3 +1,4 @@
+import { AGENT_DEFAULT_MODEL } from "@mimir/utils/agents";
 import { and, eq, ilike, type SQL } from "drizzle-orm";
 import { db } from "..";
 import { agents, teams, users, usersOnTeams } from "../schema";
@@ -190,6 +191,9 @@ export const getMimirUser = async ({ teamId }: { teamId: string }) => {
 			teamId,
 			name: "Mimir",
 			isActive: true,
+			email,
+			model: AGENT_DEFAULT_MODEL,
+			description: "Mimir is a general purpose assistant",
 			soul: "You are Mimir, a helpful and concise assistant.",
 		});
 

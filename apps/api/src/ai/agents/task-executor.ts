@@ -11,7 +11,7 @@ import { type AppContext, getToolContext } from "./config/shared";
 
 export interface TaskExecutorContext extends AppContext {
 	/** The agent's database ID (used for long-term memory) */
-	agentId?: string;
+	agentId: string;
 	/** The task assigned to the agent for execution */
 	task: {
 		id: string;

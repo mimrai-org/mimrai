@@ -6,10 +6,12 @@ import { useEffect, useMemo, useRef } from "react";
 import { queryClient, trpc } from "@/utils/trpc";
 
 export type Task = RouterOutputs["tasks"]["get"]["data"][number];
-type Status = RouterOutputs["statuses"]["get"]["data"][number];
-type Member = RouterOutputs["teams"]["getMembers"][number];
-type Project = RouterOutputs["projects"]["get"]["data"][number];
+export type Status = RouterOutputs["statuses"]["get"]["data"][number];
+export type Member = RouterOutputs["teams"]["getMembers"][number];
+export type Project = RouterOutputs["projects"]["get"]["data"][number];
 export type Agent = RouterOutputs["agents"]["get"]["data"][number];
+export type Document = RouterOutputs["documents"]["get"]["data"][number];
+export type DocumentDetail = RouterOutputs["documents"]["getById"];
 
 type EnrichedTask = Task & {
 	status: Status;
@@ -242,6 +244,52 @@ export function useAgents(
 			},
 			{
 				...options,
+				staleTime: 5 * 60 * 1000, // 5 minutes
+			},
+		),
+	);
+}
+
+/**
+ * Hook for fetching documents.
+ * Supports filtering by parentId, search, labels, and pagination.
+ */
+export function useDocuments(
+	filters: RouterInputs["documents"]["get"] = {},
+	options?: {
+		enabled?: boolean;
+		refetchOnWindowFocus?: boolean;
+		refetchOnMount?: boolean;
+		staleTime?: number;
+	},
+) {
+	return useQuery(
+		trpc.documents.get.queryOptions(
+			{
+				...filters,
+			},
+			{
+				staleTime: 5 * 60 * 1000, // 5 minutes
+				...options,
+			},
+		),
+	);
+}
+
+/**
+ * Hook for fetching a single document by ID.
+ */
+export function useDocument(
+	id: string,
+	options?: {
+		enabled?: boolean;
+	},
+) {
+	return useQuery(
+		trpc.documents.getById.queryOptions(
+			{ id },
+			{
+				enabled: options?.enabled,
 				staleTime: 5 * 60 * 1000, // 5 minutes
 			},
 		),

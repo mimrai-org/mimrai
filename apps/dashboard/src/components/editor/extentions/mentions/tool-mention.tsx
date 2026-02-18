@@ -1,13 +1,8 @@
 "use client";
 
-import {
-	mergeAttributes,
-	Node,
-	type NodeViewProps,
-	NodeViewWrapper,
-	ReactNodeViewRenderer,
-} from "@tiptap/react";
-import { ToolCaseIcon } from "lucide-react";
+import { type NodeViewProps, NodeViewWrapper } from "@tiptap/react";
+import { WrenchIcon } from "lucide-react";
+import { createMentionNodeExtension } from "./mention-node-extension";
 import type { MentionItemRendererProps, ToolMentionEntity } from "./types";
 
 /**
@@ -19,9 +14,9 @@ export function ToolMentionListItem({
 }: MentionItemRendererProps<ToolMentionEntity>) {
 	return (
 		<>
-			<ToolCaseIcon className="size-5" />
+			<WrenchIcon className="size-4 text-muted-foreground" />
 			<div className="text-left">
-				<div className="truncate">{entity.name}</div>
+				<div className="truncate">{entity.label}</div>
 			</div>
 		</>
 	);
@@ -32,7 +27,7 @@ export function ToolMentionListItem({
  * Renders the tool mention inline in the editor
  */
 function ToolMentionNodeComponent({ node }: NodeViewProps) {
-	const { id, label, name, description } = node.attrs;
+	const { id, label } = node.attrs;
 
 	return (
 		<NodeViewWrapper as="span" className="inline">
@@ -41,8 +36,8 @@ function ToolMentionNodeComponent({ node }: NodeViewProps) {
 				data-mention-type="tool"
 				data-mention-id={id}
 			>
-				<ToolCaseIcon className="size-4" />
-				<span>@{label || name}</span>
+				<WrenchIcon className="size-4" />
+				<span>@{label}</span>
 			</span>
 		</NodeViewWrapper>
 	);
@@ -52,57 +47,20 @@ function ToolMentionNodeComponent({ node }: NodeViewProps) {
  * TipTap extension for tool mentions
  * Creates an inline node that renders the tool mention with icon
  */
-export const ToolMentionExtension = Node.create({
+export const ToolMentionExtension = createMentionNodeExtension({
 	name: "toolMention",
-	group: "inline",
-	inline: true,
-	selectable: true,
-	atom: true,
-
-	addAttributes() {
-		return {
-			id: {
-				default: null as string | null,
-			},
-			label: {
-				default: null as string | null,
-			},
-			name: {
-				default: null as string | null,
-			},
-			description: {
-				default: null as string | null,
-			},
-			color: {
-				default: null as string | null,
-			},
-		};
+	entityName: "tool",
+	mentionType: "tool",
+	className:
+		"inline-flex items-center gap-1 rounded-sm border bg-accent/50 px-1 py-0.5 font-medium text-sm",
+	attributes: {
+		id: {
+			default: null as string | null,
+		},
+		label: {
+			default: null as string | null,
+		},
 	},
-
-	parseHTML() {
-		return [
-			{
-				tag: 'span[data-mention-type="tool"]',
-			},
-		];
-	},
-
-	renderHTML({ HTMLAttributes }: { HTMLAttributes: Record<string, string> }) {
-		return [
-			"span",
-			mergeAttributes(
-				{
-					"data-mention-type": "tool",
-					class:
-						"inline-flex items-center gap-1 rounded-sm border bg-accent/50 px-1 py-0.5 font-medium text-sm",
-				},
-				HTMLAttributes,
-			),
-			`@${HTMLAttributes.label}`,
-		];
-	},
-
-	addNodeView() {
-		return ReactNodeViewRenderer(ToolMentionNodeComponent);
-	},
+	renderContent: (htmlAttributes) => `@${htmlAttributes.label ?? ""}`,
+	nodeView: ToolMentionNodeComponent,
 });

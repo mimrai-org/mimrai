@@ -208,6 +208,8 @@ export const createAgentFromDB = async ({
 
 	const agentConfig: AgentConfig = {
 		...dbConfig,
+		// Spread caller-provided config (tools, stopWhen, callbacks, etc.)
+		...config,
 
 		prepareStep: async ({ steps, ...rest }) => {
 			const parentPrepareStep = config.prepareStep
@@ -230,27 +232,23 @@ export const createAgentFromDB = async ({
 			};
 		},
 
-		// Spread caller-provided config (tools, stopWhen, callbacks, etc.)
-		...config,
-
 		// Always wrap buildInstructions so we can inject toolbox & soul context
 		buildInstructions: (ctx: AppContext) => {
 			const soul = agent?.soul ?? "You are a helpful AI assistant.";
 			const callerPrompt = config.buildInstructions?.(ctx) ?? "";
 
 			return `
-<toolboxes>
+## Toolboxes
 IMPORTANT: Your capabilities might be limited, but you can gain access to more tools by using the switchToolbox tool. Available toolboxes are:
 ${availableToolboxes.map((tb) => `- ${tb}`).join("\n")}
 
 Switching to a toolbox will grant you access to the tools within it, which can help you complete your tasks.
 Example: calling switchToolbox with the {toolbox: "github"} object parameter will give you access to tools that let you interact with GitHub, such as listing pull requests, creating issues, etc.
-</toolboxes>
 
-<soul>
+
+## Soul & Identity
 This is your soul definition, use it to guide your behavior and responses:
 ${soul}
-</soul>
 
 ${callerPrompt}`;
 		},

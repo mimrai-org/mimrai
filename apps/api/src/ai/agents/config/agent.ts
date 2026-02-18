@@ -11,6 +11,7 @@ import {
 	createUIMessageStream,
 	type GatewayModelId,
 	gateway,
+	type ModelMessage,
 	smoothStream,
 	ToolLoopAgent,
 	type ToolLoopAgentSettings,
@@ -173,11 +174,59 @@ export const createAgent = (config: AgentConfig) => {
 
 					const modelMessages = await convertToModelMessages(messages);
 
+					const seenToolCallIds = new Set<string>();
+					const seenToolResultsIds = new Set<string>();
+					const repairedMessages = modelMessages.map((msg) => {
+						if (typeof msg.content === "string") {
+							return msg;
+						}
+
+						return {
+							...msg,
+							content: msg.content
+								.map((content) => {
+									if (typeof content === "string") {
+										return content;
+									}
+
+									if (content.type === "tool-call") {
+										if (seenToolCallIds.has(content.toolCallId)) {
+											return null; // Skip duplicate tool call
+										}
+
+										seenToolCallIds.add(content.toolCallId);
+										return content;
+									}
+
+									if (content.type === "tool-result") {
+										if (seenToolResultsIds.has(content.toolCallId)) {
+											return null; // Skip duplicate tool result
+										}
+
+										seenToolResultsIds.add(content.toolCallId);
+										return content;
+									}
+
+									return content;
+								})
+								.filter((c) => c !== null), // Remove nulls
+						} as ModelMessage;
+					});
+
 					const stream = await agent.stream({
-						messages: modelMessages,
+						messages: repairedMessages,
 						experimental_transform: smoothStream({ chunking: "word" }),
 					});
-					writer.merge(stream.toUIMessageStream());
+					writer.merge(
+						stream.toUIMessageStream({
+							sendReasoning: true,
+							messageMetadata({ part }) {
+								return {
+									agentId: params.context.agentId,
+								};
+							},
+						}),
+					);
 				},
 			});
 		},

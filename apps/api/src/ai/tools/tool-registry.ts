@@ -22,6 +22,8 @@ import { createCalendarEventTool } from "./create-calendar-event";
 // Assistant job tools
 // Checklist/subtask tools
 import { createChecklistItemTool } from "./create-checklist-item";
+// Document tools
+import { createDocumentTool } from "./create-document";
 import { createDraftEmailTool } from "./create-draft-email";
 import { createLabelTool } from "./create-label";
 import { createMilestoneTool } from "./create-milestone";
@@ -30,9 +32,12 @@ import { createProjectTool } from "./create-project";
 import { createTaskTool } from "./create-task";
 import { createTaskCommentTool } from "./create-task-comment";
 import { deleteCalendarEventTool } from "./delete-calendar-event";
+import { deleteDocumentTool } from "./delete-document";
 import { getAgentsTool } from "./get-agents";
 import { getCalendarEventsTool } from "./get-calendar-events";
 import { getChecklistItemsTool } from "./get-checklist-item";
+import { getDocumentByIdTool } from "./get-document-by-id";
+import { getDocumentsTool } from "./get-documents";
 import { getEmailsTool } from "./get-emails";
 import { getLabelsTool } from "./get-labels";
 // Milestone tools
@@ -48,6 +53,7 @@ import { getUsersTool } from "./get-users";
 import { sendDraftEmailTool } from "./send-draft-email";
 import { updateCalendarEventTool } from "./update-calendar-event";
 import { updateChecklistItemTool } from "./update-checklist-item";
+import { updateDocumentTool } from "./update-document";
 import { updateMilestoneTool } from "./update-milestone";
 import { updateProjectTool } from "./update-project";
 import { updateTaskTool } from "./update-task";
@@ -89,6 +95,13 @@ export const taskManagementTools = {
 	getMilestones: getMilestonesTool,
 	createMilestone: createMilestoneTool,
 	updateMilestone: updateMilestoneTool,
+
+	// Documents (knowledge base)
+	getDocuments: getDocumentsTool,
+	getDocumentById: getDocumentByIdTool,
+	createDocument: createDocumentTool,
+	updateDocument: updateDocumentTool,
+	deleteDocument: deleteDocumentTool,
 
 	// Toolbox
 	switchToolbox: switchToolboxTool,

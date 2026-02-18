@@ -8,7 +8,7 @@ import type { Context } from "@api/rest/types";
 import { chatRequestSchema } from "@api/schemas/chat";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { calculateTokenUsageCost } from "@mimir/billing";
-import { getAgentById } from "@mimir/db/queries/agents";
+import { getAgentById, getDocumentsForAgent } from "@mimir/db/queries/agents";
 import { recordCreditUsage } from "@mimir/db/queries/credits";
 import { getTeamById } from "@mimir/db/queries/teams";
 import { AGENT_DEFAULT_MODEL } from "@mimir/utils/agents";
@@ -62,11 +62,18 @@ app.post("/", withPlanFeatures(["ai"]), async (c) => {
 		];
 	}
 
+	const documents = await getDocumentsForAgent({
+		agentId: agentId!,
+		teamId,
+	});
+
 	const appContext = buildAppContext(
 		{
 			...userContext,
 			artifactSupport: true,
 			integrationType: "web",
+			documentsOfInterest: documents,
+			agentId: agentId!,
 			// contextItems,
 		},
 		id,
@@ -77,7 +84,7 @@ app.post("/", withPlanFeatures(["ai"]), async (c) => {
 		agentId,
 		teamId,
 		toolboxes: allTools.toolboxes,
-		defaultActiveToolboxes: ["taskManagement", "research"],
+		defaultActiveToolboxes: ["taskManagement", "research", "memory"],
 		config: {
 			tools: {
 				...allTools.tools,

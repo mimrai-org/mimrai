@@ -6,7 +6,7 @@ import {
 } from "@mimir/db/queries/agent-memories";
 import { tool } from "ai";
 import z from "zod";
-import { getToolContext } from "../agents/config/shared";
+import { type AppContext, getToolContext } from "../agents/config/shared";
 import type { TaskExecutorContext } from "../agents/task-executor";
 
 /**
@@ -55,8 +55,8 @@ export const saveAgentMemoryTool = tool({
 			),
 	}),
 	execute: async (input, executionOptions) => {
-		const ctx = getToolContext(executionOptions) as TaskExecutorContext;
-		const agentId = resolveAgentId(ctx);
+		const ctx = getToolContext(executionOptions) as AppContext;
+		const agentId = ctx.agentId;
 
 		if (!agentId) {
 			return { success: false, error: "No agent identity found in context" };
@@ -69,7 +69,6 @@ export const saveAgentMemoryTool = tool({
 			title: input.title,
 			content: input.content,
 			tags: input.tags,
-			sourceTaskId: ctx.task?.id,
 		});
 
 		return {

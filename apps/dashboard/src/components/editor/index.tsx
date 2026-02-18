@@ -7,6 +7,7 @@ import {
 	type Editor as EditorInstance,
 	useEditor,
 } from "@tiptap/react";
+import { useEffect } from "react";
 import { BubbleMenu } from "./extentions/bubble-menu";
 import { registerExtensions } from "./extentions/register";
 
@@ -56,7 +57,7 @@ export function Editor({
 				shouldInsertImage,
 			}),
 			content: value,
-
+			contentType: "markdown",
 			immediatelyRender: false,
 			shouldRerenderOnTransaction: false,
 			editable: !readOnly,
@@ -66,12 +67,21 @@ export function Editor({
 			onUpdate: ({ editor }) => {
 				// @ts-expect-error
 				if (ref) ref.current = editor;
-				onChange?.(editor.getHTML());
+				onChange?.(editor.getMarkdown());
 				onUpdate?.(editor);
 			},
 		},
 		[],
 	);
+
+	useEffect(() => {
+		if (editor) {
+			const chain = editor.chain();
+			if (autoFocus) chain.focus().setTextSelection(0);
+			else chain.blur();
+			chain.run();
+		}
+	}, [autoFocus, editor]);
 
 	if (!editor) return null;
 

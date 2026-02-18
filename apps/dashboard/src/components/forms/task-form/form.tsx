@@ -30,6 +30,7 @@ import { TaskChecklist } from "./checklist";
 import { CommentInput } from "./comment-input";
 import { Description } from "./description";
 import { TaskDuplicated } from "./duplicated";
+import { TaskExecution } from "./execution";
 import { taskFormSchema } from "./form-type";
 import { TaskFormProperties } from "./properties";
 import { SmartInput } from "./smart-input";
@@ -100,6 +101,22 @@ export const TaskForm = ({
 		}),
 	);
 
+	const {
+		mutate: updateTaskDescription,
+		isPending: isPendingUpdateDescription,
+	} = useMutation(
+		trpc.tasks.updateDescription.mutationOptions({
+			onError: (error) => {
+				toast.error("Failed to update task description", {
+					id: "update-task-description",
+				});
+			},
+			onSuccess: (task) => {
+				updateTaskInCache(task);
+			},
+		}),
+	);
+
 	const title = form.watch("title");
 	const [debouncedTitle] = useDebounceValue(title, 500);
 
@@ -113,6 +130,18 @@ export const TaskForm = ({
 
 	const onSubmit = async (data: z.infer<typeof taskFormSchema>) => {
 		const mentions = parseMentions(editorRef.current?.getJSON() || {});
+		// If only description was changed, call the update description endpoint to avoid updating other fields and losing concurrent updates on them
+		if (
+			data.id &&
+			Object.keys(form.formState.dirtyFields).length === 1 &&
+			form.formState.dirtyFields.description
+		) {
+			updateTaskDescription({
+				id: data.id,
+				description: data.description ?? undefined,
+			});
+			return;
+		}
 
 		if (data.id) {
 			// Update existing task
@@ -166,13 +195,17 @@ export const TaskForm = ({
 											<TaskDuplicated title={debouncedTitle} />
 										</div>
 									)}
+									<div className="my-4 px-4">
+										<TaskFormProperties />
+									</div>
 								</div>
 
 								<div className="gap-4 px-4">
 									<div className="space-y-4">
 										<Description editorRef={editorRef} />
-										<div className="mb-4">
-											<TaskFormProperties />
+
+										<div className="mt-4">
+											<TaskExecution />
 										</div>
 
 										<div className="flex flex-wrap items-center justify-between gap-2">

@@ -1,5 +1,11 @@
 "use client";
 import { AnimatePresence } from "motion/react";
+import {
+	CREATE_DOCUMENT_PANEL_TYPE,
+	CreateDocumentPanel,
+	DOCUMENT_PANEL_TYPE,
+	DocumentPanel,
+} from "./document-panel";
 import { usePanels } from "./panel-context";
 import {
 	CLONE_TASK_PANEL_TYPE,
@@ -48,6 +54,22 @@ export function PanelStack() {
 					// Add more panel types here:
 					// case PROJECT_PANEL_TYPE:
 					//   return <ProjectPanel key={`${panel.type}-${panel.id}`} panel={panel} index={index} />;
+					case DOCUMENT_PANEL_TYPE:
+						return (
+							<DocumentPanel
+								key={`${panel.type}-${panel.id}`}
+								panel={panel}
+								index={index}
+							/>
+						);
+					case CREATE_DOCUMENT_PANEL_TYPE:
+						return (
+							<CreateDocumentPanel
+								key={`${panel.type}-${panel.id}`}
+								panel={panel}
+								index={index}
+							/>
+						);
 					default:
 						return null;
 				}

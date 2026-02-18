@@ -11,18 +11,18 @@ export const useActivitiesRealtime = () => {
 		events: ["activities.created"],
 
 		onData: async (event) => {
-			if (event.data.type === "task_created") {
-				// Fetch the task details and update the cache
-				const task = await queryClient.fetchQuery(
-					trpc.tasks.getById.queryOptions({
-						id: event.data.groupId,
-					}),
-				);
-				if (task) {
-					addTaskToCache(task);
-				}
-				return;
-			}
+			// if (event.data.type === "task_created") {
+			// 	// Fetch the task details and update the cache
+			// 	const task = await queryClient.fetchQuery(
+			// 		trpc.tasks.getById.queryOptions({
+			// 			id: event.data.groupId,
+			// 		}),
+			// 	);
+			// 	if (task) {
+			// 		addTaskToCache(task);
+			// 	}
+			// 	return;
+			// }
 
 			const payload: Partial<Task> = {
 				id: event.data.groupId,

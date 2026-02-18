@@ -12,6 +12,7 @@ import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import { useUser } from "@/components/user-provider";
 import { useChatStatus } from "@/hooks/use-chat-status";
+import { useAgents } from "@/hooks/use-data";
 import { Conversation, ConversationContent } from "../ai-elements/conversation";
 import { Message, MessageAvatar, MessageContent } from "../ai-elements/message";
 import {
@@ -95,6 +96,8 @@ export const Messages = ({ isStreaming }: { isStreaming?: boolean }) => {
 		status,
 	);
 
+	const { data: agents } = useAgents();
+
 	return (
 		<Conversation className="h-full w-full">
 			<ConversationContent>
@@ -165,6 +168,12 @@ export const Messages = ({ isStreaming }: { isStreaming?: boolean }) => {
 							uniqueSources.length > 0 &&
 							message.role === "assistant" &&
 							isMessageFinished;
+
+						// Get agent info for tool call status indicators
+						const agentId = message.metadata?.agentId;
+
+						console.log({ agentId, textParts });
+						const agent = agents?.data.find((agent) => agent.id === agentId);
 
 						return (
 							<motion.div
@@ -291,10 +300,15 @@ export const Messages = ({ isStreaming }: { isStreaming?: boolean }) => {
 												<Response>{textContent}</Response>
 											</MessageContent>
 										</div>
-										{message.role === "user" && (
+										{message.role === "user" ? (
 											<MessageAvatar
 												src={user?.image || ""}
 												name={user?.name ?? "User"}
+											/>
+										) : (
+											<MessageAvatar
+												src={agent?.avatar || ""}
+												name={agent?.name || "Assistant"}
 											/>
 										)}
 									</Message>

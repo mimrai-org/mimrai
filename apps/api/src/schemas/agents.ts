@@ -47,3 +47,17 @@ export const getAgentMemoriesSchema = z.object({
 export const deleteAgentMemorySchema = z.object({
 	id: z.string(),
 });
+
+export const getDocumentsForAgentSchema = z.object({
+	agentId: z.string(),
+});
+
+export const addDocumentToAgentSchema = z.object({
+	agentId: z.string(),
+	documentId: z.string(),
+});
+
+export const removeDocumentFromAgentSchema = z.object({
+	agentId: z.string(),
+	documentId: z.string(),
+});

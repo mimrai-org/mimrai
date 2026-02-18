@@ -1,23 +1,19 @@
 "use client";
 
+import type { RouterOutputs } from "@mimir/trpc";
 import { useQuery } from "@tanstack/react-query";
-import {
-	mergeAttributes,
-	Node,
-	type NodeViewProps,
-	NodeViewWrapper,
-	ReactNodeViewRenderer,
-} from "@tiptap/react";
-import { CheckCircle2Icon, CircleIcon, Loader2Icon } from "lucide-react";
+import { type NodeViewProps, NodeViewWrapper } from "@tiptap/react";
+import { Skeleton } from "@ui/components/ui/skeleton";
+import { CheckCircle2Icon, CircleIcon } from "lucide-react";
+import { useMemo } from "react";
 import { useTaskPanel } from "@/components/panels/task-panel";
 import { StatusIcon } from "@/components/status-icon";
+import { TaskContextMenu } from "@/components/task-context-menu";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/utils/trpc";
-import type {
-	MentionItemRendererProps,
-	MentionNodeProps,
-	TaskMentionEntity,
-} from "./types";
+import { getCachedTaskFromList } from "./cache";
+import { createMentionNodeExtension } from "./mention-node-extension";
+import type { MentionItemRendererProps, TaskMentionEntity } from "./types";
 
 /**
  * Task mention list item renderer
@@ -26,7 +22,7 @@ import type {
 export function TaskMentionListItem({
 	entity,
 }: MentionItemRendererProps<TaskMentionEntity>) {
-	const isCompleted = entity.status === "done" || entity.completed;
+	const isCompleted = Boolean(entity.completed);
 
 	return (
 		<>
@@ -59,18 +55,56 @@ export function TaskMentionListItem({
  */
 function TaskMentionNodeComponent({ node }: NodeViewProps) {
 	const { id, label, sequence } = node.attrs;
+	const taskId = id as string;
 	const taskPanel = useTaskPanel();
+	const cachedTask = useMemo(() => getCachedTaskFromList(taskId), [taskId]);
 
 	// Fetch current task status - this ensures we always show the latest state
 	const { data: task, isLoading } = useQuery(
 		trpc.tasks.getById.queryOptions({
-			id: id as string,
+			id: taskId,
 		}),
 	);
 
 	// Use fetched status, fallback to stored status only while loading
-	const isCompleted = task?.status?.type === "done";
-	const currentSequence = task?.sequence ?? sequence;
+	const isCompleted =
+		task?.status?.type === "done" || Boolean(cachedTask?.completedAt);
+	const currentSequence = task?.sequence ?? cachedTask?.sequence ?? sequence;
+	const displayTaskTitle = task?.title ?? cachedTask?.title ?? label;
+	const contextMenuTask = (task ?? cachedTask) as
+		| RouterOutputs["tasks"]["get"]["data"][number]
+		| undefined;
+	const mentionContent = (
+		<div
+			className={cn(
+				"inline-flex items-center gap-1.5 rounded-md border bg-muted/50 px-2 py-0.5 align-middle font-medium text-sm transition-colors hover:bg-muted",
+				isCompleted && "opacity-70",
+			)}
+			data-mention-type="task"
+			data-mention-id={id}
+		>
+			{task?.status ? (
+				<StatusIcon {...task.status} className="size-3.5 shrink-0" />
+			) : isCompleted ? (
+				<CheckCircle2Icon className="size-3.5 shrink-0 text-green-500" />
+			) : (
+				<CircleIcon className="size-3.5 shrink-0 text-muted-foreground" />
+			)}
+			{currentSequence >= 0 && (
+				<span className="text-muted-foreground text-xs">
+					#{currentSequence}
+				</span>
+			)}
+			<span
+				className={cn(
+					"max-w-[350px] truncate",
+					isCompleted && "text-muted-foreground line-through",
+				)}
+			>
+				{displayTaskTitle}
+			</span>
+		</div>
+	);
 
 	return (
 		<NodeViewWrapper
@@ -78,36 +112,18 @@ function TaskMentionNodeComponent({ node }: NodeViewProps) {
 			type="button"
 			className="inline"
 			onClick={() => {
-				taskPanel.open(task?.id);
+				taskPanel.open(task?.id ?? taskId);
 			}}
 		>
-			<span
-				className={cn(
-					"inline-flex items-center gap-1.5 rounded-md border bg-muted/50 px-2 py-0.5 align-middle font-medium text-sm transition-colors hover:bg-muted",
-					isCompleted && "opacity-70",
-				)}
-				data-mention-type="task"
-				data-mention-id={id}
-			>
-				{isLoading ? (
-					<Loader2Icon className="size-3.5 shrink-0 animate-spin text-muted-foreground" />
-				) : (
-					<StatusIcon {...task.status} className="size-3.5 shrink-0" />
-				)}
-				{currentSequence >= 0 && (
-					<span className="text-muted-foreground text-xs">
-						#{currentSequence}
-					</span>
-				)}
-				<span
-					className={cn(
-						"max-w-[350px] truncate",
-						isCompleted && "text-muted-foreground line-through",
-					)}
-				>
-					{task?.title ?? label}
-				</span>
-			</span>
+			{isLoading && !contextMenuTask ? (
+				<Skeleton className="h-8 w-24 rounded-md" />
+			) : contextMenuTask ? (
+				<TaskContextMenu task={contextMenuTask}>
+					{mentionContent}
+				</TaskContextMenu>
+			) : (
+				mentionContent
+			)}
 		</NodeViewWrapper>
 	);
 }
@@ -117,54 +133,26 @@ function TaskMentionNodeComponent({ node }: NodeViewProps) {
  * Creates an inline node that renders the task mention with checkbox and title
  * Note: Only id, label, and sequence are stored - status is fetched dynamically
  */
-export const TaskMentionExtension = Node.create({
+export const TaskMentionExtension = createMentionNodeExtension({
 	name: "taskMention",
-	group: "inline",
-	inline: true,
-	selectable: true,
-	atom: true,
-
-	addAttributes() {
-		return {
-			id: {
-				default: null as string | null,
-			},
-			label: {
-				default: null as string | null,
-			},
-			sequence: {
-				default: null as number | null,
-			},
-		};
+	entityName: "task",
+	mentionType: "task",
+	className:
+		"inline-flex items-center gap-1.5 rounded-md border bg-muted/50 px-2 py-0.5 font-medium text-sm",
+	attributes: {
+		id: {
+			default: null as string | null,
+		},
+		label: {
+			default: null as string | null,
+		},
+		sequence: {
+			default: null as number | null,
+		},
 	},
-
-	parseHTML() {
-		return [
-			{
-				tag: 'span[data-mention-type="task"]',
-			},
-		];
-	},
-
-	renderHTML({ HTMLAttributes }: { HTMLAttributes: Record<string, unknown> }) {
-		// Note: We don't include status in HTML output since it's fetched dynamically
-		return [
-			"span",
-			mergeAttributes(
-				{
-					"data-mention-type": "task",
-					"data-mention-id": HTMLAttributes.id,
-					class:
-						"inline-flex items-center gap-1.5 rounded-md border bg-muted/50 px-2 py-0.5 font-medium text-sm",
-				},
-				HTMLAttributes,
-			),
-			HTMLAttributes.sequence ? `#${HTMLAttributes.sequence} ` : "",
-			HTMLAttributes.label,
-		];
-	},
-
-	addNodeView() {
-		return ReactNodeViewRenderer(TaskMentionNodeComponent);
-	},
+	renderContent: (htmlAttributes) => [
+		htmlAttributes.sequence ? `#${htmlAttributes.sequence} ` : "",
+		String(htmlAttributes.label ?? ""),
+	],
+	nodeView: TaskMentionNodeComponent,
 });

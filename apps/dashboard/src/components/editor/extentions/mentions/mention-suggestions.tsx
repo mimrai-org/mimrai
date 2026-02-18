@@ -27,21 +27,14 @@ const updatePosition = (editor: Editor, element: HTMLElement) => {
 	});
 };
 
-/**
- * Determine the node type to insert based on entity type
- */
-function getNodeTypeForEntity(type: MentionEntityType): string {
-	switch (type) {
-		case "user":
-			return "userMention";
-		case "task":
-			return "taskMention";
-		case "tool":
-			return "toolMention";
-		default:
-			return "mention";
-	}
-}
+const mentionNodeTypeMap = {
+	user: "userMention",
+	task: "taskMention",
+	document: "documentMention",
+	project: "mention",
+	milestone: "mention",
+	tool: "toolMention",
+} as const satisfies Record<MentionEntityType, string>;
 
 /**
  * Build unified suggestion options for the @ mention trigger
@@ -66,7 +59,7 @@ export function buildUnifiedSuggestionOptions(
 				onMention?.(props.id as string, props.label ?? "", entityType);
 			}
 
-			const nodeType = getNodeTypeForEntity(entityType);
+			const nodeType = mentionNodeTypeMap[entityType];
 
 			editor
 				.chain()

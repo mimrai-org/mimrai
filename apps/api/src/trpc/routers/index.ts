@@ -8,6 +8,7 @@ import { autopilotSettingsRouter } from "./autopilot-settings";
 import { billingRouter } from "./billing";
 import { chatRouter } from "./chats";
 import { checklistsRouter } from "./checklists";
+import { documentsRouter } from "./documents";
 import { chatFeedbackRouter } from "./feedback";
 import { githubRouter } from "./github";
 import { globalSearchRouter } from "./global-search";
@@ -76,6 +77,7 @@ export const appRouter = router({
 	shareable: shareableRouter,
 	tasksSuggestions: tasksSuggestionsRouter,
 	taskViews: taskViewsRouter,
+	documents: documentsRouter,
 	globalSearch: globalSearchRouter,
 	onboarding: onboardingRouter,
 	zen: zenRouter,

@@ -8,7 +8,9 @@ import {
 	SidebarMenuItem,
 } from "@ui/components/ui/sidebar";
 import {
+	BotIcon,
 	ClipboardClockIcon,
+	FileTextIcon,
 	HomeIcon,
 	InboxIcon,
 	SettingsIcon,
@@ -23,7 +25,11 @@ export function SidebarWorkspace() {
 
 	const isInboxActive = pathname === `${user.basePath}/inbox`;
 	const isRecurringActive = pathname === `${user.basePath}/recurring`;
+	const isDocumentsActive = pathname.startsWith(`${user.basePath}/documents`);
 	const isSettingsActive = pathname.startsWith(`${user.basePath}/settings`);
+	// const isAgentsActive = pathname.startsWith(
+	// 	`${user.basePath}/settings/agents`,
+	// );
 
 	return (
 		<SidebarGroup>
@@ -34,6 +40,22 @@ export function SidebarWorkspace() {
 							<Link href={`${user.basePath}`}>
 								<HomeIcon />
 								<span>Home</span>
+							</Link>
+						</SidebarMenuButton>
+					</SidebarMenuItem>
+					{/* <SidebarMenuItem>
+						<SidebarMenuButton asChild isActive={isAgentsActive}>
+							<Link href={`${user.basePath}/settings/agents`}>
+								<BotIcon />
+								<span>Agents</span>
+							</Link>
+						</SidebarMenuButton>
+					</SidebarMenuItem> */}
+					<SidebarMenuItem>
+						<SidebarMenuButton asChild isActive={isDocumentsActive}>
+							<Link href={`${user.basePath}/documents`}>
+								<FileTextIcon />
+								<span>Documents</span>
 							</Link>
 						</SidebarMenuButton>
 					</SidebarMenuItem>

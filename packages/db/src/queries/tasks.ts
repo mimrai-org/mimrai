@@ -631,6 +631,35 @@ export const updateTask = async ({
 	return task;
 };
 
+export const updateTaskDescription = async ({
+	id,
+	description,
+	userId,
+	teamId,
+}: {
+	id: string;
+	description: string;
+	userId: string;
+	teamId: string;
+}) => {
+	const whereClause: SQL[] = [eq(tasks.id, id), eq(tasks.teamId, teamId)];
+
+	const [task] = await db
+		.update(tasks)
+		.set({
+			description,
+			updatedAt: new Date().toISOString(),
+		})
+		.where(and(...whereClause))
+		.returning();
+
+	if (!task) {
+		throw new Error("Failed to update task description");
+	}
+
+	return task;
+};
+
 export const bulkUpdateTask = async ({
 	ids,
 	userId,

@@ -5,6 +5,7 @@
 export type MentionEntityType =
 	| "user"
 	| "task"
+	| "document"
 	| "project"
 	| "milestone"
 	| "tool";
@@ -42,6 +43,12 @@ export interface TaskMentionEntity extends MentionableEntity {
 	completed?: boolean;
 }
 
+export interface DocumentMentionEntity extends MentionableEntity {
+	type: "document";
+	name: string;
+	icon?: string | null;
+}
+
 export interface ToolMentionEntity extends MentionableEntity {
 	type: "tool";
 	name: string;
@@ -71,6 +78,7 @@ export interface MilestoneMentionEntity extends MentionableEntity {
 export type AnyMentionEntity =
 	| UserMentionEntity
 	| TaskMentionEntity
+	| DocumentMentionEntity
 	| ProjectMentionEntity
 	| MilestoneMentionEntity
 	| ToolMentionEntity;

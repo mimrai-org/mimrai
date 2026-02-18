@@ -28,6 +28,10 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { useUser } from "@/components/user-provider";
 import { useProjects, useStatuses, useTeamMembers } from "@/hooks/use-data";
+import {
+	invalidateTasksCache,
+	updateTaskInCache,
+} from "@/hooks/use-data-cache-helpers";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { queryClient, trpc } from "@/utils/trpc";
 import { Assignee, AssigneeAvatar } from "./asignee-avatar";
@@ -68,8 +72,7 @@ export const TaskContextMenu = ({
 				toast.success("Task deleted", {
 					id: "delete-task",
 				});
-				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
-				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
+				invalidateTasksCache();
 			},
 			onError: () => {
 				toast.error("Failed to delete task", {
@@ -85,12 +88,11 @@ export const TaskContextMenu = ({
 					id: "update-task",
 				});
 			},
-			onSuccess: () => {
+			onSuccess: (task) => {
 				toast.success("Task updated", {
 					id: "update-task",
 				});
-				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
-				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
+				updateTaskInCache(task);
 			},
 			onError: () => {
 				toast.error("Failed to update task", {

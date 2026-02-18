@@ -164,6 +164,21 @@ export const tasksRouter = router({
 
 			return task;
 		}),
+	updateDescription: protectedProcedure
+		.input(
+			updateTaskSchema.pick({
+				id: true,
+				description: true,
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			return updateTask({
+				...input,
+				userId: ctx.user.id,
+				teamId: ctx.user.teamId!,
+			});
+		}),
+
 	bulkUpdate: protectedProcedure
 		.input(bulkUpdateTaskSchema)
 		.mutation(async ({ ctx, input }) => {

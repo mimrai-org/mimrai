@@ -38,6 +38,20 @@ export function getToolContext(
 
 export function formatContextForLLM(context: AppContext): string {
 	return `
+## Documents
+Documents are a source of knowledge for the workspace. They can contain important information about projects, processes, or general knowledge.
+Always refer to documents when answering questions or providing information. Use tools like getDocuments to find relevant documents and extract information from them.
+You can also manage documents by creating summaries, linking them to projects or tasks, and keeping them organized for easy access.
+
+### Relevant documents specified for your reference:
+The human has specified the following documents as relevant for your reference. Always refer to these documents when providing information or answering questions, as they contain important context about the workspace and its operations.
+Use getDocumentById tool to access the content of these documents when needed.
+${
+	context.documentsOfInterest
+		?.map((doc) => `- ${doc.name} (ID: ${doc.id})`)
+		.join("\n") ?? "No specific documents provided."
+}
+
 ## Team & User Information
 User: ${context.fullName}
 User ID: ${context.userId}
@@ -63,6 +77,7 @@ export const COMMON_AGENT_RULES = `<behavior-rules>
 
 export interface AppContext {
 	userId: string;
+	agentId: string;
 	behalfUserId: string;
 	fullName: string;
 	teamName: string;
@@ -79,7 +94,10 @@ export interface AppContext {
 	artifactSupport?: boolean;
 	additionalContext: string;
 	integrationType: "web" | "slack" | "whatsapp" | "mattermost";
-	contextItems?: Array<ContextItem>;
+	documentsOfInterest?: Array<{
+		id: string;
+		name: string;
+	}>;
 	writer?: UIMessageStreamWriter<UIChatMessage>;
 	// Allow additional properties to satisfy Record<string, unknown> constraint
 	[key: string]: unknown;
@@ -88,14 +106,19 @@ export interface AppContext {
 export function buildAppContext(
 	context: ChatUserContext & {
 		artifactSupport?: boolean;
-		contextItems?: Array<ContextItem>;
 		behalfUserId?: string;
+		agentId: string;
+		documentsOfInterest?: Array<{
+			id: string;
+			name: string;
+		}>;
 		integrationType: "web" | "slack" | "whatsapp" | "mattermost";
 	},
 	chatId: string,
 ): AppContext {
 	return {
 		userId: context.userId,
+		agentId: context.agentId,
 		behalfUserId: context.behalfUserId || context.userId,
 		fullName: context.fullName ?? "",
 		teamName: context.teamName ?? "",
@@ -113,7 +136,7 @@ export function buildAppContext(
 		artifactSupport: context.artifactSupport ?? false,
 		additionalContext: context.additionalContext ?? "",
 		integrationType: context.integrationType,
-		contextItems: context.contextItems ?? [],
+		documentsOfInterest: context.documentsOfInterest ?? [],
 	};
 }
 

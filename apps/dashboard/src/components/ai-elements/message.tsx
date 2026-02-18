@@ -1,8 +1,10 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@mimir/ui/avatar";
+import { type Avatar, AvatarFallback, AvatarImage } from "@mimir/ui/avatar";
 import type { UIMessage } from "ai";
 import { cva, type VariantProps } from "class-variance-authority";
+import { Facehash } from "facehash";
 import type { ComponentProps, HTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
+import { AssigneeAvatar } from "../asignee-avatar";
 
 export type MessageProps = HTMLAttributes<HTMLDivElement> & {
 	from: UIMessage["role"];
@@ -11,7 +13,7 @@ export type MessageProps = HTMLAttributes<HTMLDivElement> & {
 export const Message = ({ className, from, ...props }: MessageProps) => (
 	<div
 		className={cn(
-			"group flex w-full items-end justify-end gap-2",
+			"group flex w-full items-start justify-end gap-2",
 			from === "user" ? "is-user" : "is-assistant flex-row-reverse justify-end",
 			className,
 		)}
@@ -25,7 +27,7 @@ const messageContentVariants = cva(
 		variants: {
 			variant: {
 				contained: [
-					"max-w-[80%] py-3",
+					"max-w-[80%] py-0",
 					"group-[.is-user]:border-none group-[.is-user]:bg-transparent group-[.is-user]:px-4 group-[.is-user]:text-foreground",
 					"group-[.is-assistant]:border-none group-[.is-assistant]:bg-transparent group-[.is-assistant]:text-foreground",
 				],
@@ -69,8 +71,5 @@ export const MessageAvatar = ({
 	className,
 	...props
 }: MessageAvatarProps) => (
-	<Avatar className={cn("size-7", className)} {...props}>
-		<AvatarImage alt="" className="mt-0 mb-0" src={src} />
-		<AvatarFallback>{name?.slice(0, 1) || "ME"}</AvatarFallback>
-	</Avatar>
+	<AssigneeAvatar image={src} name={name} className={className} {...props} />
 );

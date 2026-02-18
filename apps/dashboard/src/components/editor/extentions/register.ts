@@ -1,19 +1,17 @@
 // You can find the list of extensions here: https://tiptap.dev/docs/editor/extensions/functionality
 
 import { getApiUrl } from "@mimir/utils/envs";
-import CodeBlock from "@tiptap/extension-code-block";
 import FileHandler from "@tiptap/extension-file-handler";
 import Image from "@tiptap/extension-image";
-import Link from "@tiptap/extension-link";
 import { ListKit } from "@tiptap/extension-list";
 import Mention from "@tiptap/extension-mention";
 import Placeholder from "@tiptap/extension-placeholder";
 import { TableKit } from "@tiptap/extension-table";
-import Underline from "@tiptap/extension-underline";
+import { Markdown } from "@tiptap/markdown";
 import { mergeAttributes } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { Markdown } from "tiptap-markdown";
 import { CommentMark } from "./comment-mark";
+import { DocumentMentionExtension } from "./mentions/document-mention";
 import { buildUnifiedSuggestionOptions } from "./mentions/mention-suggestions";
 import { TaskMentionExtension } from "./mentions/task-mention";
 import { ToolMentionExtension } from "./mentions/tool-mention";
@@ -46,6 +44,7 @@ const extensions = ({
 	// Custom mention node extensions for rendering mentions as React components
 	UserMentionExtension,
 	TaskMentionExtension,
+	DocumentMentionExtension,
 	ToolMentionExtension,
 	// Unified mention extension with single @ trigger for all entity types
 	Mention.configure({

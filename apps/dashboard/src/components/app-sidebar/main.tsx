@@ -69,7 +69,7 @@ export const AppSidebarWrapper = ({
 	return (
 		<div
 			className={cn(
-				"relative flex flex-1 flex-col rounded-lg bg-background p-6",
+				"relative flex max-h-[calc(100vh-48px)] flex-1 flex-col rounded-lg bg-background p-4 [&:has([data-slot=sidebar-wrapper])]:p-0",
 				{
 					"max-w-[calc(100vw-256px)]": open,
 				},

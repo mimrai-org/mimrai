@@ -6,6 +6,7 @@ import { SaveIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import Loader from "@/components/loader";
+import { updateProjectInCache } from "@/hooks/use-data-cache-helpers";
 import { useProjectParams } from "@/hooks/use-project-params";
 import { useFormAutoSave, useZodForm } from "@/hooks/use-zod-form";
 import { queryClient, trpc } from "@/utils/trpc";
@@ -61,15 +62,11 @@ export const ProjectForm = ({
 			onSuccess: (updated) => {
 				if (!updated) return;
 
-				queryClient.invalidateQueries(trpc.projects.get.infiniteQueryOptions());
 				queryClient.invalidateQueries(
 					trpc.projects.getForTimeline.queryOptions(),
 				);
-				queryClient.invalidateQueries(
-					trpc.projects.getById.queryOptions({
-						id: updated.id,
-					}),
-				);
+
+				updateProjectInCache(updated);
 				setLastSavedAt(new Date());
 				toast.success("Project updated successfully", { id: "update-project" });
 			},

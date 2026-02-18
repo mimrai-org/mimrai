@@ -1,6 +1,7 @@
 import type { RouterOutputs } from "@mimir/trpc";
 import { trpc } from "@/utils/trpc";
 import type {
+	DocumentMentionEntity,
 	TaskMentionEntity,
 	ToolMentionEntity,
 	UserMentionEntity,
@@ -9,6 +10,7 @@ import type {
 // Type aliases for API responses
 type Member = RouterOutputs["teams"]["getMembers"][0];
 type Task = RouterOutputs["tasks"]["get"]["data"][0];
+type Document = RouterOutputs["documents"]["get"]["data"][0];
 
 /**
  * Transform a team member to a UserMentionEntity
@@ -37,8 +39,8 @@ function memberToUserEntity(member: Member): UserMentionEntity {
  * but only id, label, and sequence are persisted in the mention node
  */
 function taskToTaskEntity(task: Task): TaskMentionEntity {
-	const statusType = task.status?.type;
-	const isCompleted = statusType === "done";
+	const statusType = task.statusId;
+	const isCompleted = Boolean(task.completedAt);
 
 	return {
 		id: task.id,
@@ -50,6 +52,22 @@ function taskToTaskEntity(task: Task): TaskMentionEntity {
 		completed: isCompleted,
 		metadata: {
 			sequence: task.sequence,
+		},
+	};
+}
+
+/**
+ * Transform a document to a DocumentMentionEntity
+ */
+function documentToDocumentEntity(document: Document): DocumentMentionEntity {
+	return {
+		id: document.id,
+		type: "document",
+		label: document.name,
+		name: document.name,
+		icon: document.icon,
+		metadata: {
+			icon: document.icon,
 		},
 	};
 }
@@ -84,6 +102,17 @@ export function toolsQueryOptions() {
 }
 
 /**
+ * Query options for fetching documents matching a search query.
+ */
+export function documentsQueryOptions(query: string) {
+	return trpc.documents.get.queryOptions({
+		search: query,
+		tree: false,
+		pageSize: 5,
+	});
+}
+
+/**
  * Select and transform raw members into UserMentionEntity[],
  * filtered by query.
  */
@@ -104,6 +133,15 @@ export function selectTasks(
 	data: RouterOutputs["tasks"]["get"],
 ): TaskMentionEntity[] {
 	return data.data.map(taskToTaskEntity);
+}
+
+/**
+ * Select and transform raw document response into DocumentMentionEntity[].
+ */
+export function selectDocuments(
+	data: RouterOutputs["documents"]["get"],
+): DocumentMentionEntity[] {
+	return data.data.map(documentToDocumentEntity);
 }
 
 /**

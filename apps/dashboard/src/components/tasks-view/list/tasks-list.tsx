@@ -21,9 +21,7 @@ import {
 	PlusIcon,
 } from "lucide-react";
 import { memo, useCallback, useMemo, useRef, useState } from "react";
-import { usePanel } from "@/components/panels/panel-context";
 import {
-	TASK_PANEL_TYPE,
 	useCreateTaskPanel,
 	useTaskPanel,
 } from "@/components/panels/task-panel";
@@ -155,7 +153,7 @@ export const TasksList = () => {
 			>
 				<div
 					ref={scrollContainerRef}
-					className="h-[calc(100vh-168px)] overflow-y-auto overflow-x-hidden py-4"
+					className="h-[calc(100vh-168px)] overflow-y-auto overflow-x-hidden"
 				>
 					<div
 						style={{
@@ -258,7 +256,7 @@ const GroupHeader = memo(function GroupHeader({
 						type="button"
 						data-state={isCollapsed ? "closed" : "open"}
 						onClick={onToggle}
-						className="group mb-2 flex w-full cursor-pointer items-center gap-2 rounded-sm border bg-card px-4 py-2 text-muted-foreground text-sm transition-colors hover:text-foreground dark:border-0 dark:bg-card"
+						className="group mb-2 flex w-full cursor-pointer items-center gap-2 rounded-sm bg-card px-4 py-2 text-muted-foreground text-sm transition-colors hover:text-foreground dark:border-0 dark:bg-card"
 					>
 						<div className="text-muted-foreground group-hover:text-foreground">
 							<ChevronRightIcon className="size-4 group-data-[state=open]:hidden" />
@@ -289,7 +287,6 @@ const CreateTaskButton = memo(function CreateTaskButton({
 }) {
 	const { filters } = useTasksViewContext();
 	const createTaskPanel = useCreateTaskPanel();
-	const { setParams: setTaskParams } = useTaskParams();
 
 	const handleCreateTask = useCallback(() => {
 		createTaskPanel.open("create", {
@@ -297,12 +294,6 @@ const CreateTaskButton = memo(function CreateTaskButton({
 			projectId:
 				filters.projectId?.length > 0 ? filters.projectId[0] : undefined,
 		});
-		// setTaskParams({
-		// 	createTask: true,
-		// 	taskStatusId: groupId,
-		// 	taskProjectId:
-		// 		filters.projectId?.length > 0 ? filters.projectId[0] : undefined,
-		// });
 	}, [createTaskPanel, groupId, filters.projectId]);
 
 	return (

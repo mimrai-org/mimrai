@@ -5,6 +5,7 @@ import { union } from "drizzle-orm/pg-core";
 import { db } from "..";
 import { agents, type plansEnum, teams, users, usersOnTeams } from "../schema";
 import { recordCreditPromo } from "./credits";
+import { getMimirUser } from "./users";
 
 export const checkSlugExists = async (slug: string) => {
 	const [team] = await db
@@ -98,6 +99,8 @@ export const createTeam = async ({
 			metadata: { reason: "Welcome bonus for creating first team" },
 		});
 	}
+
+	await getMimirUser({ teamId: team.id });
 
 	await teamCache.delete(`${userId}:${team.id}`);
 

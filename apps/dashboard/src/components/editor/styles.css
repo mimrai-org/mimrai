@@ -5,21 +5,21 @@
 }
 
 .tiptap {
-	@apply text-base leading-relaxed;
-	@apply font-sans;
+	@apply text-sm leading-relaxed;
+	@apply font-sans space-y-4!;
 
 	h1 {
-		@apply text-2xl font-medium;
+		@apply text-xl font-medium;
 		margin-bottom: 1rem;
 	}
 
 	h2 {
-		@apply text-xl font-medium;
+		@apply text-lg font-medium;
 		margin-bottom: 0.5rem;
 	}
 
 	h3 {
-		@apply text-lg font-medium;
+		@apply text-base font-medium;
 		margin-bottom: 0.5rem;
 	}
 
@@ -76,18 +76,21 @@
 	}
 
 	pre {
-		@apply border rounded-sm break-words max-w-xl p-2 my-8;
+		@apply border rounded-sm break-words max-w-xl p-4 my-8 bg-card;
 
 		code {
 			background: none;
 			color: inherit;
-			font-size: 0.8rem;
+			font-family: monospace;
+			line-height: 1.4;
+			font-size: 0.875em;
 			padding: 0;
+			border: 0;
 		}
 	}
 
 	blockquote {
-		@apply border-l-2 border-primary pl-4 ml-2 my-8;
+		@apply border-l-2 border-primary pl-4 ml-2 my-8 text-muted-foreground;
 	}
 
 	img {
@@ -108,6 +111,10 @@
 		td {
 			@apply border p-2 text-left;
 		}
+	}
+
+	code {
+		@apply font-sans border bg-muted px-1 rounded;
 	}
 }
 

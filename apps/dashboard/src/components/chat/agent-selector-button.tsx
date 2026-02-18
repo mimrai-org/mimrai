@@ -6,21 +6,15 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@mimir/ui/dropdown-menu";
-import { useQuery } from "@tanstack/react-query";
 import { cn } from "@ui/lib/utils";
-import { BotIcon, CheckIcon, ChevronDownIcon } from "lucide-react";
+import { useAgents } from "@/hooks/use-data";
 import { useChatStore } from "@/store/chat";
-import { trpc } from "@/utils/trpc";
 import { AssigneeAvatar } from "../asignee-avatar";
 
 export function AgentSelectorButton() {
 	const { selectedAgentId, setSelectedAgentId } = useChatStore();
 
-	const { data: agentsData } = useQuery(
-		trpc.agents.get.queryOptions({
-			isActive: true,
-		}),
-	);
+	const { data: agentsData } = useAgents();
 
 	const agents = agentsData?.data || [];
 	const selectedAgent = agents.find((agent) => agent.id === selectedAgentId);
@@ -50,18 +44,6 @@ export function AgentSelectorButton() {
 				</button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="start" className="min-w-[180px]">
-				<DropdownMenuItem
-					onClick={() => setSelectedAgentId(null)}
-					className="flex items-center gap-2"
-				>
-					<AssigneeAvatar name="Mimir" />
-					<div>
-						<span>{"Mimir"}</span>
-						<p className="max-w-xs text-muted-foreground">
-							{"Default general-purpose AI assistant"}
-						</p>
-					</div>
-				</DropdownMenuItem>
 				{agents.map((agent) => (
 					<DropdownMenuItem
 						key={agent.id}

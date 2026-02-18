@@ -1293,7 +1293,7 @@ export const agents = pgTable(
 		description: text("description"),
 		avatar: text("avatar"),
 		isActive: boolean("is_active").default(true).notNull(),
-		model: text("model").notNull().default("openai/gpt-5"),
+		model: text("model").notNull().default("anthropic/claude-haiku-4.5"),
 		soul: text("soul"),
 
 		userId: text("user_id").notNull(),
@@ -1321,6 +1321,32 @@ export const agents = pgTable(
 			columns: [table.userId],
 			foreignColumns: [users.id],
 			name: "agents_user_id_fkey",
+		}).onDelete("cascade"),
+	],
+);
+
+export const documentsOnAgents = pgTable(
+	"documents_on_agents",
+	{
+		agentId: text("agent_id").notNull(),
+		documentId: text("document_id").notNull(),
+	},
+	(table) => [
+		index("documents_on_agents_agent_id_index").on(table.agentId),
+		index("documents_on_agents_document_id_index").on(table.documentId),
+		primaryKey({
+			columns: [table.agentId, table.documentId],
+			name: "documents_on_agents_pkey",
+		}),
+		foreignKey({
+			columns: [table.agentId],
+			foreignColumns: [agents.id],
+			name: "documents_on_agents_agent_id_fkey",
+		}).onDelete("cascade"),
+		foreignKey({
+			columns: [table.documentId],
+			foreignColumns: [documents.id],
+			name: "documents_on_agents_document_id_fkey",
 		}).onDelete("cascade"),
 	],
 );
@@ -2133,6 +2159,100 @@ export const agentMemories = pgTable(
 			foreignColumns: [tasks.id],
 			name: "agent_memories_source_task_id_fkey",
 		}).onDelete("set null"),
+	],
+);
+
+export const documents = pgTable(
+	"documents",
+	{
+		id: text("id")
+			.$defaultFn(() => randomUUID())
+			.primaryKey()
+			.notNull(),
+		name: text("name").notNull(),
+		icon: text("icon"),
+		content: text("content"),
+		teamId: text("team_id").notNull(),
+		parentId: text("parent_id"),
+		order: integer("order").default(0).notNull(),
+		createdBy: text("created_by").notNull(),
+		updatedBy: text("updated_by"),
+		fts: tsvector("fts").generatedAlwaysAs(
+			(): SQL =>
+				sql`to_tsvector('english', coalesce("name",'') || ' ' || coalesce("content",''))`,
+		),
+		createdAt: timestamp("created_at", {
+			withTimezone: true,
+			mode: "string",
+		})
+			.defaultNow()
+			.notNull(),
+		updatedAt: timestamp("updated_at", {
+			withTimezone: true,
+			mode: "string",
+		})
+			.defaultNow()
+			.notNull(),
+	},
+	(table) => [
+		index("documents_team_id_index").using("btree", table.teamId),
+		index("documents_parent_id_index").using("btree", table.parentId),
+		index("documents_fts").using(
+			"gin",
+			table.fts.asc().nullsLast().op("tsvector_ops"),
+		),
+		foreignKey({
+			columns: [table.teamId],
+			foreignColumns: [teams.id],
+			name: "documents_team_id_fkey",
+		}).onDelete("cascade"),
+		foreignKey({
+			columns: [table.parentId],
+			foreignColumns: [table.id],
+			name: "documents_parent_id_fkey",
+		}).onDelete("cascade"),
+		foreignKey({
+			columns: [table.createdBy],
+			foreignColumns: [users.id],
+			name: "documents_created_by_fkey",
+		}).onDelete("set null"),
+		foreignKey({
+			columns: [table.updatedBy],
+			foreignColumns: [users.id],
+			name: "documents_updated_by_fkey",
+		}).onDelete("set null"),
+	],
+);
+
+export const labelsOnDocuments = pgTable(
+	"labels_on_documents",
+	{
+		labelId: text("label_id").notNull(),
+		documentId: text("document_id").notNull(),
+	},
+	(table) => [
+		primaryKey({
+			columns: [table.labelId, table.documentId],
+			name: "labels_on_documents_pkey",
+		}),
+		index("labels_on_documents_document_id_index").using(
+			"btree",
+			table.documentId,
+		),
+		foreignKey({
+			columns: [table.labelId],
+			foreignColumns: [labels.id],
+			name: "labels_on_documents_label_id_fkey",
+		})
+			.onDelete("cascade")
+			.onUpdate("cascade"),
+		foreignKey({
+			columns: [table.documentId],
+			foreignColumns: [documents.id],
+			name: "labels_on_documents_document_id_fkey",
+		})
+			.onDelete("cascade")
+			.onUpdate("cascade"),
 	],
 );
 

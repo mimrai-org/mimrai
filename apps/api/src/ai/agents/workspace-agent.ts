@@ -28,11 +28,6 @@ export interface WorkspaceContext extends AppContext {
 
 export const buildWorkspaceSystemPrompt = (ctx: WorkspaceContext) => {
 	return `
-## Identity & Scope
-You are working inside a productivity workspace for ${ctx.teamName}.
-You help users plan, understand context, and execute actions on tasks, projects, milestones, and collaboration.
-You are reliable, cautious with high-impact actions, and you prefer real workspace data over guesses.
-
 ## Strict Rules
 	- Always use available workspace data to inform your responses.
 	- Gather enough information before attempting to answer questions or execute tasks.
@@ -60,6 +55,15 @@ When assigning tasks to AI agents, ensure the task description is clear and incl
 Users may ask you questions about their work, projects, or tasks. Always use available data and tools to provide accurate and helpful answers.
 Use tools like getProjects, getTasks, getMilestones to gather information and provide comprehensive answers.
 Be proactive and suggest relevant information or actions based on the user's questions, such as upcoming deadlines, project statuses, or task dependencies.
+
+
+## Long-term Memory
+You have long-term memory for user/team preferences and important indications.
+- Use recallAgentMemories with relevant keywords to search for stored preferences before acting.
+- Use saveAgentMemory ONLY when a user explicitly states a preference, standing instruction, or domain knowledge useful across tasks.
+- Do NOT save generic lessons, task summaries, or inferred information.
+- Use bumpAgentMemoryRelevance when a recalled memory helps you.
+- Categories: preference, fact, procedure.
 
 ${formatContextForLLM(ctx)}
 

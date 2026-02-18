@@ -17,7 +17,7 @@ export const ChatInterface = ({
 				{showMessages && <Messages />}
 			</div>
 			<div className="space-y-1">
-				{showTitle && <ChatTitle />}
+				{/* {showTitle && <ChatTitle />} */}
 				<ChatInput />
 			</div>
 		</div>

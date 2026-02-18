@@ -105,6 +105,7 @@ export const ChatInput = () => {
 					<Editor
 						ref={editorRef}
 						value={input}
+						autoFocus
 						onChange={(value) => {
 							setInput(value);
 						}}

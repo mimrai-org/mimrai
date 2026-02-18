@@ -1,11 +1,14 @@
 import { getAllToolsForUser } from "@api/ai/tools/tool-registry";
 import {
+	addDocumentToAgentSchema,
 	createAgentSchema,
 	deleteAgentMemorySchema,
 	deleteAgentSchema,
 	getAgentByIdSchema,
 	getAgentMemoriesSchema,
 	getAgentsSchema,
+	getDocumentsForAgentSchema,
+	removeDocumentFromAgentSchema,
 	updateAgentSchema,
 } from "@api/schemas/agents";
 import { protectedProcedure, router } from "@api/trpc/init";
@@ -14,12 +17,16 @@ import {
 	getAgentMemories,
 } from "@mimir/db/queries/agent-memories";
 import {
+	addDocumentToAgent,
 	createAgent,
 	deleteAgent,
 	getAgentById,
 	getAgents,
+	getDocumentsForAgent,
+	removeDocumentFromAgent,
 	updateAgent,
 } from "@mimir/db/queries/agents";
+import { getMimirUser } from "@mimir/db/queries/users";
 import { getModels } from "@mimir/utils/agents";
 import type { Tool } from "ai";
 
@@ -27,6 +34,7 @@ export const agentsRouter = router({
 	get: protectedProcedure
 		.input(getAgentsSchema)
 		.query(async ({ ctx, input }) => {
+			await getMimirUser({ teamId: ctx.team.id });
 			return getAgents({
 				...input,
 				teamId: ctx.user.teamId!,
@@ -127,5 +135,32 @@ export const agentsRouter = router({
 		.input(deleteAgentMemorySchema)
 		.mutation(async ({ input }) => {
 			return deleteAgentMemory(input.id);
+		}),
+
+	getDocumentsForAgent: protectedProcedure
+		.input(getDocumentsForAgentSchema)
+		.query(async ({ ctx, input }) => {
+			return getDocumentsForAgent({
+				...input,
+				teamId: ctx.user.teamId!,
+			});
+		}),
+
+	addDocumentToAgent: protectedProcedure
+		.input(addDocumentToAgentSchema)
+		.mutation(async ({ ctx, input }) => {
+			return addDocumentToAgent({
+				...input,
+				teamId: ctx.user.teamId!,
+			});
+		}),
+
+	removeDocumentFromAgent: protectedProcedure
+		.input(removeDocumentFromAgentSchema)
+		.mutation(async ({ ctx, input }) => {
+			return removeDocumentFromAgent({
+				...input,
+				teamId: ctx.user.teamId!,
+			});
 		}),
 });

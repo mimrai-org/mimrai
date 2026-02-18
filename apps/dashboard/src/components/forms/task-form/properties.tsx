@@ -26,10 +26,6 @@ export const TaskFormProperties = () => {
 			</div>
 
 			<div className="mt-4">
-				<TaskExecution />
-			</div>
-
-			<div className="mt-4">
 				<TaskFormDependenciesList />
 			</div>
 		</div>

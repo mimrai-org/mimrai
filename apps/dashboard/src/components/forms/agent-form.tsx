@@ -5,7 +5,6 @@ import { Button } from "@ui/components/ui/button";
 import { DataSelectInput } from "@ui/components/ui/data-select-input";
 import {
 	DropdownMenu,
-	DropdownMenuCheckboxItem,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
@@ -28,7 +27,10 @@ import { toast } from "sonner";
 import z from "zod";
 import { Editor } from "@/components/editor";
 import { useAgentParams } from "@/hooks/use-agent-params";
-import { invalidateMembersCache } from "@/hooks/use-data-cache-helpers";
+import {
+	invalidateAgentsCache,
+	invalidateMembersCache,
+} from "@/hooks/use-data-cache-helpers";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { queryClient, trpc } from "@/utils/trpc";
 import { AssigneeAvatar } from "../asignee-avatar";
@@ -69,10 +71,8 @@ export const AgentForm = ({
 	const { mutate: createAgent, isPending: isCreating } = useMutation(
 		trpc.agents.create.mutationOptions({
 			onSuccess: () => {
-				queryClient.invalidateQueries(
-					trpc.agents.get.infiniteQueryOptions({ pageSize: 20 }),
-				);
 				invalidateMembersCache();
+				invalidateAgentsCache();
 				toast.success("Agent created");
 				setParams(null);
 			},
@@ -82,9 +82,7 @@ export const AgentForm = ({
 	const { mutate: updateAgent, isPending: isUpdating } = useMutation(
 		trpc.agents.update.mutationOptions({
 			onSuccess: () => {
-				queryClient.invalidateQueries(
-					trpc.agents.get.infiniteQueryOptions({ pageSize: 20 }),
-				);
+				invalidateAgentsCache();
 				invalidateMembersCache();
 				toast.success("Agent updated");
 				setParams(null);

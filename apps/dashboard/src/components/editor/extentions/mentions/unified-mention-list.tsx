@@ -2,7 +2,13 @@
 
 import { useQuery } from "@tanstack/react-query";
 import type { SuggestionProps } from "@tiptap/suggestion";
-import { LayersIcon, Loader2Icon, ToolCaseIcon, UserIcon } from "lucide-react";
+import {
+	FileTextIcon,
+	LayersIcon,
+	Loader2Icon,
+	ToolCaseIcon,
+	UserIcon,
+} from "lucide-react";
 import {
 	useEffect,
 	useImperativeHandle,
@@ -12,7 +18,10 @@ import {
 } from "react";
 import { useDebounceValue } from "usehooks-ts";
 import { cn } from "@/lib/utils";
+import { DocumentMentionListItem } from "./document-mention";
 import {
+	documentsQueryOptions,
+	selectDocuments,
 	selectTasks,
 	selectTools,
 	selectUsers,
@@ -39,6 +48,7 @@ interface MentionGroup {
 const mentionGroups: MentionGroup[] = [
 	{ type: "user", label: "Members", icon: UserIcon },
 	{ type: "task", label: "Tasks", icon: LayersIcon },
+	{ type: "document", label: "Documents", icon: FileTextIcon },
 	{ type: "tool", label: "Tools", icon: ToolCaseIcon },
 ];
 
@@ -57,6 +67,10 @@ function MentionItemRenderer({
 			return <UserMentionListItem entity={entity} isSelected={isSelected} />;
 		case "task":
 			return <TaskMentionListItem entity={entity} isSelected={isSelected} />;
+		case "document":
+			return (
+				<DocumentMentionListItem entity={entity} isSelected={isSelected} />
+			);
 		case "tool":
 			return <ToolMentionListItem entity={entity} isSelected={isSelected} />;
 		default:
@@ -69,6 +83,7 @@ interface UnifiedMentionListProps extends SuggestionProps<AnyMentionEntity> {}
 export function UnifiedMentionList(props: UnifiedMentionListProps) {
 	const [selectedIndex, setSelectedIndex] = useState(0);
 	const containerRef = useRef<HTMLDivElement>(null);
+	const previousResultsSignatureRef = useRef("");
 
 	const query = props.query;
 	const [debouncedQuery] = useDebounceValue(query, DEBOUNCE_MS);
@@ -87,6 +102,12 @@ export function UnifiedMentionList(props: UnifiedMentionListProps) {
 		select: selectTasks,
 	});
 
+	// Fetch documents — search is server-side, keyed by debounced query.
+	const { data: documents = [] } = useQuery({
+		...documentsQueryOptions(debouncedQuery),
+		select: selectDocuments,
+	});
+
 	// Fetch tools — tool list is static per session, filter client-side.
 	const { data: tools = [] } = useQuery({
 		...toolsQueryOptions(),
@@ -94,20 +115,19 @@ export function UnifiedMentionList(props: UnifiedMentionListProps) {
 		staleTime: 60_000,
 	});
 
-	console.log("Tools after selection:", tools);
-
 	// Group items by type
 	const groupedItems = useMemo(() => {
 		const groups: Record<MentionEntityType, AnyMentionEntity[]> = {
 			user: users,
 			task: tasks,
+			document: documents,
 			project: [],
 			milestone: [],
 			tool: tools,
 		};
 
 		return groups;
-	}, [users, tasks, tools]);
+	}, [users, tasks, documents, tools]);
 
 	// Flatten items for index-based navigation
 	const flatItems = useMemo(() => {
@@ -117,21 +137,19 @@ export function UnifiedMentionList(props: UnifiedMentionListProps) {
 		}
 		return result;
 	}, [groupedItems]);
+	const resultsSignature = useMemo(
+		() => flatItems.map((item) => item.id).join("|"),
+		[flatItems],
+	);
 
 	useEffect(() => {
-		if (containerRef.current) {
-			const container = containerRef.current;
-			const itemElement = container?.querySelector(
-				`[data-item-id="${flatItems[selectedIndex]?.id}"]`,
-			) as HTMLElement | undefined;
-
-			container?.scrollTo({
-				top: itemElement
-					? itemElement.offsetTop - container.offsetTop - 100
-					: 0,
-				behavior: "instant",
-			});
-		}
+		if (!containerRef.current || flatItems.length === 0) return;
+		const selectedItem = flatItems[selectedIndex];
+		if (!selectedItem) return;
+		const itemElement = containerRef.current.querySelector(
+			`[data-item-id="${selectedItem.id}"]`,
+		) as HTMLElement | null;
+		itemElement?.scrollIntoView({ block: "nearest" });
 	}, [selectedIndex, flatItems]);
 
 	const handleSelect = (index: number) => {
@@ -158,8 +176,12 @@ export function UnifiedMentionList(props: UnifiedMentionListProps) {
 		handleSelect(selectedIndex);
 	};
 
-	// // Reset selection when results change
-	// useEffect(() => setSelectedIndex(0), [flatItems]);
+	// Reset selection when query results change
+	useEffect(() => {
+		if (previousResultsSignatureRef.current === resultsSignature) return;
+		previousResultsSignatureRef.current = resultsSignature;
+		setSelectedIndex(0);
+	}, [resultsSignature]);
 
 	// @ts-expect-error - TipTap's ref handling
 	useImperativeHandle(props.ref, () => ({
@@ -205,7 +227,10 @@ export function UnifiedMentionList(props: UnifiedMentionListProps) {
 
 	const hasAnyItems = flatItems.length > 0;
 	const isInitialLoad =
-		users.length === 0 && tasks.length === 0 && tools.length === 0;
+		users.length === 0 &&
+		tasks.length === 0 &&
+		documents.length === 0 &&
+		tools.length === 0;
 
 	return (
 		<div
