@@ -204,12 +204,6 @@ ${membersText}
 ${memoryContext}
 Use updateProjectMemory to persist decisions, progress, and plans across invocations.
 
-### Long-term Memory
-You have long-term memory that persists across projects. Use it ONLY for user/team preferences and important indications.
-- Use recallAgentMemories with relevant keywords to search for stored preferences.
-- Use saveAgentMemory ONLY when a user explicitly states a preference, gives a standing instruction, or shares domain knowledge useful in future invocations.
-- Do NOT save generic lessons, task summaries, or things you can infer from context.
-- Categories: preference (user/team preference or standing instruction), fact (domain knowledge), procedure (user-defined workflow).
 `;
 }
 

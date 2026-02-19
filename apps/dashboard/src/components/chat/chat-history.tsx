@@ -10,15 +10,7 @@ import {
 import { Input } from "@ui/components/ui/input";
 import { Separator } from "@ui/components/ui/separator";
 import { cn } from "@ui/lib/utils";
-import {
-	ArrowRight,
-	ChevronRight,
-	MessageCircleHeartIcon,
-	MessageCircleIcon,
-	PlusIcon,
-	SearchIcon,
-	TrashIcon,
-} from "lucide-react";
+import { PlusIcon, SearchIcon, TrashIcon } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";

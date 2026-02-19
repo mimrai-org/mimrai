@@ -45,11 +45,6 @@ export const getDocumentsTool = tool({
 			yield result.data.map((doc) => ({
 				id: doc.id,
 				name: doc.name,
-				content: doc.content
-					? doc.content.length > 500
-						? `${doc.content.slice(0, 500)}…`
-						: doc.content
-					: null,
 				parentId: doc.parentId,
 				labels: doc.labels,
 				childrenCount: doc.children.length,

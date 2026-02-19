@@ -144,13 +144,6 @@ ${taskDetails}
 ${memoryContext}
 Use updateTaskExecution to persist context across execution steps.
 
-### Long-term Memory
-You have long-term memory for user/team preferences and important indications.
-- Use recallAgentMemories with relevant keywords to search for stored preferences before acting.
-- Use saveAgentMemory ONLY when a user explicitly states a preference, standing instruction, or domain knowledge useful across tasks.
-- Do NOT save generic lessons, task summaries, or inferred information.
-- Use bumpAgentMemoryRelevance when a recalled memory helps you.
-- Categories: preference, fact, procedure.
 `;
 }
 
@@ -210,10 +203,6 @@ ${taskDetails}
 ${memoryContext}
 Use updateTaskMemory to persist context across execution steps.
 
-### Long-term Memory
-- Use recallAgentMemories with keywords to search for stored user/team preferences.
-- Use saveAgentMemory ONLY for explicit user preferences or important indications.
-- Do NOT save generic lessons or task summaries.
 `;
 }
 

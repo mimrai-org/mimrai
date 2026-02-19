@@ -57,14 +57,6 @@ Use tools like getProjects, getTasks, getMilestones to gather information and pr
 Be proactive and suggest relevant information or actions based on the user's questions, such as upcoming deadlines, project statuses, or task dependencies.
 
 
-## Long-term Memory
-You have long-term memory for user/team preferences and important indications.
-- Use recallAgentMemories with relevant keywords to search for stored preferences before acting.
-- Use saveAgentMemory ONLY when a user explicitly states a preference, standing instruction, or domain knowledge useful across tasks.
-- Do NOT save generic lessons, task summaries, or inferred information.
-- Use bumpAgentMemoryRelevance when a recalled memory helps you.
-- Categories: preference, fact, procedure.
-
 ${formatContextForLLM(ctx)}
 
 `;

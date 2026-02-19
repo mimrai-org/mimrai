@@ -98,14 +98,19 @@ export const deleteChat = async (chatId: string, teamId: string) => {
 
 export const getChatHistory = async ({
 	teamId,
+	userId,
 	search,
 	pageSize = 20,
 }: {
 	teamId: string;
+	userId?: string;
 	search?: string;
 	pageSize?: number;
 }) => {
 	const whereClause: SQL[] = [eq(chats.teamId, teamId)];
+	if (userId) {
+		whereClause.push(eq(chats.userId, userId));
+	}
 	if (search) {
 		whereClause.push(ilike(chats.title, `%${search}%`));
 	}

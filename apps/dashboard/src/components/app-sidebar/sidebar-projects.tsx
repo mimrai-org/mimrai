@@ -7,7 +7,6 @@ import {
 	SidebarGroupContent,
 	SidebarGroupLabel,
 	SidebarMenu,
-	SidebarMenuAction,
 	SidebarMenuButton,
 	SidebarMenuItem,
 	useSidebar,
@@ -17,7 +16,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useProjectParams } from "@/hooks/use-project-params";
 import { trpc } from "@/utils/trpc";
-import { AssigneeAvatar } from "../asignee-avatar";
 import { ProjectIcon } from "../project-icon";
 import { ProjectContextMenu } from "../projects/context-menu";
 import { useUser } from "../user-provider";
@@ -66,9 +64,6 @@ export function SidebarProjects() {
 											<span>{project.name}</span>
 										</Link>
 									</SidebarMenuButton>
-									<SidebarMenuAction>
-										<AssigneeAvatar {...project.lead} className="size-5" />
-									</SidebarMenuAction>
 								</SidebarMenuItem>
 							</ProjectContextMenu>
 						);

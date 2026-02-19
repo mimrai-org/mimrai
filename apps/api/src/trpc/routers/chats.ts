@@ -18,8 +18,9 @@ export const chatRouter = router({
 		.input(getChatsHistorySchema)
 		.query(async ({ ctx, input }) => {
 			return getChatHistory({
-				teamId: ctx.user.teamId!,
 				...input,
+				teamId: ctx.user.teamId!,
+				userId: ctx.user.id,
 			});
 		}),
 	delete: protectedProcedure
