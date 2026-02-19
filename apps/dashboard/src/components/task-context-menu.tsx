@@ -28,12 +28,11 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { useUser } from "@/components/user-provider";
 import { useProjects, useStatuses, useTeamMembers } from "@/hooks/use-data";
-import { useTaskParams } from "@/hooks/use-task-params";
 import {
-	invalidateTaskQueries,
-	optimisticRemoveTask,
-	optimisticUpdateTask,
-} from "@/store/entity-mutations";
+	invalidateTasksCache,
+	updateTaskInCache,
+} from "@/hooks/use-data-cache-helpers";
+import { useTaskParams } from "@/hooks/use-task-params";
 import { queryClient, trpc } from "@/utils/trpc";
 import { Assignee, AssigneeAvatar } from "./asignee-avatar";
 import { useChatContext } from "./chat/chat-context/store";
@@ -73,7 +72,7 @@ export const TaskContextMenu = ({
 				toast.success("Task deleted", {
 					id: "delete-task",
 				});
-				invalidateTaskQueries();
+				invalidateTasksCache();
 			},
 			onError: () => {
 				toast.error("Failed to delete task", {
@@ -93,7 +92,7 @@ export const TaskContextMenu = ({
 				toast.success("Task updated", {
 					id: "update-task",
 				});
-				optimisticUpdateTask(task.id, task);
+				invalidateTasksCache();
 			},
 			onError: () => {
 				toast.error("Failed to update task", {
@@ -133,7 +132,7 @@ export const TaskContextMenu = ({
 
 	const handleDeleteTask = async (taskId: string) => {
 		await deleteTask({ id: taskId });
-		invalidateTaskQueries();
+		invalidateTasksCache();
 	};
 
 	const handleUpdateTask = async (data: {

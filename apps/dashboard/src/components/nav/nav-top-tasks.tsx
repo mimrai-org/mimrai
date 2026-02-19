@@ -4,7 +4,7 @@ import { Skeleton } from "@ui/components/ui/skeleton";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useUser } from "@/components/user-provider";
-import { useEntityTasks } from "@/hooks/use-entity-data";
+import { useTasks } from "@/hooks/use-data";
 import { StatusIcon } from "../status-icon";
 import {
 	PropertyDueDate,
@@ -13,7 +13,7 @@ import {
 
 export const NavTopTasks = () => {
 	const user = useUser();
-	const { tasks: top3, isLoading } = useEntityTasks({
+	const { tasks: top3, isLoading } = useTasks({
 		pageSize: 3,
 		statusType: ["to_do", "in_progress", "review"],
 	});

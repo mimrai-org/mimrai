@@ -12,11 +12,11 @@ import { Editor } from "@/components/editor";
 import { LabelInput } from "@/components/forms/task-form/label-input";
 import { ResourceIconPicker } from "@/components/resource-icon/resource-icon-picker";
 import { useUser } from "@/components/user-provider";
-import { useFormAutoSave, useZodForm } from "@/hooks/use-zod-form";
 import {
-	invalidateDocumentQueries,
-	optimisticUpdateDocument,
-} from "@/store/entity-mutations";
+	invalidateDocumentsCache,
+	updateDocumentInCache,
+} from "@/hooks/use-data-cache-helpers";
+import { useFormAutoSave, useZodForm } from "@/hooks/use-zod-form";
 import { trpc } from "@/utils/trpc";
 import { DocumentChildren } from "./document-children";
 import { documentFormSchema } from "./form-type";
@@ -51,7 +51,7 @@ export const DocumentForm = ({
 			},
 			onSuccess: (doc) => {
 				toast.success("Document created", { id: "create-document" });
-				invalidateDocumentQueries();
+				invalidateDocumentsCache();
 				router.push(`${user.basePath}/documents/${doc.id}`);
 			},
 			onError: () => {
@@ -78,7 +78,7 @@ export const DocumentForm = ({
 				...data,
 			};
 			updateDocument(payload);
-			optimisticUpdateDocument(data.id, {
+			updateDocumentInCache({
 				...payload,
 				labels: undefined,
 			});

@@ -12,8 +12,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useUser } from "@/components/user-provider";
-import { invalidateTaskQueries } from "@/store/entity-mutations";
-import { trpc } from "@/utils/trpc";
+import { queryClient, trpc } from "@/utils/trpc";
 import { StatusIcon } from "../status-icon";
 import { useZenMode } from "./use-zen-mode";
 
@@ -46,7 +45,8 @@ export const ZenModeDoneButton = () => {
 				handleNext();
 			},
 			onSettled: () => {
-				invalidateTaskQueries();
+				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
+				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
 			},
 		}),
 	);

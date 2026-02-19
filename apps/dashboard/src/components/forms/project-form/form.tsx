@@ -6,12 +6,9 @@ import { SaveIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import Loader from "@/components/loader";
+import { updateProjectInCache } from "@/hooks/use-data-cache-helpers";
 import { useProjectParams } from "@/hooks/use-project-params";
 import { useFormAutoSave, useZodForm } from "@/hooks/use-zod-form";
-import {
-	invalidateProjectQueries,
-	optimisticUpdateProject,
-} from "@/store/entity-mutations";
 import { queryClient, trpc } from "@/utils/trpc";
 import { ProjectColorPicker } from "./color-picker";
 import { Description } from "./description";
@@ -69,7 +66,7 @@ export const ProjectForm = ({
 					trpc.projects.getForTimeline.queryOptions(),
 				);
 
-				optimisticUpdateProject(updated.id, updated);
+				updateProjectInCache(updated);
 				setLastSavedAt(new Date());
 				toast.success("Project updated successfully", { id: "update-project" });
 			},

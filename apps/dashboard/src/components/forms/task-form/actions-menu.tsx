@@ -22,8 +22,7 @@ import { useCloneTaskPanel } from "@/components/panels/task-panel";
 import { useShareableParams } from "@/hooks/use-shareable-params";
 import { useTaskDependencyParams } from "@/hooks/use-task-dependency-params";
 import { useTaskParams } from "@/hooks/use-task-params";
-import { invalidateTaskQueries } from "@/store/entity-mutations";
-import { trpc } from "@/utils/trpc";
+import { queryClient, trpc } from "@/utils/trpc";
 import type { TaskFormValues } from "./form-type";
 
 export const ActionsMenu = () => {
@@ -45,7 +44,8 @@ export const ActionsMenu = () => {
 				toast.success("Task deleted", {
 					id: "deleting-task",
 				});
-				invalidateTaskQueries();
+				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
+				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
 				setParams(null);
 			},
 			onError: () => {

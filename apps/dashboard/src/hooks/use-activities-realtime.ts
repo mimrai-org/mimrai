@@ -1,7 +1,7 @@
 import { useChannelName, useRealtime } from "@/lib/realtime-client";
-import { entityStore } from "@/store/entity-store";
 import { queryClient, trpc } from "@/utils/trpc";
 import type { Task } from "./use-data";
+import { addTaskToCache, updateTaskInCache } from "./use-data-cache-helpers";
 
 export const useActivitiesRealtime = () => {
 	const channels = useChannelName();
@@ -12,14 +12,14 @@ export const useActivitiesRealtime = () => {
 
 		onData: async (event) => {
 			// if (event.data.type === "task_created") {
-			// 	// Fetch the task details and update the store
+			// 	// Fetch the task details and update the cache
 			// 	const task = await queryClient.fetchQuery(
 			// 		trpc.tasks.getById.queryOptions({
 			// 			id: event.data.groupId,
 			// 		}),
 			// 	);
 			// 	if (task) {
-			// 		entityStore.getState().upsertTasks([task]);
+			// 		addTaskToCache(task);
 			// 	}
 			// 	return;
 			// }
@@ -29,6 +29,7 @@ export const useActivitiesRealtime = () => {
 			};
 
 			if (event.data.type === "task_column_changed") {
+				// Update the get task by id query
 				payload.statusId = event.data.metadata.toColumnId as string;
 			}
 
@@ -36,7 +37,7 @@ export const useActivitiesRealtime = () => {
 				payload.assigneeId = event.data.metadata.assigneeId as string;
 			}
 
-			entityStore.getState().updateTask(event.data.groupId, payload);
+			updateTaskInCache(payload);
 
 			if (
 				[

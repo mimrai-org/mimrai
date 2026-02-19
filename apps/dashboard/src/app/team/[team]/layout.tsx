@@ -2,7 +2,6 @@ import { Provider as OpenPanelProvider } from "@mimir/events/client";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { EntitySyncProvider } from "@/components/entity-sync-provider";
 import { PanelProvider } from "@/components/panels/panel-context";
 import { PanelStack } from "@/components/panels/panel-stack";
 // import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -46,18 +45,16 @@ export default async function Layout({ children, params }: Props) {
 	return (
 		<Suspense>
 			<UserProvider user={user}>
-				<EntitySyncProvider>
-					<PanelProvider>
-						<GlobalSheets />
-						{children}
+				<PanelProvider>
+					<GlobalSheets />
+					{children}
 
-						{/* {process.env.NODE_ENV === "development" && (
+					{/* {process.env.NODE_ENV === "development" && (
 							<ReactQueryDevtools buttonPosition="bottom-left" />
 						)} */}
-						<OpenPanelProvider profileId={user.id} />
-						<PanelStack />
-					</PanelProvider>
-				</EntitySyncProvider>
+					<OpenPanelProvider profileId={user.id} />
+					<PanelStack />
+				</PanelProvider>
 			</UserProvider>
 		</Suspense>
 	);

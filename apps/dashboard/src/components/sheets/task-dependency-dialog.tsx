@@ -16,7 +16,6 @@ import {
 import { useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
 import { useTaskDependencyParams } from "@/hooks/use-task-dependency-params";
-import { invalidateTaskQueries } from "@/store/entity-mutations";
 import { queryClient, trpc } from "@/utils/trpc";
 import { DependencyIcon } from "../dependency-icon";
 import { PropertyStatus } from "../tasks-view/properties/task-properties-components";
@@ -71,7 +70,7 @@ export const TaskDependencyDialog = () => {
 					}),
 				);
 
-				invalidateTaskQueries();
+				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
 			},
 		}),
 	);

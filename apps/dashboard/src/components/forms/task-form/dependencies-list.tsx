@@ -26,7 +26,6 @@ import { useFormContext } from "react-hook-form";
 import { DependencyIcon } from "@/components/dependency-icon";
 import { PropertyStatus } from "@/components/tasks-view/properties/task-properties-components";
 import { useTaskDependencyParams } from "@/hooks/use-task-dependency-params";
-import { invalidateTaskQueries } from "@/store/entity-mutations";
 import { queryClient, trpc } from "@/utils/trpc";
 import type { TaskFormValues } from "./form-type";
 
@@ -167,7 +166,7 @@ const Item = ({
 					}),
 				);
 
-				invalidateTaskQueries();
+				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions({}));
 			},
 		}),
 	);

@@ -22,16 +22,12 @@ import { useDebounceValue } from "usehooks-ts";
 import Loader from "@/components/loader";
 import { TaskContextMenu } from "@/components/task-context-menu";
 import { TaskItem } from "@/components/tasks-view/task-item";
-import { useEntityTasks } from "@/hooks/use-entity-data";
+import { useTasks } from "@/hooks/use-data";
 import { useTaskParams } from "@/hooks/use-task-params";
-import {
-	invalidateProjectQueries,
-	invalidateTaskQueries,
-} from "@/store/entity-mutations";
 import { queryClient, trpc } from "@/utils/trpc";
 
 export const TasksList = ({ projectId }: { projectId: string }) => {
-	const { tasks, isLoading, hasNextPage, fetchNextPage } = useEntityTasks({
+	const { tasks, isLoading, hasNextPage, fetchNextPage } = useTasks({
 		pageSize: 20,
 		projectId: [projectId],
 	});
@@ -46,8 +42,9 @@ export const TasksList = ({ projectId }: { projectId: string }) => {
 			},
 			onSuccess: (task) => {
 				toast.success("Task removed successfully", { id: "remove-task" });
-				invalidateTaskQueries();
-				invalidateProjectQueries();
+				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
+				queryClient.invalidateQueries(trpc.projects.get.infiniteQueryOptions());
+				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
 			},
 		}),
 	);
@@ -130,8 +127,9 @@ const AddTaskButton = ({ projectId }: { projectId: string }) => {
 			},
 			onSuccess: (task) => {
 				toast.success("Task added successfully", { id: "add-task" });
-				invalidateProjectQueries();
-				invalidateTaskQueries();
+				queryClient.invalidateQueries(trpc.projects.get.infiniteQueryOptions());
+				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
+				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
 			},
 		}),
 	);
