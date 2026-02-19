@@ -56,12 +56,16 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 	return (
 		<Kanban.Column
 			className={cn(
-				"flex h-[calc(100vh-188px)] min-h-[200px] min-w-86 max-w-86 flex-1 grow-1 flex-col rounded-sm p-0 shadow-none",
+				"flex h-[calc(100vh-188px)] min-h-[200px] min-w-86 max-w-86 flex-1 grow-1 flex-col rounded-sm bg-card p-2 shadow-none dark:bg-card/30",
 			)}
 			value={columnName}
 		>
 			<div className="flex items-center justify-between">
-				<div className="flex items-center gap-2">
+				<div
+					className={cn("flex items-center gap-2", {
+						"opacity-50": tasks.length === 0,
+					})}
+				>
 					<Badge
 						variant="secondary"
 						className={cn(

@@ -18,6 +18,7 @@ export default async function Page({ params }: Props) {
 			<TasksView
 				defaultFilters={{
 					...defaultView?.filters,
+					viewType: "board",
 				}}
 				id={defaultView?.id}
 				projectId={projectId}
