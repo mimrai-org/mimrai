@@ -96,7 +96,7 @@ export const TaskForm = ({
 				toast.error("Failed to update task", { id: "update-task" });
 			},
 			onSuccess: (task) => {
-				updateTaskInCache(task);
+				invalidateTasksCache();
 			},
 		}),
 	);

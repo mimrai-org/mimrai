@@ -33,6 +33,7 @@ import {
 	unsubscribeUserFromTask,
 	updateTask,
 	updateTaskComment,
+	updateTaskDescription,
 	updateTaskRecurringJob,
 } from "@mimir/db/queries/tasks";
 import { getDuplicateTaskEmbedding } from "@mimir/db/queries/tasks-embeddings";
@@ -172,7 +173,7 @@ export const tasksRouter = router({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			return updateTask({
+			return updateTaskDescription({
 				...input,
 				userId: ctx.user.id,
 				teamId: ctx.user.teamId!,

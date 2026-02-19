@@ -638,7 +638,7 @@ export const updateTaskDescription = async ({
 	teamId,
 }: {
 	id: string;
-	description: string;
+	description?: string;
 	userId: string;
 	teamId: string;
 }) => {
@@ -647,7 +647,7 @@ export const updateTaskDescription = async ({
 	const [task] = await db
 		.update(tasks)
 		.set({
-			description,
+			description: description ?? "",
 			updatedAt: new Date().toISOString(),
 		})
 		.where(and(...whereClause))
