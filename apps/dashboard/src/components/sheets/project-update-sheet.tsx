@@ -51,7 +51,7 @@ export const ProjectUpdateSheet = () => {
 						/>
 					</div>
 				) : (
-					<Skeleton className="h-[200px] w-full" />
+					<Skeleton className="h-[120px] w-full" />
 				)}
 			</DialogContent>
 		</Dialog>

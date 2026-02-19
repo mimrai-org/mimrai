@@ -2,13 +2,19 @@ import { useQuery } from "@tanstack/react-query";
 import { Input } from "@ui/components/ui/input";
 import {
 	SidebarGroup,
+	SidebarGroupAction,
 	SidebarGroupContent,
 	SidebarGroupLabel,
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from "@ui/components/ui/sidebar";
-import { ChevronLeftIcon, MessageCirclePlus, SearchIcon } from "lucide-react";
+import {
+	ChevronLeftIcon,
+	MessageCirclePlus,
+	PlusIcon,
+	SearchIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -60,19 +66,17 @@ export const ChatSidebar = () => {
 										<span>{selectedAgent.name}</span>
 									</SidebarMenuButton>
 								</SidebarMenuItem>
-
-								<SidebarMenuItem>
-									<Link href={`${user.basePath}/chat`}>
-										<SidebarMenuButton>
-											<MessageCirclePlus />
-											<span>New Chat</span>
-										</SidebarMenuButton>
-									</Link>
-								</SidebarMenuItem>
 							</SidebarMenu>
 						</SidebarGroupContent>
 					</SidebarGroup>
 					<SidebarGroup className="flex-1">
+						<SidebarGroupLabel>Chats</SidebarGroupLabel>
+						<Link href={`${user.basePath}/chat`}>
+							<SidebarGroupAction>
+								<PlusIcon />
+								<span className="sr-only">New Chat</span>
+							</SidebarGroupAction>
+						</Link>
 						<SidebarGroupContent className="flex flex-1 flex-col">
 							<SidebarMenu className="flex-1">
 								<SidebarMenuItem className="relative">

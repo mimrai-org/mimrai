@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { BoxIcon } from "lucide-react";
+import { BoxIcon, FolderIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Response } from "@/components/chat/response";
 import { trpc } from "@/utils/trpc";
@@ -19,7 +19,7 @@ export const ProjectResultItem = ({ item }: ResultItemProps) => {
 	return (
 		<BaseResultItem
 			onSelect={handleSelect}
-			icon={BoxIcon}
+			icon={FolderIcon}
 			preview={<ProjectResultPreview item={item} />}
 			iconColor={item.color}
 			title={item.title}
