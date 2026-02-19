@@ -47,9 +47,9 @@ import { useUser } from "@/components/user-provider";
 import type { Document } from "@/hooks/use-data";
 import { useDocuments } from "@/hooks/use-data";
 import {
-	invalidateDocumentsCache,
-	updateDocumentInCache,
-} from "@/hooks/use-data-cache-helpers";
+	invalidateDocumentQueries,
+	optimisticUpdateDocument,
+} from "@/store/entity-mutations";
 import { trpc } from "@/utils/trpc";
 import { DocumentContextMenu } from "./context-menu";
 import { DocumentIcon } from "./document-icon";
@@ -293,7 +293,7 @@ export function DocumentsSidebar() {
 			},
 			onSuccess: (doc) => {
 				toast.success("Document created", { id: "create-document" });
-				invalidateDocumentsCache();
+				invalidateDocumentQueries();
 				router.push(`${user.basePath}/documents/${doc.id}`);
 			},
 			onError: () => {
@@ -307,7 +307,7 @@ export function DocumentsSidebar() {
 			onSuccess: (docs) => {
 				console.log("Reorder successful", docs);
 				for (const doc of docs) {
-					updateDocumentInCache(doc);
+					optimisticUpdateDocument(doc.id, doc);
 				}
 			},
 			onError: () => {

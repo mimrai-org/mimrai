@@ -7,8 +7,9 @@ import { CheckIcon, Trash2Icon, XIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import Loader from "@/components/loader";
+import { invalidateTaskQueries } from "@/store/entity-mutations";
 import { useTaskSelectionStore } from "@/store/task-selection";
-import { queryClient, trpc } from "@/utils/trpc";
+import { trpc } from "@/utils/trpc";
 
 export const TaskListBulkActions = () => {
 	const selectedTaskIds = useTaskSelectionStore(
@@ -28,8 +29,7 @@ export const TaskListBulkActions = () => {
 		trpc.tasks.bulkUpdate.mutationOptions({
 			onSuccess: () => {
 				clearTaskSelection();
-				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
-				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
+				invalidateTaskQueries();
 			},
 		}),
 	);
@@ -39,8 +39,7 @@ export const TaskListBulkActions = () => {
 			onSuccess: () => {
 				clearTaskSelection();
 				setConfirmDelete(false);
-				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
-				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
+				invalidateTaskQueries();
 			},
 		}),
 	);

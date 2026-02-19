@@ -3,10 +3,10 @@ import {
 	type UseQueryOptions,
 	useMutation,
 	useQuery,
-	useQueryClient,
 } from "@tanstack/react-query";
 import { useMemo } from "react";
 import type { EnrichedTask, Task } from "@/hooks/use-data";
+import { optimisticUpdateTask } from "@/store/entity-mutations";
 import { trpc } from "@/utils/trpc";
 import { AssigneeAvatar } from "../asignee-avatar";
 import { MilestoneIcon } from "../milestone-icon";
@@ -315,8 +315,6 @@ export const useTasksGrouped = () => {
 		return group;
 	}, [tasks, columns, filters.groupBy, filters?.showEmptyColumns]);
 
-	const queryClient = useQueryClient();
-
 	// 2. Mutations
 	const { mutateAsync: updateTask } = useMutation(
 		trpc.tasks.update.mutationOptions(),
@@ -414,26 +412,9 @@ export const useTasksGrouped = () => {
 	};
 
 	const updateCache = (updatedTask: Partial<Task>) => {
-		queryClient.setQueryData(
-			trpc.tasks.get.infiniteQueryKey({
-				...filters,
-				view: filters.viewType,
-			}),
-			(old) => {
-				if (!old) return old;
-				return {
-					...old,
-					pages: old.pages.map((page) => ({
-						...page,
-						data: page.data
-							.map((t) =>
-								t.id === updatedTask.id ? { ...t, ...updatedTask } : t,
-							)
-							.sort((a, b) => a.order - b.order),
-					})),
-				};
-			},
-		);
+		if (updatedTask.id) {
+			optimisticUpdateTask(updatedTask.id, updatedTask);
+		}
 	};
 
 	return {
