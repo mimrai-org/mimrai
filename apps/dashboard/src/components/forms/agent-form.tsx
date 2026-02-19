@@ -27,11 +27,11 @@ import { toast } from "sonner";
 import z from "zod";
 import { Editor } from "@/components/editor";
 import { useAgentParams } from "@/hooks/use-agent-params";
-import {
-	invalidateAgentsCache,
-	invalidateMembersCache,
-} from "@/hooks/use-data-cache-helpers";
 import { useZodForm } from "@/hooks/use-zod-form";
+import {
+	invalidateAgentQueries,
+	invalidateMemberQueries,
+} from "@/store/entity-mutations";
 import { queryClient, trpc } from "@/utils/trpc";
 import { AssigneeAvatar } from "../asignee-avatar";
 
@@ -71,8 +71,8 @@ export const AgentForm = ({
 	const { mutate: createAgent, isPending: isCreating } = useMutation(
 		trpc.agents.create.mutationOptions({
 			onSuccess: () => {
-				invalidateMembersCache();
-				invalidateAgentsCache();
+				invalidateMemberQueries();
+				invalidateAgentQueries();
 				toast.success("Agent created");
 				setParams(null);
 			},
@@ -82,8 +82,8 @@ export const AgentForm = ({
 	const { mutate: updateAgent, isPending: isUpdating } = useMutation(
 		trpc.agents.update.mutationOptions({
 			onSuccess: () => {
-				invalidateAgentsCache();
-				invalidateMembersCache();
+				invalidateAgentQueries();
+				invalidateMemberQueries();
 				toast.success("Agent updated");
 				setParams(null);
 			},

@@ -27,6 +27,7 @@ import {
 	useTaskPanel,
 } from "@/components/panels/task-panel";
 import type { Task } from "@/hooks/use-data";
+import { entityStore } from "@/store/entity-store";
 import { useTaskSelectionStore } from "@/store/task-selection";
 import { queryClient, trpc } from "@/utils/trpc";
 import Loader from "../../loader";
@@ -59,6 +60,7 @@ export const TasksList = () => {
 	const taskPanel = useTaskPanel();
 	const handleOpenTask = useCallback(
 		(task: Task) => {
+			entityStore.getState().upsertTasks([task]);
 			queryClient.setQueryData(
 				trpc.tasks.getById.queryKey({ id: task.id }),
 				task,

@@ -27,6 +27,7 @@ import { motion } from "motion/react";
 import Link from "next/link";
 import { useState } from "react";
 import { useUser } from "@/components/user-provider";
+import { invalidateTaskQueries } from "@/store/entity-mutations";
 import { queryClient, trpc } from "@/utils/trpc";
 import { useZenMode, type ZenModeTask } from "./use-zen-mode";
 
@@ -100,7 +101,7 @@ export const ZenModeQueueList = ({
 	const { mutate: updateTask } = useMutation(
 		trpc.tasks.update.mutationOptions({
 			onSettled: () => {
-				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
+				invalidateTaskQueries();
 			},
 		}),
 	);

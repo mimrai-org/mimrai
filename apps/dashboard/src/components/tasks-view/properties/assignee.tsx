@@ -14,7 +14,8 @@ import {
 import { useMemo, useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
 import { cn } from "@/lib/utils";
-import { queryClient, trpc } from "@/utils/trpc";
+import { optimisticUpdateTask } from "@/store/entity-mutations";
+import { trpc } from "@/utils/trpc";
 import { Assignee, AssigneeAvatar } from "../../asignee-avatar";
 import type { KanbanTask } from "../kanban/kanban-task";
 
@@ -49,9 +50,8 @@ export const TaskPropertyAssignee = ({ task }: { task: KanbanTask }) => {
 
 	const { mutate: updateTask, isPending } = useMutation(
 		trpc.tasks.update.mutationOptions({
-			onSuccess: (task) => {
-				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
-				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
+			onMutate: (variables) => {
+				optimisticUpdateTask(variables.id, variables);
 			},
 		}),
 	);

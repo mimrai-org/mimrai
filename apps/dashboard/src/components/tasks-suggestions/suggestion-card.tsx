@@ -21,6 +21,7 @@ import type {
 import { motion } from "motion/react";
 import { toast } from "sonner";
 import { useTaskParams } from "@/hooks/use-task-params";
+import { invalidateTaskQueries } from "@/store/entity-mutations";
 import { queryClient, trpc } from "@/utils/trpc";
 import Loader from "../loader";
 
@@ -79,8 +80,7 @@ export const SuggestionCard = ({
 
 				if (!data) return;
 
-				queryClient.invalidateQueries(trpc.tasks.get.queryOptions({}));
-				queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions({}));
+				invalidateTaskQueries();
 				queryClient.setQueryData(
 					trpc.tasksSuggestions.get.queryKey({
 						status: ["pending"],

@@ -8,7 +8,8 @@ import {
 	useState,
 } from "react";
 import { useActivitiesRealtime } from "@/hooks/use-activities-realtime";
-import { type EnrichedTask, useTasks } from "@/hooks/use-data";
+import type { EnrichedTask } from "@/hooks/use-data";
+import { useEntityTasks } from "@/hooks/use-entity-data";
 import { useTasksFilterParams } from "@/hooks/use-tasks-filter-params";
 import { useUser } from "../user-provider";
 import { TasksCalendar } from "./calendar/calendar";
@@ -130,8 +131,8 @@ export const TasksView = ({
 		[],
 	);
 
-	// Use the unified hook for fetching tasks with client-side joins
-	const { tasks, isLoading, fetchNextPage, hasNextPage } = useTasks(
+	// Use the entity store for fetching tasks with normalized data
+	const { tasks, isLoading, fetchNextPage, hasNextPage } = useEntityTasks(
 		{
 			...filters,
 			// Calendar view uses the same data as list view

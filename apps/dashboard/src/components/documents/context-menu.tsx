@@ -9,7 +9,7 @@ import { ArrowUpRightIcon, FilePlus, TrashIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { Document } from "@/hooks/use-data";
-import { invalidateDocumentsCache } from "@/hooks/use-data-cache-helpers";
+import { invalidateDocumentQueries } from "@/store/entity-mutations";
 import { trpc } from "@/utils/trpc";
 import {
 	useCreateDocumentPanel,
@@ -35,7 +35,7 @@ export const DocumentContextMenu = ({
 			},
 			onSuccess: () => {
 				toast.success("Document deleted", { id: "delete-document" });
-				invalidateDocumentsCache();
+				invalidateDocumentQueries();
 			},
 			onError: () => {
 				toast.error("Failed to delete document", { id: "delete-document" });
@@ -50,7 +50,7 @@ export const DocumentContextMenu = ({
 			},
 			onSuccess: (doc) => {
 				toast.success("Document created", { id: "create-document" });
-				invalidateDocumentsCache();
+				invalidateDocumentQueries();
 				router.push(`${user.basePath}/documents/${doc.id}`);
 			},
 			onError: () => {

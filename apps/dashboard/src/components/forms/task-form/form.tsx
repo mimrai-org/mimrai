@@ -16,12 +16,12 @@ import {
 	useTaskPanel,
 } from "@/components/panels/task-panel";
 import { useUser } from "@/components/user-provider";
-import {
-	invalidateTasksCache,
-	updateTaskInCache,
-} from "@/hooks/use-data-cache-helpers";
 import { useTaskParams } from "@/hooks/use-task-params";
 import { useFormAutoSave, useZodForm } from "@/hooks/use-zod-form";
+import {
+	invalidateTaskQueries,
+	optimisticUpdateTask,
+} from "@/store/entity-mutations";
 import { trpc } from "@/utils/trpc";
 import { ActionsMenu } from "./actions-menu";
 import { TaskActivitiesList } from "./activities-list";
@@ -79,7 +79,7 @@ export const TaskForm = ({
 			},
 			onSuccess: (task) => {
 				toast.success("Task created successfully", { id: "create-task" });
-				invalidateTasksCache();
+				invalidateTaskQueries();
 				taskPanel.open(task.id);
 				createTaskPanel.closeAll();
 				cloneTaskPanel.closeAll();
@@ -96,7 +96,7 @@ export const TaskForm = ({
 				toast.error("Failed to update task", { id: "update-task" });
 			},
 			onSuccess: (task) => {
-				updateTaskInCache(task);
+				optimisticUpdateTask(task.id, task);
 			},
 		}),
 	);
@@ -112,7 +112,7 @@ export const TaskForm = ({
 				});
 			},
 			onSuccess: (task) => {
-				updateTaskInCache(task);
+				optimisticUpdateTask(task.id, task);
 			},
 		}),
 	);

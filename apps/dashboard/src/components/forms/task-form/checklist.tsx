@@ -39,6 +39,7 @@ import { Response } from "@/components/chat/response";
 import { Editor } from "@/components/editor";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { cn } from "@/lib/utils";
+import { invalidateTaskQueries } from "@/store/entity-mutations";
 import { queryClient, trpc } from "@/utils/trpc";
 
 export const TaskChecklist = ({ taskId }: { taskId: string }) => {
@@ -92,7 +93,7 @@ export const TaskChecklist = ({ taskId }: { taskId: string }) => {
 						);
 					},
 				);
-				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
+				invalidateTaskQueries();
 			},
 		}),
 	);
@@ -103,7 +104,7 @@ export const TaskChecklist = ({ taskId }: { taskId: string }) => {
 				queryClient.invalidateQueries(
 					trpc.checklists.get.queryOptions({ taskId }),
 				);
-				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
+				invalidateTaskQueries();
 				toast.success("Checklist item deleted");
 			},
 		}),
@@ -330,7 +331,7 @@ export const TaskChecklistItemForm = ({
 				queryClient.invalidateQueries(
 					trpc.checklists.get.queryOptions({ taskId }),
 				);
-				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
+				invalidateTaskQueries();
 				onSuccess();
 				toast.success("Checklist item created");
 			},

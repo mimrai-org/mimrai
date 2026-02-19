@@ -29,10 +29,7 @@ export default function Providers({
 				withCredentials: true,
 			}}
 		>
-			<PersistQueryClientProviderWithIDB
-				client={localQueryClient}
-				session={session}
-			>
+			<QueryClientProvider client={localQueryClient}>
 				<ThemeProvider
 					attribute="class"
 					defaultTheme="system"
@@ -43,7 +40,7 @@ export default function Providers({
 				</ThemeProvider>
 				{/* <CleanTasksFilters /> */}
 				{/* <ReactQueryDevtools /> */}
-			</PersistQueryClientProviderWithIDB>
+			</QueryClientProvider>
 		</RealtimeProvider>
 	);
 }
