@@ -26,13 +26,13 @@ import {
 	useCreateTaskPanel,
 	useTaskPanel,
 } from "@/components/panels/task-panel";
-import { useTaskParams } from "@/hooks/use-task-params";
+import type { Task } from "@/hooks/use-data";
 import { useTaskSelectionStore } from "@/store/task-selection";
 import { queryClient, trpc } from "@/utils/trpc";
 import Loader from "../../loader";
 import { TaskContextMenu } from "../../task-context-menu";
 import type { PropertyKey } from "../properties/task-properties";
-import { type GenericGroup, type Task, useTasksGrouped } from "../tasks-group";
+import { type GenericGroup, useTasksGrouped } from "../tasks-group";
 import { useTasksViewContext } from "../tasks-view";
 import { TaskListBulkActions } from "./bulk-actions";
 import { TaskItem } from "./task-item";

@@ -92,7 +92,7 @@ export const TaskContextMenu = ({
 				toast.success("Task updated", {
 					id: "update-task",
 				});
-				updateTaskInCache(task);
+				invalidateTasksCache();
 			},
 			onError: () => {
 				toast.error("Failed to update task", {
@@ -132,8 +132,7 @@ export const TaskContextMenu = ({
 
 	const handleDeleteTask = async (taskId: string) => {
 		await deleteTask({ id: taskId });
-		queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
-		queryClient.invalidateQueries(trpc.tasks.get.infiniteQueryOptions());
+		invalidateTasksCache();
 	};
 
 	const handleUpdateTask = async (data: {
