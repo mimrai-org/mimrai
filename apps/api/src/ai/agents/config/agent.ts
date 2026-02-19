@@ -1,16 +1,19 @@
 import type { UIChatMessage } from "@api/ai/types";
 import { generateTitle } from "@api/ai/utils/generate-title";
 import { summarizeChat } from "@api/ai/utils/summarize-chat";
+import { phClient } from "@api/lib/posthog";
 import {
 	getChatById,
 	saveChat,
 	saveChatMessage,
 } from "@mimir/db/queries/chats";
+import { withTracing } from "@posthog/ai";
 import {
 	convertToModelMessages,
 	createUIMessageStream,
 	type GatewayModelId,
 	gateway,
+	type LanguageModel,
 	type ModelMessage,
 	smoothStream,
 	ToolLoopAgent,
@@ -95,9 +98,27 @@ export const createAgent = (config: AgentConfig) => {
 	const buildAgent = (params: AgentGenerateParams) => {
 		const ctx = params.context;
 		const instructions = config.buildInstructions?.(ctx) ?? "";
+		const model =
+			typeof config.model === "string"
+				? gateway(config.model as GatewayModelId)
+				: (config.model as Exclude<LanguageModel, string>);
+
+		console.log({ model });
+
+		const posthogModelWrapped = withTracing(model, phClient, {
+			posthogDistinctId: ctx.userId,
+			posthogProperties: {
+				chatId: ctx.chatId,
+				agentId: ctx.agentId,
+			},
+			posthogGroups: {
+				team: ctx.teamId,
+			},
+		});
 
 		const agent = new ToolLoopAgent({
 			...config,
+			model: posthogModelWrapped,
 			experimental_context: params.context,
 			experimental_repairToolCall: repairToolCall,
 			instructions: instructions,
