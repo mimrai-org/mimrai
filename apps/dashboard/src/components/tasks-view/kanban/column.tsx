@@ -95,10 +95,9 @@ export function BoardColumn({ column, columnName, tasks }: BoardColumnProps) {
 						size="sm"
 						variant="ghost"
 						onClick={() => {
-							setTaskParams({
-								createTask: true,
-								taskStatusId: column.id,
-								taskProjectId:
+							createTaskPanel.open("create", {
+								statusId: column.id,
+								projectId:
 									filters.projectId?.length > 0
 										? filters.projectId[0]
 										: undefined,
