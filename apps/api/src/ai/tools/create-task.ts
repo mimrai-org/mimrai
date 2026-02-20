@@ -7,10 +7,7 @@ import { getToolContext } from "../agents/config/shared";
 
 export const createTaskToolSchema = z.object({
 	title: z.string().min(1).describe("Title"),
-	description: z
-		.string()
-		.optional()
-		.describe("Description, HTML format supported"),
+	description: z.string().optional().describe("Description, Markdown format"),
 	assigneeId: z.string().optional().describe("User ID (uuid) of the assignee"),
 	priority: z
 		.enum(["low", "medium", "high", "urgent"])

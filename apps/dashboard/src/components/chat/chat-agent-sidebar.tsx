@@ -22,11 +22,14 @@ import {
 	SidebarMenuItem,
 } from "@ui/components/ui/sidebar";
 import {
-	DotIcon,
-	KeyIcon,
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@ui/components/ui/tooltip";
+import {
+	InfoIcon,
 	PlusIcon,
 	SettingsIcon,
-	SignalHigh,
 	TriangleAlert,
 	XIcon,
 } from "lucide-react";
@@ -48,6 +51,17 @@ export const ChatAgentSidebar = () => {
 	const selectedAgentId = useChatStore((state) => state.selectedAgentId);
 	const hasSelectedAgent = !!selectedAgentId;
 
+	const { data: selectedAgent } = useQuery(
+		trpc.agents.getById.queryOptions(
+			{
+				id: selectedAgentId!,
+			},
+			{
+				enabled: hasSelectedAgent,
+			},
+		),
+	);
+
 	const { data: documentsForAgent } = useQuery(
 		trpc.agents.getDocumentsForAgent.queryOptions(
 			{
@@ -63,6 +77,18 @@ export const ChatAgentSidebar = () => {
 		trpc.agents.getToolsForAgent.queryOptions(
 			{
 				id: selectedAgentId!,
+			},
+			{
+				enabled: hasSelectedAgent,
+			},
+		),
+	);
+
+	const { data: agentRecurringTasks } = useQuery(
+		trpc.tasks.get.queryOptions(
+			{
+				assigneeId: [selectedAgent.userId],
+				recurring: true,
 			},
 			{
 				enabled: hasSelectedAgent,
@@ -205,6 +231,31 @@ export const ChatAgentSidebar = () => {
 										<TriangleAlert className="text-destructive" />
 									)}
 								</SidebarMenuAction>
+							</SidebarMenuItem>
+						))}
+					</SidebarMenu>
+				</SidebarGroupContent>
+			</SidebarGroup>
+			<SidebarGroup>
+				<SidebarGroupLabel>Recurring tasks</SidebarGroupLabel>
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<SidebarGroupAction>
+							<InfoIcon />
+						</SidebarGroupAction>
+					</TooltipTrigger>
+					<TooltipContent className="max-w-xs">
+						Ask your agent to create recurring tasks assigned to itself to see
+						them here.
+					</TooltipContent>
+				</Tooltip>
+				<SidebarGroupContent>
+					<SidebarMenu>
+						{agentRecurringTasks?.data.map((task) => (
+							<SidebarMenuItem key={task.id}>
+								<SidebarMenuButton>
+									<span>{task.title}</span>
+								</SidebarMenuButton>
 							</SidebarMenuItem>
 						))}
 					</SidebarMenu>

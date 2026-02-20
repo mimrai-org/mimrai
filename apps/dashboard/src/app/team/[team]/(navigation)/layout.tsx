@@ -16,7 +16,14 @@ export default async function DashboardLayout({
 		<>
 			{/*<Header />*/}
 			<Suspense>
-				<SidebarProvider defaultOpen={true}>
+				<SidebarProvider
+					defaultOpen={true}
+					style={
+						{
+							"--sidebar-width": "240px",
+						} as React.CSSProperties
+					}
+				>
 					<AppSidebar />
 					<BreadcrumbsProvider session={session}>
 						<main className="flex flex-1 flex-col">
