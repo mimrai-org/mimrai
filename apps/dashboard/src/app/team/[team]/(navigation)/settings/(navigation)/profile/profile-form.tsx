@@ -73,7 +73,6 @@ export const ProfileForm = ({
 
 		const formData = new FormData();
 		formData.append("file", file);
-		console.log("Uploading file:", file.name);
 
 		const response = await fetch(`${getApiUrl()}/api/attachments/upload`, {
 			method: "POST",

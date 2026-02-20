@@ -305,7 +305,6 @@ export function DocumentsSidebar() {
 	const { mutate: reorderDocuments } = useMutation(
 		trpc.documents.reorder.mutationOptions({
 			onSuccess: (docs) => {
-				console.log("Reorder successful", docs);
 				for (const doc of docs) {
 					updateDocumentInCache(doc);
 				}
@@ -331,8 +330,6 @@ export function DocumentsSidebar() {
 
 	const handleDragEnd = (event: DragEndEvent) => {
 		const { active, over } = event;
-
-		console.log({ active, over });
 
 		if (!over || active.id === over.id) return;
 

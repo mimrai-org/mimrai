@@ -55,7 +55,6 @@ export const ChatInput = () => {
 
 	const handleSubmit = (message: ChatInputMessage) => {
 		const cleanText = message.text?.replace(/&nbsp;/g, "").trim();
-		console.log(cleanText);
 		const hasText = Boolean(cleanText);
 		const hasAttachments = Boolean(message.files?.length);
 

@@ -59,8 +59,6 @@ export const MattermostNotificationsSettings = ({
 		}),
 	);
 
-	console.log(form.formState.errors);
-
 	const handleSubmit = (data: z.infer<typeof schema>) => {
 		if (!installedIntegration) return;
 

@@ -150,7 +150,6 @@ export const Messages = ({ isStreaming }: { isStreaming?: boolean }) => {
 						// Get agent info for tool call status indicators
 						const agentId = message.metadata?.agentId;
 
-						console.log({ agentId, textParts });
 						const agent = agents?.data.find((agent) => agent.id === agentId);
 
 						return (

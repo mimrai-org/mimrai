@@ -1,6 +1,6 @@
 import { TZDate } from "@date-fns/tz";
 import { createActivity } from "@mimir/db/queries/activities";
-import { getSystemUser } from "@mimir/db/queries/users";
+import { getMimirUser } from "@mimir/db/queries/users";
 import {
 	activities,
 	autopilotSettings,
@@ -121,7 +121,7 @@ ${completedTasks
 
 		console.log(summary.usage);
 
-		const user = await getSystemUser();
+		const user = await getMimirUser({ teamId });
 
 		logger.info(summary.text);
 

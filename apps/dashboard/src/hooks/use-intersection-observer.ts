@@ -27,8 +27,6 @@ export const useIntersectionObserver = <T extends HTMLElement = HTMLElement>({
 					const isElementIntersecting = entry.isIntersecting;
 					setIsIntersecting(isElementIntersecting);
 
-					console.log(isElementIntersecting);
-
 					if (isElementIntersecting && !hasIntersected) {
 						setHasIntersected(true);
 					}

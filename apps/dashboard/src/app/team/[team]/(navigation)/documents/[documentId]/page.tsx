@@ -13,8 +13,6 @@ export default async function DocumentPage({ params }: Props) {
 		id: documentId,
 	});
 
-	console.log("DocumentPage", { documentId, document });
-
 	if (!document) {
 		return (
 			<div className="flex h-full items-center justify-center">
