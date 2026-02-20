@@ -48,6 +48,9 @@ export const createAgent = (config: AgentConfig) => {
 
 		const savePromises = [];
 
+		const createdAt = new Date();
+		const assistantCreatedAt = new Date(createdAt.getTime() + 500); // Ensure assistant message is after user message
+
 		// Save the message to the chat
 		savePromises.push(
 			saveChatMessage({
@@ -56,6 +59,7 @@ export const createAgent = (config: AgentConfig) => {
 				userId: context.userId,
 				message: assistantMessage,
 				role: "assistant",
+				createdAt: assistantCreatedAt.toISOString(),
 			}),
 		);
 
@@ -67,6 +71,7 @@ export const createAgent = (config: AgentConfig) => {
 				userId: context.userId,
 				message: userMessage,
 				role: "user",
+				createdAt: createdAt.toISOString(),
 			}),
 		);
 

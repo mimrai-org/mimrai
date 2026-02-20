@@ -128,28 +128,6 @@ export const Messages = ({ isStreaming }: { isStreaming?: boolean }) => {
 						// Extract sources from webSearch tool results (already deduplicated)
 						const webSearchSources = extractWebSearchSources(message.parts);
 
-						// Extract tool calls for status indicators
-						const toolCallParts = message.parts.filter((part) =>
-							part.type.startsWith("tool-"),
-						);
-
-						const toolCalls = toolCallParts.map((part) => {
-							const toolCallPart = part as {
-								input: Record<string, unknown>;
-								output: Record<string, unknown>;
-								type: string;
-								state: "output-available" | "output-error" | "output-denied";
-							};
-							const toolName = toolCallPart.type.replace("tool-", "");
-
-							return {
-								toolName: toolName,
-								input: toolCallPart.input,
-								output: toolCallPart.output,
-								state: toolCallPart.state,
-							};
-						});
-
 						// Combine sources and deduplicate between AI SDK and webSearch sources
 						const allSources = [...aiSdkSources, ...webSearchSources];
 						const uniqueSources = allSources.filter(
@@ -195,32 +173,6 @@ export const Messages = ({ isStreaming }: { isStreaming?: boolean }) => {
 										<ReasoningTrigger />
 										<ReasoningContent>{reasoningContent}</ReasoningContent>
 									</Reasoning>
-								)}
-
-								{toolCallParts.length > 0 && (
-									<div className="mb-2 flex flex-col gap-1 text-xs">
-										{toolCalls.map((toolCall, idx) => (
-											<div
-												key={idx}
-												className="flex w-fit items-center gap-2 rounded-md bg-transparent px-2 py-1 text-muted-foreground dark:bg-transparent/30"
-											>
-												{![
-													"output-available",
-													"output-error",
-													"output-denied",
-												].includes(toolCall.state) ? (
-													<Loader className="size-3" />
-												) : (
-													<WrenchIcon
-														className={cn("size-3", {
-															"text-red-500": toolCall.state === "output-error",
-														})}
-													/>
-												)}
-												{toolCall.toolName}
-											</div>
-										))}
-									</div>
 								)}
 
 								{/* Render file attachments */}

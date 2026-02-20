@@ -2,7 +2,7 @@
 import { useChat } from "@ai-sdk/react";
 import type { UIChatMessage } from "@api/ai/types";
 import { DefaultChatTransport } from "ai";
-import { createContext, useContext, useEffect, useMemo } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef } from "react";
 import { getSelectedAgentCookieKeyClient, useChatStore } from "@/store/chat";
 import { useUser } from "../user-provider";
 import type { ChatInputMessage } from "./chat-input";
@@ -39,6 +39,7 @@ export const ChatProvider = ({
 	const user = useUser();
 	const setSelectedAgentId = useChatStore((state) => state.setSelectedAgentId);
 	const selectedAgentId = useChatStore((state) => state.selectedAgentId);
+	const hasAttemptedResumeRef = useRef(false);
 
 	const authenticatedFetch = useMemo(
 		() =>
@@ -94,8 +95,24 @@ export const ChatProvider = ({
 					},
 				};
 			},
+			prepareReconnectToStreamRequest({ id }) {
+				return {
+					api: `${process.env.NEXT_PUBLIC_SERVER_URL}/api/chat/${id}/stream`,
+					credentials: "include",
+				};
+			},
 		}),
 	});
+
+	useEffect(() => {
+		if (hasAttemptedResumeRef.current) {
+			return;
+		}
+		hasAttemptedResumeRef.current = true;
+		chat.resumeStream().catch((error) => {
+			console.error("Failed to resume chat stream:", error);
+		});
+	}, [chat]);
 
 	const merge = useMemo(() => {
 		return {

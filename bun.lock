@@ -59,6 +59,7 @@
         "posthog-node": "^5.24.17",
         "redis": "^5.8.2",
         "resend": "^6.1.2",
+        "resumable-stream": "^2.2.10",
         "stripe": "^19.1.0",
         "twilio": "^5.10.4",
         "zod": "catalog:",
@@ -3157,6 +3158,8 @@
     "responsive-react-email": ["responsive-react-email@0.0.5", "", { "peerDependencies": { "react": "18.x", "react-email": "1.x" } }, "sha512-r+Z6Yp6G3Sm9eKmttsb8GVij25rXJGN2eoQ9OfMcuVMfBfq1NdytIFLBo/6wdMW1zw+ko1FEUG/zgRyK9UuYLw=="],
 
     "restore-cursor": ["restore-cursor@5.1.0", "", { "dependencies": { "onetime": "^7.0.0", "signal-exit": "^4.1.0" } }, "sha512-oMA2dcrw6u0YfxJQXm342bFKX/E4sG9rbTzO9ptUcR/e8A33cHuvStiYOwH7fszkZlZ1z/ta9AAoPk2F4qIOHA=="],
+
+    "resumable-stream": ["resumable-stream@2.2.10", "", {}, "sha512-pSJtiDVkPgirq4x+e+gu67IEkUVYGu1cPgW5AnTHCfYGRfIUjS3d4pj7VGveXmYWb9hy6yIMFTM4YzK7rqj14A=="],
 
     "retry": ["retry@0.13.1", "", {}, "sha512-XQBQ3I8W1Cge0Seh+6gjj03LbmRFWuoszgK9ooCpwYIrhhoO80pfq4cUkU5DkknwfOfFteRwlZ56PYOGYyFWdg=="],
 

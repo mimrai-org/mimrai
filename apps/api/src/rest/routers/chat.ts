@@ -1,6 +1,7 @@
 import { createAgentFromDB } from "@api/ai/agents/agent-factory";
 import { type AppContext, buildAppContext } from "@api/ai/agents/config/shared";
 import { buildWorkspaceSystemPrompt } from "@api/ai/agents/workspace-agent";
+import { chatResumableStreamContext } from "@api/ai/chat-stream-context";
 import { getAllToolsForUser } from "@api/ai/tools/tool-registry";
 import { formatLLMContextItems } from "@api/ai/utils/format-context-items";
 import { getUserContext } from "@api/ai/utils/get-user-context";
@@ -9,10 +10,19 @@ import { chatRequestSchema } from "@api/schemas/chat";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { calculateTokenUsageCost } from "@mimir/billing";
 import { getAgentById, getDocumentsForAgent } from "@mimir/db/queries/agents";
+import {
+	clearChatActiveStreamId,
+	clearChatActiveStreamIdIfMatch,
+	getChatById,
+	setChatActiveStreamId,
+} from "@mimir/db/queries/chats";
 import { recordCreditUsage } from "@mimir/db/queries/credits";
-import { getTeamById } from "@mimir/db/queries/teams";
 import { AGENT_DEFAULT_MODEL } from "@mimir/utils/agents";
-import { createUIMessageStreamResponse } from "ai";
+import {
+	createUIMessageStreamResponse,
+	generateId,
+	UI_MESSAGE_STREAM_HEADERS,
+} from "ai";
 import { withPlanFeatures } from "../middleware/plan-feature";
 
 const app = new OpenAPIHono<Context>();
@@ -79,6 +89,8 @@ app.post("/", withPlanFeatures(["ai"]), async (c) => {
 		id,
 	);
 
+	await clearChatActiveStreamId({ chatId: id });
+
 	// Use agent from database if agentId is provided, otherwise use default workspace agent
 	const agent = await createAgentFromDB({
 		agentId,
@@ -123,8 +135,57 @@ app.post("/", withPlanFeatures(["ai"]), async (c) => {
 		context: appContext,
 	});
 
+	const streamId = generateId();
+
 	return createUIMessageStreamResponse({
 		stream,
+		consumeSseStream: async ({ stream: sseStream }) => {
+			console.log("Setting active stream ID for chat:", id, streamId);
+			await setChatActiveStreamId({
+				chatId: id,
+				streamId,
+			});
+
+			try {
+				await chatResumableStreamContext.createNewResumableStream(
+					streamId,
+					() => sseStream,
+				);
+			} catch (error) {
+				await clearChatActiveStreamIdIfMatch({
+					chatId: id,
+					streamId,
+				});
+				console.error("Failed to create resumable stream:", error);
+			}
+		},
+	});
+});
+
+app.get("/:id/stream", withPlanFeatures(["ai"]), async (c) => {
+	const teamId = c.get("teamId");
+	const chatId = c.req.param("id");
+	const chat = await getChatById(chatId, teamId);
+
+	if (!chat) {
+		return c.body(null, 404);
+	}
+
+	if (!chat.activeStreamId) {
+		return c.body(null, 204);
+	}
+
+	const resumedStream = await chatResumableStreamContext.resumeExistingStream(
+		chat.activeStreamId,
+	);
+
+	if (!resumedStream) {
+		await clearChatActiveStreamId({ chatId });
+		return c.body(null, 204);
+	}
+
+	return new Response(resumedStream, {
+		headers: UI_MESSAGE_STREAM_HEADERS,
 	});
 });
 

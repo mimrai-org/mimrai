@@ -12,7 +12,7 @@ import {
 	PromptInputTools,
 } from "@mimir/ui/prompt-input-new";
 import type { Editor as EditorInstance } from "@tiptap/react";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { useChatParams } from "@/hooks/use-chat-params";
 import { useDataPart } from "@/hooks/use-data-part";
 import { useChatStore } from "@/store/chat";
@@ -38,8 +38,7 @@ export const ChatInput = () => {
 	const editorRef = useRef<EditorInstance>(null);
 	const { setParams, chatId: chatIdParam } = useChatParams();
 	const { setItems } = useChatContext();
-	const [value, setValue] = useState("");
-	const { status, id: chatId, sendMessage, stop } = useAIChat();
+	const { status, id: chatId, sendMessage } = useAIChat();
 	const [data] = useDataPart<ChatTitleData>("chat-title");
 	const chatTitle = data;
 
@@ -52,23 +51,20 @@ export const ChatInput = () => {
 		isProcessing,
 		showCommands,
 		setInput,
-		handleInputChange,
-		handleKeyDown,
-		resetCommandState,
 	} = useChatStore();
 
 	const handleSubmit = (message: ChatInputMessage) => {
-		const hasText = Boolean(message.text);
+		const cleanText = message.text?.replace(/&nbsp;/g, "").trim();
+		console.log(cleanText);
+		const hasText = Boolean(cleanText);
 		const hasAttachments = Boolean(message.files?.length);
 
 		if (!(hasText || hasAttachments)) {
 			return;
 		}
 
-		// If currently streaming, stop the current stream first
 		if (status === "streaming" || status === "submitted") {
-			stop?.();
-			// Continue to send the new message after stopping
+			return;
 		}
 
 		if (!chatIdParam) {
@@ -76,7 +72,7 @@ export const ChatInput = () => {
 		}
 
 		sendMessage({
-			text: message.text || "Sent with attachments",
+			text: cleanText || "Sent with attachments",
 			files: message.files,
 			metadata: {
 				agentId: selectedAgentId,

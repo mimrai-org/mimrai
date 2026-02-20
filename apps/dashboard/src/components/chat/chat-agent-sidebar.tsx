@@ -7,13 +7,6 @@ import {
 	CommandList,
 } from "@ui/components/ui/command";
 import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@ui/components/ui/dropdown-menu";
-import { Input } from "@ui/components/ui/input";
-import {
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
@@ -27,9 +20,8 @@ import {
 	SidebarMenuAction,
 	SidebarMenuButton,
 	SidebarMenuItem,
-	SidebarSeparator,
 } from "@ui/components/ui/sidebar";
-import { LinkIcon, PlusIcon, SettingsIcon, XIcon } from "lucide-react";
+import { PlusIcon, SettingsIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
 import { useAgentParams } from "@/hooks/use-agent-params";

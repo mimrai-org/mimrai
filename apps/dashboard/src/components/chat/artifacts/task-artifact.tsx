@@ -15,7 +15,7 @@ export const TaskArtifactMessage = ({
 	if (taskParts.length === 0) return null;
 
 	return (
-		<div className="flex flex-col gap-2">
+		<div className="my-6 flex flex-col gap-2">
 			{taskParts.map((part, index) => (
 				<TaskArtifact key={index} task={part.data} />
 			))}

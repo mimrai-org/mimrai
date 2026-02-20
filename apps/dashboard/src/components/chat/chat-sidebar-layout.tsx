@@ -31,7 +31,7 @@ export function ChatSidebarLayout({ children }: { children: React.ReactNode }) {
 			{selectedAgentId ? (
 				<>
 					<div className="flex-1 overflow-y-auto">{children}</div>
-					<Sidebar collapsible="none" className="border-l">
+					<Sidebar collapsible="none" className="hidden border-l xl:block">
 						<SidebarContent>
 							<ChatAgentSidebar />
 						</SidebarContent>

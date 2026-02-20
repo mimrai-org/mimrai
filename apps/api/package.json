@@ -51,6 +51,7 @@
 		"posthog-node": "^5.24.17",
 		"redis": "^5.8.2",
 		"resend": "^6.1.2",
+		"resumable-stream": "^2.2.10",
 		"stripe": "^19.1.0",
 		"twilio": "^5.10.4",
 		"zod": "catalog:",

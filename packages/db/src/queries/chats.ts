@@ -1,5 +1,5 @@
 import type { UIChatMessage } from "@api/ai/types";
-import { and, desc, eq, ilike, or, type SQL, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, type SQL, sql } from "drizzle-orm";
 import { db } from "..";
 import { chatMessages, chats } from "../schema";
 
@@ -94,6 +94,52 @@ export const deleteChat = async (chatId: string, teamId: string) => {
 	await db
 		.delete(chats)
 		.where(and(eq(chats.id, chatId), eq(chats.teamId, teamId)));
+};
+
+export const setChatActiveStreamId = async ({
+	chatId,
+	streamId,
+}: {
+	chatId: string;
+	streamId: string;
+}) => {
+	await db
+		.update(chats)
+		.set({
+			activeStreamId: streamId,
+			updatedAt: new Date().toISOString(),
+		})
+		.where(eq(chats.id, chatId));
+};
+
+export const clearChatActiveStreamId = async ({
+	chatId,
+}: {
+	chatId: string;
+}) => {
+	await db
+		.update(chats)
+		.set({
+			activeStreamId: null,
+			updatedAt: new Date().toISOString(),
+		})
+		.where(eq(chats.id, chatId));
+};
+
+export const clearChatActiveStreamIdIfMatch = async ({
+	chatId,
+	streamId,
+}: {
+	chatId: string;
+	streamId: string;
+}) => {
+	await db
+		.update(chats)
+		.set({
+			activeStreamId: null,
+			updatedAt: new Date().toISOString(),
+		})
+		.where(and(eq(chats.id, chatId), eq(chats.activeStreamId, streamId)));
 };
 
 export const getChatHistory = async ({

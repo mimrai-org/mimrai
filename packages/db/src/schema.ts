@@ -567,6 +567,7 @@ export const chats = pgTable(
 		userId: text("user_id").notNull(),
 		title: text("title"),
 		summary: text("summary"),
+		activeStreamId: text("active_stream_id"),
 		lastSummaryAt: timestamp("last_summary_at", {
 			withTimezone: true,
 			mode: "string",

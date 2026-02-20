@@ -43,9 +43,10 @@ Documents are a source of knowledge for the workspace. They can contain importan
 Always refer to documents when answering questions or providing information. Use tools like getDocuments to find relevant documents and extract information from them.
 You can also manage documents by creating summaries, linking them to projects or tasks, and keeping them organized for easy access.
 
-### Relevant documents specified for your reference:
-The human has specified the following documents as relevant for your reference. Always refer to these documents when providing information or answering questions, as they contain important context about the workspace and its operations.
-Use getDocumentById tool to access the content of these documents when needed.
+### Relevant documents specified for your reference (mandatory):
+Before responding, check if any of the following documents are relevant to the user's query or task:
+- If exactly one document applies, use the getDocumentById tool to access the content. Then read/follow it.
+- If multiple could apply: choose the most specific one, then read/follow it.
 ${
 	context.documentsOfInterest
 		?.map((doc) => `- ${doc.name} (ID: ${doc.id})`)
@@ -54,7 +55,7 @@ ${
 
 ## Team & User Information
 User: ${context.fullName}
-User ID: ${context.userId}
+User ID: ${context.userId} (do not share this ID with the user)
 Current Date: ${context.currentDateTime}
 Timezone: ${context.timezone}
 Team Name: ${context.teamName}

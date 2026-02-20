@@ -53,7 +53,7 @@ export const MessageContent = ({
 	...props
 }: MessageContentProps) => (
 	<div
-		className={cn(messageContentVariants({ variant, className }))}
+		className={cn(className, "max-w-[80%] rounded-sm bg-card p-3 text-sm")}
 		{...props}
 	>
 		{children}
