@@ -23,10 +23,14 @@ export const validateIntegration = async (
 		}
 
 		switch (type) {
-			case "mattermost":
-				return await validateMattermost(safeConfig.data);
+			case "mattermost": {
+				const parsedMattermost =
+					integrationsRegistry.mattermost.configSchema.parse(config);
+				return await validateMattermost(parsedMattermost);
+			}
 			case "whatsapp":
-				// Currently, WhatsApp integration does not require validation
+			case "smtp":
+				// Currently, these integrations do not require runtime validation
 				return true;
 			default:
 				throw new Error("Validation not implemented for this integration type");

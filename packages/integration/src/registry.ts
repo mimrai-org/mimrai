@@ -57,6 +57,20 @@ export const integrationsRegistry = {
 				.optional(),
 		}),
 	},
+	smtp: {
+		name: "SMTP",
+		type: "smtp" as const,
+		description: "Send emails using your custom SMTP server",
+		configSchema: z.object({
+			host: z.string().min(1, "Host is required"),
+			port: z.number().int().min(1).max(65535),
+			user: z.string().min(1, "User is required"),
+			password: z.string().min(1, "Password is required"),
+			secure: z.boolean().optional(),
+			fromName: z.string().optional(),
+			fromEmail: z.string().email().optional(),
+		}),
+	},
 } as const;
 
 export type IntegrationName = keyof typeof integrationsRegistry;

@@ -8,6 +8,7 @@ const icons = {
 	whatsapp: "/icons/whatsapp.svg",
 	github: "/icons/github.svg",
 	"google-calendar": "/icons/gcalendar.svg",
+	smtp: "/icons/gmail.svg",
 };
 
 export const IntegrationIcon = ({

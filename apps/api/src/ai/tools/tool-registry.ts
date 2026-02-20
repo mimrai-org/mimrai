@@ -51,6 +51,7 @@ import { getTaskByIdTool } from "./get-task-by-id";
 import { getTasksTool } from "./get-tasks";
 import { getUsersTool } from "./get-users";
 import { sendDraftEmailTool } from "./send-draft-email";
+import { sendEmailTool } from "./send-email";
 import { updateCalendarEventTool } from "./update-calendar-event";
 import { updateChecklistItemTool } from "./update-checklist-item";
 import { updateDocumentTool } from "./update-document";
@@ -140,6 +141,9 @@ export const integrationToolRegistry = {
 		updateCalendarEvent: updateCalendarEventTool,
 		deleteCalendarEvent: deleteCalendarEventTool,
 		getCalendarEvents: getCalendarEventsTool,
+	},
+	smtp: {
+		sendEmail: sendEmailTool,
 	},
 	// Future integrations can be added here:
 	// slack: { ... },

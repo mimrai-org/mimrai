@@ -11,6 +11,8 @@ import { ConfigIntegrationGoogleCalendarForm } from "./google-calendar/config";
 import { InstallIntegrationGoogleCalendarForm } from "./google-calendar/install";
 import { IntegrationMattermostForm } from "./mattermost/install";
 import { LinkIntegrationMattermostForm } from "./mattermost/link";
+import { ConfigIntegrationSmtpForm } from "./smtp/config";
+import { InstallIntegrationSmtpForm } from "./smtp/install";
 import { InstallIntegrationWhatsappForm } from "./whatsapp/install";
 
 export type IntegrationType = RouterOutputs["integrations"]["getByType"];
@@ -28,6 +30,7 @@ export const integrationInstallForms: Partial<
 	whatsapp: InstallIntegrationWhatsappForm,
 	"google-calendar": InstallIntegrationGoogleCalendarForm,
 	gmail: InstallIntegrationGmailForm,
+	smtp: InstallIntegrationSmtpForm,
 };
 
 export const integrationLinkUserForms: Partial<
@@ -37,6 +40,7 @@ export const integrationLinkUserForms: Partial<
 	mattermost: LinkIntegrationMattermostForm,
 	"google-calendar": InstallIntegrationGoogleCalendarForm,
 	gmail: InstallIntegrationGmailForm,
+	smtp: InstallIntegrationSmtpForm,
 };
 
 export const integrationConfigForms: Partial<
@@ -45,6 +49,7 @@ export const integrationConfigForms: Partial<
 	"google-calendar": ConfigIntegrationGoogleCalendarForm,
 	github: InstallIntegrationGithubForm,
 	gmail: ConfigIntegrationGmailForm,
+	smtp: ConfigIntegrationSmtpForm,
 };
 
 export const IntegrationForm = ({ type }: { type: IntegrationName }) => {

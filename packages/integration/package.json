@@ -18,7 +18,8 @@
 		"./slack": "./src/slack/index.ts",
 		"./whatsapp": "./src/whatsapp/index.ts",
 		"./google-calendar": "./src/google-calendar/index.ts",
-		"./gmail": "./src/gmail/index.ts"
+		"./gmail": "./src/gmail/index.ts",
+		"./smtp": "./src/smtp/index.ts"
 	},
 	"dependencies": {
 		"@ai-sdk/openai": "3.0.23",
@@ -28,13 +29,14 @@
 		"@mimir/db": "workspace:*",
 		"@mimir/events": "workspace:*",
 		"@mimir/utils": "workspace:*",
-		"@trigger.dev/sdk": "catalog:",
-		"date-fns": "^4.1.0",
 		"@slack/bolt": "^4.6.0",
+		"@trigger.dev/sdk": "catalog:",
 		"ai": "6.0.64",
+		"date-fns": "^4.1.0",
 		"drizzle-orm": "catalog:",
 		"googleapis": "^169.0.0",
 		"mime-types": "^3.0.1",
+		"nodemailer": "^8.0.1",
 		"redis": "^5.8.2",
 		"twilio": "^5.10.6",
 		"ws": "^8.18.3",

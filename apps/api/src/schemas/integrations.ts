@@ -80,3 +80,13 @@ export const updateLinkedUserSchema = z.object({
 	refreshToken: z.string().optional(),
 	config: z.record(z.string(), z.any()).optional(),
 });
+
+export const linkCurrentUserSchema = z.object({
+	integrationType: z.literal(
+		Object.keys(integrationsRegistry) as Array<
+			keyof typeof integrationsRegistry
+		>,
+	),
+	externalUserId: z.string().optional(),
+	externalUserName: z.string().optional(),
+});

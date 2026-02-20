@@ -4,6 +4,7 @@ import {
 	getIntegrationLogsSchema,
 	getLinkedUsersSchema,
 	installIntegrationSchema,
+	linkCurrentUserSchema,
 	updateIntegrationSchema,
 	updateLinkedUserSchema,
 	validateIntegrationSchema,
@@ -16,6 +17,7 @@ import {
 	getIntegrations,
 	getLinkedUsers,
 	installIntegration,
+	linkUserToIntegration,
 	uninstallIntegration,
 	updateIntegration,
 	updateLinkedUser,
@@ -143,6 +145,33 @@ export const integrationsRouter = router({
 				teamId: ctx.user.teamId!,
 				userId: ctx.user.id,
 				...input,
+			});
+		}),
+
+	linkCurrentUser: protectedProcedure
+		.input(linkCurrentUserSchema)
+		.mutation(async ({ ctx, input }) => {
+			const integration = await getIntegrationByType({
+				type: input.integrationType as IntegrationName,
+				teamId: ctx.user.teamId!,
+			});
+
+			if (!integration) {
+				throw new Error("Integration is not installed for this team");
+			}
+
+			const currentUser = await getCurrentUser(ctx.user.id);
+			const externalUserId =
+				input.externalUserId || currentUser?.email || ctx.user.id;
+			const externalUserName =
+				input.externalUserName || currentUser?.name || currentUser?.email || "";
+
+			return linkUserToIntegration({
+				integrationId: integration.id,
+				integrationType: input.integrationType as IntegrationName,
+				userId: ctx.user.id,
+				externalUserId,
+				externalUserName,
 			});
 		}),
 
