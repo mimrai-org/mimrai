@@ -87,11 +87,11 @@ export const ChatAgentSidebar = () => {
 	const { data: agentRecurringTasks } = useQuery(
 		trpc.tasks.get.queryOptions(
 			{
-				assigneeId: [selectedAgent.userId],
+				assigneeId: selectedAgent?.userId ? [selectedAgent?.userId] : [],
 				recurring: true,
 			},
 			{
-				enabled: hasSelectedAgent,
+				enabled: selectedAgent?.userId != null,
 			},
 		),
 	);
