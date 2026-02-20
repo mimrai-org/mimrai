@@ -171,9 +171,11 @@ export const getIntegrationTools = async (
 ): Promise<{
 	tools: Record<string, Tool>;
 	toolboxes: Record<string, Record<string, Tool>>;
+	errors: Record<string, Error>;
 }> => {
 	const tools: Record<string, Tool> = {};
 	const toolboxes: Record<string, Record<string, Tool>> = {};
+	const errors: Record<string, Error> = {};
 
 	if (enabledIntegrations) {
 		for (const integration of enabledIntegrations) {
@@ -188,18 +190,26 @@ export const getIntegrationTools = async (
 
 			const mcpConfig = integrationMcpBuilder[integration.type];
 			if (mcpConfig) {
-				const mcpClient = await createMCPClient(mcpConfig(integration));
-				const mcpTools = await mcpClient.tools();
-				Object.assign(tools, mcpTools);
-				toolboxes[integration.type] = {
-					...toolboxes[integration.type],
-					...mcpTools,
-				};
+				try {
+					const mcpClient = await createMCPClient(mcpConfig(integration));
+					const mcpTools = await mcpClient.tools();
+					Object.assign(tools, mcpTools);
+					toolboxes[integration.type] = {
+						...toolboxes[integration.type],
+						...mcpTools,
+					};
+				} catch (error) {
+					errors[integration.type] = error as Error;
+					console.error(
+						`Failed to load tools for integration "${integration.name}" (${integration.type}):`,
+						error,
+					);
+				}
 			}
 		}
 	}
 
-	return { tools, toolboxes };
+	return { tools, toolboxes, errors };
 };
 
 /**
@@ -213,9 +223,11 @@ export const getTeamMcpTools = async (
 ): Promise<{
 	tools: Record<string, Tool>;
 	toolboxes: Record<string, Record<string, Tool>>;
+	errors: Record<string, Error>;
 }> => {
 	const tools: Record<string, Tool> = {};
 	const toolboxes: Record<string, Record<string, Tool>> = {};
+	const errors: Record<string, Error> = {};
 
 	const mcpServerConfigs = await getMcpServers({ teamId, activeOnly: true });
 	console.log(
@@ -263,6 +275,7 @@ export const getTeamMcpTools = async (
 			Object.assign(tools, mcpTools);
 			toolboxes[`mcp:${server.name}`] = mcpTools;
 		} catch (error) {
+			errors[`mcp:${server.name}`] = error as Error;
 			console.error(
 				`Failed to load MCP server "${server.name}" (${server.id}):`,
 				error,
@@ -270,7 +283,7 @@ export const getTeamMcpTools = async (
 		}
 	}
 
-	return { tools, toolboxes };
+	return { tools, toolboxes, errors };
 };
 
 export const getAllTools = async (
@@ -283,10 +296,12 @@ export const getAllTools = async (
 
 	let mcpTools: Record<string, Tool> = {};
 	let mcpToolboxes: Record<string, Record<string, Tool>> = {};
+	let mcpErrors: Record<string, Error> = {};
 	if (teamId) {
 		const teamMcp = await getTeamMcpTools(teamId, userId);
 		mcpTools = teamMcp.tools;
 		mcpToolboxes = teamMcp.toolboxes;
+		mcpErrors = teamMcp.errors;
 	}
 
 	return {
@@ -303,6 +318,9 @@ export const getAllTools = async (
 			taskManagement: taskManagementTools,
 			research: researchTools,
 			memory: memoryTools,
+		},
+		errors: {
+			...mcpErrors,
 		},
 	};
 };

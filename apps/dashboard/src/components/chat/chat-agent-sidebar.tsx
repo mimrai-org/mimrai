@@ -21,7 +21,15 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from "@ui/components/ui/sidebar";
-import { PlusIcon, SettingsIcon, XIcon } from "lucide-react";
+import {
+	DotIcon,
+	KeyIcon,
+	PlusIcon,
+	SettingsIcon,
+	SignalHigh,
+	TriangleAlert,
+	XIcon,
+} from "lucide-react";
 import { useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
 import { useAgentParams } from "@/hooks/use-agent-params";
@@ -44,6 +52,17 @@ export const ChatAgentSidebar = () => {
 		trpc.agents.getDocumentsForAgent.queryOptions(
 			{
 				agentId: selectedAgentId,
+			},
+			{
+				enabled: hasSelectedAgent,
+			},
+		),
+	);
+
+	const { data: tools } = useQuery(
+		trpc.agents.getToolsForAgent.queryOptions(
+			{
+				id: selectedAgentId!,
 			},
 			{
 				enabled: hasSelectedAgent,
@@ -166,6 +185,25 @@ export const ChatAgentSidebar = () => {
 									}}
 								>
 									<XIcon />
+								</SidebarMenuAction>
+							</SidebarMenuItem>
+						))}
+					</SidebarMenu>
+				</SidebarGroupContent>
+			</SidebarGroup>
+			<SidebarGroup>
+				<SidebarGroupLabel>Integrations</SidebarGroupLabel>
+				<SidebarGroupContent>
+					<SidebarMenu>
+						{tools?.map((tool) => (
+							<SidebarMenuItem key={tool.name}>
+								<SidebarMenuButton className="capitalize">
+									<span>{tool.name}</span>
+								</SidebarMenuButton>
+								<SidebarMenuAction>
+									{tool.status === "error" && (
+										<TriangleAlert className="text-destructive" />
+									)}
 								</SidebarMenuAction>
 							</SidebarMenuItem>
 						))}

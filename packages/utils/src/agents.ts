@@ -47,3 +47,18 @@ export const getModels = async (): Promise<Model[]> => {
 		})
 		.filter((model) => promotedModels.includes(model.name));
 };
+
+export const formatToolName = (toolName: string) => {
+	return toolName
+		.replace(/^mcp:/, "")
+		.replace(/[_-]+/g, " ")
+		.replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+		.toLowerCase()
+		.trim();
+};
+
+export const HIDDEN_AGENT_INTEGRATIONS = [
+	"taskManagement",
+	"memory",
+	"research",
+];

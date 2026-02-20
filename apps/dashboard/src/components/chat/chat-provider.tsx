@@ -3,6 +3,7 @@ import { useChat } from "@ai-sdk/react";
 import type { UIChatMessage } from "@api/ai/types";
 import { DefaultChatTransport } from "ai";
 import { createContext, useContext, useEffect, useMemo, useRef } from "react";
+import { useAgentToolCacheInvalidation } from "@/hooks/use-agent-tool-cache-invalidation";
 import { getSelectedAgentCookieKeyClient, useChatStore } from "@/store/chat";
 import { useUser } from "../user-provider";
 import type { ChatInputMessage } from "./chat-input";
@@ -103,6 +104,8 @@ export const ChatProvider = ({
 			},
 		}),
 	});
+
+	useAgentToolCacheInvalidation(chat.messages);
 
 	useEffect(() => {
 		if (hasAttemptedResumeRef.current) {

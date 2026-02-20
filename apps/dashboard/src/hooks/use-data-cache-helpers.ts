@@ -1,4 +1,3 @@
-import type { RouterInputs, RouterOutputs } from "@mimir/trpc";
 import { queryClient, trpc } from "@/utils/trpc";
 import type { Document, Member, Project, Status, Task } from "./use-data";
 
@@ -145,6 +144,21 @@ export function invalidateTasksCache() {
 export function invalidateProjectsCache() {
 	queryClient.invalidateQueries(trpc.projects.get.infiniteQueryOptions());
 	queryClient.invalidateQueries(trpc.projects.get.queryOptions());
+}
+
+export function invalidateLabelsCache() {
+	queryClient.invalidateQueries(trpc.labels.get.queryOptions({}));
+	queryClient.invalidateQueries({
+		queryKey: trpc.labels.getById.queryKey(),
+	});
+}
+
+export function invalidateMilestonesCache() {
+	queryClient.invalidateQueries(trpc.milestones.get.infiniteQueryOptions());
+	queryClient.invalidateQueries(trpc.milestones.get.queryOptions({}));
+	queryClient.invalidateQueries({
+		queryKey: trpc.milestones.getById.queryKey(),
+	});
 }
 
 /**

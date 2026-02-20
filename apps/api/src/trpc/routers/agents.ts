@@ -27,7 +27,11 @@ import {
 	updateAgent,
 } from "@mimir/db/queries/agents";
 import { getMimirUser } from "@mimir/db/queries/users";
-import { getModels } from "@mimir/utils/agents";
+import {
+	formatToolName,
+	getModels,
+	HIDDEN_AGENT_INTEGRATIONS,
+} from "@mimir/utils/agents";
 import type { Tool } from "ai";
 
 export const agentsRouter = router({
@@ -92,6 +96,61 @@ export const agentsRouter = router({
 		return Object.keys(toolboxes);
 	}),
 
+	getToolsForAgent: protectedProcedure
+		.input(getAgentByIdSchema)
+		.query(async ({ ctx, input }) => {
+			const { toolboxes, errors } = await getAllToolsForUser({
+				userId: ctx.user.id,
+				teamId: ctx.user.teamId!,
+			});
+
+			const agent = await getAgentById({
+				...input,
+				teamId: ctx.user.teamId!,
+			});
+
+			const result: {
+				name: string;
+				description: string;
+				status: "active" | "error";
+			}[] = [];
+
+			for (const toolboxKey of Object.keys(toolboxes)) {
+				if (HIDDEN_AGENT_INTEGRATIONS.includes(toolboxKey)) {
+					continue;
+				}
+
+				if (
+					agent.activeToolboxes.length === 0 ||
+					agent.activeToolboxes.includes(toolboxKey)
+				) {
+					result.push({
+						name: formatToolName(toolboxKey),
+						description: "",
+						status: "active",
+					});
+				}
+			}
+
+			for (const errorKey of Object.keys(errors)) {
+				if (HIDDEN_AGENT_INTEGRATIONS.includes(errorKey)) {
+					continue;
+				}
+				if (
+					agent.activeToolboxes.length === 0 ||
+					agent.activeToolboxes.includes(errorKey)
+				) {
+					result.push({
+						name: formatToolName(errorKey),
+						description: `Failed to load tools from this source: ${errors[errorKey].message}`,
+						status: "error",
+					});
+				}
+			}
+
+			return result;
+		}),
+
 	getTools: protectedProcedure.query(async ({ ctx }) => {
 		const { toolboxes } = await getAllToolsForUser({
 			userId: ctx.user.id,
@@ -114,8 +173,6 @@ export const agentsRouter = router({
 				});
 			}
 		}
-
-		console.log("Fetched tools for user:", ctx.user.id, result);
 
 		return result;
 	}),
