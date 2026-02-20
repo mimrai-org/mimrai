@@ -13,12 +13,28 @@ export const getTaskByIdTool = tool({
 	inputSchema: getTaskByIdToolSchema,
 	execute: async function* ({ id }, executionOptions) {
 		try {
-			const { userId, teamId, teamSlug } = getToolContext(executionOptions);
+			const { userId, teamId, teamSlug, writer } =
+				getToolContext(executionOptions);
 
 			const result = await getTaskById(id, userId);
 			if (!result) {
 				yield { type: "text", text: "Task not found." };
 				return;
+			}
+
+			if (writer) {
+				writer.write({
+					type: "data-task",
+					data: {
+						id: result.id,
+						title: result.title,
+						description: result.description,
+						statusId: result.statusId,
+						assignee: result.assigneeId,
+						dueDate: result.dueDate,
+						sequence: result.sequence,
+					},
+				});
 			}
 
 			yield {

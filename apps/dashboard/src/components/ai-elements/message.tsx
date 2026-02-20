@@ -53,7 +53,7 @@ export const MessageContent = ({
 	...props
 }: MessageContentProps) => (
 	<div
-		className={cn(className, "my-1 max-w-[80%] rounded-sm bg-card p-3 text-sm")}
+		className={cn(className, "mb-1 max-w-[80%] rounded-sm text-sm")}
 		{...props}
 	>
 		{children}

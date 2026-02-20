@@ -15,7 +15,7 @@ export const TaskArtifactMessage = ({
 	if (taskParts.length === 0) return null;
 
 	return (
-		<div className="my-6 flex flex-col gap-2">
+		<div className="flex flex-col">
 			{taskParts.map((part, index) => (
 				<TaskArtifact key={index} task={part.data} />
 			))}
@@ -37,7 +37,7 @@ export const TaskArtifact = ({ task }: { task: MessageDataParts["task"] }) => {
 	return (
 		<button
 			type="button"
-			className="text-left"
+			className="mb-1 text-left"
 			onClick={() => {
 				taskPanel.open(taskWithStatus?.id);
 			}}

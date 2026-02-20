@@ -41,7 +41,8 @@ export const createTaskTool = tool({
 	inputSchema: createTaskToolSchema,
 	execute: async function* (input, executionOptions) {
 		try {
-			const { userId, teamId, teamName } = getToolContext(executionOptions);
+			const { userId, teamId, teamName, writer } =
+				getToolContext(executionOptions);
 
 			const newTask = await createTask({
 				title: input.title,
@@ -59,6 +60,13 @@ export const createTaskTool = tool({
 				labels: input.labelsIds || [],
 				userId: userId,
 			});
+
+			if (writer) {
+				writer.write({
+					type: "data-task",
+					data: newTask,
+				});
+			}
 
 			trackTaskCreated({
 				userId: userId,
