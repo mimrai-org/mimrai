@@ -61,6 +61,8 @@ app.get("oauth/callback", ...protectedMiddleware, async (c) => {
 		type: "google-calendar",
 		config: {},
 		teamId,
+		userId,
+		source: "oauth",
 	});
 
 	const link = await linkUserToIntegration({

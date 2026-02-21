@@ -32,7 +32,7 @@ ${userPrompt}
 - Keep the title concise and self-explanatory.
 - The description should provide enough detail for someone to understand the task without further clarification.
 - return dates in UTC ISO 8601 format.
-- If the task is recurring, provide the frequency, interval, and start date. Otherswise, set recurring to null.
+- If the task is recurring, provide a cron expression (5 fields: minute hour day-of-month month day-of-week). Otherswise, set recurring to null.
 - Use provided ID for labels and assignees, do not invent new ones.
 - If you don't have enough information to fill a field, set it to null.
 - Do not include any information that is not relevant to the task details.
@@ -83,14 +83,10 @@ export const smartCompleteResponseSchema = z.object({
 		.nullable()
 		.describe("ID of the user to assign the task to"),
 	recurring: z
-		.object({
-			frequency: z.enum(["daily", "weekly", "monthly", "yearly"]),
-			interval: z.coerce.number().min(1).max(12),
-			startDate: z.string(),
-		})
+		.string()
 		.nullable()
 		.describe(
-			"Recurrence settings for the task. If provided, the task will be set to recur based on these settings.",
+			"Cron expression for the task recurrence. If provided, the task will be set to recur based on this schedule.",
 		),
 
 	explanation: z

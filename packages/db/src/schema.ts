@@ -247,11 +247,6 @@ export const usersOnTeams = pgTable(
 	],
 );
 
-export const usersOnTeamsRelations = relations(usersOnTeams, ({ one }) => ({
-	team: one(teams, { fields: [usersOnTeams.teamId], references: [teams.id] }),
-	user: one(users, { fields: [usersOnTeams.userId], references: [users.id] }),
-}));
-
 export const userInvites = pgTable(
 	"user_invites",
 	{
@@ -334,16 +329,14 @@ export const tasks = pgTable(
 		focusOrder: smallint("focus_order"),
 		focusReason: text("focus_reason"),
 
-		recurring: jsonb("recurring").$type<{
-			frequency: "daily" | "weekly" | "monthly" | "yearly";
-			interval: number;
-			startDate?: string;
-		}>(),
+		recurring: text("recurring"),
 		recurringJobId: text("recurring_job_id"),
 		recurringNextDate: timestamp("recurring_next_date", {
 			withTimezone: true,
 			mode: "string",
 		}),
+		triggerId: text("trigger_id"),
+		isTemplate: boolean("is_template").default(false).notNull(),
 
 		completedAt: timestamp("completed_at", {
 			withTimezone: true,
@@ -373,6 +366,8 @@ export const tasks = pgTable(
 		index("tasks_permalink_id_index").on(table.permalinkId),
 		index("tasks_team_id_index").using("btree", table.teamId),
 		index("tasks_assignee_id_index").using("btree", table.assigneeId),
+		index("tasks_is_template_index").using("btree", table.isTemplate),
+		index("tasks_trigger_id_index").using("btree", table.triggerId),
 		foreignKey({
 			columns: [table.completedBy],
 			foreignColumns: [users.id],
@@ -412,6 +407,11 @@ export const tasks = pgTable(
 			columns: [table.prReviewId],
 			foreignColumns: [prReviews.id],
 			name: "tasks_pr_review_id_fkey",
+		}).onDelete("set null"),
+		foreignKey({
+			columns: [table.triggerId],
+			foreignColumns: [triggers.id],
+			name: "tasks_trigger_id_fkey",
 		}).onDelete("set null"),
 	],
 );
@@ -472,27 +472,6 @@ export const taskEmbeddings = pgTable(
 	],
 );
 
-export const tasksRelations = relations(tasks, ({ one }) => ({
-	assignee: one(users, { fields: [tasks.assigneeId], references: [users.id] }),
-	team: one(teams, { fields: [tasks.teamId], references: [teams.id] }),
-}));
-
-export const usersWithTasksRelations = relations(users, ({ many }) => ({
-	tasks: many(tasks),
-}));
-
-export const teamsWithTasksRelations = relations(teams, ({ many }) => ({
-	tasks: many(tasks),
-}));
-
-export const teamsWithCreditsRelations = relations(teams, ({ many, one }) => ({
-	creditLedger: many(creditLedger),
-	creditBalance: one(creditBalance, {
-		fields: [teams.id],
-		references: [creditBalance.teamId],
-	}),
-}));
-
 export const statusTypeEnum = pgEnum("status_type", [
 	"done",
 	"backlog",
@@ -532,17 +511,6 @@ export const statuses = pgTable(
 		}).onDelete("cascade"),
 	],
 );
-
-export const tasksWithColumnRelations = relations(tasks, ({ one }) => ({
-	column: one(statuses, {
-		fields: [tasks.statusId],
-		references: [statuses.id],
-	}),
-}));
-
-export const tasksOnColumnsRelations = relations(statuses, ({ many }) => ({
-	tasks: many(tasks),
-}));
 
 export const workingMemory = pgTable("working_memory", {
 	id: text("id").primaryKey().notNull(),
@@ -639,13 +607,43 @@ export const integrations = pgTable(
 	],
 );
 
-export const integrationsRelations = relations(integrations, ({ one }) => ({
-	team: one(teams, { fields: [integrations.teamId], references: [teams.id] }),
-}));
-
-export const teamsWithIntegrationsRelations = relations(teams, ({ many }) => ({
-	integrations: many(integrations),
-}));
+export const triggers = pgTable(
+	"triggers",
+	{
+		id: text("id")
+			.$defaultFn(() => randomUUID())
+			.primaryKey()
+			.notNull(),
+		name: text("name").notNull(),
+		description: text("description"),
+		teamId: text("team_id").notNull(),
+		integrationId: text("integration_id"),
+		type: text("type").notNull(),
+		createdAt: timestamp("created_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
+		updatedAt: timestamp("updated_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
+	},
+	(table) => [
+		index("triggers_team_id_index").on(table.teamId),
+		index("triggers_integration_id_index").on(table.integrationId),
+		index("triggers_type_index").on(table.type),
+		foreignKey({
+			columns: [table.teamId],
+			foreignColumns: [teams.id],
+			name: "triggers_team_id_fkey",
+		}).onDelete("cascade"),
+		foreignKey({
+			columns: [table.integrationId],
+			foreignColumns: [integrations.id],
+			name: "triggers_integration_id_fkey",
+		}).onDelete("set null"),
+	],
+);
 
 export const integrationLogsLevelEnum = pgEnum("integration_logs_level", [
 	"info",
@@ -1500,17 +1498,6 @@ export const projectMembers = pgTable(
 			.onUpdate("cascade"),
 	],
 );
-
-export const projectMembersRelations = relations(projectMembers, ({ one }) => ({
-	project: one(projects, {
-		fields: [projectMembers.projectId],
-		references: [projects.id],
-	}),
-	user: one(users, {
-		fields: [projectMembers.userId],
-		references: [users.id],
-	}),
-}));
 
 export const projectHealthEnum = pgEnum("project_health", [
 	"on_track",

@@ -1,6 +1,8 @@
 import {
 	type IntegrationConfig,
+	type IntegrationInstallSource,
 	type IntegrationName,
+	type IntegrationRegistryItem,
 	integrationsRegistry,
 } from "@integration/registry";
 import { integrationsCache } from "@mimir/cache/integrations-cache";
@@ -18,13 +20,17 @@ export const installIntegration = async ({
 	config,
 	teamId,
 	externalTeamId,
+	userId,
+	source,
 }: {
 	type: IntegrationName;
 	config: IntegrationConfig;
 	teamId: string;
 	externalTeamId?: string;
+	userId?: string;
+	source?: IntegrationInstallSource;
 }) => {
-	const registry = integrationsRegistry[type];
+	const registry = integrationsRegistry[type] as IntegrationRegistryItem;
 	if (!registry) {
 		throw new Error("Unsupported integration type");
 	}
@@ -56,20 +62,55 @@ export const installIntegration = async ({
 		throw new Error(`Invalid configuration: ${safeConfig.error.message}`);
 	}
 
-	const [integration] = await db
-		.insert(integrations)
-		.values({
+	return await db.transaction(async (tx) => {
+		await registry.onPreInstall?.({
 			type,
-			config: safeConfig.data,
-			name: registry.name,
 			teamId,
+			config: safeConfig.data,
 			externalTeamId,
-		})
-		.returning();
+			userId,
+			source,
+			tx,
+		});
 
-	// await initIntegrationSingle(integration);
+		const [integration] = await tx
+			.insert(integrations)
+			.values({
+				type,
+				config: safeConfig.data,
+				name: registry.name,
+				teamId,
+				externalTeamId,
+			})
+			.returning();
 
-	return integration;
+		if (!integration) {
+			throw new Error("Failed to install integration");
+		}
+
+		await registry.onPostInstall?.({
+			type,
+			teamId,
+			config: safeConfig.data,
+			externalTeamId,
+			userId,
+			source,
+			tx,
+			integration: {
+				id: integration.id,
+				type: integration.type,
+				name: integration.name,
+				teamId: integration.teamId,
+				config: integration.config,
+				externalTeamId: integration.externalTeamId,
+			},
+			isNewInstall: true,
+		});
+
+		// await initIntegrationSingle(integration);
+
+		return integration;
+	});
 };
 
 export const getIntegrations = async ({

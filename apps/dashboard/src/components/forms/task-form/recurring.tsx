@@ -1,13 +1,12 @@
+import {
+	cronToRecurrenceEditor,
+	recurrenceEditorToCron,
+} from "@mimir/utils/recurrence";
 import { PopoverClose } from "@radix-ui/react-popover";
 import { Button } from "@ui/components/ui/button";
 import { Calendar } from "@ui/components/ui/calendar";
-import {
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
-} from "@ui/components/ui/form";
+import { FormControl, FormField, FormItem } from "@ui/components/ui/form";
+import { Input } from "@ui/components/ui/input";
 import {
 	Popover,
 	PopoverContent,
@@ -20,7 +19,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@ui/components/ui/select";
-import { formatRelative } from "date-fns";
+import { format, formatRelative } from "date-fns";
 import { CalendarSyncIcon, ChevronDownIcon, XIcon } from "lucide-react";
 import { useFormContext } from "react-hook-form";
 import type { TaskFormValues } from "./form-type";
@@ -51,9 +50,55 @@ const formatInterval = (interval: number, frequency: string) => {
 	return `Every ${interval} ${formattedFrequency}s`;
 };
 
+const getDefaultRecurrence = () => ({
+	frequency: "daily" as const,
+	interval: 1,
+	startDate: new Date().toISOString(),
+});
+
+const getIntervalOptions = (frequency: string) => {
+	if (frequency === "weekly" || frequency === "yearly") {
+		return [1];
+	}
+
+	return new Array(12).fill(null).map((_, index) => index + 1);
+};
+
 export const Recurring = () => {
 	const form = useFormContext<TaskFormValues>();
-	const recurring = form.watch("recurring");
+	const recurringCron = form.watch("recurring");
+	const recurring = recurringCron
+		? cronToRecurrenceEditor(recurringCron)
+		: null;
+
+	const setRecurring = (
+		nextValue: Partial<NonNullable<typeof recurring>>,
+		{ shouldValidate = false }: { shouldValidate?: boolean } = {},
+	) => {
+		const currentValue = recurring ?? getDefaultRecurrence();
+		const frequency = nextValue.frequency ?? currentValue.frequency;
+		const normalizedInterval =
+			frequency === "weekly" || frequency === "yearly"
+				? 1
+				: Number(nextValue.interval ?? currentValue.interval);
+
+		const cronExpression = recurrenceEditorToCron({
+			frequency,
+			interval: normalizedInterval,
+			startDate: nextValue.startDate ?? currentValue.startDate,
+		});
+
+		form.setValue("recurring", cronExpression, {
+			shouldDirty: true,
+			shouldValidate,
+		});
+	};
+
+	const recurrenceDate = recurring?.startDate
+		? new Date(recurring.startDate)
+		: new Date();
+
+	const timeValue = format(recurrenceDate, "HH:mm");
 
 	return (
 		<Popover>
@@ -97,34 +142,35 @@ export const Recurring = () => {
 							}
 							captionLayout="dropdown"
 							onSelect={(date) => {
-								form.setValue("recurring.startDate", date?.toISOString(), {
-									shouldDirty: true,
-									shouldValidate: true,
-								});
+								setRecurring(
+									{
+										startDate: date?.toISOString(),
+									},
+									{ shouldValidate: true },
+								);
 							}}
 						/>
 					</div>
 					<div className="flex flex-col space-y-2 px-4 pb-4">
 						<FormField
-							name="recurring.frequency"
+							name="recurring"
 							control={form.control}
-							render={({ field }) => (
+							render={() => (
 								<FormItem className="w-full">
 									<FormControl>
 										<Select
-											value={field.value}
+											value={recurring?.frequency}
 											onValueChange={(value) => {
-												if (!recurring?.startDate) {
-													form.setValue(
-														"recurring.startDate",
-														new Date().toISOString(),
-														{
-															shouldDirty: true,
-															shouldValidate: true,
-														},
-													);
-												}
-												field.onChange(value);
+												setRecurring(
+													{
+														frequency: value as
+															| "daily"
+															| "weekly"
+															| "monthly"
+															| "yearly",
+													},
+													{ shouldValidate: true },
+												);
 											}}
 										>
 											<SelectTrigger size="sm" className="w-full">
@@ -143,26 +189,32 @@ export const Recurring = () => {
 						/>
 
 						<FormField
-							name="recurring.interval"
+							name="recurring"
 							control={form.control}
-							render={({ field }) => (
+							render={() => (
 								<FormItem className="w-full">
 									<FormControl>
 										<Select
-											value={field.value?.toString()}
-											onValueChange={field.onChange}
+											value={String(recurring?.interval ?? 1)}
+											onValueChange={(value) => {
+												setRecurring(
+													{
+														interval: Number(value),
+													},
+													{ shouldValidate: true },
+												);
+											}}
 										>
 											<SelectTrigger size="sm" className="w-full">
 												<SelectValue placeholder="Every..." />
 											</SelectTrigger>
 											<SelectContent>
-												{new Array(12).fill(null).map((_, index) => (
-													<SelectItem
-														key={index + 1}
-														value={(index + 1).toString()}
-													>
+												{getIntervalOptions(
+													recurring?.frequency || "daily",
+												).map((option) => (
+													<SelectItem key={option} value={option.toString()}>
 														{formatInterval(
-															index + 1,
+															option,
 															recurring?.frequency || "daily",
 														)}
 													</SelectItem>
@@ -173,7 +225,33 @@ export const Recurring = () => {
 								</FormItem>
 							)}
 						/>
-						{recurring?.startDate && (
+
+						<Input
+							type="time"
+							value={timeValue}
+							onChange={(event) => {
+								const [hours, minutes] = event.target.value
+									.split(":")
+									.map(Number);
+								if (hours === undefined || minutes === undefined) {
+									return;
+								}
+
+								const nextDate = new Date(recurrenceDate);
+								nextDate.setHours(hours, minutes);
+
+								setRecurring(
+									{
+										startDate: nextDate.toISOString(),
+									},
+									{ shouldValidate: true },
+								);
+							}}
+							placeholder="Set time"
+							className="border-0"
+						/>
+
+						{recurringCron && (
 							<PopoverClose asChild>
 								<Button
 									variant="destructive"
@@ -195,10 +273,5 @@ export const Recurring = () => {
 				</div>
 			</PopoverContent>
 		</Popover>
-		// 			</FormControl>
-		// 			<FormMessage />
-		// 		</FormItem>
-		// 	)}
-		// />
 	);
 };

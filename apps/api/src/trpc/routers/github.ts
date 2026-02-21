@@ -70,6 +70,8 @@ export const githubRouter = router({
 					type: "github",
 					config: existingLink.integrationConfig,
 					teamId: ctx.user.teamId!,
+					userId: ctx.user.id,
+					source: "trpc",
 				});
 			}
 

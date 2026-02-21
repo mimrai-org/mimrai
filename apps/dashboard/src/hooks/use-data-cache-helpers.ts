@@ -188,15 +188,40 @@ export function invalidateDocumentByIdCache(documentId: string) {
 }
 
 export function updateProjectInCache(updatedProject: Partial<Project>) {
-	queryClient.setQueryData(trpc.projects.get.queryKey(), (old) => {
-		if (!old?.data) return old;
-		return {
-			...old,
-			data: old.data.map((p) =>
-				p.id === updatedProject.id ? { ...p, ...updatedProject } : p,
-			),
-		};
-	});
+	const updateProject = (projects: Project[]) => {
+		return projects.map((p) =>
+			p.id === updatedProject.id ? { ...p, ...updatedProject } : p,
+		);
+	};
+
+	queryClient.setQueriesData(
+		{
+			queryKey: trpc.projects.get.infiniteQueryKey(),
+		},
+		(old: any) => {
+			if (!old?.pages) return old;
+			return {
+				...old,
+				pages: old.pages.map((page: any) => ({
+					...page,
+					data: updateProject(page.data),
+				})),
+			};
+		},
+	);
+
+	queryClient.setQueriesData(
+		{
+			queryKey: trpc.projects.get.queryKey(),
+		},
+		(old: any) => {
+			if (!old?.data) return old;
+			return {
+				...old,
+				data: updateProject(old.data),
+			};
+		},
+	);
 
 	queryClient.setQueryData(
 		trpc.projects.getById.queryKey({ id: updatedProject.id }),

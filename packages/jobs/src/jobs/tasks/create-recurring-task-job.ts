@@ -1,16 +1,41 @@
 import { createTask, updateTaskRecurringJob } from "@mimir/db/queries/tasks";
 import {
 	checklistItems,
-	labels,
 	labelsOnTasks,
 	statuses,
 	tasks,
 } from "@mimir/db/schema";
 import { getNextTaskRecurrenceDate } from "@mimir/utils/recurrence";
-import { logger, schemaTask } from "@trigger.dev/sdk";
+import { logger, runs, schemaTask } from "@trigger.dev/sdk";
 import { and, desc, eq } from "drizzle-orm";
 import z from "zod";
 import { getDb } from "../../init";
+
+const getValidReferenceDate = (referenceDate?: Date): Date => {
+	if (!referenceDate || Number.isNaN(referenceDate.getTime())) {
+		return new Date();
+	}
+	return referenceDate;
+};
+
+const cancelRecurringRun = async ({
+	taskId,
+	jobId,
+}: {
+	taskId: string;
+	jobId: string;
+}) => {
+	try {
+		await runs.cancel(jobId);
+	} catch (error) {
+		logger.warn(
+			`Failed to cancel recurring job with ID ${jobId} for task ID ${taskId}.`,
+			{
+				error,
+			},
+		);
+	}
+};
 
 export const createRecurringTaskJob = schemaTask({
 	id: "create-recurring-task-job",
@@ -29,96 +54,137 @@ export const createRecurringTaskJob = schemaTask({
 			return;
 		}
 
-		// If the job is scheduled, create the next occurrence
-		if (originalTask.recurringJobId) {
-			const [column] = await db
-				.select()
-				.from(statuses)
-				.where(
-					and(
-						eq(statuses.teamId, originalTask.teamId),
-						eq(statuses.type, "in_progress"),
-					),
-				)
-				.orderBy(desc(statuses.order))
-				.limit(1);
-
-			if (!column) {
-				logger.warn(
-					`No in_progress column found for team ID ${originalTask.teamId}.`,
-				);
-				return;
-			}
-
-			const originalLabels = await db
-				.select()
-				.from(labelsOnTasks)
-				.innerJoin(labels, eq(labels.id, labelsOnTasks.labelId))
-				.where(and(eq(labelsOnTasks.taskId, originalTask.id)));
-
-			const newTask = await createTask({
-				title: originalTask.title,
-				description: originalTask.description,
-				assigneeId: originalTask.assigneeId,
-				statusId: column.id,
-				priority: originalTask.priority,
-				labels: originalLabels.map((l) => l.labels.id),
-				attachments: originalTask.attachments,
-				teamId: originalTask.teamId,
-				projectId: originalTask.projectId,
-				mentions: originalTask.mentions,
-			});
-
-			const originalChecklistItems = await db
-				.select()
-				.from(checklistItems)
-				.where(eq(checklistItems.taskId, originalTask.id));
-
-			for (const item of originalChecklistItems) {
-				// Clean up the item object
-				delete item.id;
-				delete item.isCompleted;
-
-				await db.insert(checklistItems).values({
-					...item,
-					taskId: newTask.id,
+		if (!originalTask.recurring) {
+			if (originalTask.recurringJobId === ctx.run.id) {
+				await updateTaskRecurringJob({
+					taskId: originalTask.id,
+					jobId: null,
+					nextOccurrenceDate: null,
 				});
 			}
+			return;
+		}
 
+		if (originalTask.recurringJobId !== ctx.run.id) {
 			logger.info(
-				`Created recurring task with ID ${newTask.id} from original task ID ${originalTask.id}.`,
+				`Skipping stale recurring run ${ctx.run.id} for task ${originalTask.id}. Current run is ${originalTask.recurringJobId}.`,
+			);
+			return;
+		}
+
+		const [column] = await db
+			.select()
+			.from(statuses)
+			.where(
+				and(
+					eq(statuses.teamId, originalTask.teamId),
+					eq(statuses.type, "to_do"),
+				),
+			)
+			.orderBy(desc(statuses.order))
+			.limit(1);
+
+		const originalLabels = await db
+			.select({ labelId: labelsOnTasks.labelId })
+			.from(labelsOnTasks)
+			.where(eq(labelsOnTasks.taskId, originalTask.id));
+
+		const newTask = await createTask({
+			title: originalTask.title,
+			description: originalTask.description,
+			assigneeId: originalTask.assigneeId,
+			statusId: column?.id ?? originalTask.statusId,
+			priority: originalTask.priority,
+			labels: originalLabels.map((label) => label.labelId),
+			attachments: originalTask.attachments,
+			teamId: originalTask.teamId,
+			projectId: originalTask.projectId,
+			milestoneId: originalTask.milestoneId,
+			repositoryName: originalTask.repositoryName,
+			branchName: originalTask.branchName,
+			mentions: originalTask.mentions,
+			isTemplate: false,
+			triggerId: null,
+			recurring: null,
+		});
+
+		const originalChecklistItems = await db
+			.select()
+			.from(checklistItems)
+			.where(eq(checklistItems.taskId, originalTask.id));
+
+		if (originalChecklistItems.length > 0) {
+			await db.insert(checklistItems).values(
+				originalChecklistItems.map((item) => ({
+					taskId: newTask.id,
+					description: item.description,
+					isCompleted: false,
+					order: item.order,
+					assigneeId: item.assigneeId,
+					teamId: item.teamId,
+					attachments: item.attachments,
+				})),
 			);
 		}
 
-		// Schedule the next occurrence
-		if (originalTask.recurring) {
-			const isFirst = !originalTask.recurringJobId;
+		logger.info(
+			`Created recurring task with ID ${newTask.id} from original task ID ${originalTask.id}.`,
+		);
 
-			// Calculate next occurrence date
-			const nextDate = getNextTaskRecurrenceDate({
-				currentDate: isFirst
-					? originalTask.recurring.startDate
-						? new Date(originalTask.recurring.startDate)
-						: ctx.run.createdAt
-					: ctx.run.createdAt,
-				frequency: originalTask.recurring.frequency,
-				interval: originalTask.recurring.interval,
-			});
-
-			const nextJob = await createRecurringTaskJob.trigger(
-				{
-					originalTaskId: originalTask.id,
-				},
-				{
-					delay: nextDate,
-				},
-			);
-
-			await updateTaskRecurringJob({
-				taskId: originalTask.id,
-				jobId: nextJob.id,
-				nextOccurrenceDate: nextDate.toISOString(),
-			});
-		}
+		await syncRecurringTaskSchedule({
+			taskId: originalTask.id,
+			recurringCron: originalTask.recurring,
+			referenceDate: originalTask.recurringNextDate
+				? new Date(originalTask.recurringNextDate)
+				: undefined,
+		});
 	},
 });
+
+export const syncRecurringTaskSchedule = async ({
+	taskId,
+	recurringCron,
+	previousJobId,
+	referenceDate,
+}: {
+	taskId: string;
+	recurringCron: string | null;
+	previousJobId?: string | null;
+	referenceDate?: Date;
+}) => {
+	if (previousJobId) {
+		await cancelRecurringRun({ taskId, jobId: previousJobId });
+	}
+
+	if (!recurringCron) {
+		await updateTaskRecurringJob({
+			taskId,
+			jobId: null,
+			nextOccurrenceDate: null,
+		});
+		return null;
+	}
+
+	const nextDate = getNextTaskRecurrenceDate({
+		currentDate: getValidReferenceDate(referenceDate),
+		cronExpression: recurringCron,
+	});
+
+	const nextJob = await createRecurringTaskJob.trigger(
+		{
+			originalTaskId: taskId,
+		},
+		{
+			delay: nextDate,
+			idempotencyKey: `recurring-task-${taskId}-${nextDate.toISOString()}`,
+		},
+	);
+
+	await updateTaskRecurringJob({
+		taskId,
+		jobId: nextJob.id,
+		nextOccurrenceDate: nextDate.toISOString(),
+	});
+
+	return nextJob;
+};

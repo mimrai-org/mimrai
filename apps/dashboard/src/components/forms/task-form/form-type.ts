@@ -1,3 +1,4 @@
+import { isTest } from "better-auth";
 import z from "zod";
 
 export const taskFormSchema = z.object({
@@ -27,17 +28,7 @@ export const taskFormSchema = z.object({
 	repositoryName: z.string().nullable().optional(),
 	branchName: z.string().nullable().optional(),
 	showSmartInput: z.boolean().nullable().optional(),
-	recurring: z
-		.object({
-			frequency: z.enum(["daily", "weekly", "monthly", "yearly"]),
-			interval: z.coerce.number().min(1).max(12),
-			startDate: z
-				.string()
-				.default(() => new Date().toISOString())
-				.optional(),
-		})
-		.transform((val) => (val.frequency && val.interval ? val : null))
-		.nullable()
-		.optional(),
+	isTemplate: z.boolean().nullable().optional(),
+	recurring: z.string().nullable().optional(),
 });
 export type TaskFormValues = z.infer<typeof taskFormSchema>;

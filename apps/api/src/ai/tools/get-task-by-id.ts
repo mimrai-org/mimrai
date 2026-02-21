@@ -38,10 +38,8 @@ export const getTaskByIdTool = tool({
 			}
 
 			yield {
-				data: {
-					...result,
-					description: htmlToText(result.description || ""),
-				},
+				...result,
+				description: htmlToText(result.description || ""),
 			};
 		} catch (error) {
 			console.error("Error in getTaskByIdTool:", error);

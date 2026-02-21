@@ -17,8 +17,8 @@ export const processUserEmailJob = schemaTask({
 		const output = await processEmail({ decodedEmail, teamId });
 
 		logger.log(
-			`Processed email ${decodedEmail.id}, found ${output.object.tasks.length} tasks`,
-			output.object,
+			`Processed email ${decodedEmail.id}, found ${output.output.tasks.length} tasks`,
+			output.output,
 		);
 
 		const { data: statuses } = await getStatuses({
@@ -50,7 +50,7 @@ export const processUserEmailJob = schemaTask({
 				date: decodedEmail.date,
 			},
 		});
-		for (const payload of output.object.tasks) {
+		for (const payload of output.output.tasks) {
 			promises.push(
 				createIntake({
 					userId,

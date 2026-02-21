@@ -30,7 +30,7 @@ import {
 } from "@mimir/db/queries/task-executions";
 import { createTaskComment, getTaskById } from "@mimir/db/queries/tasks";
 import { getTeamById } from "@mimir/db/queries/teams";
-import { getSystemUser } from "@mimir/db/queries/users";
+import { getMimirUser } from "@mimir/db/queries/users";
 import { AGENT_DEFAULT_MODEL } from "@mimir/utils/agents";
 import { logger, schemaTask } from "@trigger.dev/sdk";
 import { convertToModelMessages, generateId, stepCountIs } from "ai";
@@ -364,7 +364,9 @@ const getTaskExecutorContext = async ({
 }) => {
 	const task = await getTaskById(taskId);
 	const execution = await createTaskExecution({ taskId, teamId });
-	const systemUser = await getSystemUser();
+	const systemUser = await getMimirUser({
+		teamId,
+	});
 	if (!systemUser) {
 		return { status: "failed", reason: "system_user_not_found" };
 	}
@@ -499,6 +501,7 @@ const getTaskExecutorContext = async ({
 		...buildAppContext(
 			{
 				...userContext,
+				agentId: agentConfig?.id,
 				integrationType: "web",
 				behalfUserId: agentConfig?.behalfUserId ?? task.createdBy,
 			},

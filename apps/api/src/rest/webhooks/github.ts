@@ -456,6 +456,8 @@ app.get("/setup", ...protectedMiddleware, async (c) => {
 			token: data.access_token,
 			installationId,
 		},
+		userId: session!.userId,
+		source: "webhook",
 	});
 
 	await linkUserToIntegration({

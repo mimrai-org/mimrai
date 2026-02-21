@@ -163,7 +163,12 @@ export const getTasks = async ({
 			),
 		);
 
-	input.recurring && whereClause.push(isNotNull(tasks.recurringJobId));
+	if (input.recurring) {
+		whereClause.push(isNotNull(tasks.recurringJobId));
+	} else {
+		whereClause.push(or(eq(tasks.isTemplate, false), isNull(tasks.isTemplate)));
+	}
+
 	input.projectId &&
 		input.projectId.length > 0 &&
 		whereClause.push(inArray(tasks.projectId, input.projectId));
@@ -347,6 +352,8 @@ export const getTasks = async ({
 			recurring: tasks.recurring,
 			recurringJobId: tasks.recurringJobId,
 			recurringNextDate: tasks.recurringNextDate,
+			triggerId: tasks.triggerId,
+			isTemplate: tasks.isTemplate,
 			labels: labelsSubquery.labels,
 			dependencies: dependenciesSubquery.dependencies,
 		})
@@ -408,11 +415,9 @@ export interface CreateTaskInput {
 	mentions?: string[];
 	projectId: string | null;
 	userId?: string;
-	recurring?: {
-		startDate?: string;
-		frequency: "daily" | "weekly" | "monthly" | "yearly";
-		interval: number;
-	};
+	recurring?: string;
+	isTemplate?: boolean;
+	triggerId?: string | null;
 }
 
 export const createTask = async ({
@@ -469,7 +474,7 @@ export const createTask = async ({
 	});
 
 	// Trigger agent if task is assigned to system user
-	if (task.assigneeId) {
+	if (task.assigneeId && !task.isTemplate) {
 		triggerAgentTaskExecutionIfNeeded({
 			taskId: task.id,
 			teamId: task.teamId,
@@ -527,11 +532,9 @@ export const updateTask = async ({
 	projectId?: string | null;
 	milestoneId?: string | null;
 	prReviewId?: string;
-	recurring?: {
-		startDate?: string;
-		frequency: "daily" | "weekly" | "monthly" | "yearly";
-		interval: number;
-	};
+	recurring?: string | null;
+	isTemplate?: boolean;
+	triggerId?: string | null;
 }) => {
 	const whereClause: SQL[] = [eq(tasks.id, input.id)];
 
@@ -597,7 +600,7 @@ export const updateTask = async ({
 	});
 
 	// Trigger agent if task is assigned to system user or has relevant updates
-	if (input.assigneeId) {
+	if (input.assigneeId && !task.isTemplate) {
 		const status = await getStatusById({
 			id: task.statusId,
 			teamId: task.teamId,
@@ -616,7 +619,12 @@ export const updateTask = async ({
 	}
 
 	// Trigger PM agent if task status changed and task belongs to a project
-	if (input.statusId && input.statusId !== oldTask.statusId && task.projectId) {
+	if (
+		input.statusId &&
+		input.statusId !== oldTask.statusId &&
+		task.projectId &&
+		!task.isTemplate
+	) {
 		triggerPMAgentOnStatusChange({
 			taskId: task.id,
 			teamId: task.teamId,
@@ -876,6 +884,8 @@ export const getTaskById = async (id: string, userId?: string) => {
 			recurring: tasks.recurring,
 			recurringJobId: tasks.recurringJobId,
 			recurringNextDate: tasks.recurringNextDate,
+			triggerId: tasks.triggerId,
+			isTemplate: tasks.isTemplate,
 			status: {
 				id: statuses.id,
 				name: statuses.name,
@@ -1248,7 +1258,7 @@ export const updateTaskRecurringJob = async ({
 }: {
 	taskId: string;
 	jobId: string | null;
-	nextOccurrenceDate?: string;
+	nextOccurrenceDate: string | null;
 }) => {
 	const [task] = await db
 		.update(tasks)
@@ -1295,6 +1305,8 @@ export const cloneTask = async ({
 		userId,
 		dueDate: task.dueDate!,
 		recurring: task.recurring!,
+		isTemplate: task.isTemplate,
+		triggerId: task.triggerId,
 		attachments: task.attachments!,
 	});
 

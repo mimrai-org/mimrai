@@ -612,6 +612,7 @@
       "name": "@mimir/utils",
       "version": "1.0.0",
       "dependencies": {
+        "croner": "^9.1.0",
         "date-fns": "4.1.0",
         "tokenlens": "^1.3.1",
       },

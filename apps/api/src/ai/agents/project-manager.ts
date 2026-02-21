@@ -23,7 +23,7 @@ import { type AppContext, getToolContext } from "./config/shared";
 
 export interface ProjectManagerContext extends AppContext {
 	/** The PM agent's database ID (used for long-term memory) */
-	agentId?: string;
+	agentId: string;
 
 	/** The project assigned to this PM agent */
 	project: {

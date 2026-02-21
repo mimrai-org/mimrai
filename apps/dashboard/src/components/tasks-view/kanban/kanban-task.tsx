@@ -1,7 +1,7 @@
 import type { RouterOutputs } from "@mimir/trpc";
 import { useTaskPanel } from "@/components/panels/task-panel";
-import { TaskProperty } from "@/components/tasks-view/properties/task-properties";
 import { useUser } from "@/components/user-provider";
+import type { EnrichedTask } from "@/hooks/use-data";
 import { cn } from "@/lib/utils";
 import {
 	PropertyAssignee,
@@ -15,8 +15,6 @@ import {
 	PropertyStatus,
 } from "../properties/task-properties-components";
 
-export type KanbanTask = RouterOutputs["tasks"]["get"]["data"][number];
-
 export const KanbanTask = ({
 	task,
 	ref,
@@ -24,7 +22,7 @@ export const KanbanTask = ({
 	...props
 }: {
 	className?: string;
-	task: KanbanTask;
+	task: EnrichedTask;
 	ref?: React.Ref<HTMLDivElement>;
 }) => {
 	const user = useUser();
@@ -33,7 +31,7 @@ export const KanbanTask = ({
 	return (
 		<div
 			className={cn(
-				"group/task relative flex min-h-14 cursor-pointer flex-col rounded-md border bg-popover transition-colors hover:bg-accent/30",
+				"group/task relative flex cursor-pointer flex-col rounded-md border bg-popover transition-colors hover:bg-accent/30",
 				{
 					"opacity-50!": task.status?.type === "done",
 				},
@@ -43,12 +41,10 @@ export const KanbanTask = ({
 			ref={ref}
 			onClick={(e) => {
 				taskPanel.open(task.id);
-				// router.push(`${user?.basePath}/tasks/${task.id}`);
 			}}
 			{...props}
 		>
-			{/* <Link href={`${user?.basePath}/tasks/${task.id}`} prefetch={true}> */}
-			<div className="p-3">
+			<div className="p-2">
 				<div className="flex h-full grow-1 flex-col justify-between gap-2">
 					<div className="flex items-center justify-between gap-2">
 						<div className={"flex items-center gap-2 text-xs"}>
@@ -79,7 +75,6 @@ export const KanbanTask = ({
 					</div>
 				</div>
 			</div>
-			{/* </Link> */}
 			{/* Too much visual noise */}
 			{/* <KanbanTaskStamp task={task} /> */}
 		</div>

@@ -34,14 +34,12 @@ import {
 	updateTask,
 	updateTaskComment,
 	updateTaskDescription,
-	updateTaskRecurringJob,
 } from "@mimir/db/queries/tasks";
 import { getDuplicateTaskEmbedding } from "@mimir/db/queries/tasks-embeddings";
 import { getMemberById } from "@mimir/db/queries/teams";
 import { trackTaskCreated } from "@mimir/events/server";
 import { syncGoogleCalendarTaskEvent } from "@mimir/integration/google-calendar";
-import { createRecurringTaskJob } from "@mimir/jobs/tasks/create-recurring-task-job";
-import { runs } from "@trigger.dev/sdk";
+import { syncRecurringTaskSchedule } from "@mimir/jobs/tasks/create-recurring-task-job";
 import z from "zod";
 
 export const tasksRouter = router({
@@ -55,7 +53,6 @@ export const tasksRouter = router({
 				userId: ctx.user.id,
 			});
 		}),
-
 	create: protectedProcedure
 		.input(createTaskSchema)
 		.mutation(async ({ ctx, input }) => {
@@ -74,13 +71,13 @@ export const tasksRouter = router({
 
 			// If recurring is set, schedule the first occurrence
 			if (task.recurring) {
-				// Schedule the job to create the next occurrence
-				await createRecurringTaskJob.trigger({
-					originalTaskId: task.id,
+				await syncRecurringTaskSchedule({
+					taskId: task.id,
+					recurringCron: task.recurring,
 				});
 			}
 
-			if (task.dueDate) {
+			if (task.dueDate && !task.isTemplate) {
 				// Sync the calendar event
 				syncGoogleCalendarTaskEvent({
 					taskId: task.id,
@@ -111,49 +108,22 @@ export const tasksRouter = router({
 				teamId: ctx.user.teamId!,
 			});
 
-			// If recurring is set, schedule the first occurrence
-			if (task.recurring?.interval && task.recurring?.frequency) {
-				const existingJob = task.recurringJobId;
-				if (existingJob) {
-					// If there's an existing job, we might want to cancel it first
-					try {
-						await runs.cancel(existingJob);
-					} catch (error) {
-						// Failed to cancel existing job, log and continue
-						console.warn(
-							`Failed to cancel existing recurring job with ID ${existingJob} for task ID ${task.id}:`,
-							error,
-						);
-					}
-					await updateTaskRecurringJob({
-						jobId: null,
-						taskId: task.id,
-					});
-				}
-				// Schedule the job to create the next occurrence
-				await createRecurringTaskJob.trigger({
-					originalTaskId: task.id,
-				});
-			} else if (oldTask.recurringJobId) {
-				// If recurring was removed, cancel any existing job
-				try {
-					await runs.cancel(oldTask.recurringJobId);
-				} catch (error) {
-					// Failed to cancel existing job, log and continue
-					console.warn(
-						`Failed to cancel existing recurring job with ID ${oldTask.recurringJobId} for task ID ${task.id}:`,
-						error,
-					);
-				}
-				await updateTaskRecurringJob({
-					jobId: null,
+			const recurringChanged = oldTask.recurring !== task.recurring;
+			const missingRecurringJob =
+				Boolean(task.recurring) && !oldTask.recurringJobId;
+
+			if (recurringChanged || missingRecurringJob) {
+				await syncRecurringTaskSchedule({
 					taskId: task.id,
+					recurringCron: task.recurring ?? null,
+					previousJobId: oldTask.recurringJobId,
 				});
 			}
 
 			if (
-				oldTask.dueDate !== task.dueDate ||
-				oldTask.subscribers !== task.subscribers
+				!task.isTemplate &&
+				(oldTask.dueDate !== task.dueDate ||
+					oldTask.subscribers !== task.subscribers)
 			) {
 				// Due date or subscribers changed, sync the calendar event
 				syncGoogleCalendarTaskEvent({

@@ -5,8 +5,9 @@ import { getTaskPermalink } from "@mimir/utils/tasks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Editor as EditorInstance } from "@tiptap/react";
 import { format } from "date-fns";
-import { Link2Icon, Loader2 } from "lucide-react";
+import { CalendarIcon, Link2Icon, Loader2, PlusIcon } from "lucide-react";
 import { useRef, useState } from "react";
+import { useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { useDebounceValue } from "usehooks-ts";
 import type z from "zod";
@@ -52,11 +53,9 @@ export const TaskForm = ({
 	const user = useUser();
 	const editorRef = useRef<EditorInstance | null>(null);
 	const [lastSavedDate, setLastSavedDate] = useState<Date>(new Date());
-	const { setParams } = useTaskParams();
 	const taskPanel = useTaskPanel();
 	const createTaskPanel = useCreateTaskPanel();
 	const cloneTaskPanel = useCloneTaskPanel();
-	const queryClient = useQueryClient();
 
 	const form = useZodForm(taskFormSchema, {
 		defaultValues: {
@@ -68,6 +67,10 @@ export const TaskForm = ({
 			assigneeId: user?.id || null,
 			...defaultValues,
 		},
+	});
+	const recurring = useWatch({
+		control: form.control,
+		name: "recurring",
 	});
 
 	const [id, permalinkId] = form.watch(["id", "permalinkId"]);
@@ -246,11 +249,30 @@ export const TaskForm = ({
 														Boolean(id)
 													}
 												>
-													{(isPendingCreate || isPendingUpdate) && (
+													{isPendingCreate || isPendingUpdate ? (
 														<Loader2 className="animate-spin" />
+													) : (
+														<PlusIcon />
 													)}
 													{id ? "Save Changes" : "Create Task"}
+													{recurring && " & Schedule"}
 												</Button>
+
+												{recurring && (
+													<Button
+														size="sm"
+														className="text-xs"
+														type="button"
+														onClick={(e) => {
+															form.setValue("isTemplate", true);
+															e.currentTarget.form?.requestSubmit();
+														}}
+													>
+														<CalendarIcon />
+														{id && recurring && "Re-"}
+														Schedule
+													</Button>
+												)}
 
 												{id && <ActionsMenu />}
 											</div>

@@ -1,5 +1,46 @@
 import z from "zod/v3";
 
+type MaybePromise<T> = T | Promise<T>;
+
+export type IntegrationInstallSource = "trpc" | "oauth" | "webhook" | "system";
+
+export interface IntegrationInstallContext {
+	type: string;
+	teamId: string;
+	config: unknown;
+	externalTeamId?: string;
+	userId?: string;
+	source?: IntegrationInstallSource;
+	tx: unknown;
+}
+
+export interface IntegrationPostInstallContext
+	extends IntegrationInstallContext {
+	integration: {
+		id: string;
+		type: string;
+		name: string;
+		teamId: string;
+		config: unknown;
+		externalTeamId?: string | null;
+	};
+	isNewInstall: boolean;
+}
+
+export interface IntegrationLifecycleHooks {
+	onPreInstall?: (context: IntegrationInstallContext) => MaybePromise<void>;
+	onPostInstall?: (
+		context: IntegrationPostInstallContext,
+	) => MaybePromise<void>;
+}
+
+export interface IntegrationRegistryItem extends IntegrationLifecycleHooks {
+	name: string;
+	type: string;
+	description: string;
+	configSchema: z.ZodTypeAny;
+}
+
 export const integrationsRegistry = {
 	mattermost: {
 		name: "Mattermost",
@@ -71,7 +112,7 @@ export const integrationsRegistry = {
 			fromEmail: z.string().email().optional(),
 		}),
 	},
-} as const;
+} as const satisfies Record<string, IntegrationRegistryItem>;
 
 export type IntegrationName = keyof typeof integrationsRegistry;
 export type IntegrationConfig<T extends IntegrationName = IntegrationName> =

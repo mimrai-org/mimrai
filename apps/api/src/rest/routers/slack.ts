@@ -39,6 +39,7 @@ app.get("/oauth/callback", async (c) => {
 		},
 		teamId: teamId!,
 		externalTeamId: externalTeamId!,
+		source: "oauth",
 	});
 
 	return c.redirect(`${getAppUrl()}/team/${team.slug}/settings/integrations`);

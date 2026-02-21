@@ -4,6 +4,10 @@ import {
 	shareablePolicyEnum,
 	statusTypeEnum,
 } from "@mimir/db/schema";
+import {
+	cronToRecurrenceEditor,
+	isValidTaskRecurrenceCron,
+} from "@mimir/utils/recurrence";
 import z from "zod";
 import { paginationSchema } from "./base";
 
@@ -29,6 +33,7 @@ export const getTasksSchema = z.object({
 		.optional()
 		.nullable(),
 	createdAt: z.tuple([z.coerce.date(), z.coerce.date()]).optional().nullable(),
+	isTemplate: z.boolean().optional().nullable(),
 	completedBy: z.array(z.string()).optional().nullable(),
 	view: z.enum(["board", "list", "calendar"]).optional().nullable(),
 	recurring: z.boolean().optional().nullable(),
@@ -49,12 +54,18 @@ export const createTaskSchema = z.object({
 	mentions: z.array(z.string()).nullable().optional(),
 	repositoryName: z.string().nullable().optional(),
 	branchName: z.string().nullable().optional(),
+	isTemplate: z.boolean().optional().default(false),
+	triggerId: z.string().nullable().optional(),
 	recurring: z
-		.object({
-			startDate: z.string().optional(),
-			frequency: z.enum(["daily", "weekly", "monthly", "yearly"]),
-			interval: z.number().min(1).max(365),
-		})
+		.string()
+		.refine(
+			(value) =>
+				isValidTaskRecurrenceCron(value) ||
+				cronToRecurrenceEditor(value) !== null,
+			{
+				message: "Invalid recurring cron expression",
+			},
+		)
 		.nullable()
 		.optional(),
 });
@@ -81,12 +92,18 @@ export const updateTaskSchema = z.object({
 	repositoryName: z.string().nullable().optional(),
 	branchName: z.string().nullable().optional(),
 	attachments: z.array(z.string()).nullable().optional(),
+	isTemplate: z.boolean().optional(),
+	triggerId: z.string().nullable().optional(),
 	recurring: z
-		.object({
-			frequency: z.enum(["daily", "weekly", "monthly", "yearly"]),
-			interval: z.coerce.number().min(1).max(365),
-			startDate: z.string().nullable().optional(),
-		})
+		.string()
+		.refine(
+			(value) =>
+				isValidTaskRecurrenceCron(value) ||
+				cronToRecurrenceEditor(value) !== null,
+			{
+				message: "Invalid recurring cron expression",
+			},
+		)
 		.nullable()
 		.optional(),
 });

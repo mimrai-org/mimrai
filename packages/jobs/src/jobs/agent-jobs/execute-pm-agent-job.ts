@@ -34,10 +34,10 @@ import {
 	getProjectExecution,
 	updateProjectExecution,
 } from "@mimir/db/queries/project-executions";
-import { getProjectById } from "@mimir/db/queries/projects";
+import type { getProjectById } from "@mimir/db/queries/projects";
 import { createTaskComment, getTasks } from "@mimir/db/queries/tasks";
 import { getMembers, getTeamById } from "@mimir/db/queries/teams";
-import { getSystemUser } from "@mimir/db/queries/users";
+import { getMimirUser } from "@mimir/db/queries/users";
 import { statuses } from "@mimir/db/schema";
 import { AGENT_DEFAULT_MODEL } from "@mimir/utils/agents";
 import { logger, schemaTask } from "@trigger.dev/sdk";
@@ -86,231 +86,233 @@ export const executePMAgentJob = schemaTask({
 	maxDuration: 15 * 60, // 15 minutes
 	run: async (payload) => {
 		const { projectId, teamId, trigger } = payload;
+		//disable PM agent for now until we can ensure it has proper guardrails and monitoring in place
+		return false;
 
-		logger.info("Starting PM agent execution", {
-			projectId,
-			triggerType: trigger.type,
-		});
+		// logger.info("Starting PM agent execution", {
+		// 	projectId,
+		// 	triggerType: trigger.type,
+		// });
 
-		// ── 1. Validate team ────────────────────────────────────────────────
-		const team = await getTeamById(teamId);
-		if (!team) {
-			logger.error("Team not found for PM agent execution", { teamId });
-			return { status: "failed", reason: "team_not_found" };
-		}
+		// // ── 1. Validate team ────────────────────────────────────────────────
+		// const team = await getTeamById(teamId);
+		// if (!team) {
+		// 	logger.error("Team not found for PM agent execution", { teamId });
+		// 	return { status: "failed", reason: "team_not_found" };
+		// }
 
-		// ── 2. Validate project ─────────────────────────────────────────────
-		const project = await getProjectById({ projectId, teamId });
-		if (!project) {
-			logger.error("Project not found", { projectId });
-			return { status: "failed", reason: "project_not_found" };
-		}
+		// // ── 2. Validate project ─────────────────────────────────────────────
+		// const project = await getProjectById({ projectId, teamId });
+		// if (!project) {
+		// 	logger.error("Project not found", { projectId });
+		// 	return { status: "failed", reason: "project_not_found" };
+		// }
 
-		// ── 3. Check plan & credits ─────────────────────────────────────────
-		const canAccess = await checkPlanFeatures(teamId, ["ai"]);
-		if (!canAccess) {
-			logger.error("Team plan does not support AI features", { teamId });
-			return { status: "failed", reason: "plan_cannot_access_ai_features" };
-		}
+		// // ── 3. Check plan & credits ─────────────────────────────────────────
+		// const canAccess = await checkPlanFeatures(teamId, ["ai"]);
+		// if (!canAccess) {
+		// 	logger.error("Team plan does not support AI features", { teamId });
+		// 	return { status: "failed", reason: "plan_cannot_access_ai_features" };
+		// }
 
-		const creditBalance = await getCreditBalance({ teamId });
-		if ((creditBalance?.balanceCents ?? 0) <= 0) {
-			logger.warn("Insufficient credits for PM agent", { teamId });
-			return { status: "failed", reason: "insufficient_credits" };
-		}
+		// const creditBalance = await getCreditBalance({ teamId });
+		// if ((creditBalance?.balanceCents ?? 0) <= 0) {
+		// 	logger.warn("Insufficient credits for PM agent", { teamId });
+		// 	return { status: "failed", reason: "insufficient_credits" };
+		// }
 
-		// ── 4. Resolve PM agent identity ────────────────────────────────────
-		// The PM agent is the project lead, or the first active agent, or system user
-		const { pmAgent, pmUserId } = await resolvePMAgent({
-			project,
-			teamId,
-		});
+		// // ── 4. Resolve PM agent identity ────────────────────────────────────
+		// // The PM agent is the project lead, or the first active agent, or system user
+		// const { pmAgent, pmUserId } = await resolvePMAgent({
+		// 	project,
+		// 	teamId,
+		// });
 
-		// ── 5. Build full context ───────────────────────────────────────────
-		const pmContext = await buildPMContext({
-			projectId,
-			teamId,
-			project,
-			pmAgent,
-			pmUserId,
-			trigger: trigger as ProjectManagerTrigger,
-		});
+		// // ── 5. Build full context ───────────────────────────────────────────
+		// const pmContext = await buildPMContext({
+		// 	projectId,
+		// 	teamId,
+		// 	project,
+		// 	pmAgent,
+		// 	pmUserId,
+		// 	trigger: trigger as ProjectManagerTrigger,
+		// });
 
-		// ── 6. Create/get execution record ─────────────────────────────────
-		const execution = await createProjectExecution({
-			projectId,
-			teamId,
-		});
+		// // ── 6. Create/get execution record ─────────────────────────────────
+		// const execution = await createProjectExecution({
+		// 	projectId,
+		// 	teamId,
+		// });
 
-		// ── 7. Mark as executing ────────────────────────────────────────────
-		await Promise.all([
-			updateProjectExecution({
-				projectId,
-				status: "executing",
-			}),
-		]);
+		// // ── 7. Mark as executing ────────────────────────────────────────────
+		// await Promise.all([
+		// 	updateProjectExecution({
+		// 		projectId,
+		// 		status: "executing",
+		// 	}),
+		// ]);
 
-		// ── 8. Build message based on trigger ───────────────────────────────
-		const messageText = buildTriggerMessage(trigger as ProjectManagerTrigger);
-		const message: UIChatMessage = {
-			id: generateId(),
-			role: "user",
-			parts: [{ type: "text", text: messageText }],
-		};
+		// // ── 8. Build message based on trigger ───────────────────────────────
+		// const messageText = buildTriggerMessage(trigger as ProjectManagerTrigger);
+		// const message: UIChatMessage = {
+		// 	id: generateId(),
+		// 	role: "user",
+		// 	parts: [{ type: "text", text: messageText }],
+		// };
 
-		// ── 9. Setup chat for context persistence ───────────────────────────
-		const chatId = `pm-${projectId}`;
-		const chat = await getChatById(chatId, teamId);
-		if (!chat) {
-			await saveChat({
-				chatId,
-				teamId,
-				title: `PM: ${project.name}`,
-				userId: pmUserId,
-			});
-		}
+		// // ── 9. Setup chat for context persistence ───────────────────────────
+		// const chatId = `pm-${projectId}`;
+		// const chat = await getChatById(chatId, teamId);
+		// if (!chat) {
+		// 	await saveChat({
+		// 		chatId,
+		// 		teamId,
+		// 		title: `PM: ${project.name}`,
+		// 		userId: pmUserId,
+		// 	});
+		// }
 
-		await saveChatMessage({
-			chatId,
-			teamId,
-			message,
-			userId: pmUserId,
-			role: "user",
-		});
+		// await saveChatMessage({
+		// 	chatId,
+		// 	teamId,
+		// 	message,
+		// 	userId: pmUserId,
+		// 	role: "user",
+		// });
 
-		try {
-			// ── 10. Get tools ───────────────────────────────────────────────
-			const userIntegrations = await getUserAvailableIntegrations({
-				userId: pmAgent?.behalfUserId ?? pmUserId,
-				teamId,
-			});
+		// try {
+		// 	// ── 10. Get tools ───────────────────────────────────────────────
+		// 	const userIntegrations = await getUserAvailableIntegrations({
+		// 		userId: pmAgent?.behalfUserId ?? pmUserId,
+		// 		teamId,
+		// 	});
 
-			const { tools: allTools, toolboxes } = await getAllTools(
-				userIntegrations,
-				teamId,
-				pmAgent?.behalfUserId ?? pmUserId,
-			);
+		// 	const { tools: allTools, toolboxes } = await getAllTools(
+		// 		userIntegrations,
+		// 		teamId,
+		// 		pmAgent?.behalfUserId ?? pmUserId,
+		// 	);
 
-			const tools = {
-				updateProjectMemory: updateProjectMemoryTool,
-				...allTools,
-			};
+		// 	const tools = {
+		// 		updateProjectMemory: updateProjectMemoryTool,
+		// 		...allTools,
+		// 	};
 
-			// ── 11. Create and run agent ────────────────────────────────────
-			const agent = await createAgentFromDB({
-				agentId: pmAgent?.id,
-				teamId,
-				toolboxes,
-				defaultActiveToolboxes: ["taskManagement", "research", "memory"],
-				defaultActiveTools: ["updateProjectMemory"],
-				config: {
-					tools,
-					experimental_context: pmContext,
-					stopWhen: stepCountIs(50),
-					buildInstructions: buildProjectManagerSystemPrompt as (
-						ctx: AppContext,
-					) => string,
+		// 	// ── 11. Create and run agent ────────────────────────────────────
+		// 	const agent = await createAgentFromDB({
+		// 		agentId: pmAgent?.id,
+		// 		teamId,
+		// 		toolboxes,
+		// 		defaultActiveToolboxes: ["taskManagement", "research", "memory"],
+		// 		defaultActiveTools: ["updateProjectMemory"],
+		// 		config: {
+		// 			tools,
+		// 			experimental_context: pmContext,
+		// 			stopWhen: stepCountIs(50),
+		// 			buildInstructions: buildProjectManagerSystemPrompt as (
+		// 				ctx: AppContext,
+		// 			) => string,
 
-					onStepFinish: async ({ toolResults }) => {
-						for (const call of toolResults) {
-							logger.info(`PM Tool: ${call.toolName}`, {
-								toolName: call.toolName,
-								input: call.input,
-								output: call.output,
-							});
-						}
-					},
+		// 			onStepFinish: async ({ toolResults }) => {
+		// 				for (const call of toolResults) {
+		// 					logger.info(`PM Tool: ${call.toolName}`, {
+		// 						toolName: call.toolName,
+		// 						input: call.input,
+		// 						output: call.output,
+		// 					});
+		// 				}
+		// 			},
 
-					onFinish: async ({ totalUsage, finishReason }) => {
-						const usageCost = await calculateTokenUsageCost({
-							model: pmAgent?.model || AGENT_DEFAULT_MODEL,
-							usage: totalUsage,
-						});
-						await addProjectExecutionUsageMetrics(projectId, {
-							inputTokens: totalUsage.inputTokens || 0,
-							outputTokens: totalUsage.outputTokens || 0,
-							totalTokens: totalUsage.totalTokens || 0,
-							costUSD: usageCost?.costUSD || 0,
-						});
+		// 			onFinish: async ({ totalUsage, finishReason }) => {
+		// 				const usageCost = await calculateTokenUsageCost({
+		// 					model: pmAgent?.model || AGENT_DEFAULT_MODEL,
+		// 					usage: totalUsage,
+		// 				});
+		// 				await addProjectExecutionUsageMetrics(projectId, {
+		// 					inputTokens: totalUsage.inputTokens || 0,
+		// 					outputTokens: totalUsage.outputTokens || 0,
+		// 					totalTokens: totalUsage.totalTokens || 0,
+		// 					costUSD: usageCost?.costUSD || 0,
+		// 				});
 
-						const usageCostCents = Math.round((usageCost?.costUSD || 0) * 100);
-						if (usageCostCents > 0) {
-							await recordCreditUsage({
-								teamId,
-								amountCents: usageCostCents,
-								metadata: {
-									projectId,
-									type: "pm-agent",
-									model:
-										usageCost?.model || pmAgent?.model || AGENT_DEFAULT_MODEL,
-									inputTokens: totalUsage.inputTokens || 0,
-									outputTokens: totalUsage.outputTokens || 0,
-									totalTokens: totalUsage.totalTokens || 0,
-									costUSD: usageCost?.costUSD || 0,
-								},
-							});
-						}
-						logger.info("Agent OnFinish", { totalUsage, finishReason });
-					},
-				},
-			});
+		// 				const usageCostCents = Math.round((usageCost?.costUSD || 0) * 100);
+		// 				if (usageCostCents > 0) {
+		// 					await recordCreditUsage({
+		// 						teamId,
+		// 						amountCents: usageCostCents,
+		// 						metadata: {
+		// 							projectId,
+		// 							type: "pm-agent",
+		// 							model:
+		// 								usageCost?.model || pmAgent?.model || AGENT_DEFAULT_MODEL,
+		// 							inputTokens: totalUsage.inputTokens || 0,
+		// 							outputTokens: totalUsage.outputTokens || 0,
+		// 							totalTokens: totalUsage.totalTokens || 0,
+		// 							costUSD: usageCost?.costUSD || 0,
+		// 						},
+		// 					});
+		// 				}
+		// 				logger.info("Agent OnFinish", { totalUsage, finishReason });
+		// 			},
+		// 		},
+		// 	});
 
-			logger.info("Running PM agent", { projectId });
-			const response = await agent.generate({
-				context: pmContext,
-				message,
-			});
-			logger.info("PM agent execution completed", { projectId });
+		// 	logger.info("Running PM agent", { projectId });
+		// 	const response = await agent.generate({
+		// 		context: pmContext,
+		// 		message,
+		// 	});
+		// 	logger.info("PM agent execution completed", { projectId });
 
-			// Save response to chat
-			await saveChatMessage({
-				chatId,
-				teamId,
-				message: response,
-				userId: pmUserId,
-				role: "assistant",
-			});
+		// 	// Save response to chat
+		// 	await saveChatMessage({
+		// 		chatId,
+		// 		teamId,
+		// 		message: response,
+		// 		userId: pmUserId,
+		// 		role: "assistant",
+		// 	});
 
-			// If trigger was about a specific task, post the response as a comment
-			if (trigger.taskId) {
-				const textParts = response.parts.filter((p) => p.type === "text");
-				const lastText = textParts[textParts.length - 1]?.text || "";
-				const cleanedResponse = lastText.replace(/<[^>]*>/g, "");
+		// 	// If trigger was about a specific task, post the response as a comment
+		// 	if (trigger.taskId) {
+		// 		const textParts = response.parts.filter((p) => p.type === "text");
+		// 		const lastText = textParts[textParts.length - 1]?.text || "";
+		// 		const cleanedResponse = lastText.replace(/<[^>]*>/g, "");
 
-				if (cleanedResponse.trim()) {
-					await createTaskComment({
-						taskId: trigger.taskId,
-						userId: pmUserId,
-						teamId,
-						comment: cleanedResponse,
-					});
-				}
-			}
+		// 		if (cleanedResponse.trim()) {
+		// 			await createTaskComment({
+		// 				taskId: trigger.taskId,
+		// 				userId: pmUserId,
+		// 				teamId,
+		// 				comment: cleanedResponse,
+		// 			});
+		// 		}
+		// 	}
 
-			// ── 12. Mark idle (PM stays alive for future triggers) ────────
-			await Promise.all([
-				updateProjectExecution({
-					projectId,
-					status: "idle",
-					completedAt: new Date().toISOString(),
-				}),
-			]);
+		// 	// ── 12. Mark idle (PM stays alive for future triggers) ────────
+		// 	await Promise.all([
+		// 		updateProjectExecution({
+		// 			projectId,
+		// 			status: "idle",
+		// 			completedAt: new Date().toISOString(),
+		// 		}),
+		// 	]);
 
-			return { status: "completed" };
-		} catch (error) {
-			logger.error("PM agent execution failed", { error });
-			const errorMessage =
-				error instanceof Error ? error.message : "Unknown error";
+		// 	return { status: "completed" };
+		// } catch (error) {
+		// 	logger.error("PM agent execution failed", { error });
+		// 	const errorMessage =
+		// 		error instanceof Error ? error.message : "Unknown error";
 
-			await updateProjectExecution({
-				projectId,
-				status: "failed",
-				lastError: errorMessage,
-				completedAt: new Date().toISOString(),
-			});
+		// 	await updateProjectExecution({
+		// 		projectId,
+		// 		status: "failed",
+		// 		lastError: errorMessage,
+		// 		completedAt: new Date().toISOString(),
+		// 	});
 
-			return { status: "failed", reason: "unexpected_error" };
-		}
+		// 	return { status: "failed", reason: "unexpected_error" };
+		// }
 	},
 });
 
@@ -364,6 +366,7 @@ async function buildPMContext({
 		...buildAppContext(
 			{
 				...userContext,
+				agentId: pmAgent?.id,
 				integrationType: "web",
 				behalfUserId: pmAgent?.behalfUserId ?? pmUserId,
 			},
@@ -507,7 +510,9 @@ async function resolvePMAgent({
 	}
 
 	// 3. Fallback to system user
-	const systemUser = await getSystemUser();
+	const systemUser = await getMimirUser({
+		teamId,
+	});
 	if (!systemUser) {
 		throw new Error("System user not found for PM agent");
 	}

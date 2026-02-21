@@ -11,6 +11,7 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
+		"croner": "^9.1.0",
 		"date-fns": "4.1.0",
 		"tokenlens": "^1.3.1"
 	},
@@ -32,6 +33,7 @@
 		"./shareable": "./src/shareable.ts",
 		"./pr-reviews": "./src/pr-reviews.ts",
 		"./teams": "./src/teams.ts",
-		"./agents": "./src/agents.ts"
+		"./agents": "./src/agents.ts",
+		"./system-triggers": "./src/system-triggers.ts"
 	}
 }

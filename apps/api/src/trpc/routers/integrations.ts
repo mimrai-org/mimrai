@@ -90,6 +90,8 @@ export const integrationsRouter = router({
 				type: input.type,
 				config: input.config,
 				teamId: ctx.user.teamId!,
+				userId: ctx.user.id,
+				source: "trpc",
 			});
 		}),
 

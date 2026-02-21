@@ -1,5 +1,6 @@
 import { createTask } from "@mimir/db/queries/tasks";
 import { trackTaskCreated } from "@mimir/events/server";
+import { syncRecurringTaskSchedule } from "@mimir/jobs/tasks/create-recurring-task-job";
 import { getTaskPermalink } from "@mimir/utils/tasks";
 import { tool } from "ai";
 import z from "zod";
@@ -31,6 +32,17 @@ export const createTaskToolSchema = z.object({
 		.array(z.url())
 		.optional()
 		.describe("List of attachment URLs for the task"),
+
+	recurring: z
+		.string()
+		.optional()
+		.describe(
+			"Recurrence pattern in cron format (e.g. '0 9 * * 1' for every Monday at 9 AM)",
+		),
+	isTemplate: z
+		.boolean()
+		.optional()
+		.describe("Whether this task is a template for future tasks"),
 });
 
 export const createTaskTool = tool({
@@ -55,8 +67,17 @@ export const createTaskTool = tool({
 				teamId: teamId,
 				attachments: input.attachments || [],
 				labels: input.labelsIds || [],
+				recurring: input.recurring,
+				isTemplate: input.isTemplate,
 				userId: userId,
 			});
+
+			if (input.recurring) {
+				await syncRecurringTaskSchedule({
+					taskId: newTask.id,
+					recurringCron: input.recurring,
+				});
+			}
 
 			if (writer) {
 				writer.write({
@@ -73,9 +94,7 @@ export const createTaskTool = tool({
 			});
 
 			yield {
-				type: "text",
-				text: `Task created: ${newTask.title}`,
-				taskLink: getTaskPermalink(newTask.permalinkId),
+				id: newTask.id,
 			};
 		} catch (error) {
 			console.error("Error creating task:", error);

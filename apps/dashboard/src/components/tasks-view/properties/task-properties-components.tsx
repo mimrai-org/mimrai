@@ -3,6 +3,7 @@ import { cn } from "@ui/lib/utils";
 import { formatRelative } from "date-fns";
 import { CheckSquareIcon } from "lucide-react";
 import { memo, useMemo } from "react";
+import type { EnrichedTask } from "@/hooks/use-data";
 import { DependencyIcon } from "../../dependency-icon";
 import { MilestoneIcon } from "../../milestone-icon";
 import { ProjectIcon } from "../../project-icon";
@@ -88,26 +89,26 @@ const PropertyDependencies = memo(function PropertyDependencies({
 
 const PropertyStatus = memo(function PropertyStatus({
 	task,
-}: PropertyComponentProps<Pick<Task, "status" | "id">>) {
+}: PropertyComponentProps<Pick<EnrichedTask, "status" | "id">>) {
 	return <TaskPropertyStatus status={task.status} id={task.id} />;
 });
 
 const PropertyLabels = memo(function PropertyLabels({
 	task,
-}: PropertyComponentProps<Pick<Task, "labels">>) {
+}: PropertyComponentProps<Pick<EnrichedTask, "labels">>) {
 	return <TaskPropertyLabels labels={task.labels} />;
 });
 
 const PropertyDueDate = memo(function PropertyDueDate({
 	task,
-}: PropertyComponentProps<Pick<Task, "dueDate">>) {
+}: PropertyComponentProps<Pick<EnrichedTask, "dueDate">>) {
 	if (!task.dueDate) return null;
 	return <TaskPropertyDueDate task={task} />;
 });
 
 const PropertyChecklist = memo(function PropertyChecklist({
 	task,
-}: PropertyComponentProps<Pick<Task, "checklistSummary">>) {
+}: PropertyComponentProps<Pick<EnrichedTask, "checklistSummary">>) {
 	if (!task.checklistSummary?.total || task.checklistSummary.total <= 0)
 		return null;
 	return (
@@ -128,7 +129,7 @@ const PropertyChecklist = memo(function PropertyChecklist({
 
 const PropertyProject = memo(function PropertyProject({
 	task,
-}: PropertyComponentProps<Pick<Task, "project">>) {
+}: PropertyComponentProps<Pick<EnrichedTask, "project">>) {
 	if (!task.project) return null;
 	return (
 		<span className="flex h-5.5 items-center gap-2 rounded-sm bg-secondary px-2 text-xs">
