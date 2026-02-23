@@ -16,14 +16,9 @@ import {
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Button } from "@ui/components/ui/button";
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-} from "@ui/components/ui/card";
+import { DataSelectInput } from "@ui/components/ui/data-select-input";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -33,10 +28,10 @@ import {
 } from "@ui/components/ui/dropdown-menu";
 import { cn } from "@ui/lib/utils";
 import { EllipsisIcon, GripVerticalIcon, PlusIcon } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { StatusIcon } from "@/components/status-icon";
-import { useStatuses } from "@/hooks/use-data";
+import { useProjects, useStatuses } from "@/hooks/use-data";
 import { useStatusParams } from "@/hooks/use-status-params";
 import { queryClient, trpc } from "@/utils/trpc";
 
@@ -45,19 +40,24 @@ type Status = {
 	name: string;
 	description: string | null;
 	order: number;
+	projectIds: string[];
 	type: "done" | "to_do" | "backlog" | "in_progress" | "review";
 };
 
 const SortableStatusItem = ({
 	status,
 	isPending,
+	disableDrag,
 	setParams,
 	onDelete,
+	projectNamesById,
 }: {
 	status: Status;
 	isPending: boolean;
+	disableDrag: boolean;
 	setParams: ReturnType<typeof useStatusParams>["setParams"];
 	onDelete: (id: string) => void;
+	projectNamesById: Map<string, string>;
 }) => {
 	const {
 		attributes,
@@ -66,45 +66,62 @@ const SortableStatusItem = ({
 		transform,
 		transition,
 		isDragging,
-	} = useSortable({ id: status.id });
+	} = useSortable({ id: status.id, disabled: disableDrag });
 
 	const style = {
 		transform: CSS.Transform.toString(transform),
 		transition,
 	};
 
-	const gridClass = "grid grid-cols-[auto_1fr_1fr_1fr_auto] gap-4";
+	const scopeText =
+		status.projectIds.length === 0
+			? "Global"
+			: (() => {
+					const names = status.projectIds.map(
+						(projectId) => projectNamesById.get(projectId) ?? "Unknown project",
+					);
+					if (names.length <= 2) return names.join(", ");
+					return `${names.slice(0, 2).join(", ")} +${names.length - 2}`;
+				})();
 
 	return (
-		<li
+		<div
 			ref={setNodeRef}
 			style={style}
 			className={cn(
-				gridClass,
-				"items-center border-b py-2 text-sm last:border-0",
+				"flex items-center gap-4 rounded-sm px-4 py-2 text-sm hover:bg-accent dark:hover:bg-accent/30",
 				isDragging && "opacity-50",
 			)}
 		>
 			<button
 				type="button"
-				className="cursor-grab touch-none text-muted-foreground hover:text-foreground"
-				{...attributes}
-				{...listeners}
+				className={cn(
+					"touch-none text-muted-foreground hover:text-foreground",
+					disableDrag ? "cursor-not-allowed opacity-40" : "cursor-grab",
+				)}
+				{...(disableDrag ? {} : attributes)}
+				{...(disableDrag ? {} : listeners)}
 			>
 				<GripVerticalIcon className="size-4" />
 			</button>
-			<span className="flex items-center gap-2">
-				<StatusIcon className="inline size-4!" type={status.type} />
-				{status.name}
-			</span>
-			<span className="text-muted-foreground">{status.description}</span>
-			<span className="text-muted-foreground">
-				{status.type.replaceAll("_", " ").toUpperCase()}
-			</span>
+			<div className="inline rounded bg-accent p-2 dark:bg-accent/30">
+				<StatusIcon className="selft-center size-4" type={status.type} />
+			</div>
+			<div className="min-w-0 flex-1">
+				<div className="flex items-center gap-2">
+					<span className="font-medium">{status.name}</span>
+				</div>
+				<div className="truncate text-muted-foreground text-xs">
+					{scopeText}
+				</div>
+			</div>
+			<div className="text-muted-foreground text-xs uppercase tracking-wide">
+				{status.type.replaceAll("_", " ")}
+			</div>
 			<div className="flex justify-end">
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
-						<Button size="sm" variant="ghost">
+						<Button size="sm" variant="ghost" className="size-5">
 							<EllipsisIcon />
 						</Button>
 					</DropdownMenuTrigger>
@@ -134,14 +151,16 @@ const SortableStatusItem = ({
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</div>
-		</li>
+		</div>
 	);
 };
 
 export const StatusesList = () => {
-	const { setParams } = useStatusParams();
 	const { data } = useStatuses();
+	const { data: projects } = useProjects();
+	const { setParams } = useStatusParams();
 	const [items, setItems] = useState<Status[]>([]);
+	const [projectFilterId, setProjectFilterId] = useState<string | null>(null);
 
 	// Keep local state in sync with server data
 	const statuses = data?.data ?? [];
@@ -153,6 +172,22 @@ export const StatusesList = () => {
 		setItems(statuses);
 	}
 
+	const projectNamesById = useMemo(() => {
+		return new Map(
+			(projects?.data ?? []).map((project) => [project.id, project.name]),
+		);
+	}, [projects?.data]);
+
+	const filteredItems = useMemo(() => {
+		if (!projectFilterId) return items;
+
+		return items.filter(
+			(status) =>
+				status.projectIds.length === 0 ||
+				status.projectIds.includes(projectFilterId),
+		);
+	}, [items, projectFilterId]);
+
 	const sensors = useSensors(
 		useSensor(PointerSensor),
 		useSensor(KeyboardSensor, {
@@ -163,7 +198,9 @@ export const StatusesList = () => {
 	const { mutate: deleteStatus, isPending } = useMutation(
 		trpc.statuses.delete.mutationOptions({
 			onSuccess: () => {
-				queryClient.invalidateQueries(trpc.statuses.get.queryOptions());
+				queryClient.invalidateQueries({
+					queryKey: trpc.statuses.get.queryKey(),
+				});
 				toast.success("Status deleted successfully");
 			},
 		}),
@@ -172,7 +209,9 @@ export const StatusesList = () => {
 	const { mutate: reorderStatuses } = useMutation(
 		trpc.statuses.reorder.mutationOptions({
 			onSuccess: () => {
-				queryClient.invalidateQueries(trpc.statuses.get.queryOptions());
+				queryClient.invalidateQueries({
+					queryKey: trpc.statuses.get.queryKey(),
+				});
 				toast.success("Statuses reordered successfully");
 			},
 			onError: () => {
@@ -186,6 +225,11 @@ export const StatusesList = () => {
 	);
 
 	const handleDragEnd = (event: DragEndEvent) => {
+		if (projectFilterId) {
+			toast.message("Clear the project filter to reorder all statuses");
+			return;
+		}
+
 		const { active, over } = event;
 
 		if (over && active.id !== over.id) {
@@ -205,55 +249,59 @@ export const StatusesList = () => {
 		}
 	};
 
-	const gridClass = "grid grid-cols-[auto_1fr_1fr_1fr_auto] gap-4";
-
 	return (
-		<Card>
-			<CardHeader>
-				<div className="flex items-center justify-between">
-					<CardTitle>Statuses</CardTitle>
-					<Button size="sm" onClick={() => setParams({ createStatus: true })}>
-						<PlusIcon />
-						Add Status
-					</Button>
-				</div>
-			</CardHeader>
-			<CardContent>
-				<ul>
-					<li
-						className={cn(
-							gridClass,
-							"border-b pb-4 font-medium text-muted-foreground text-xs",
+		<div className="text-sm">
+			<div className="mb-2 flex items-center">
+				<DataSelectInput
+					size="sm"
+					className="w-64"
+					queryOptions={trpc.projects.get.queryOptions(
+						{},
+						{
+							select: (result) => result.data,
+						},
+					)}
+					value={projectFilterId}
+					onChange={(value) => setProjectFilterId(value || null)}
+					getLabel={(item) => item?.name ?? ""}
+					getValue={(item) => item?.id ?? ""}
+					renderItem={(item) => item.name}
+					placeholder="All projects"
+					clearable
+				/>
+			</div>
+
+			<DndContext
+				sensors={sensors}
+				collisionDetection={closestCenter}
+				onDragEnd={handleDragEnd}
+			>
+				<SortableContext
+					items={filteredItems.map((s) => s.id)}
+					strategy={verticalListSortingStrategy}
+				>
+					<div>
+						{filteredItems.map((status) => (
+							<SortableStatusItem
+								key={status.id}
+								status={status}
+								isPending={isPending}
+								disableDrag={Boolean(projectFilterId)}
+								setParams={setParams}
+								onDelete={(id) => deleteStatus({ id })}
+								projectNamesById={projectNamesById}
+							/>
+						))}
+						{filteredItems.length === 0 && (
+							<div className="px-4 py-8 text-center text-muted-foreground">
+								{projectFilterId
+									? "No statuses available for this project"
+									: "No statuses yet"}
+							</div>
 						)}
-					>
-						<span />
-						<span>Name</span>
-						<span>Description</span>
-						<span>Type</span>
-						<span />
-					</li>
-					<DndContext
-						sensors={sensors}
-						collisionDetection={closestCenter}
-						onDragEnd={handleDragEnd}
-					>
-						<SortableContext
-							items={items.map((s) => s.id)}
-							strategy={verticalListSortingStrategy}
-						>
-							{items.map((status) => (
-								<SortableStatusItem
-									key={status.id}
-									status={status}
-									isPending={isPending}
-									setParams={setParams}
-									onDelete={(id) => deleteStatus({ id })}
-								/>
-							))}
-						</SortableContext>
-					</DndContext>
-				</ul>
-			</CardContent>
-		</Card>
+					</div>
+				</SortableContext>
+			</DndContext>
+		</div>
 	);
 };

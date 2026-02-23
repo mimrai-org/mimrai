@@ -19,8 +19,8 @@ export const TaskFormProperties = () => {
 				<Assignee />
 				<DueDate />
 				<Priority />
-				<StatusSelect />
 				<ProjectSelect />
+				<StatusSelect />
 				<MilestoneSelect />
 				<Recurring />
 			</div>

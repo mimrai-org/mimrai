@@ -2,13 +2,6 @@
 import { t } from "@mimir/locale";
 import { Button } from "@mimir/ui/button";
 import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@mimir/ui/card";
-import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
@@ -19,7 +12,6 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { EllipsisIcon, PlusIcon } from "lucide-react";
 import { useLabelParams } from "@/hooks/use-task-label-params";
-import { cn } from "@/lib/utils";
 import { queryClient, trpc } from "@/utils/trpc";
 
 export const LabelList = () => {
@@ -34,88 +26,63 @@ export const LabelList = () => {
 		}),
 	);
 
-	const gridClasses = "grid grid-cols-[3fr_1fr_1fr_50px] gap-8 items-center";
-
 	return (
-		<Card>
-			<CardHeader>
-				<div className="flex justify-between">
-					<div className="space-y-1">
-						<CardTitle>{t("settings.labels.title")}</CardTitle>
-						<CardDescription>
-							{t("settings.labels.description")}
-						</CardDescription>
-					</div>
-					<div>
-						<Button
-							size={"sm"}
-							onClick={() => setParams({ createLabel: true })}
-						>
-							<PlusIcon />
-							Add Label
-						</Button>
-					</div>
-				</div>
-			</CardHeader>
-			<CardContent>
-				<ul className="">
-					<li
-						className={cn(
-							gridClasses,
-							"font-medium text-muted-foreground text-sm",
-						)}
+		<div className="text-xs">
+			<div>
+				{labels?.map((label) => (
+					<div
+						key={label.id}
+						className="flex items-center gap-4 rounded-sm px-4 py-2 hover:bg-accent dark:hover:bg-accent/30"
 					>
-						<span>{t("settings.labels.table.name")}</span>
-						<span className="flex justify-end">
-							{t("settings.labels.table.tasks")}
-						</span>
-						<span className="flex justify-end">
-							{t("settings.labels.table.createdAt")}
-						</span>
-						<span />
-					</li>
-					{labels?.map((label) => (
-						<li
-							key={label.id}
-							className={cn(gridClasses, "border-b py-2 text-sm last:border-0")}
-						>
-							<LabelBadge {...label} />
-							<span className="flex justify-end">{label.taskCount}</span>
-							<span className="flex justify-end">
-								{format(new Date(label.createdAt), "PPP")}
-							</span>
-							<span>
-								<DropdownMenu>
-									<DropdownMenuTrigger asChild>
-										<Button size={"icon"} variant="ghost">
-											<EllipsisIcon />
-										</Button>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent>
-										<DropdownMenuItem
-											onClick={() => {
-												queryClient.setQueryData(
-													trpc.labels.getById.queryKey({ id: label.id }),
-													label,
-												);
-												setParams({ labelId: label.id });
-											}}
-										>
-											Edit
-										</DropdownMenuItem>
-										<DropdownMenuItem
-											variant="destructive"
-											onClick={() => deleteLabel({ id: label.id })}
-										>
-											Delete
-										</DropdownMenuItem>
-									</DropdownMenuContent>
-								</DropdownMenu>
-							</span>
-						</li>
-					))}
-				</ul>
-			</CardContent>
-		</Card>
+						<div className="flex min-w-0 flex-1 items-center gap-2">
+							<div className="font-medium">
+								<LabelBadge {...label} />
+							</div>
+						</div>
+						<div className="text-muted-foreground text-xs">
+							{label.taskCount} {t("settings.labels.table.tasks").toLowerCase()}
+						</div>
+						<div>
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<Button size={"icon"} variant="ghost" className="size-5">
+										<EllipsisIcon />
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent>
+									<DropdownMenuItem
+										onClick={() => {
+											queryClient.setQueryData(
+												trpc.labels.getById.queryKey({ id: label.id }),
+												label,
+											);
+											setParams({ labelId: label.id });
+										}}
+									>
+										Edit
+									</DropdownMenuItem>
+									<DropdownMenuItem
+										variant="destructive"
+										onClick={() => deleteLabel({ id: label.id })}
+									>
+										Delete
+									</DropdownMenuItem>
+								</DropdownMenuContent>
+							</DropdownMenu>
+						</div>
+					</div>
+				))}
+				{labels?.length === 0 && (
+					<div className="px-4 py-8 text-center text-muted-foreground">
+						No labels yet
+					</div>
+				)}
+				{!labels && (
+					<div className="px-4 py-8 text-center text-muted-foreground">
+						Loading labels...
+					</div>
+				)}
+			</div>
+		</div>
 	);
 };

@@ -1,4 +1,5 @@
 import { Button } from "@mimir/ui/button";
+import { DataSelectInput } from "@mimir/ui/data-select-input";
 import {
 	Form,
 	FormControl,
@@ -25,6 +26,7 @@ import { updateStatusInCache } from "@/hooks/use-data-cache-helpers";
 import { useStatusParams } from "@/hooks/use-status-params";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { trpc } from "@/utils/trpc";
+import { ProjectIcon } from "../project-icon";
 import { StatusIcon } from "../status-icon";
 
 const schema = z.object({
@@ -32,6 +34,7 @@ const schema = z.object({
 	name: z.string().min(1).max(255),
 	description: z.string().max(5000).optional(),
 	type: z.enum(["done", "to_do", "backlog", "in_progress", "review"]),
+	projectIds: z.array(z.string()).optional(),
 });
 
 export const StatusForm = ({
@@ -46,6 +49,7 @@ export const StatusForm = ({
 			name: "",
 			description: "",
 			type: "in_progress",
+			projectIds: [],
 			...defaultValues,
 		},
 	});
@@ -60,7 +64,9 @@ export const StatusForm = ({
 					trpc.statuses.getById.queryKey({ id: status.id }),
 					status,
 				);
-				queryClient.invalidateQueries(trpc.statuses.get.queryOptions());
+				queryClient.invalidateQueries({
+					queryKey: trpc.statuses.get.queryKey(),
+				});
 				queryClient.invalidateQueries(trpc.tasks.get.queryOptions());
 				toast.success("Status created successfully", { id: "create-status" });
 				setParams(null);
@@ -130,6 +136,55 @@ export const StatusForm = ({
 								<FormControl>
 									<Textarea placeholder="Description" {...field} />
 								</FormControl>
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name="projectIds"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Projects</FormLabel>
+								<FormControl>
+									<DataSelectInput
+										queryOptions={trpc.projects.get.queryOptions(
+											{},
+											{
+												select: (data) => data.data,
+											},
+										)}
+										value={field.value ?? []}
+										onChange={(value) => field.onChange(value ?? [])}
+										getLabel={(item) => item?.name ?? ""}
+										getValue={(item) => item?.id ?? ""}
+										renderItem={(item) => item.name}
+										placeholder="Global status (all projects)"
+										renderMultiple={(items) => {
+											return (
+												<div className="flex flex-wrap gap-1">
+													{items.map((item) => (
+														<div
+															key={item.id}
+															className="rounded bg-accent px-2 py-1 text-xs"
+														>
+															<ProjectIcon
+																{...item}
+																className="mr-1 inline size-3"
+															/>
+															{item.name}
+														</div>
+													))}
+												</div>
+											);
+										}}
+										multiple
+										clearable
+									/>
+								</FormControl>
+								<p className="text-muted-foreground text-xs">
+									Leave empty to make this status available in all projects.
+								</p>
+								<FormMessage />
 							</FormItem>
 						)}
 					/>

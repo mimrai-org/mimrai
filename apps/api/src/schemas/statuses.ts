@@ -5,6 +5,7 @@ import { paginationSchema } from "./base";
 export const getColumnsSchema = z.object({
 	...paginationSchema.shape,
 	type: z.array(z.enum(statusTypeEnum.enumValues)).optional(),
+	projectId: z.string().nullable().optional(),
 });
 export type GetColumnsInput = z.infer<typeof getColumnsSchema>;
 
@@ -14,6 +15,7 @@ export const createColumnSchema = z.object({
 	order: z.number().optional(),
 	type: z.enum(statusTypeEnum.enumValues),
 	teamId: z.string(),
+	projectIds: z.array(z.string()).optional(),
 });
 export type CreateColumnInput = z.infer<typeof createColumnSchema>;
 
@@ -23,6 +25,7 @@ export const updateColumnSchema = z.object({
 	description: z.string().max(5000).optional(),
 	type: z.enum(statusTypeEnum.enumValues).optional(),
 	order: z.number().optional(),
+	projectIds: z.array(z.string()).optional(),
 });
 export type UpdateColumnInput = z.infer<typeof updateColumnSchema>;
 

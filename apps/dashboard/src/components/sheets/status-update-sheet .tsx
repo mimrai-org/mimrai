@@ -1,5 +1,10 @@
 "use client";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@mimir/ui/sheet";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from "@mimir/ui/dialog";
 import { useQuery } from "@tanstack/react-query";
 import { useStatusParams } from "@/hooks/use-status-params";
 import { trpc } from "@/utils/trpc";
@@ -20,11 +25,11 @@ export const StatusUpdateSheet = () => {
 	);
 
 	return (
-		<Sheet open={isOpen} onOpenChange={() => setParams(null)}>
-			<SheetContent>
-				<SheetHeader>
-					<SheetTitle>Update Status</SheetTitle>
-				</SheetHeader>
+		<Dialog open={isOpen} onOpenChange={() => setParams(null)}>
+			<DialogContent>
+				<DialogHeader>
+					<DialogTitle>Update Status</DialogTitle>
+				</DialogHeader>
 
 				<StatusForm
 					defaultValues={{
@@ -32,9 +37,11 @@ export const StatusUpdateSheet = () => {
 						name: status?.name || "",
 						description: status?.description || "",
 						type: status?.type || "in_progress",
+						projectIds:
+							((status as any)?.projectIds as string[] | undefined) || [],
 					}}
 				/>
-			</SheetContent>
-		</Sheet>
+			</DialogContent>
+		</Dialog>
 	);
 };

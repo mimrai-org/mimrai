@@ -51,7 +51,11 @@ import {
 	triggerPMAgentOnMention,
 	triggerPMAgentOnStatusChange,
 } from "./agent-triggers";
-import { getStatusById, getStatuses } from "./statuses";
+import {
+	assertStatusAllowedForProject,
+	getStatusById,
+	getStatuses,
+} from "./statuses";
 import { upsertTaskEmbedding } from "./tasks-embeddings";
 import { getMembers } from "./teams";
 
@@ -425,6 +429,12 @@ export const createTask = async ({
 	userId,
 	...input
 }: CreateTaskInput) => {
+	await assertStatusAllowedForProject({
+		statusId: input.statusId,
+		teamId: input.teamId,
+		projectId: input.projectId,
+	});
+
 	const { sequence, order } = await getNextTaskSequence(input.teamId);
 	const permalinkId = await generateTaskPermalinkId();
 
@@ -550,6 +560,15 @@ export const updateTask = async ({
 
 	if (!oldTask) {
 		throw new Error("Task not found");
+	}
+
+	if (input.statusId !== undefined || input.projectId !== undefined) {
+		await assertStatusAllowedForProject({
+			statusId: input.statusId ?? oldTask.statusId,
+			teamId: oldTask.teamId,
+			projectId:
+				input.projectId !== undefined ? (input.projectId ?? null) : oldTask.projectId,
+		});
 	}
 
 	const [task] = await db
@@ -698,6 +717,17 @@ export const bulkUpdateTask = async ({
 
 	if (oldTasks.length === 0) {
 		throw new Error("No tasks found");
+	}
+
+	if (input.statusId !== undefined || input.projectId !== undefined) {
+		for (const oldTask of oldTasks) {
+			await assertStatusAllowedForProject({
+				statusId: input.statusId ?? oldTask.statusId,
+				teamId,
+				projectId:
+					input.projectId !== undefined ? (input.projectId ?? null) : oldTask.projectId,
+			});
+		}
 	}
 
 	const updateData: any = {

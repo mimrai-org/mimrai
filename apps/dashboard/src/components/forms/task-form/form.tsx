@@ -88,7 +88,9 @@ export const TaskForm = ({
 				cloneTaskPanel.closeAll();
 			},
 			onError: (error) => {
-				toast.error("Failed to create task", { id: "create-task" });
+				toast.error(error.message || "Failed to create task", {
+					id: "create-task",
+				});
 			},
 		}),
 	);
@@ -96,7 +98,9 @@ export const TaskForm = ({
 	const { mutate: updateTask, isPending: isPendingUpdate } = useMutation(
 		trpc.tasks.update.mutationOptions({
 			onError: (error) => {
-				toast.error("Failed to update task", { id: "update-task" });
+				toast.error(error.message || "Failed to update task", {
+					id: "update-task",
+				});
 			},
 			onSuccess: (task) => {
 				invalidateTasksCache();

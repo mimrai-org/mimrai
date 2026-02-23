@@ -6,6 +6,7 @@ import {
 	useQueryClient,
 } from "@tanstack/react-query";
 import { useMemo } from "react";
+import { toast } from "sonner";
 import type { EnrichedTask, Task } from "@/hooks/use-data";
 import { trpc } from "@/utils/trpc";
 import { AssigneeAvatar } from "../asignee-avatar";
@@ -259,6 +260,19 @@ const MIN_ORDER = 0;
 const MAX_ORDER = 74000;
 const DEFAULT_EMPTY_COLUMN_ORDER = 64000;
 
+const isStatusAllowedForProject = (
+	status: { name?: string; projectIds?: string[] | null } | null | undefined,
+	projectId: string | null | undefined,
+) => {
+	if (!status) return true;
+
+	const scopedProjectIds = status.projectIds ?? [];
+	if (scopedProjectIds.length === 0) return true;
+	if (!projectId) return false;
+
+	return scopedProjectIds.includes(projectId);
+};
+
 export const useTasksGrouped = () => {
 	const { filters } = useTasksViewContext();
 	const tasks = useTasksSorted();
@@ -346,6 +360,58 @@ export const useTasksGrouped = () => {
 		return (prevOrder + overItemOrder) / 2;
 	};
 
+	const handleReorderError = (error: unknown) => {
+		queryClient.invalidateQueries({
+			queryKey: trpc.tasks.get.infiniteQueryKey(),
+		});
+		queryClient.invalidateQueries({
+			queryKey: trpc.tasks.get.queryKey(),
+		});
+		toast.error(
+			error instanceof Error ? error.message : "Failed to move task",
+		);
+	};
+
+	const guardScopedMove = ({
+		activeTask,
+		targetColumn,
+		targetStatus,
+		targetProjectId,
+	}: {
+		activeTask: EnrichedTask;
+		targetColumn?: GenericGroup;
+		targetStatus?: Status | null;
+		targetProjectId?: string | null;
+	}) => {
+		if (filters.groupBy === "status") {
+			if (
+				!isStatusAllowedForProject(
+					targetStatus ?? ((targetColumn?.data as Status | undefined) ?? null),
+					activeTask.projectId,
+				)
+			) {
+				toast.error("This status is not available for the task's project");
+				return false;
+			}
+		}
+
+		if (filters.groupBy === "project") {
+			if (
+				!isStatusAllowedForProject(
+					(activeTask.status as Status | undefined) ?? null,
+					targetProjectId ?? targetColumn?.id ?? null,
+				)
+			) {
+				toast.error(
+					"Move blocked: current status is not allowed in the target project",
+				);
+				return false;
+			}
+		}
+
+		return true;
+	};
+
 	const reorderTask = async (
 		activeId: string,
 		overId: string | undefined,
@@ -359,6 +425,14 @@ export const useTasksGrouped = () => {
 		// Case A: Moving to an empty column (overId is undefined or null, but we have column name)
 		if (activeTask && targetColumn) {
 			if (!targetColumn) return;
+			if (
+				!guardScopedMove({
+					activeTask,
+					targetColumn,
+				})
+			) {
+				return;
+			}
 
 			const options = tasksGroupByOptions[targetColumn.type];
 			const columnUpdateKey = options.updateKey;
@@ -372,11 +446,15 @@ export const useTasksGrouped = () => {
 			options.updateData(newTaskPayload, targetColumn.data);
 
 			updateCache(newTaskPayload);
-			await updateTask({
-				id: newTaskPayload.id,
-				[columnUpdateKey]: newTaskPayload[columnUpdateKey],
-				order: newTaskPayload.order,
-			});
+			try {
+				await updateTask({
+					id: newTaskPayload.id,
+					[columnUpdateKey]: newTaskPayload[columnUpdateKey],
+					order: newTaskPayload.order,
+				});
+			} catch (error) {
+				handleReorderError(error);
+			}
 			return;
 		}
 
@@ -404,13 +482,33 @@ export const useTasksGrouped = () => {
 		};
 		options.updateData(newTaskPayload, options.getData(overTask));
 
+		if (
+			!guardScopedMove({
+				activeTask,
+				targetStatus:
+					filters.groupBy === "status"
+						? ((options.getData(overTask) as Status | undefined) ?? null)
+						: undefined,
+				targetProjectId:
+					filters.groupBy === "project"
+						? ((overTask.projectId as string | null | undefined) ?? null)
+						: undefined,
+			})
+		) {
+			return;
+		}
+
 		updateCache(newTaskPayload);
 
-		await updateTask({
-			id: newTaskPayload.id,
-			[columnUpdateKey]: newTaskPayload[columnUpdateKey],
-			order: newTaskPayload.order,
-		});
+		try {
+			await updateTask({
+				id: newTaskPayload.id,
+				[columnUpdateKey]: newTaskPayload[columnUpdateKey],
+				order: newTaskPayload.order,
+			});
+		} catch (error) {
+			handleReorderError(error);
+		}
 	};
 
 	const updateCache = (updatedTask: Partial<Task>) => {

@@ -6,6 +6,13 @@ import {
 	SheetHeader,
 	SheetTitle,
 } from "@mimir/ui/sheet";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+} from "@ui/components/ui/dialog";
 import { useStatusParams } from "@/hooks/use-status-params";
 import { StatusForm } from "../forms/status-form";
 
@@ -15,17 +22,17 @@ export const StatusCreateSheet = () => {
 	const isOpen = Boolean(createStatus);
 
 	return (
-		<Sheet open={isOpen} onOpenChange={() => setParams(null)}>
-			<SheetContent>
-				<SheetHeader>
-					<SheetTitle>Create Status</SheetTitle>
-					<SheetDescription>
+		<Dialog open={isOpen} onOpenChange={() => setParams(null)}>
+			<DialogContent>
+				<DialogHeader>
+					<DialogTitle>Create Status</DialogTitle>
+					<DialogDescription>
 						Create a new status for your project.
-					</SheetDescription>
-				</SheetHeader>
+					</DialogDescription>
+				</DialogHeader>
 
 				<StatusForm defaultValues={{}} />
-			</SheetContent>
-		</Sheet>
+			</DialogContent>
+		</Dialog>
 	);
 };

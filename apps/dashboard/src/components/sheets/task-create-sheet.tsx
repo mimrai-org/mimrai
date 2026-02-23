@@ -23,9 +23,13 @@ export const TaskCreateSheet = () => {
 
 	const { data: todoStatus } = useQuery(
 		trpc.statuses.get.queryOptions(
-			{ type: ["to_do"], pageSize: 1 },
 			{
-				select: (data) => data.data[0],
+				type: ["to_do"],
+				pageSize: 1,
+				projectId: taskProjectId || null,
+			} as any,
+			{
+				select: (data) => data.data[0] as { id: string } | undefined,
 				refetchOnMount: false,
 				refetchOnWindowFocus: false,
 			},

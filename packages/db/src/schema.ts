@@ -493,6 +493,7 @@ export const statuses = pgTable(
 		description: text("description"),
 		type: statusTypeEnum("type").default("in_progress").notNull(),
 		isFinalState: boolean("is_final_state").default(false).notNull(),
+		projectIds: text("project_ids").array().default([]).notNull(),
 		createdAt: timestamp("created_at", {
 			withTimezone: true,
 			mode: "string",

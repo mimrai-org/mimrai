@@ -6,15 +6,20 @@ import type { Document, Member, Project, Status, Task } from "./use-data";
  * This will automatically update all tasks using this status.
  */
 export function updateStatusInCache(updatedStatus: Status) {
-	queryClient.setQueryData(trpc.statuses.get.queryKey(), (old) => {
-		if (!old) return old;
-		return {
-			...old,
-			data: old.data.map((s) =>
-				s.id === updatedStatus.id ? updatedStatus : s,
-			),
-		};
-	});
+	queryClient.setQueriesData(
+		{
+			queryKey: trpc.statuses.get.queryKey(),
+		},
+		(old: any) => {
+			if (!old?.data) return old;
+			return {
+				...old,
+				data: old.data.map((s: Status) =>
+					s.id === updatedStatus.id ? updatedStatus : s,
+				),
+			};
+		},
+	);
 }
 
 /**

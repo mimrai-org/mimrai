@@ -25,7 +25,8 @@ export const ZenModeDoneButton = () => {
 	const { data: statuses } = useQuery(
 		trpc.statuses.get.queryOptions({
 			type: ["done"],
-		}),
+			projectId: task.projectId ?? null,
+		} as any),
 	);
 
 	const sortedStatuses = statuses?.data?.sort((a, b) => {
