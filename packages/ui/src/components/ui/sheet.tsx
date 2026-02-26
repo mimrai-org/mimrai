@@ -51,7 +51,7 @@ function SheetContent({
 }) {
 	return (
 		<SheetPortal>
-			<SheetOverlay className="backdrop-blur-xs dark:bg-white/5" />
+			<SheetOverlay />
 			<SheetPrimitive.Content
 				data-slot="sheet-content"
 				className={cn(

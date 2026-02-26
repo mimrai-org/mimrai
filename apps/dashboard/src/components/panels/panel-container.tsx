@@ -105,7 +105,7 @@ export function PanelContainer({
 				zIndex: 45 + index,
 			}}
 			className={cn(
-				"fixed bottom-0 left-auto max-h-[calc(100vh-2rem)] overflow-y-auto rounded-t-lg border-x border-t bg-background pt-0 shadow-lg shadow-secondary/20 sm:w-[700px]",
+				"fixed bottom-0 left-auto max-h-[calc(100vh-2rem)] overflow-y-auto rounded-t-lg border-x border-t bg-card pt-0 shadow-lg shadow-secondary/20 sm:w-[700px]",
 				className,
 			)}
 			onClick={handlePanelClick}

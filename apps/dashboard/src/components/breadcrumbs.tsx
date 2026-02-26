@@ -39,7 +39,7 @@ interface BreadcrumpItem {
 }
 
 const breadcrumpsMap: BreadcrumpItem[] = [
-	{ icon: HomeIcon, label: "Home", segments: [] },
+	// { icon: HomeIcon, label: "Home", segments: [] },
 	{
 		icon: FoldersIcon,
 		label: "Projects",
@@ -122,11 +122,11 @@ export const BreadcrumbsProvider = ({
 	const basePath = `/team/${session?.user?.teamSlug || ""}`;
 	const segments = useSelectedLayoutSegments();
 	const [overrideCrumbs, setOverrideCrumbs] = useState<BreadcrumpItem[]>([
-		{
-			segments: [],
-			label: "Home",
-			customElement: <TeamSwitcher />,
-		},
+		// {
+		// 	segments: [],
+		// 	label: "Home",
+		// 	// customElement: <TeamSwitcher />,
+		// },
 	]);
 
 	const crumbs = useMemo(() => {
@@ -150,6 +150,10 @@ export const BreadcrumbsProvider = ({
 
 				// prevent adding uuids or dynamic segments
 				if (label?.match(/^[0-9a-fA-F-]{36}$/)) {
+					continue;
+				}
+
+				if (!segmentSlice[segmentSlice.length - 1]) {
 					continue;
 				}
 

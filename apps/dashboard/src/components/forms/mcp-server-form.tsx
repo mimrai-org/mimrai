@@ -74,7 +74,9 @@ export const McpServerForm = ({
 	);
 
 	const { mutateAsync: updateServer, isPending: isUpdating } = useMutation(
-		trpc.mcpServers.update.mutationOptions(),
+		trpc.mcpServers.update.mutationOptions({
+			onSuccess: (data) => {},
+		}),
 	);
 
 	const isPending = isCreating || isUpdating;
