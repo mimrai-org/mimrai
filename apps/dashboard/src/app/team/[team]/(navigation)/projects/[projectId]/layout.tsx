@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { BreadcrumbSetter } from "@/components/breadcrumbs";
 import { trpcClient } from "@/utils/trpc";
 
@@ -12,6 +13,10 @@ export default async function ProjectLayout({ children, params }: Props) {
 	const project = await trpcClient.projects.getById.query({
 		id: projectId,
 	});
+
+	if (!project) {
+		return notFound();
+	}
 
 	return (
 		<div className="overflow-x-auto">

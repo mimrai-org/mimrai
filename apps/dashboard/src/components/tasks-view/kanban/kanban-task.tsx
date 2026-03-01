@@ -2,6 +2,7 @@ import type { RouterOutputs } from "@mimir/trpc";
 import { useTaskPanel } from "@/components/panels/task-panel";
 import { useUser } from "@/components/user-provider";
 import type { EnrichedTask } from "@/hooks/use-data";
+import { updateTaskInCache } from "@/hooks/use-data-cache-helpers";
 import { cn } from "@/lib/utils";
 import {
 	PropertyAssignee,
@@ -40,6 +41,7 @@ export const KanbanTask = ({
 			)}
 			ref={ref}
 			onClick={(e) => {
+				updateTaskInCache(task);
 				taskPanel.open(task.id);
 			}}
 			{...props}

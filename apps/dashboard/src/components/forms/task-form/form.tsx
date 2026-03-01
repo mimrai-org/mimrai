@@ -82,7 +82,8 @@ export const TaskForm = ({
 			},
 			onSuccess: (task) => {
 				toast.success("Task created successfully", { id: "create-task" });
-				invalidateTasksCache();
+				// invalidateTasksCache();
+				updateTaskInCache(task);
 				taskPanel.open(task.id);
 				createTaskPanel.closeAll();
 				cloneTaskPanel.closeAll();
@@ -104,6 +105,9 @@ export const TaskForm = ({
 			},
 			onSuccess: (task) => {
 				invalidateTasksCache();
+				toast.success("Task updated successfully", { id: "update-task" });
+				updateTaskInCache(task);
+				setLastSavedDate(new Date());
 			},
 		}),
 	);

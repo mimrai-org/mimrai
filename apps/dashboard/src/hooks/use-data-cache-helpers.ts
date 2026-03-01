@@ -76,8 +76,12 @@ export function updateTaskInCache(updatedTask: Partial<Task>) {
 	);
 
 	if (updatedTask.id) {
-		queryClient.invalidateQueries(
-			trpc.tasks.getById.queryOptions({ id: updatedTask.id }),
+		queryClient.setQueryData(
+			trpc.tasks.getById.queryKey({ id: updatedTask.id }),
+			(old) => {
+				if (!old) return old;
+				return { ...old, ...updatedTask };
+			},
 		);
 	}
 }
