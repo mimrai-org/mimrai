@@ -29,9 +29,20 @@ export default function LoginPage() {
 				/>
 			</div>
 			<div className="relative flex h-screen flex-col">
-				<Suspense>
+				<div className="mx-auto my-auto max-w-md">
+					<h1 className="text-2xl">
+						Paused for now <br />
+						<span className="text-zinc-400">but we're not gone.</span>
+					</h1>
+					<p className="mt-4">
+						We're taking a pause to focus on building the best possible product.
+						We're not gone, and we'll be back with something amazing. Stay
+						tuned!
+					</p>
+				</div>
+				{/* <Suspense>
 					<SignInForm />
-				</Suspense>
+				</Suspense> */}
 			</div>
 		</div>
 	);

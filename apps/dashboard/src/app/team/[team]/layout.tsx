@@ -19,43 +19,45 @@ type Props = {
 };
 
 export default async function Layout({ children, params }: Props) {
-	const { team } = await params;
-	const session = await getSession();
+	return redirect("/sign-in");
 
-	if (!session?.user?.teamSlug) {
-		return redirect("/sign-in");
-	}
+	// const { team } = await params;
+	// const session = await getSession();
 
-	// switch to the team in the URL
-	try {
-		if (session.user?.teamSlug !== team) {
-			await trpcClient.users.switchTeam.mutate({
-				slug: team,
-			});
-		}
-	} catch (error) {
-		if (!session.user.teamSlug) {
-			return redirect("/team");
-		}
-		return redirect(`/team/${session.user.teamSlug}/onboarding`);
-	}
+	// if (!session?.user?.teamSlug) {
+	// 	return redirect("/sign-in");
+	// }
 
-	const user = await trpcClient.users.getCurrent.query();
+	// // switch to the team in the URL
+	// try {
+	// 	if (session.user?.teamSlug !== team) {
+	// 		await trpcClient.users.switchTeam.mutate({
+	// 			slug: team,
+	// 		});
+	// 	}
+	// } catch (error) {
+	// 	if (!session.user.teamSlug) {
+	// 		return redirect("/team");
+	// 	}
+	// 	return redirect(`/team/${session.user.teamSlug}/onboarding`);
+	// }
 
-	return (
-		<Suspense>
-			<UserProvider user={user}>
-				<PanelProvider>
-					<GlobalSheets />
-					{children}
+	// const user = await trpcClient.users.getCurrent.query();
 
-					{/* {process.env.NODE_ENV === "development" && (
-							<ReactQueryDevtools buttonPosition="bottom-left" />
-						)} */}
-					<OpenPanelProvider profileId={user.id} />
-					<PanelStack />
-				</PanelProvider>
-			</UserProvider>
-		</Suspense>
-	);
+	// return (
+	// 	<Suspense>
+	// 		<UserProvider user={user}>
+	// 			<PanelProvider>
+	// 				<GlobalSheets />
+	// 				{children}
+
+	// 				{/* {process.env.NODE_ENV === "development" && (
+	// 						<ReactQueryDevtools buttonPosition="bottom-left" />
+	// 					)} */}
+	// 				<OpenPanelProvider profileId={user.id} />
+	// 				<PanelStack />
+	// 			</PanelProvider>
+	// 		</UserProvider>
+	// 	</Suspense>
+	// );
 }
