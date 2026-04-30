@@ -44,6 +44,7 @@
 	"dependencies": {
 		"@trpc/next": "^11.6.0",
 		"@upstash/ratelimit": "^2.0.8",
-		"facehash": "^0.0.5"
+		"facehash": "^0.0.5",
+		"next": "16.1.6"
 	}
 }

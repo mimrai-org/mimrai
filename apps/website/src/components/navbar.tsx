@@ -33,7 +33,7 @@ export const Navbar: React.FC = () => {
 				</Link>
 
 				{/* Desktop Menu */}
-				{/* <div className="hidden items-center gap-8 md:flex">
+				<div className="hidden items-center gap-8 md:flex">
 					<Link
 						href="#features"
 						className="text-sm text-zinc-400 transition-colors hover:text-white"
@@ -66,7 +66,7 @@ export const Navbar: React.FC = () => {
 							Get Started
 						</Button>
 					</Link>
-				</div> */}
+				</div>
 
 				{/* Mobile Toggle */}
 				<button
@@ -81,7 +81,7 @@ export const Navbar: React.FC = () => {
 			{/* Mobile Menu */}
 			{mobileMenuOpen && (
 				<div className="slide-in-from-top-2 absolute top-full left-0 flex w-full animate-in flex-col gap-4 border-border border-b bg-background p-6 md:hidden">
-					{/* <a href="#features" className="text-sm text-zinc-400">
+					<a href="#features" className="text-sm text-zinc-400">
 						Features
 					</a>
 					<a href="#product" className="text-sm text-zinc-400">
@@ -92,7 +92,7 @@ export const Navbar: React.FC = () => {
 					</a>
 					<Button variant="default" className="w-full justify-center">
 						Get Started
-					</Button> */}
+					</Button>
 				</div>
 			)}
 		</nav>
