@@ -5,3 +5,4 @@ node_modules
 out
 TEST_PROMPTS.md
 .vercel
+.graymatter
