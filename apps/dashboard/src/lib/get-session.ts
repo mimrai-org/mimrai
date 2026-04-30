@@ -24,6 +24,10 @@ export const getSession = async (
 		session = null;
 	}
 
+	if (!session) {
+		return null;
+	}
+
 	const teamId = (session?.user as any)?.teamId as string | undefined;
 	const teamSlug = (session?.user as any)?.teamSlug as string | undefined;
 
