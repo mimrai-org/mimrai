@@ -8,15 +8,21 @@ export const getSession = async (
 ) => {
 	const { cache } = params;
 
-	const { data: session } = await authClient.getSession({
-		fetchOptions: {
-			headers: {
-				cookie: (await headers()).get("cookie") || "",
+	let session;
+	try {
+		const response = await authClient.getSession({
+			fetchOptions: {
+				headers: {
+					cookie: (await headers()).get("cookie") || "",
+				},
+				credentials: "include",
+				cache,
 			},
-			credentials: "include",
-			cache,
-		},
-	});
+		});
+		session = response.data;
+	} catch {
+		session = null;
+	}
 
 	const teamId = (session?.user as any)?.teamId as string | undefined;
 	const teamSlug = (session?.user as any)?.teamSlug as string | undefined;
