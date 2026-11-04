@@ -10,7 +10,7 @@ export const Footer: React.FC = () => {
 				<div className="flex items-center gap-2">
 					<Logo className="size-8 rounded-sm bg-white" />
 					<span className="font-semibold text-white tracking-wide">
-						MIMRAI <span className="text-zinc-500">Tasks</span>
+						Mimir
 					</span>
 				</div>
 

@@ -1,6 +1,7 @@
 {
 	"$schema": "../../node_modules/wrangler/config-schema.json",
 	"name": "mimrai-tasks",
+	"account_id": "e84d2ca710c9119c485b47206a4f8ea2",
 	"compatibility_date": "2026-11-01",
 	"assets": {
 		"directory": "./out",

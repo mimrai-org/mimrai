@@ -25,8 +25,8 @@ const notoSansRunic = Noto_Sans_Runic({
 export const metadata: Metadata = {
 	metadataBase: new URL(SITE_URL),
 	title: {
-		default: "MIMRAI Tasks - Open-source task management template",
-		template: "%s | MIMRAI Tasks",
+		default: "Mimir - Open-source task management template",
+		template: "%s | Mimir",
 	},
 	description:
 		"An open-source, AI-assisted task management app you can fork and self-host. Next.js, Hono, tRPC, Drizzle and Better Auth, by MIMRAI.",
@@ -58,14 +58,14 @@ export const metadata: Metadata = {
 		type: "website",
 		locale: "en_US",
 		url: "/",
-		title: "MIMRAI Tasks - Open-source task management template",
+		title: "Mimir - Open-source task management template",
 		description:
 			"An open-source, AI-assisted task management app you can fork and self-host.",
-		siteName: "MIMRAI Tasks",
+		siteName: "Mimir",
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "MIMRAI Tasks - Open-source task management template",
+		title: "Mimir - Open-source task management template",
 		description:
 			"An open-source, AI-assisted task management app you can fork and self-host.",
 	},

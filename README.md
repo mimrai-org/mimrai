@@ -1,10 +1,10 @@
 ![hero](github.png)
 
-<h1 align="center"><b>MIMRAI Tasks</b></h1>
+<h1 align="center"><b>Mimir</b></h1>
 
 <p align="center">An open-source, AI-assisted task management app you can fork and self-host.<br/><a href="https://tasks.mimrai.com">tasks.mimrai.com</a> · by <a href="https://mimrai.com">MIMRAI</a></p>
 
-> MIMRAI Tasks started as a product and is no longer run as a hosted service. The full codebase is published as a template: use it as a starting point for your own tool, self-host it for your team, or take the parts you need. Click **Use this template** on GitHub to start your own copy.
+> Mimir started as a product and is no longer run as a hosted service. The full codebase is published as a template: use it as a starting point for your own tool, self-host it for your team, or take the parts you need. Click **Use this template** on GitHub to start your own copy.
 
 ## Architecture
 
