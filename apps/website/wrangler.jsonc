@@ -1,0 +1,14 @@
+{
+	"$schema": "../../node_modules/wrangler/config-schema.json",
+	"name": "mimrai-tasks",
+	"account_id": "e84d2ca710c9119c485b47206a4f8ea2",
+	"compatibility_date": "2026-11-01",
+	"assets": {
+		"directory": "./out",
+		"not_found_handling": "404-page",
+		"html_handling": "auto-trailing-slash"
+	},
+	"routes": [{ "pattern": "tasks.mimrai.com", "custom_domain": true }],
+	"workers_dev": false,
+	"preview_urls": false
+}

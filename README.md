@@ -1,10 +1,10 @@
 ![hero](github.png)
 
-<h1 align="center"><b>Mimrai</b></h1>
+<h1 align="center"><b>Mimir</b></h1>
 
-Open source minimalist task management tool to track your tasks and projects with ease.
+<p align="center">An open-source, AI-assisted task management app you can fork and self-host.<br/><a href="https://tasks.mimrai.com">tasks.mimrai.com</a> · by <a href="https://mimrai.com">MIMRAI</a></p>
 
-> Mimrai is an evolving project, currently in its early stages of development. Your feedback and contributions are highly valued to help shape its future.
+> Mimir started as a product and is no longer run as a hosted service. The full codebase is published as a template: use it as a starting point for your own tool, self-host it for your team, or take the parts you need. Click **Use this template** on GitHub to start your own copy.
 
 ## Architecture
 
@@ -32,6 +32,16 @@ Open source minimalist task management tool to track your tasks and projects wit
 - Sentry (error tracking)
 - OpenPanel.dev (events and analytics)
 - OpenAI (ai features)
+
+## Landing page
+
+The landing page in `apps/website` is a static Next.js export served by a Cloudflare Worker, `mimrai-tasks`, at [tasks.mimrai.com](https://tasks.mimrai.com). Its settings live in `apps/website/wrangler.jsonc`.
+
+```sh
+cd apps/website
+bunx wrangler login   # once
+bun run deploy        # next build && wrangler deploy
+```
 
 ## Repo Activity
 

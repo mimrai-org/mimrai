@@ -1,24 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+	output: "export",
+	trailingSlash: false,
 	devIndicators: false,
 	poweredByHeader: false,
 	reactStrictMode: true,
-	typescript: {
-		ignoreBuildErrors: true,
-	},
-	transpilePackages: ["@mimir/integration", "@mimir/api", "@mimir/ui"],
+	transpilePackages: ["@mimir/ui"],
 	images: {
-		remotePatterns: [
-			{
-				protocol: "https",
-				hostname: "**",
-			},
-			{
-				protocol: "http",
-				hostname: "(localhost|127.0.0.1)",
-			},
-		],
+		unoptimized: true,
 	},
 };
 

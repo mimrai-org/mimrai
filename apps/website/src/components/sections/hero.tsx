@@ -1,13 +1,13 @@
 "use client";
 
-import { getAppUrl } from "@mimir/utils/envs";
 import { Badge } from "@ui/components/ui/badge";
 import { Button } from "@ui/components/ui/button";
-import { ArrowRight, ChevronRight, Github, Sparkles } from "lucide-react";
+import { ArrowRight, ChevronRight, Github } from "lucide-react";
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import type React from "react";
+import { REPO_URL, TEMPLATE_URL } from "@/lib/links";
 import { AbstractSphere, ParticleNetwork } from "../visuals/background-effects";
 
 export const Hero: React.FC = () => {
@@ -28,7 +28,7 @@ export const Hero: React.FC = () => {
 						className="gap-2 rounded-full border-white/10 bg-white/5 py-1 pr-3 pl-2 font-medium text-zinc-300"
 					>
 						<span className="h-2 w-2 animate-pulse rounded-full bg-indigo-500" />
-						Introducing Mimir • Your AI Companion
+						Open source • Fork it, ship it
 						<ChevronRight size={12} className="ml-1 text-zinc-500" />
 					</Badge>
 				</motion.div>
@@ -49,9 +49,9 @@ export const Hero: React.FC = () => {
 					transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
 					className="mb-10 max-w-2xl font-light text-lg text-zinc-400 leading-relaxed md:text-xl"
 				>
-					More than a project manager. Mimrai is an intelligent companion that
-					understands your team's rhythm, filters operational noise, and guides
-					you through complexity with calm and focus.
+					A complete, AI-assisted task manager you can fork and self-host.
+					Boards, projects, milestones and Mimir, an assistant that understands
+					your team's rhythm. Built by MIMRAI, now open as a template.
 				</motion.p>
 
 				<motion.div
@@ -60,12 +60,12 @@ export const Hero: React.FC = () => {
 					transition={{ duration: 0.6, ease: "easeOut", delay: 0.3 }}
 					className="flex w-full flex-col items-center gap-4 sm:w-auto sm:flex-row"
 				>
-					<Link href={`${getAppUrl()}/sign-in`}>
+					<Link href={TEMPLATE_URL} target="_blank" rel="noopener noreferrer">
 						<Button
 							size="lg"
 							className="w-full min-w-[160px] gap-2 rounded-full sm:w-auto"
 						>
-							Meet Mimir <ArrowRight size={16} />
+							Use this template <ArrowRight size={16} />
 						</Button>
 					</Link>
 
@@ -73,9 +73,7 @@ export const Hero: React.FC = () => {
 						variant="secondary"
 						size="lg"
 						className="w-full min-w-[160px] gap-2 rounded-full sm:w-auto"
-						onClick={() =>
-							window.open("https://github.com/mimrai-org/mimrai", "_blank")
-						}
+						onClick={() => window.open(REPO_URL, "_blank")}
 					>
 						<Github size={16} />
 						Star on GitHub

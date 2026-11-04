@@ -3,6 +3,7 @@ import { Button } from "@ui/components/ui/button";
 import { GithubIcon } from "lucide-react";
 import { motion } from "motion/react";
 import type React from "react";
+import { REPO_URL } from "@/lib/links";
 
 export const OpenSource: React.FC = () => {
 	return (
@@ -26,8 +27,8 @@ export const OpenSource: React.FC = () => {
 						transition={{ delay: 0.1 }}
 						className="mb-6 font-light text-3xl text-white md:text-4xl"
 					>
-						Shape the future of <br />
-						productivity.
+						Make it yours. <br />
+						It's all open.
 					</motion.h2>
 
 					<motion.p
@@ -37,13 +38,14 @@ export const OpenSource: React.FC = () => {
 						transition={{ delay: 0.2 }}
 						className="mb-8 text-lg text-zinc-400 leading-relaxed"
 					>
-						Mimrai is early, open source, and building in public. We believe the
-						best tools are built with their users, not just for them.
+						We built this as a product, then decided to give it away. The whole
+						stack is in one repo: a Next.js dashboard, a Hono and tRPC API,
+						Drizzle on Postgres, Better Auth, Trigger.dev jobs and AI agents
+						with tools.
 						<br />
 						<br />
-						This is a big opportunity to be among the first. Your opinion
-						matters. Join us early to request features, report bugs, and
-						directly influence our roadmap.
+						Fork it as a starting point for your own tool, self-host it for your
+						team, or lift the parts you need.
 					</motion.p>
 
 					<motion.div
@@ -55,12 +57,10 @@ export const OpenSource: React.FC = () => {
 					>
 						<Button
 							variant="default"
-							onClick={() =>
-								window.open("https://github.com/mimrai-org/mimrai", "_blank")
-							}
+							onClick={() => window.open(REPO_URL, "_blank")}
 						>
 							<GithubIcon size={16} />
-							Star on GitHub
+							View on GitHub
 						</Button>
 					</motion.div>
 				</div>
@@ -97,8 +97,8 @@ export const OpenSource: React.FC = () => {
 						</p>
 						<br />
 						<p>
-							<span className="text-green-400">+</span> Your code impacts
-							thousands of teams.
+							<span className="text-green-400">+</span> Ship your own task
+							manager.
 						</p>
 					</div>
 				</motion.div>
