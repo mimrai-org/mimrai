@@ -1,5 +1,4 @@
 "use client";
-import { getAppUrl } from "@mimir/utils/envs";
 import { Badge } from "@ui/components/ui/badge";
 import { Button } from "@ui/components/ui/button";
 import {
@@ -13,6 +12,7 @@ import {
 import { motion } from "motion/react";
 import Link from "next/link";
 import type React from "react";
+import { TEMPLATE_URL } from "@/lib/links";
 import { Waveform } from "../visuals/background-effects";
 
 export const ProductSection: React.FC = () => {
@@ -54,8 +54,8 @@ export const ProductSection: React.FC = () => {
 						transition={{ duration: 0.6, delay: 0.2 }}
 						className="flex gap-4"
 					>
-						<Link href={`${getAppUrl()}/sign-in`}>
-							<Button variant="default">Get Started</Button>
+						<Link href={TEMPLATE_URL} target="_blank" rel="noopener noreferrer">
+							<Button variant="default">Use this template</Button>
 						</Link>
 					</motion.div>
 				</div>

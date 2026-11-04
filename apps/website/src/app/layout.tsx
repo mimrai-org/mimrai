@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Noto_Sans_Runic } from "next/font/google";
 import Providers from "@/components/providers";
 import "../../index.css";
-import { Provider as OpenPanelProvider } from "@mimir/events/client";
 import { Footer } from "@/components/footer";
 import { Navbar } from "@/components/navbar";
+import { SITE_URL } from "@/lib/links";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -23,15 +23,13 @@ const notoSansRunic = Noto_Sans_Runic({
 });
 
 export const metadata: Metadata = {
-	metadataBase: new URL(
-		process.env.NEXT_PUBLIC_SITE_URL || "https://mimrai.com",
-	),
+	metadataBase: new URL(SITE_URL),
 	title: {
-		default: "Mimrai - Minimalist Task Management Tool",
-		template: "%s | Mimrai",
+		default: "MIMRAI Tasks - Open-source task management template",
+		template: "%s | MIMRAI Tasks",
 	},
 	description:
-		"Open source minimalist task management tool to track your tasks and projects with ease. Built with AI-powered features.",
+		"An open-source, AI-assisted task management app you can fork and self-host. Next.js, Hono, tRPC, Drizzle and Better Auth, by MIMRAI.",
 	keywords: [
 		"task management",
 		"project management",
@@ -39,10 +37,12 @@ export const metadata: Metadata = {
 		"open source",
 		"AI assistant",
 		"minimalist",
+		"template",
+		"self-hosted",
 	],
-	authors: [{ name: "Mimrai" }],
-	creator: "Mimrai",
-	publisher: "Mimrai",
+	authors: [{ name: "MIMRAI", url: "https://mimrai.com" }],
+	creator: "MIMRAI",
+	publisher: "MIMRAI",
 	robots: {
 		index: true,
 		follow: true,
@@ -58,17 +58,16 @@ export const metadata: Metadata = {
 		type: "website",
 		locale: "en_US",
 		url: "/",
-		title: "Mimrai - Minimalist Task Management Tool",
+		title: "MIMRAI Tasks - Open-source task management template",
 		description:
-			"Open source minimalist task management tool to track your tasks and projects with ease.",
-		siteName: "Mimrai",
+			"An open-source, AI-assisted task management app you can fork and self-host.",
+		siteName: "MIMRAI Tasks",
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "Mimrai - Minimalist Task Management Tool",
+		title: "MIMRAI Tasks - Open-source task management template",
 		description:
-			"Open source minimalist task management tool to track your tasks and projects with ease.",
-		creator: "@mimrai",
+			"An open-source, AI-assisted task management app you can fork and self-host.",
 	},
 	alternates: {
 		canonical: "/",
@@ -85,7 +84,6 @@ export default function RootLayout({
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} ${notoSansRunic.variable} flex min-h-screen flex-col antialiased`}
 			>
-				<OpenPanelProvider />
 				<Providers>
 					<Navbar />
 					<main>{children}</main>

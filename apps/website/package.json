@@ -6,20 +6,15 @@
 		"clean": "rm -rf .turbo node_modules",
 		"dev": "next dev --port=3001",
 		"build": "next build",
-		"start": "next start"
+		"start": "next start",
+		"preview": "wrangler dev",
+		"deploy": "next build && wrangler deploy"
 	},
 	"dependencies": {
-		"@hookform/resolvers": "^5.2.2",
-		"@mimir/api": "workspace:*",
 		"@mimir/ui": "workspace:*",
-		"@mimir/events": "workspace:*",
 		"@mimir/locale": "workspace:*",
 		"@mimir/tsconfig": "workspace:*",
 		"@mimir/utils": "workspace:*",
-		"@tanstack/react-query": "^5.85.5",
-		"@trpc/client": "^11.5.0",
-		"@trpc/server": "^11.5.0",
-		"@trpc/tanstack-react-query": "^11.5.0",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
 		"cmdk": "^1.1.1",
@@ -29,12 +24,10 @@
 		"motion": "^12.23.22",
 		"next": "16.1.6",
 		"next-themes": "^0.4.6",
-		"nuqs": "^2.6.0",
 		"radix-ui": "^1.4.2",
 		"react": "19.2.3",
 		"react-day-picker": "^9.11.1",
 		"react-dom": "19.2.3",
-		"react-hook-form": "^7.63.0",
 		"react-markdown": "^10.1.0",
 		"react-syntax-highlighter": "^15.6.6",
 		"recharts": "2.15.4",
@@ -54,6 +47,7 @@
 		"@types/react-dom": "19.2.1",
 		"@types/react-syntax-highlighter": "^15.5.13",
 		"tailwindcss": "^4.1.10",
-		"typescript": "^5.9.2"
+		"typescript": "^5.9.2",
+		"wrangler": "^4.157.0"
 	}
 }
